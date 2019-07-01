@@ -1,6 +1,6 @@
 [package]
 name = "ncursesw"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Steve Whittle <narfit66@googlemail.com>"]
 description = "A fat wrapper around the ncurses TUI library"
 documentation = "https://github.com/narfit66/ncursesw-rs"
