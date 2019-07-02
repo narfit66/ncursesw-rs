@@ -206,6 +206,15 @@ pub fn LINES() -> i32 {
     ncurses::LINES()
 }
 
+/// The number of columns (x-axis) that a tab represents
+///
+/// # Example
+///
+/// ```
+/// let tabsize = TABSIZE();
+///
+/// assert!(tabsize > 0);
+/// ```
 pub fn TABSIZE() -> i32 {
     ncurses::TABSIZE()
 }
@@ -330,6 +339,15 @@ pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) of a specified length to the current position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+///
+/// addnstr(&string, 29)?;
+/// ```
 pub fn addnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::addnstr(c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("addnstr")),
@@ -337,6 +355,15 @@ pub fn addnstr(str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) of a specified length to the current position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+///
+/// addnwstr(&string, 29)?;
+/// ```
 pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::addnwstr(raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("addnwstr")),
@@ -344,6 +371,15 @@ pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) to the current position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+///
+/// addstr(&string)?;
+/// ```
 pub fn addstr(str: &str) -> result!(()) {
     match ncurses::addstr(c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("addstr")),
@@ -351,6 +387,15 @@ pub fn addstr(str: &str) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) to the current position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+///
+/// addwstr(&string)?;
+/// ```
 pub fn addwstr(wstr: &WideString) -> result!(()) {
     match ncurses::addwstr(raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("addwstr")),
@@ -358,6 +403,17 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Allocate an extended color pair using the passed colors (foreground and background)
+///
+/// # Example
+///
+/// ```
+/// let colors = Colors::new(Color::Red, Color::Blue);
+/// let color_pair = alloc_pair(colors)?;
+///
+/// assert!(color_pair.foreground() == Color::Red);
+/// assert!(color_pair.background() == Color::Blue);
+/// ```
 pub fn alloc_pair(colors: extend::Colors) -> result!(extend::ColorPair) {
     match ncurses::alloc_pair(colors.foreground().into(), colors.background().into()) {
         ERR  => Err(ncurses_function_error!("alloc_pair")),
@@ -706,6 +762,21 @@ pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
 
 simple_ncurses_function!(filter);
 
+/// Find a previously allocated extended color pair using the passed colors (foreground and background)
+///
+/// # Example
+///
+/// ```
+/// let colors = Colors::new(Color::Red, Color::Blue);
+///
+/// match find_pair(colors) {
+///     None             => println!("no color pair found for colors {}", colors),
+///     Some(color_pair) => {
+///         assert!(color_pair.foreground() == Color::Red);
+///         assert!(color_pair.background() == Color::Blue);
+///     }
+/// }
+/// ```
 pub fn find_pair(colors: extend::Colors) -> Option<extend::ColorPair> {
     match ncurses::find_pair(colors.foreground().into(), colors.background().into()) {
         ERR  => None,
@@ -717,8 +788,21 @@ basic_ncurses_function!(flash, "flash");
 
 basic_ncurses_function!(flushinp, "flushinp");
 
-pub fn free_pair(pair: extend::ColorPair) -> result!(()) {
-    match ncurses::free_pair(extend::ColorPair::into(pair)) {
+/// Free a previously allocated extended color pair
+///
+/// Warning : This will de-allocate the color pair internally within the ncurses library
+///           but the user must make sure there color_pair goes out of scope otherwise
+///           unpredicable results will occur.
+///
+/// # Example
+/// ```
+/// let color_pair = ColorPair::new(Colors::new(Color::Red, Color::Yellow))?;
+/// free_pair(color_pair)?;
+///
+/// // warning: even tho color_pair is still in scope it now represents an un-initialised color_pair
+/// ```
+pub fn free_pair(color_pair: extend::ColorPair) -> result!(()) {
+    match ncurses::free_pair(extend::ColorPair::into(color_pair)) {
         ERR => Err(ncurses_function_error!("free_pair")),
         _   => Ok(())
     }
@@ -1070,6 +1154,13 @@ pub fn immedok(handle: WINDOW, bf: bool) {
     ncurses::immedok(handle, bf)
 }
 
+/// Return a Complex character from the current cursor position from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let cchar = in_wch()?;
+/// ```
 pub fn in_wch() -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -1079,6 +1170,13 @@ pub fn in_wch() -> result!(ComplexChar) {
     }
 }
 
+/// Return a complex string of characters starting at the current cursor position for a specified number of characters from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let chstring = in_wchnstr(10)?;
+/// ```
 pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::in_wchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -1095,6 +1193,15 @@ pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
     }
 }
 
+/// Return a Complex string of characters starting at the current cursor position from the standard screen
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let chstring = in_wchstr()?;
+/// ```
 pub fn in_wchstr() -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -1109,10 +1216,24 @@ pub fn in_wchstr() -> result!(ComplexString) {
     }
 }
 
+/// Return a Chtype character from the current cursor position from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let chchar = inch()?;
+/// ```
 pub fn inch() -> ChtypeChar {
     ChtypeChar::from(ncurses::inch())
 }
 
+/// Return a Chtype string of characters starting at the current cursor position for a specified number of characters from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let chstring = inchnstr(10)?;
+/// ```
 pub fn inchnstr(number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::inchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -1130,6 +1251,15 @@ pub fn inchnstr(number: i32) -> result!(ChtypeString) {
     }
 }
 
+/// Return a Chtype string of characters starting at the current cursor position from the standard screen
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let chstring = inchstr()?;
+/// ```
 pub fn inchstr() -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -1180,6 +1310,13 @@ pub fn initscr() -> result!(WINDOW) {
     }
 }
 
+/// Return a ascii string of characters starting at the current cursor position for a specified number of characters from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let string = innstr(10)?;
+/// ```
 pub fn innstr(number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "ncursesw::innstr() : number={} > {}", number, LINE_MAX);
 
@@ -1265,6 +1402,15 @@ pub fn insstr(str: &str) -> result!(()) {
     }
 }
 
+/// Return an ascii string of characters starting at the current cursor position from the standard screen
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let string = instr()?;
+/// ```
 pub fn instr() -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1557,6 +1703,16 @@ pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) of a specified length to the spcified position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvaddnstr(origin, &string, 29)?;
+/// ```
 pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvaddnstr(origin.y, origin.x, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("mvaddnstr")),
@@ -1564,6 +1720,16 @@ pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) of a specified length to the specified position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvaddnwstr(origin, &string, 29)?;
+/// ```
 pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvaddnwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("mvaddnwstr")),
@@ -1571,6 +1737,16 @@ pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(())
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) to the specified position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvaddstr(origin, &string)?;
+/// ```
 pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvaddstr(origin.y, origin.x, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("mvaddstr")),
@@ -1578,6 +1754,16 @@ pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) to the specified position on the standard screen
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvaddwstr(origin, &string)?;
+/// ```
 pub fn mvaddwstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvaddwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("mvaddwstr")),
@@ -1751,6 +1937,14 @@ pub fn mvhline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(())
     }
 }
 
+/// Return a Complex character from the specified cursor position from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let cchar = mvin_wch(origin)?;
+/// ```
 pub fn mvin_wch(origin: Origin) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -1760,6 +1954,14 @@ pub fn mvin_wch(origin: Origin) -> result!(ComplexChar) {
     }
 }
 
+/// Return a complex string of characters starting at the specified cursor position for a specified number of characters from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvin_wchnstr(origin, 10)?;
+/// ```
 pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::mvin_wchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -1776,6 +1978,16 @@ pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
     }
 }
 
+/// Return a Complex string of characters starting at the specified cursor position from the standard screen
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvin_wchstr(origin)?;
+/// ```
 pub fn mvin_wchstr(origin: Origin) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -1790,10 +2002,26 @@ pub fn mvin_wchstr(origin: Origin) -> result!(ComplexString) {
     }
 }
 
+/// Return a Chtype character from the specified cursor position from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chchar = mvinch(origin)?;
+/// ```
 pub fn mvinch(origin: Origin) -> ChtypeChar {
     ChtypeChar::from(ncurses::mvinch(origin.y, origin.x))
 }
 
+/// Return a Chtype string of characters starting at the specified cursor position for a specified number of characters from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvinchnstr(origin, 10)?;
+/// ```
 pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::mvinchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -1811,6 +2039,16 @@ pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
     }
 }
 
+/// Return a Chtype string of characters starting at the specified cursor position from the standard screen
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvinchstr(origin)?;
+/// ```
 pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -1826,6 +2064,14 @@ pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
     }
 }
 
+/// Return a ascii string of characters starting at the specified cursor position for a specified number of characters from the standard screen
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let string = mvinnstr(origin, 10)?;
+/// ```
 pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "ncursesw::mvinnstr() : number={} > {}", number, LINE_MAX);
 
@@ -1902,6 +2148,16 @@ pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Return an ascii string of characters starting at the specified cursor position from the standard screen
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let string = mvinstr(origin)?;
+/// ```
 pub fn mvinstr(origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2071,6 +2327,16 @@ pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> resu
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) of a specified length to the spcified position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvwaddnstr(window_handle, origin, &string, 29)?;
+/// ```
 pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvwaddnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("mvwaddnstr")),
@@ -2078,6 +2344,16 @@ pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
     }
 }
 
+/// Add a wide character string (unicode) of a specified length to the specified position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvwaddnwstr(window_handle, origin, &string, 29)?;
+/// ```
 pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvwaddnwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("mvwaddnwstr")),
@@ -2085,6 +2361,16 @@ pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i3
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) to the specified position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvwaddstr(window_handle, origin, &string)?;
+/// ```
 pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvwaddstr(handle, origin.y, origin.x, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("mvwaddstr")),
@@ -2092,6 +2378,16 @@ pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) to the specified position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+/// let origin = Origin { y: 10, x: 15 };
+///
+/// mvwaddwstr(window_handle, origin, &string)?;
+/// ```
 pub fn mvwaddwstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvwaddwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("mvwaddwstr")),
@@ -2258,6 +2554,14 @@ pub fn mvwin(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
+/// Return a Complex character from the specified cursor position from the specified window
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let cchar = mvwin_wch(window_handle, origin)?;
+/// ```
 pub fn mvwin_wch(handle: WINDOW, origin: Origin) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -2267,6 +2571,14 @@ pub fn mvwin_wch(handle: WINDOW, origin: Origin) -> result!(ComplexChar) {
     }
 }
 
+/// Return a complex string of characters starting at the specified cursor position for a specified number of characters from the specified window
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvwin_wchnstr(window_handle, origin, 10)?;
+/// ```
 pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::mvwin_wchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -2283,6 +2595,16 @@ pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Com
     }
 }
 
+/// Return a Complex string of characters starting at the specified cursor position from the specified window
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvwin_wchstr(window_handle, origin)?;
+/// ```
 pub fn mvwin_wchstr(handle: WINDOW, origin: Origin) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -2297,10 +2619,26 @@ pub fn mvwin_wchstr(handle: WINDOW, origin: Origin) -> result!(ComplexString) {
     }
 }
 
+/// Return a Chtype character from the specified cursor position from the specified window
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chchar = mvwinch(window_handle, origin)?;
+/// ```
 pub fn mvwinch(handle: WINDOW, origin: Origin) -> ChtypeChar {
     ChtypeChar::from(ncurses::mvwinch(handle, origin.y, origin.x))
 }
 
+/// Return a Chtype string of characters starting at the specified cursor position for a specified number of characters from the specified window
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvwinchnstr(window_handle, origin, 10)?;
+/// ```
 pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::mvwinchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -2318,6 +2656,16 @@ pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Chtyp
     }
 }
 
+/// Return a Chtype string of characters starting at the specified cursor position from the specified window
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let chstring = mvwinchstr(window_handle, origin)?;
+/// ```
 pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -2333,6 +2681,14 @@ pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
     }
 }
 
+/// Return a ascii string of characters starting at the specified cursor position for a specified number of characters from the specified window
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let string = mvwinnstr(window_handle, origin, 10)?;
+/// ```
 pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "ncursesw::mvwinnstr() : number={} > {}", number, LINE_MAX);
 
@@ -2409,6 +2765,16 @@ pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Return an ascii string of characters starting at the specified cursor position from the specified window
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let origin = Origin { y: 5, x: 15 };
+/// let string = mvwinstr(window_handle, origin)?;
+/// ```
 pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -3055,6 +3421,15 @@ pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) of a specified length to the current position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+///
+/// waddnstr(window_handle, &string, 29)?;
+/// ```
 pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match ncurses::waddnstr(handle, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("waddnstr")),
@@ -3062,6 +3437,15 @@ pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) of a specified length to the current position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+///
+/// waddnwstr(window_handle, &string, 29)?;
+/// ```
 pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::waddnwstr(handle, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("waddnwstr")),
@@ -3069,6 +3453,15 @@ pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) 
     }
 }
 
+/// Add a ascii string (as of ABI 6 if not before unicode strings are also supported) to the current position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let string = "testing, testing... 1..2..3..";
+///
+/// waddstr(window_handle, origin, &string)?;
+/// ```
 pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     match ncurses::waddstr(handle, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("waddstr")),
@@ -3076,6 +3469,15 @@ pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     }
 }
 
+/// Add a wide character string (unicode) to the current position on the specified window
+///
+/// # Example
+///
+/// ```
+/// let wide_string = WideString::from_str("testing, testing... 1..2..3..");
+///
+/// waddwstr(window_handle, &string)?;
+/// ```
 pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match ncurses::waddwstr(handle, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("waddwstr")),
@@ -3417,6 +3819,13 @@ pub fn whline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) 
     }
 }
 
+/// Return a Complex character from the current cursor position from the specified window
+///
+/// # Example
+///
+/// ```
+/// let cchar = win_wch(window_handle)?;
+/// ```
 pub fn win_wch(handle: WINDOW) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -3426,6 +3835,13 @@ pub fn win_wch(handle: WINDOW) -> result!(ComplexChar) {
     }
 }
 
+/// Return a complex string of characters starting at the current cursor position for a specified number of characters from the specified window
+///
+/// # Example
+///
+/// ```
+/// let chstring = win_wchnstr(window_handle, 10)?;
+/// ```
 pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::win_wchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -3442,6 +3858,15 @@ pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
     }
 }
 
+/// Return a Complex string of characters starting at the current cursor position from the specified window
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let chstring = win_wchstr(window_handle)?;
+/// ```
 pub fn win_wchstr(handle: WINDOW) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -3456,10 +3881,24 @@ pub fn win_wchstr(handle: WINDOW) -> result!(ComplexString) {
     }
 }
 
+/// Return a Chtype character from the current cursor position from the specified window
+///
+/// # Example
+///
+/// ```
+/// let chchar = mvwinch(window_handle)?;
+/// ```
 pub fn winch(handle: WINDOW) -> ChtypeChar {
     ChtypeChar::from(ncurses::winch(handle))
 }
 
+/// Return a Chtype string of characters starting at the current cursor position for a specified number of characters from the specified window
+///
+/// # Example
+///
+/// ```
+/// let chstring = winchnstr(window_handle, 10)?;
+/// ```
 pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "ncursesw::winchnstr() : number={} > {}", number, LINE_MAX);
 
@@ -3477,6 +3916,15 @@ pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
     }
 }
 
+/// Return a Chtype string of characters starting at the current cursor position from the specified window
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let chstring = winchstr(window_handle)?;
+/// ```
 pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -3492,6 +3940,13 @@ pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
     }
 }
 
+/// Return a ascii string of characters starting at the current cursor position for a specified number of characters from the specified window
+///
+/// # Example
+///
+/// ```
+/// let string = winnstr(window_handle, 10)?;
+/// ```
 pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "ncursesw::winnstr() : number={} > {}", number, LINE_MAX);
 
@@ -3577,6 +4032,15 @@ pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
     }
 }
 
+/// Return an ascii string of characters starting at the current cursor position from the specified window
+///
+/// Warning : This function is inherently unsafe, the ncurses library may overwrite the maximum buffer size which will cause undefined behaviour
+///
+/// # Example
+///
+/// ```
+/// let string = winstr(window_handle)?;
+/// ```
 pub fn winstr(handle: WINDOW) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
