@@ -834,6 +834,7 @@ pub fn get_wch() -> result!(WideCharResult) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use getn_wstr() instead")]
 pub fn get_wstr() -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -1071,6 +1072,7 @@ pub fn getparyx(handle: WINDOW) -> result!(Origin) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use getnstr() instead")]
 pub fn getstr() -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1202,6 +1204,7 @@ pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
 /// ```
 /// let chstring = in_wchstr()?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use in_wchnstr() instead")]
 pub fn in_wchstr() -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -1260,6 +1263,7 @@ pub fn inchnstr(number: i32) -> result!(ChtypeString) {
 /// ```
 /// let chstring = inchstr()?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use inchnstr() instead")]
 pub fn inchstr() -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -1411,6 +1415,7 @@ pub fn insstr(str: &str) -> result!(()) {
 /// ```
 /// let string = instr()?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use innstr() instead")]
 pub fn instr() -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1433,6 +1438,7 @@ pub fn intrflush(handle: WINDOW, bf: bool) -> result!(()) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use innwstr() instead")]
 pub fn inwstr() -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -1819,6 +1825,7 @@ pub fn mvget_wch(origin: Origin) -> result!(WideCharResult) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvgetn_wstr() instead")]
 pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -1906,6 +1913,7 @@ pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvgetnstr() instead")]
 pub fn mvgetstr(origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1988,6 +1996,7 @@ pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
 /// let origin = Origin { y: 5, x: 15 };
 /// let chstring = mvin_wchstr(origin)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvin_wchnstr() instead")]
 pub fn mvin_wchstr(origin: Origin) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -2049,6 +2058,7 @@ pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
 /// let origin = Origin { y: 5, x: 15 };
 /// let chstring = mvinchstr(origin)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvinchnstr() instead")]
 pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -2158,6 +2168,7 @@ pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
 /// let origin = Origin { y: 5, x: 15 };
 /// let string = mvinstr(origin)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvinnstr() instead")]
 pub fn mvinstr(origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2173,6 +2184,7 @@ pub fn mvinstr(origin: Origin) -> result!(String) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvinnwstr() instead")]
 pub fn mvinwstr(origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -2429,6 +2441,7 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(WideCharResult) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwgetn_wstr() instead")]
 pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -2516,6 +2529,7 @@ pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwgetnstr() instead")]
 pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2605,6 +2619,7 @@ pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Com
 /// let origin = Origin { y: 5, x: 15 };
 /// let chstring = mvwin_wchstr(window_handle, origin)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwin_wchnstr() instead")]
 pub fn mvwin_wchstr(handle: WINDOW, origin: Origin) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -2666,6 +2681,7 @@ pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Chtyp
 /// let origin = Origin { y: 5, x: 15 };
 /// let chstring = mvwinchstr(window_handle, origin)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwinchnstr() instead")]
 pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -2775,6 +2791,7 @@ pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
 /// let origin = Origin { y: 5, x: 15 };
 /// let string = mvwinstr(window_handle, origin)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwinnstr() instead")]
 pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2790,6 +2807,7 @@ pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwinnwstr() instead")]
 pub fn mvwinwstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -3672,6 +3690,7 @@ pub fn wget_wch(handle: WINDOW) -> result!(WideCharResult) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use wgetn_wstr() instead")]
 pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -3788,6 +3807,7 @@ pub fn wgetscrreg(handle: WINDOW) -> result!(Region) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use wgetnstr() instead")]
 pub fn wgetstr(handle: WINDOW) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -3867,6 +3887,7 @@ pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
 /// ```
 /// let chstring = win_wchstr(window_handle)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use win_wchnstr() instead")]
 pub fn win_wchstr(handle: WINDOW) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -3925,6 +3946,7 @@ pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
 /// ```
 /// let chstring = winchstr(window_handle)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use winchnstr() instead")]
 pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -4041,6 +4063,7 @@ pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
 /// ```
 /// let string = winstr(window_handle)?;
 /// ```
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use winnstr() instead")]
 pub fn winstr(handle: WINDOW) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -4056,6 +4079,7 @@ pub fn winstr(handle: WINDOW) -> result!(String) {
     }
 }
 
+#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use winnwstr() instead")]
 pub fn winwstr(handle: WINDOW) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
