@@ -39,6 +39,12 @@ cargo build
 
 ## How to Use
 
+```
+extern crate ncursesw;
+
+use ncursesw::*;
+```
+
 This library follows the basic principles that are used when using ncurses with `C`, it supports the standard ascii function (the add function seem to support unicode characters out of the box in ABI 6 if not earlier), ascii characters with attributes and/or color (chtype), wide characters (wchar_t/wint_t) and complex characters with attributes and color (cchar_t).
 
 All features are supported as of ncurses ABI 6.1 including extended color pairs, soft labels and ripoff lines, i would suggest examining ncurses maintainer Thomas E. Dickey online documentation (https://invisible-island.net/ncurses/man/ncurses.3x.html) and read the excelent reference book `Dan Gookin's Guide to Ncurses Programming` to gain an understanding in how to use this library.
