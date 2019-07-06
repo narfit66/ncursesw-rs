@@ -220,13 +220,6 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
     }
 }
 
-pub fn alloc_pair(colors: extend::Colors) -> result!(extend::ColorPair) {
-    match ncurses::alloc_pair(colors.foreground().into(), colors.background().into()) {
-        ERR  => Err(ncurses_function_error!("alloc_pair")),
-        pair => Ok(extend::ColorPair::from(pair))
-    }
-}
-
 pub fn assume_default_colors<S, C, T>(colors: S) -> result!(()) where S: ColorsType<C, T>, C: ColorType<T>, T: ColorAttributeTypes {
     match ncurses::assume_default_colors(colors.foreground().number(), colors.background().number()) {
         ERR => Err(ncurses_function_error!("assume_default_colors")),
@@ -568,19 +561,13 @@ pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
 
 simple_ncurses_function!(filter);
 
-pub fn find_pair(colors: extend::Colors) -> Option<extend::ColorPair> {
-    match ncurses::find_pair(colors.foreground().into(), colors.background().into()) {
-        ERR  => None,
-        pair => Some(extend::ColorPair::from(pair))
-    }
-}
-
 basic_ncurses_function!(flash, "flash");
 
 basic_ncurses_function!(flushinp, "flushinp");
 
-pub fn free_pair(color_pair: extend::ColorPair) -> result!(()) {
-    match ncurses::free_pair(extend::ColorPair::into(color_pair)) {
+#[deprecated(since = "0.1.3", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
+pub fn free_pair<P, T>(color_pair: P) -> result!(()) where P: ColorPairType<T>, i32: From<P>, T: ColorAttributeTypes {
+    match ncurses::free_pair(color_pair.into()) {
         ERR => Err(ncurses_function_error!("free_pair")),
         _   => Ok(())
     }
@@ -598,14 +585,11 @@ pub fn get_wch() -> result!(WideCharResult) {
     match unsafe { ncurses::get_wch(wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("get_wch")),
         KEY_CODE_YES => {
-            if wch[0] == KEY_MOUSE as wint_t {
-                Err(NCurseswError::KeyMouse)
-            } else if wch[0] == KEY_RESIZE as wint_t {
-                Err(NCurseswError::KeyReSize)
-            } else if wch[0] == KEY_EVENT as wint_t {
-                Err(NCurseswError::KeyEvent)
-            } else {
-                Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+            match wch[0] as i32 {
+                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
+                KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                KEY_EVENT  => Err(NCurseswError::KeyEvent),
+                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
             }
         },
         _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
@@ -1403,14 +1387,11 @@ pub fn mvget_wch(origin: Origin) -> result!(WideCharResult) {
     match unsafe { ncurses::mvget_wch(origin.y, origin.x, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("mvget_wch")),
         KEY_CODE_YES => {
-            if wch[0] == KEY_MOUSE as wint_t {
-                Err(NCurseswError::KeyMouse)
-            } else if wch[0] == KEY_RESIZE as wint_t {
-                Err(NCurseswError::KeyReSize)
-            } else if wch[0] == KEY_EVENT as wint_t {
-                Err(NCurseswError::KeyEvent)
-            } else {
-                Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+            match wch[0] as i32 {
+                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
+                KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                KEY_EVENT  => Err(NCurseswError::KeyEvent),
+                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
             }
         },
         _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
@@ -1826,14 +1807,11 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(WideCharResult) {
     match unsafe { ncurses::mvwget_wch(handle, origin.y, origin.x, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("mvwget_wch")),
         KEY_CODE_YES => {
-            if wch[0] == KEY_MOUSE as wint_t {
-                Err(NCurseswError::KeyMouse)
-            } else if wch[0] == KEY_RESIZE as wint_t {
-                Err(NCurseswError::KeyReSize)
-            } else if wch[0] == KEY_EVENT as wint_t {
-                Err(NCurseswError::KeyEvent)
-            } else {
-                Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+            match wch[0] as i32 {
+                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
+                KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                KEY_EVENT  => Err(NCurseswError::KeyEvent),
+                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
             }
         },
         _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
@@ -2891,14 +2869,11 @@ pub fn wget_wch(handle: WINDOW) -> result!(WideCharResult) {
     match unsafe { ncurses::wget_wch(handle, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("wget_wch")),
         KEY_CODE_YES => {
-            if wch[0] == KEY_MOUSE as wint_t {
-                Err(NCurseswError::KeyMouse)
-            } else if wch[0] == KEY_RESIZE as wint_t {
-                Err(NCurseswError::KeyReSize)
-            } else if wch[0] == KEY_EVENT as wint_t {
-                Err(NCurseswError::KeyEvent)
-            } else {
-                Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+            match wch[0] as i32 {
+                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
+                KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                KEY_EVENT  => Err(NCurseswError::KeyEvent),
+                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
             }
         },
         _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))

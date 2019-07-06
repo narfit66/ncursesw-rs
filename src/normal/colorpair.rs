@@ -31,6 +31,8 @@ use ncurseswerror::NCurseswError;
 use shims::ncurses::{attr_t, short_t};
 use crate::{COLOR_PAIR, PAIR_NUMBER, init_pair, pair_content};
 
+include!("../include/colorpair.rs");
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ColorPair {
     raw: short_t
@@ -47,12 +49,6 @@ impl ColorPair {
 
     pub(crate) fn as_attr_t(&self) -> attr_t {
         COLOR_PAIR(*self)
-    }
-}
-
-impl Default for ColorPair {
-    fn default() -> Self {
-        Self { raw: 0 }
     }
 }
 
@@ -88,8 +84,8 @@ impl BitOr<Attribute> for ColorPair {
 }
 
 impl From<short_t> for ColorPair {
-    fn from(pair: short_t) -> Self {
-        Self { raw: pair }
+    fn from(raw: short_t) -> Self {
+        Self { raw }
     }
 }
 
@@ -106,8 +102,8 @@ impl From<Attributes> for ColorPair {
 }
 
 impl From<i32> for ColorPair {
-    fn from(pair_number: i32) -> Self {
-        Self { raw: pair_number as short_t }
+    fn from(raw: i32) -> Self {
+        Self { raw: raw as short_t }
     }
 }
 

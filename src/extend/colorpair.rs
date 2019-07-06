@@ -29,6 +29,8 @@ use gen::{ColorPairType, ColorPairGeneric};
 use ncurseswerror::NCurseswError;
 use crate::{init_extended_pair, extended_pair_content};
 
+include!("../include/colorpair.rs");
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ColorPair {
     raw: i32
@@ -41,12 +43,6 @@ impl ColorPair {
 
     pub fn colors(&self) -> result!(Colors) {
         extended_pair_content(*self)
-    }
-}
-
-impl Default for ColorPair {
-    fn default() -> Self {
-        Self { raw: 0 }
     }
 }
 
@@ -73,8 +69,8 @@ impl ColorPairGeneric<i32> for ColorPair {
 }
 
 impl From<i32> for ColorPair {
-    fn from(pair: i32) -> Self {
-        ColorPair { raw: pair }
+    fn from(raw: i32) -> Self {
+        Self { raw }
     }
 }
 
