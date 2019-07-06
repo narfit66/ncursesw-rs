@@ -1071,8 +1071,8 @@ pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
     }
 }
 
-pub fn ins_wch(wch: &ComplexString) -> result!(()) {
-    match ncurses::ins_wch(raw_with_nul_as_slice!(wch)) {
+pub fn ins_wch(wch: ComplexChar) -> result!(()) {
+    match ncurses::ins_wch(&ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("ins_wch")),
         _   => Ok(())
     }
@@ -1636,8 +1636,8 @@ pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()
     }
 }
 
-pub fn mvins_wch(origin: Origin, wch: &ComplexString) -> result!(()) {
-    match ncurses::mvins_wch(origin.y, origin.x, raw_with_nul_as_slice!(wch)) {
+pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
+    match ncurses::mvins_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("mvins_wch")),
         _   => Ok(())
     }
@@ -2063,8 +2063,8 @@ pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i
     }
 }
 
-pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: &ComplexString) -> result!(()) {
-    match ncurses::mvwins_wch(handle, origin.y, origin.x, raw_with_nul_as_slice!(wch)) {
+pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
+    match ncurses::mvwins_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("mvwins_wch")),
         _   => Ok(())
     }
@@ -3147,8 +3147,8 @@ pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(())
     }
 }
 
-pub fn wins_wch(handle: WINDOW, wch: &ComplexString) -> result!(()) {
-    match ncurses::wins_wch(handle, raw_with_nul_as_slice!(wch)) {
+pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
+    match ncurses::wins_wch(handle, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("wins_wch")),
         _   => Ok(())
     }
