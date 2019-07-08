@@ -66,20 +66,7 @@ macro_rules! ncurses_function_error { ($func: expr) => { NCurseswError::NCursesF
 
 macro_rules! panels_function_error { ($func: expr) => { NCurseswError::PanelFunction { func: String::from($func) } } }
 
-macro_rules! basic_panels_function {
-    ($f: ident, $n: expr) => {
-        pub fn $f(handle: PANEL) -> result!(()) {
-            match npanels::$f(handle) {
-                ERR => Err(panels_function_error!($n)),
-                _   => Ok(())
-            }
-        }
-    }
-}
-
 macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type = bindings::$name as $type; } }
-
-macro_rules! wrap_extern { ($name: ident : $type: ty) => { pub fn $name() -> $type { unsafe { wrapped::$name } } } }
 
 macro_rules! c_str_with_nul { ($name: ident) => { unsafe { &*($name.to_c_str().as_bytes_with_nul() as *const [u8] as *const [i8]) } } }
 

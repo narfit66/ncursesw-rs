@@ -24,7 +24,6 @@
 #![allow(non_snake_case)]
 #![warn(missing_debug_implementations)]
 
-use libc::c_int;
 use std::{char, ptr};
 
 use cstring::*;
@@ -62,11 +61,30 @@ mod wrapped {
     }
 }
 
-wrap_extern!(curscr: WINDOW);
-wrap_extern!(newscr: WINDOW);
-wrap_extern!(stdscr: WINDOW);
+pub fn curscr() -> WINDOW {
+    unsafe {
+        wrapped::curscr
+    }
+}
+
+pub fn newscr() -> WINDOW {
+    unsafe {
+        wrapped::newscr
+    }
+}
+
+pub fn stdscr() -> WINDOW {
+    unsafe {
+        wrapped::stdscr
+    }
+}
+
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-wrap_extern!(COLORS: c_int);
+pub fn COLORS() -> i32 {
+    unsafe {
+        wrapped::COLORS
+    }
+}
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn COLOR_PAIR(n: i32) -> i32 {
@@ -83,15 +101,39 @@ pub fn PAIR_NUMBER(attr: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-wrap_extern!(COLOR_PAIRS: c_int);
+pub fn COLOR_PAIRS() -> i32 {
+    unsafe {
+        wrapped::COLOR_PAIRS
+    }
+}
+
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-wrap_extern!(COLS: c_int);
+pub fn COLS() -> i32 {
+    unsafe {
+        wrapped::COLS
+    }
+}
+
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-wrap_extern!(ESCDELAY: c_int);
+pub fn ESCDELAY() -> i32 {
+    unsafe {
+        wrapped::ESCDELAY
+    }
+}
+
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-wrap_extern!(LINES: c_int);
+pub fn LINES() -> i32 {
+    unsafe {
+        wrapped::LINES
+    }
+}
+
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-wrap_extern!(TABSIZE: c_int);
+pub fn TABSIZE() -> i32 {
+    unsafe {
+        wrapped::TABSIZE
+    }
+}
 
 pub fn acs_map() -> *const chtype {
     unsafe {
@@ -509,7 +551,6 @@ pub fn erase() -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
-// TODO: fix me!!!
 pub fn erasechar() -> i8 {
     unsafe {
         bindings::erasechar()
@@ -533,11 +574,11 @@ pub unsafe fn extended_color_content(color: i32, r: *mut i32, g: *mut i32, b: *m
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-pub unsafe fn extended_pair_content(pair: i32, f: *mut i32, b: *mut i32) -> i32 {
-    assert!(!f.is_null(), "ncurses::extended_pair_content() : f.is_null()");
-    assert!(!b.is_null(), "ncurses::extended_pair_content() : b.is_null()");
+pub unsafe fn extended_pair_content(pair: i32, fg: *mut i32, bg: *mut i32) -> i32 {
+    assert!(!fg.is_null(), "ncurses::extended_pair_content() : fg.is_null()");
+    assert!(!bg.is_null(), "ncurses::extended_pair_content() : bg.is_null()");
 
-    bindings::extended_pair_content(pair, f, b)
+    bindings::extended_pair_content(pair, fg, bg)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
@@ -1966,11 +2007,11 @@ pub fn overwrite(srcwin: WINDOW, dstwin: WINDOW) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
-pub unsafe fn pair_content(pair: short_t, f: *mut short_t, b: *mut short_t) -> i32 {
-    assert!(!f.is_null(), "ncurses::pair_content() : f.is_null()");
-    assert!(!b.is_null(), "ncurses::pair_content() : b.is_null()");
+pub unsafe fn pair_content(pair: short_t, fg: *mut short_t, bg: *mut short_t) -> i32 {
+    assert!(!fg.is_null(), "ncurses::pair_content() : fg.is_null()");
+    assert!(!bg.is_null(), "ncurses::pair_content() : bg.is_null()");
 
-    bindings::pair_content(pair, f, b)
+    bindings::pair_content(pair, fg, bg)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>

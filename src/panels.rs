@@ -40,21 +40,45 @@ pub fn new_panel(window_handle: WINDOW) -> result!(PANEL) {
 } 
 
 /// puts panel at the bottom of all panels.
-basic_panels_function!(bottom_panel, "bottom_panel");
+pub fn bottom_panel(handle: PANEL) -> result!(()) {
+    match npanels::bottom_panel(handle) {
+        ERR => Err(panels_function_error!("bottom_panel")),
+        _   => Ok(())
+    }
+}
 
 /// puts the given visible panel on top of all panels in the stack.
-basic_panels_function!(top_panel, "top_panel");
+pub fn top_panel(handle: PANEL) -> result!(()) {
+    match npanels::top_panel(handle) {
+        ERR => Err(panels_function_error!("top_panel")),
+        _   => Ok(())
+    }
+}
 
 /// makes a hidden panel visible by placing it on top of the panels in the panel stack.
-basic_panels_function!(show_panel, "show_panel");
+pub fn show_panel(handle: PANEL) -> result!(()) {
+    match npanels::show_panel(handle) {
+        ERR => Err(panels_function_error!("show_panel")),
+        _   => Ok(())
+    }
+}
 
-/// refreshes the virtual screen to reflect the relations between the panels in the stack, but does not call doupdate() to refresh the physical screen. Use this function and not wrefresh() or wnoutrefresh(). update_panels() may be called more than once before a call to doupdate(), but doupdate() is the function responsible for updating the physical screen.
+/// refreshes the virtual screen to reflect the relations between the panels in the stack.
+///
+/// Does not call doupdate() to refresh the physical screen. Use this function and not wrefresh() or wnoutrefresh().
+/// update_panels() may be called more than once before a call to doupdate(), but doupdate() is the function
+/// responsible for updating the physical screen.
 pub fn update_panels() {
     npanels::update_panels();
 } 
 
 /// removes the given panel from the panel stack and thus hides it from view. The PANEL structure is not lost, merely removed from the stack.
-basic_panels_function!(hide_panel, "hide_panel");
+pub fn hide_panel(handle: PANEL) -> result!(()) {
+    match npanels::hide_panel(handle) {
+        ERR => Err(panels_function_error!("hide_panel")),
+        _   => Ok(())
+    }
+}
 
 /// returns a pointer to the window of the given panel.
 pub fn panel_window(handle: PANEL) -> result!(WINDOW) {
@@ -118,4 +142,9 @@ pub fn panel_userptr(handle: PANEL) -> Option<PANEL_USERPTR> {
 }
 
 /// removes the given panel from the stack and deallocates the PANEL structure (but not its associated window).
-basic_panels_function!(del_panel, "del_panel");
+pub fn del_panel(handle: PANEL) -> result!(()) {
+    match npanels::del_panel(handle) {
+        ERR => Err(panels_function_error!("del_panel")),
+        _   => Ok(())
+    }
+}
