@@ -23,7 +23,7 @@
 use keybinding::KeyBinding;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum CharacterResult {
+pub enum CharacterResult<T> {
     Key(KeyBinding),
-    Character(char)
+    Character(T)
 }

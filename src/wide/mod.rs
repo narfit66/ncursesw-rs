@@ -21,11 +21,9 @@
 */
 
 mod charandattributes;
-mod charresult;
 mod char;
 mod string;
 
 pub use wide::charandattributes::*;
-pub use wide::charresult::*;
 pub use wide::char::*;
 pub use wide::string::*;

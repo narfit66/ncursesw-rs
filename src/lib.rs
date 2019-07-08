@@ -580,7 +580,7 @@ pub fn get_escdelay() -> result!(time::Duration) {
     Ok(delay)
 }
 
-pub fn get_wch() -> result!(WideCharResult) {
+pub fn get_wch() -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::get_wch(wch.as_mut_ptr()) } {
@@ -590,10 +590,10 @@ pub fn get_wch() -> result!(WideCharResult) {
                 KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
+        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
     }
 }
 
@@ -698,7 +698,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
     }
 }
 
-pub fn getch() -> result!(CharacterResult) {
+pub fn getch() -> result!(CharacterResult<char>) {
     match ncurses::getch() {
         ERR        => Err(ncurses_function_error!("getch")),
         KEY_MOUSE  => Err(NCurseswError::KeyMouse),
@@ -1382,7 +1382,7 @@ pub fn mvderwin(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
-pub fn mvget_wch(origin: Origin) -> result!(WideCharResult) {
+pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::mvget_wch(origin.y, origin.x, wch.as_mut_ptr()) } {
@@ -1392,10 +1392,10 @@ pub fn mvget_wch(origin: Origin) -> result!(WideCharResult) {
                 KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
+        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
     }
 }
 
@@ -1425,7 +1425,7 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
     }
 }
 
-pub fn mvgetch(origin: Origin) -> result!(CharacterResult) {
+pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvgetch(origin.y, origin.x) {
         ERR        => Err(ncurses_function_error!("mvgetch")),
         KEY_MOUSE  => Err(NCurseswError::KeyMouse),
@@ -1802,7 +1802,7 @@ pub fn mvwdelch(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
-pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(WideCharResult) {
+pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::mvwget_wch(handle, origin.y, origin.x, wch.as_mut_ptr()) } {
@@ -1812,10 +1812,10 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(WideCharResult) {
                 KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
+        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
     }
 }
 
@@ -1845,7 +1845,7 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     }
 }
 
-pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult) {
+pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvwgetch(handle, origin.y, origin.x) {
         ERR        => Err(ncurses_function_error!("mvwgetch")),
         KEY_MOUSE  => Err(NCurseswError::KeyMouse),
@@ -2864,7 +2864,7 @@ pub fn wechochar(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
 
 basic_ncurses_function_with_window!(werase, "werase");
 
-pub fn wget_wch(handle: WINDOW) -> result!(WideCharResult) {
+pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::wget_wch(handle, wch.as_mut_ptr()) } {
@@ -2874,10 +2874,10 @@ pub fn wget_wch(handle: WINDOW) -> result!(WideCharResult) {
                 KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(WideCharResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(WideCharResult::Character(WideChar::from(wch[0])))
+        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
     }
 }
 
@@ -2916,7 +2916,7 @@ pub fn wgetbkgrnd(handle: WINDOW) -> result!(ComplexChar) {
     }
 }
 
-pub fn wgetch(handle: WINDOW) -> result!(CharacterResult) {
+pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
     match ncurses::wgetch(handle) {
         ERR        => Err(ncurses_function_error!("wgetch")),
         KEY_MOUSE  => Err(NCurseswError::KeyMouse),
