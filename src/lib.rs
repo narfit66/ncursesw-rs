@@ -62,6 +62,7 @@ mod origin;
 mod region;
 mod size;
 mod softlabeltype;
+mod utils;
 
 pub use attributescolorpairset::*;
 pub use characterresult::*;
@@ -77,10 +78,10 @@ pub use ncurseswerror::*;
 pub use origin::*;
 pub use orientation::*;
 pub use region::*;
-use semver::Version;
 use shims::*;
 pub use size::*;
 pub use softlabeltype::*;
+pub use utils::*;
 
 pub use chtypet::*;
 pub use complex::*;
@@ -855,7 +856,7 @@ pub fn getstr() -> result!(String) {
 pub fn getwin(path: &path::Path) -> result!(WINDOW) {
     let mode = "r";
 
-    match utils::fopen(path, mode) {
+    match shims::utils::fopen(path, mode) {
         None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
         Some(fp) => match ncurses::getwin(fp) {
             None      => Err(ncurses_function_error!("getwin")),
@@ -2258,7 +2259,7 @@ pub fn putp(_str: &str) -> i32 {
 pub fn putwin(handle: WINDOW, path: &path::Path) -> result!(()) {
     let mode = "w";
 
-    match utils::fopen(path, mode) {
+    match shims::utils::fopen(path, mode) {
         None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
         Some(fp) => {
             if ncurses::putwin(handle, fp) == ERR {
@@ -3315,22 +3316,4 @@ pub fn wvline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) 
         ERR => Err(ncurses_function_error!("wvline_set")),
         _   => Ok(())
     }
-}
-
-//
-// sundry non-ncurses routines.
-//
-
-pub fn ncurses_version() -> Version {
-    Version {
-        major: u64::from(bindings::NCURSES_VERSION_MAJOR),
-        minor: u64::from(bindings::NCURSES_VERSION_MINOR),
-        patch: u64::from(bindings::NCURSES_VERSION_PATCH),
-        pre:   vec!(),
-        build: vec!()
-    }
-}
-
-pub fn setlocale(lc: LcCategory, locale: &str) -> String {
-    utils::setlocale(LcCategory::into(lc), locale)
 }
