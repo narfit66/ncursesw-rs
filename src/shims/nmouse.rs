@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use std::ptr;
-
 use bindings;
 use ncurses;
 
@@ -60,12 +58,8 @@ pub fn mouseinterval(erval: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub unsafe fn mousemask(newmask: mmask_t, oldmask: *mut mmask_t) -> mmask_t {
-    bindings::mousemask(newmask, if oldmask.is_null() {
-        ptr::null_mut()
-    } else {
-        oldmask
-    })
+pub unsafe fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmask_t {
+    bindings::mousemask(newmask, return_mut_ptr!(oldmask))
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
