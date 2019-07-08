@@ -254,7 +254,7 @@ const MASK_SHIFT: i32     = 7 - NCURSES_MOUSE_VERSION;
 const MODIFIER_SHIFT: i32 = 4 + NCURSES_MOUSE_VERSION;
 
 /* Mouse Support */
-macro_rules! ncurses_mouse_mask( ($b:expr, $m:expr) => ($m << (($b - 1) * MASK_SHIFT)); );
+macro_rules! ncurses_mouse_mask( ($b: expr, $m: expr) => ($m << (($b - 1) * MASK_SHIFT)); );
 
 wrap_const!(NCURSES_BUTTON_RELEASED: i32);
 wrap_const!(NCURSES_BUTTON_PRESSED: i32);

@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+use std::ptr;
+
 use bindings;
 use ncurses;
 
@@ -29,12 +31,10 @@ pub type mmask_t = bindings::mmask_t;
 pub type MEVENT = *mut bindings::MEVENT;
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub fn getmouse(event: MEVENT) -> i32 {
+pub unsafe fn getmouse(event: MEVENT) -> i32 {
     assert!(!event.is_null(), "nmouse::getmouse() : event.is_null()");
 
-    unsafe {
-        bindings::getmouse(event)
-    }
+    bindings::getmouse(event)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
@@ -45,10 +45,11 @@ pub fn has_mouse() -> bool {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub fn mouse_trafo(py: &mut[i32], px: &mut[i32], to_screen: bool) -> bool {
-    unsafe {
-        bindings::mouse_trafo(py.as_mut_ptr(), px.as_mut_ptr(), to_screen)
-    }
+pub unsafe fn mouse_trafo(py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
+    assert!(!py.is_null(), "nmouse::mouse_trafo : py.is_null()");
+    assert!(!px.is_null(), "nmouse::mouse_trafo : px.is_null()");
+
+    bindings::mouse_trafo(py, px, to_screen)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
@@ -59,38 +60,33 @@ pub fn mouseinterval(erval: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub fn mousemask(newmask: mmask_t, oldmask: Option<&mut mmask_t>) -> mmask_t {
-    unsafe {
-        bindings::mousemask(newmask, match oldmask {
-            None       => std::ptr::null_mut(),
-            Some(mask) => mask
-        })
-    }
+pub unsafe fn mousemask(newmask: mmask_t, oldmask: *mut mmask_t) -> mmask_t {
+    bindings::mousemask(newmask, if oldmask.is_null() {
+        ptr::null_mut()
+    } else {
+        oldmask
+    })
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub fn ungetmouse(event: MEVENT) -> i32 {
+pub unsafe fn ungetmouse(event: MEVENT) -> i32 {
     assert!(!event.is_null(), "nmouse::ungetmouse() : event.is_null()");
 
-    unsafe {
-        bindings::ungetmouse(event)
-    }
+    bindings::ungetmouse(event)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub fn wenclose(win: WINDOW, y: i32, x: i32) -> bool {
+pub unsafe fn wenclose(win: WINDOW, y: i32, x: i32) -> bool {
     assert!(!win.is_null(), "nmouse::wenclose() : win.is_null()");
 
-    unsafe {
-        bindings::wenclose(win, y as libc::c_int, x as libc::c_int)
-    }
+    bindings::wenclose(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
-pub fn wmouse_trafo(win: WINDOW, py: &mut[i32], px: &mut[i32], to_screen: bool) -> bool {
+pub unsafe fn wmouse_trafo(win: WINDOW, py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
     assert!(!win.is_null(), "nmouse::wmouse_trafo() : win.is_null()");
+    assert!(!py.is_null(), "nmouse::wmouse_trafo : py.is_null()");
+    assert!(!px.is_null(), "nmouse::wmouse_trafo : px.is_null()");
 
-    unsafe {
-        bindings::wmouse_trafo(win, py.as_mut_ptr(), px.as_mut_ptr(), to_screen)
-    }
+    bindings::wmouse_trafo(win, py, px, to_screen)
 }
