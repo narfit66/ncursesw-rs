@@ -1,0 +1,14 @@
+language: rust
+rust:
+    - stable
+    - beta
+    - nightly
+matrix:
+    allow_failures:
+        - rust: nightly
+    fast_finish: true
+install:
+    ./ncurses-install
+    ./ncurses-compile
+script:
+    - cargo build --verbose
