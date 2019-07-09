@@ -8,7 +8,6 @@ matrix:
         - rust: nightly
     fast_finish: true
 install:
-    ./ncurses-install
-    ./ncurses-compile
+    ./ncurses-install-compile
 script:
     - cargo build --verbose

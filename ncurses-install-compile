@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#    ncurses-install
+#    ncurses-install-compile
 #
 #    Copyright (c) 2019 Stephen Whittle  All rights reserved.
 #
@@ -21,53 +21,5 @@
 #    IN THE SOFTWARE.
 #
 
-#if [[ $(id -u) -ne 0 ]] ; then
-#    printf "must be a superuser!!!\n" >&2
-#
-#    exit 1
-#fi
-
-package="ncurses"
-
-source ".$package"
-
-apt-get update
-rc=$?
-
-[[ $rc -ne 0 ]] && exit $rc
-
-apt-get -y install wget \
-                   pkg-config \
-                   build-essential
-rc=$?
-
-[[ $rc -ne 0 ]] && exit $rc
-
-if [[ ! -d "$install_dir" ]] ; then
-    mkdir --parents \
-          "$install_dir"
-    rc=$?
-
-    [[ $rc -ne 0 ]] && exit $rc
-fi
-
-cd "$install_dir"
-rc=$?
-
-[[ $rc -ne 0 ]] && exit $rc
-
-if [[ ! -f "$archive_file" ]] ; then
-    wget "ftp://ftp.invisible-island.net/$package/$archive_file"
-    rc=$?
-
-    [[ $rc -ne 0 ]] && exit $rc
-fi
-
-if [[ ! -d "$package-$archive_version" ]] ; then
-    tar -zxvf "$archive_file"
-    rc=$?
-
-    [[ $rc -ne 0 ]] && exit $rc
-fi
-
-exit $rc
+./ncurses-install
+./ncurses-compile
