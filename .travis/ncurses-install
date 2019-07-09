@@ -1,0 +1,5 @@
+#!/bin/sh
+set -ex
+wget ftp://ftp.invisible-island.net/ncurses/ncurses-6.1.tar.gz
+tar -zxvf ncurses-6.1.tar.gz
+cd ncurses-6.1 && ./configure --prefix=/usr --enable-pc-files --with-shared --enable-widec --enable-ext-colors --enable-ext-mouse --enable-ext-putwin CPPFLAGS="-P" && make && sudo make install
