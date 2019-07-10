@@ -43,15 +43,6 @@ wrap_const!(COLOR_BLUE: i16);
 wrap_const!(COLOR_MAGENTA: i16);
 wrap_const!(COLOR_CYAN: i16);
 wrap_const!(COLOR_WHITE: i16);
-/* extended Colors */
-pub const EXT_COLOR_BLACK: i32   = bindings::COLOR_BLACK as i32;
-pub const EXT_COLOR_RED: i32     = bindings::COLOR_RED as i32;
-pub const EXT_COLOR_GREEN: i32   = bindings::COLOR_GREEN as i32;
-pub const EXT_COLOR_YELLOW: i32  = bindings::COLOR_YELLOW as i32;
-pub const EXT_COLOR_BLUE: i32    = bindings::COLOR_BLUE as i32;
-pub const EXT_COLOR_MAGENTA: i32 = bindings::COLOR_MAGENTA as i32;
-pub const EXT_COLOR_CYAN: i32    = bindings::COLOR_CYAN as i32;
-pub const EXT_COLOR_WHITE: i32   = bindings::COLOR_WHITE as i32;
 
 /*
  * This value is used in the firstchar and lastchar fields to mark

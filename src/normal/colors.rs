@@ -20,7 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use gen::ColorsType;
+use crate::COLORS;
+use gen::{ColorsType, ColorType};
 use normal::Color;
 use shims::ncurses::short_t;
 

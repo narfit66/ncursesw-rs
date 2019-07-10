@@ -24,24 +24,24 @@
 
 use std::convert::{From, Into};
 
+use basecolor::BaseColor;
 use gen::ColorType;
 use ncurseswerror::NCurseswError;
 use extend::rgb::RGB;
-use shims::constants::{EXT_COLOR_BLACK, EXT_COLOR_RED, EXT_COLOR_GREEN, EXT_COLOR_YELLOW, EXT_COLOR_BLUE, EXT_COLOR_MAGENTA, EXT_COLOR_CYAN, EXT_COLOR_WHITE};
+use shims::constants::COLOR_WHITE;
 use crate::{init_extended_color, extended_color_content};
+
+const EXT_COLOR_WHITE: i32 = COLOR_WHITE as i32;
+const LIGHT_COLOR_OFFSET: i32 = EXT_COLOR_WHITE + 1;
+
+include!("../include/color.rs");
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[repr(i32)]
 pub enum Color {
-    Default,
-    Black,
-    Red,
-    Green,
-    Yellow,
-    Blue,
-    Magenta,
-    Cyan,
-    White,
+    TerminalDefault,
+    Dark(BaseColor),
+    Light(BaseColor),
     Custom(i32)
 }
 
@@ -63,17 +63,14 @@ impl ColorType<i32> for Color {
 
 impl From<i32> for Color {
     fn from(color: i32) -> Self {
-        match color {
-            -1                => Color::Default,
-            EXT_COLOR_BLACK   => Color::Black,
-            EXT_COLOR_RED     => Color::Red,
-            EXT_COLOR_GREEN   => Color::Green,
-            EXT_COLOR_YELLOW  => Color::Yellow,
-            EXT_COLOR_BLUE    => Color::Blue,
-            EXT_COLOR_MAGENTA => Color::Magenta,
-            EXT_COLOR_CYAN    => Color::Cyan,
-            EXT_COLOR_WHITE   => Color::White,
-            n                 => Color::Custom(n)
+        if color == -1 {
+            Color::TerminalDefault
+        } else if color <= EXT_COLOR_WHITE {
+            Color::Dark(BaseColor::from(color))
+        } else if color <= EXT_COLOR_WHITE + LIGHT_COLOR_OFFSET {
+            Color::Light(BaseColor::from(color - LIGHT_COLOR_OFFSET))
+        } else {
+            Color::Custom(color)
         }
     }
 }
@@ -81,16 +78,10 @@ impl From<i32> for Color {
 impl Into<i32> for Color {
     fn into(self) -> i32 {
         match self {
-            Color::Default   => -1,
-            Color::Black     => EXT_COLOR_BLACK,
-            Color::Red       => EXT_COLOR_RED,
-            Color::Green     => EXT_COLOR_GREEN,
-            Color::Yellow    => EXT_COLOR_YELLOW,
-            Color::Blue      => EXT_COLOR_BLUE,
-            Color::Magenta   => EXT_COLOR_MAGENTA,
-            Color::Cyan      => EXT_COLOR_CYAN,
-            Color::White     => EXT_COLOR_WHITE,
-            Color::Custom(n) => n
+            Color::TerminalDefault => -1,
+            Color::Dark(color)     => i32::from(color.dark()),
+            Color::Light(color)    => i32::from(color.light()),
+            Color::Custom(n)       => n
         }
     }
 }

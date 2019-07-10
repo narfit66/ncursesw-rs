@@ -24,25 +24,24 @@
 
 use std::convert::{From, Into};
 
+use basecolor::BaseColor;
 use gen::ColorType;
 use ncurseswerror::NCurseswError;
 use normal::rgb::RGB;
 use shims::ncurses::short_t;
-use shims::constants::{COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE};
+use shims::constants::COLOR_WHITE;
 use crate::{init_color, color_content};
+
+const LIGHT_COLOR_OFFSET: i16 = COLOR_WHITE + 1;
+
+include!("../include/color.rs");
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 #[repr(i16)]
 pub enum Color {
-    Default,
-    Black,
-    Red,
-    Green,
-    Yellow,
-    Blue,
-    Magenta,
-    Cyan,
-    White,
+    TerminalDefault,
+    Dark(BaseColor),
+    Light(BaseColor),
     Custom(short_t)
 }
 
@@ -66,17 +65,14 @@ impl ColorType<short_t> for Color {
 
 impl From<short_t> for Color {
     fn from(color: short_t) -> Self {
-        match color {
-            -1            => Color::Default,
-            COLOR_BLACK   => Color::Black,
-            COLOR_RED     => Color::Red,
-            COLOR_GREEN   => Color::Green,
-            COLOR_YELLOW  => Color::Yellow,
-            COLOR_BLUE    => Color::Blue,
-            COLOR_MAGENTA => Color::Magenta,
-            COLOR_CYAN    => Color::Cyan,
-            COLOR_WHITE   => Color::White,
-            n             => Color::Custom(n)
+        if color == -1 {
+            Color::TerminalDefault
+        } else if color <= COLOR_WHITE {
+            Color::Dark(BaseColor::from(color))
+        } else if color <= COLOR_WHITE + LIGHT_COLOR_OFFSET {
+            Color::Light(BaseColor::from(color - LIGHT_COLOR_OFFSET))
+        } else {
+            Color::Custom(color)
         }
     }
 }
@@ -84,16 +80,10 @@ impl From<short_t> for Color {
 impl Into<short_t> for Color {
     fn into(self) -> short_t {
         match self {
-            Color::Default   => -1,
-            Color::Black     => COLOR_BLACK,
-            Color::Red       => COLOR_RED,
-            Color::Green     => COLOR_GREEN,
-            Color::Yellow    => COLOR_YELLOW,
-            Color::Blue      => COLOR_BLUE,
-            Color::Magenta   => COLOR_MAGENTA,
-            Color::Cyan      => COLOR_CYAN,
-            Color::White     => COLOR_WHITE,
-            Color::Custom(n) => n
+            Color::TerminalDefault => -1,
+            Color::Dark(color)     => color.dark(),
+            Color::Light(color)    => color.light(),
+            Color::Custom(n)       => n
         }
     }
 }

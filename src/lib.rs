@@ -48,6 +48,7 @@ mod complex;
 mod wide;
 
 mod attributescolorpairset;
+mod basecolor;
 mod characterresult;
 mod cstring;
 mod changed;
@@ -65,6 +66,7 @@ mod softlabeltype;
 mod utils;
 
 pub use attributescolorpairset::*;
+pub use basecolor::*;
 pub use characterresult::*;
 use cstring::*;
 pub use changed::*;

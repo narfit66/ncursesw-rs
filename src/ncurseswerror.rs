@@ -33,6 +33,7 @@ custom_error::custom_error! { pub NCurseswError
     IntError { source: num::TryFromIntError } = "unable to convert",
     CharError { source: char::CharTryFromError } = "unable to convert",
     InternalError = "an internal error has occured",
+    ColorParseError { color: String } = "'{color}' not a known color",
 
     FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
 }

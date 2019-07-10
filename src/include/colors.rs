@@ -30,6 +30,9 @@ macro_rules! define_colors {
 
         impl ColorsType<Color, $type> for Colors {
             fn new(foreground: Color, background: Color) -> Self {
+                assert!(foreground.number() <= COLORS(), "Terminal supports no more than {} colors", COLORS());
+                assert!(background.number() <= COLORS(), "Terminal supports no more than {} colors", COLORS());
+
                 Self { foreground, background }
             }
 

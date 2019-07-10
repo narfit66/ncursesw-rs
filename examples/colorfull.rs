@@ -14,8 +14,8 @@ fn main_routine() -> Result<(), NCurseswError> {
     initscr()?;
     start_color()?;
 
-    let colors1 = Colors::new(Color::Red, Color::Black);
-    let colors2 = Colors::new(Color::Yellow, Color::Black);
+    let colors1 = Colors::new(Color::Light(BaseColor::Red), Color::Dark(BaseColor::Black));
+    let colors2 = Colors::new(Color::Light(BaseColor::Yellow), Color::Dark(BaseColor::Black));
 
     let color_pair0 = ColorPair::default();
     let color_pair1 = ColorPair::new(1, colors1)?;
