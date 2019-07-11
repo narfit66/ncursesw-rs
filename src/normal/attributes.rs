@@ -41,21 +41,6 @@ impl Attributes {
 ///
 /// Note: as only one color pair can be applied to attributes at any one time any previously Or'd
 /// color_pair will be Xor'd out of the attributes before Or'ing the new color pair..
-///
-/// # Example
-///
-/// ```
-/// let colors1 = Colors::new(Color::Red, Color::Black);
-///
-/// let color_pair0 = ColorPair::default();
-/// let color_pair1 = ColorPair::new(1, &colors1)?;
-///
-/// let mut attributes = Attribute::Normal;
-///
-/// assert!(attributes.color_pair() == color_pair0);
-/// attributes = attributes | color_pair1
-/// assert!(attributes.color_pair() == color_pair1);
-/// ```
 impl BitOr<ColorPair> for Attributes {
     type Output = Attributes;
 

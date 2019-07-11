@@ -65,16 +65,6 @@ impl ColorPairGeneric<short_t> for ColorPair {
 }
 
 /// Implement the | operator for combining a `ColorPair` and a `Attribute` to produce `Attributes`
-///
-/// # Example
-///
-/// ```
-/// let colors1 = Colors::new(Color::Red, Color::Black);
-/// let color_pair1 = ColorPair::new(1, colors1)?;
-/// let attributes = Attribute::Blink | color_pair1;
-/// assert!(!attributes.is_bold());
-/// assert!(attributes.is_blink());
-/// ```
 impl BitOr<Attribute> for ColorPair {
     type Output = Attributes;
 

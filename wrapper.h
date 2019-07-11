@@ -32,6 +32,7 @@
 #define MARK_FIX_753(req_name, type) const type Fix753_##req_name = req_name;
 
 MARK_FIX_753(A_NORMAL, attr_t);
+MARK_FIX_753(A_ATTRIBUTES, attr_t);
 MARK_FIX_753(A_CHARTEXT, attr_t);
 MARK_FIX_753(A_COLOR, attr_t);
 MARK_FIX_753(A_STANDOUT, attr_t);
@@ -49,3 +50,4 @@ MARK_FIX_753(A_LOW, attr_t);
 MARK_FIX_753(A_RIGHT, attr_t);
 MARK_FIX_753(A_TOP, attr_t);
 MARK_FIX_753(A_VERTICAL, attr_t);
+MARK_FIX_753(A_ITALIC, attr_t);

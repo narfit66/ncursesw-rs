@@ -29,15 +29,6 @@ use shims::ncurses::attr_t;
 include!("../include/attribute.rs");
 
 /// Implement the | operator for combining two 'Attribute's into Attributes
-///
-/// # Example
-///
-/// ```
-/// let attributes = Attribute::Blink | Attribute::Reverse;
-/// assert!(!attributes.is_bold());
-/// assert!(attributes.is_blink());
-/// assert!(attributes.is_reverse());
-/// ```
 impl BitOr for Attribute {
     type Output = Attributes;
 
@@ -47,16 +38,6 @@ impl BitOr for Attribute {
 }
 
 /// Implement the | operator for combining a `ColorPair` and an `Attribute` to produce `Attributes`
-///
-/// # Example
-///
-/// ```
-/// let colors5 = Colors::new(Color::Red, Color::Black);
-/// let attributes = ColorPair::new(5, &colors5) | Attribute::Blink;
-/// assert!(attributes.color_pair() == 5);
-/// assert!(!attributes.is_bold());
-/// assert!(attributes.is_blink());
-/// ```
 impl BitOr<ColorPair> for Attribute {
     type Output = Attributes;
 

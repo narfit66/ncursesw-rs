@@ -29,15 +29,6 @@ use shims::ncurses::attr_t;
 include!("../include/attribute.rs");
 
 /// Implement the | operator for combining two 'Attribute's into Attributes
-///
-/// # Example
-///
-/// ```
-/// let attributes = Attribute::Blink | Attribute::Reverse;
-/// assert!(!attributes.is_bold());
-/// assert!(attributes.is_blink());
-/// assert!(attributes.is_reverse());
-/// ```
 impl BitOr for Attribute {
     type Output = Attributes;
 

@@ -11,3 +11,4 @@ install:
     ./.travis/ncurses-install
 script:
     - cargo build --verbose
+    - cargo test --verbose

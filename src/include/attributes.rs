@@ -124,17 +124,6 @@ impl AttributesGeneric for Attributes {
 }
 
 /// Implement the | operator for adding Attributes to Attributes
-///
-/// # Example
-///
-/// ```
-/// let mut attributes = Attributes::default() | Attribute::Bold;
-/// let other = Attributes::default() | Attribute::Reverse;
-/// attributes = attributes | other;
-/// assert!(attributes.is_bold());
-/// assert!(attributes.is_reverse());
-/// assert!(!attributes.is_dim());
-/// ```
 impl BitOr for Attributes {
     type Output = Self;
 
@@ -144,17 +133,6 @@ impl BitOr for Attributes {
 }
 
 /// Implement the ^ operator for removing Attributes from Attributes
-///
-/// # Example
-///
-/// ```
-/// let mut attributes = Attributes::default() | Attribute::Blink | Attribute::Bold;
-/// let other = Attributes::default() | Attribute::Reverse | Attribute::Bold;
-/// attributes = attributes ^ other;
-/// assert!(!attributes.is_bold());
-/// assert!(attributes.is_reverse());
-/// assert!(attributes.is_blink());
-/// ```
 impl BitXor for Attributes {
     type Output = Self;
 
@@ -164,15 +142,6 @@ impl BitXor for Attributes {
 }
 
 /// Implement the | operator for adding an Attribute to Attributes
-///
-/// # Example
-///
-/// ```
-/// let mut attributes = Attributes::default();
-/// assert!(!attributes.is_bold());
-/// attributes = attributes | Attribute::Bold;
-/// assert!(attributes.is_bold());
-/// ```
 impl BitOr<Attribute> for Attributes {
     type Output = Self;
 
@@ -203,15 +172,6 @@ impl BitOr<Attribute> for Attributes {
 }
 
 /// Implement the ^ operator for disabling an Attribute from Attributes
-///
-/// # Example
-///
-/// ```
-/// let mut attributes = Attributes::from(Attribute::Bold);
-/// assert!(attributes.is_bold());
-/// attributes = attributes ^ Attribute::Bold;
-/// assert!(!attributes.is_bold());
-/// ```
 impl BitXor<Attribute> for Attributes {
     type Output = Self;
 
