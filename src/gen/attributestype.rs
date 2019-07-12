@@ -22,7 +22,9 @@
 
 use gen::{AttributesGeneric, ColorAttributeTypes};
 
-pub trait AttributesType<T>: AttributesGeneric where T: ColorAttributeTypes {
+pub trait AttributesType<T>: AttributesGeneric
+    where T: ColorAttributeTypes
+{
     fn is_normal(&self) -> bool;
     fn set_normal(&mut self);
 

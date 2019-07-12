@@ -21,6 +21,7 @@
 */
 
 use std::{num, char};
+use crate::{COLORS, COLOR_PAIRS};
 
 custom_error::custom_error! { pub NCurseswError
     NCursesFunction { func: String } = "ncurses::{func}()",
@@ -34,6 +35,8 @@ custom_error::custom_error! { pub NCurseswError
     CharError { source: char::CharTryFromError } = "unable to convert",
     InternalError = "an internal error has occured",
     ColorParseError { color: String } = "'{color}' not a known color",
+    ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
+    ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
 
     FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
 }

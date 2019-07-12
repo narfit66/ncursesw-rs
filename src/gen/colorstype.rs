@@ -22,7 +22,10 @@
 
 use gen::{ColorType, ColorAttributeTypes};
 
-pub trait ColorsType<C, T> where C: ColorType<T>, T: ColorAttributeTypes {
+pub trait ColorsType<C, T>
+    where C: ColorType<T>,
+          T: ColorAttributeTypes
+{
     fn new(foreground: C, background: C) -> Self;
     fn foreground(&self) -> C;
     fn background(&self) -> C;

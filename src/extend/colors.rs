@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use crate::COLORS;
-use gen::{ColorsType, ColorType};
+use gen::ColorsType;
 use extend::Color;
 
 include!("../include/colors.rs");

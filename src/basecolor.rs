@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::trivially_copy_pass_by_ref)]
+
 use std::str::FromStr;
 
 use ncurseswerror::NCurseswError;

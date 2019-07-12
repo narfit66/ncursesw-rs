@@ -24,8 +24,8 @@
 
 use std::convert::{From, Into};
 
-use extend::Colors;
-use gen::{ColorPairType, ColorPairGeneric};
+use extend::{Colors, Color};
+use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
 use ncurseswerror::NCurseswError;
 use crate::{init_extended_pair, extended_pair_content};
 
@@ -40,8 +40,10 @@ impl ColorPair {
     pub fn new(pair: i32, colors: Colors) -> result!(Self) {
         init_extended_pair(pair, colors)
     }
+}
 
-    pub fn colors(&self) -> result!(Colors) {
+impl ColorPairColors<Colors, Color, i32> for ColorPair {
+    fn colors(&self) -> result!(Colors) {
         extended_pair_content(*self)
     }
 }

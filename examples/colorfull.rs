@@ -18,6 +18,9 @@ fn main_routine() -> Result<(), NCurseswError> {
     let colors2 = Colors::new(Color::Light(BaseColor::Yellow), Color::Dark(BaseColor::Black));
 
     let color_pair0 = ColorPair::default();
+
+    assume_default_colors(color_pair0)?;
+
     let color_pair1 = ColorPair::new(1, colors1)?;
     let color_pair2 = ColorPair::new(2, colors2)?;
 

@@ -223,8 +223,13 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
     }
 }
 
-pub fn assume_default_colors<S, C, T>(colors: S) -> result!(()) where S: ColorsType<C, T>, C: ColorType<T>, T: ColorAttributeTypes {
-    match ncurses::assume_default_colors(colors.foreground().number(), colors.background().number()) {
+pub fn assume_default_colors<P, R, C, T>(color_pair: P) -> result!(())
+    where P: ColorPairColors<R, C, T>,
+          R: ColorsType<C, T>,
+          C: ColorType<T>,
+          T: ColorAttributeTypes
+{
+    match ncurses::assume_default_colors(color_pair.colors()?.foreground().number(), color_pair.colors()?.background().number()) {
         ERR => Err(ncurses_function_error!("assume_default_colors")),
         _   => Ok(())
     }
@@ -257,21 +262,31 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
     }
 }
 
-pub fn attr_off<A, T>(attrs: A) -> result!(()) where A: AttributesType<T>, T: ColorAttributeTypes {
+pub fn attr_off<A, T>(attrs: A) -> result!(())
+    where A: AttributesType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::attr_off(attrs.as_attr_t(), ptr::null_mut()) } {
         ERR => Err(ncurses_function_error!("attr_off")),
         _   => Ok(())
     }
 }
 
-pub fn attr_on<A, T>(attrs: A) -> result!(()) where A: AttributesType<T>, T: ColorAttributeTypes {
+pub fn attr_on<A, T>(attrs: A) -> result!(())
+    where A: AttributesType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::attr_on(attrs.as_attr_t(), ptr::null_mut()) } {
         ERR => Err(ncurses_function_error!("attr_on")),
         _   => Ok(())
     }
 }
 
-pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::attr_set(attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("attr_set")),
         _   => Ok(())
@@ -379,7 +394,11 @@ pub fn can_change_color() -> bool {
 
 basic_ncurses_function!(cbreak, "cbreak");
 
-pub fn chgat<A, P, T>(number: i32, attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn chgat<A, P, T>(number: i32, attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::chgat(number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
         ERR => Err(ncurses_function_error!("chgat")),
         _   => Ok(())
@@ -410,7 +429,10 @@ pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
     }
 }
 
-pub fn color_set<P, T>(color_pair: P) -> result!(()) where P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn color_set<P, T>(color_pair: P) -> result!(())
+    where P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::color_set(color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("color_set")),
         _   => Ok(())
@@ -569,7 +591,11 @@ basic_ncurses_function!(flash, "flash");
 basic_ncurses_function!(flushinp, "flushinp");
 
 #[deprecated(since = "0.1.3", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
-pub fn free_pair<P, T>(color_pair: P) -> result!(()) where P: ColorPairType<T>, i32: From<P>, T: ColorAttributeTypes {
+pub fn free_pair<P, T>(color_pair: P) -> result!(())
+    where P: ColorPairType<T>,
+          i32: From<P>,
+          T: ColorAttributeTypes
+{
     match ncurses::free_pair(color_pair.into()) {
         ERR => Err(ncurses_function_error!("free_pair")),
         _   => Ok(())
@@ -999,30 +1025,50 @@ pub fn inchstr() -> result!(ChtypeString) {
 }
 
 pub fn init_color(color: short_t, rgb: normal::RGB) -> result!(normal::Color) {
-    match ncurses::init_color(color, rgb.red(), rgb.green(), rgb.blue()) {
-        ERR => Err(ncurses_function_error!("init_color")),
-        _   => Ok(normal::Color::from(color))
+    if i32::from(color) > COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match ncurses::init_color(color, rgb.red(), rgb.green(), rgb.blue()) {
+            ERR => Err(ncurses_function_error!("init_color")),
+            _   => Ok(normal::Color::from(color))
+        }
     }
 }
 
 pub fn init_extended_color(color: i32, rgb: extend::RGB) -> result!(extend::Color) {
-    match ncurses::init_extended_color(color, rgb.red(), rgb.green(), rgb.blue()) {
-        ERR => Err(ncurses_function_error!("init_extended_color")),
-        _   => Ok(extend::Color::from(color))
+    if color > COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match ncurses::init_extended_color(color, rgb.red(), rgb.green(), rgb.blue()) {
+            ERR => Err(ncurses_function_error!("init_extended_color")),
+            _   => Ok(extend::Color::from(color))
+        }
     }
 }
 
 pub fn init_extended_pair(pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    match ncurses::init_extended_pair(pair, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
-        ERR => Err(ncurses_function_error!("init_extended_pair")),
-        _   => Ok(extend::ColorPair::from(pair))
+    if pair > COLOR_PAIRS() {
+        Err(NCurseswError::ColorPairLimit)
+    } else if colors.foreground().number() > COLORS() || colors.background().number() > COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match ncurses::init_extended_pair(pair, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
+            ERR => Err(ncurses_function_error!("init_extended_pair")),
+            _   => Ok(extend::ColorPair::from(pair))
+        }
     }
 }
 
 pub fn init_pair(pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    match ncurses::init_pair(pair, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
-        ERR => Err(ncurses_function_error!("init_pair")),
-        _   => Ok(normal::ColorPair::from(pair))
+    if i32::from(pair) > COLOR_PAIRS() {
+        Err(NCurseswError::ColorPairLimit)
+    } else if colors.foreground().number() > COLORS() || colors.background().number() > COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match ncurses::init_pair(pair, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
+            ERR => Err(ncurses_function_error!("init_pair")),
+            _   => Ok(normal::ColorPair::from(pair))
+        }
     }
 }
 
@@ -1356,7 +1402,11 @@ pub fn mvaddwstr(origin: Origin, wstr: &WideString) -> result!(()) {
     }
 }
 
-pub fn mvchgat<A, P, T>(origin: Origin, number: i32, attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn mvchgat<A, P, T>(origin: Origin, number: i32, attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::mvchgat(origin.y, origin.x, number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
         ERR => Err(ncurses_function_error!("mvchgat")),
         _   => Ok(())
@@ -1790,7 +1840,11 @@ pub fn mvwaddwstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(
     }
 }
 
-pub fn mvwchgat<A, P, T>(handle: WINDOW, origin: Origin, number: i32, attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn mvwchgat<A, P, T>(handle: WINDOW, origin: Origin, number: i32, attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::mvwchgat(handle, origin.y, origin.x, number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
         ERR => Err(ncurses_function_error!("mvwchgat")),
         _   => Ok(())
@@ -2367,7 +2421,11 @@ pub fn set_term(scr: SCREEN) -> result!(SCREEN) {
     }
 }
 
-pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(ComplexChar) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(ComplexChar)
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     let mut cchar_buf: [cchar_t; 1] = unsafe { mem::zeroed() };
     let wchar_buf: [wchar_t; 2] = [u32::from(ch) as wchar_t, 0x00];
 
@@ -2397,21 +2455,31 @@ pub fn slk_attr() -> attr_t {
     ncurses::slk_attr()
 }
 
-pub fn slk_attr_off<A, T>(attrs: A) -> result!(()) where A: AttributesType<T>, T: ColorAttributeTypes {
+pub fn slk_attr_off<A, T>(attrs: A) -> result!(())
+    where A: AttributesType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::slk_attr_off(attrs.as_attr_t(), ptr::null_mut()) } {
         ERR => Err(ncurses_function_error!("slk_attr_off")),
         _   => Ok(())
     }
 }
 
-pub fn slk_attr_on<A, T>(attrs: A) -> result!(()) where A: AttributesType<T>, T: ColorAttributeTypes {
+pub fn slk_attr_on<A, T>(attrs: A) -> result!(())
+    where A: AttributesType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::slk_attr_on(attrs.as_attr_t(), ptr::null_mut()) } {
         ERR => Err(ncurses_function_error!("slk_attr_on")),
         _   => Ok(())
     }
 }
 
-pub fn slk_attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn slk_attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::slk_attr_set(attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("slk_attr_set")),
         _   => Ok(())
@@ -2726,21 +2794,31 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
     }
 }
 
-pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(()) where A: AttributesType<T>, T: ColorAttributeTypes {
+pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
+    where A: AttributesType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::wattr_off(handle, attrs.as_attr_t(), ptr::null_mut()) } {
         ERR => Err(ncurses_function_error!("wattr_off")),
         _   => Ok(())
     }
 }
 
-pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(()) where A: AttributesType<T>, T: ColorAttributeTypes {
+pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
+    where A: AttributesType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::wattr_on(handle, attrs.as_attr_t(), ptr::null_mut()) } {
         ERR => Err(ncurses_function_error!("wattr_on")),
         _   => Ok(())
     }
 }
 
-pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::wattr_set(handle, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("wattr_set")),
         _   => Ok(())
@@ -2824,7 +2902,11 @@ pub fn wborder_set(handle: WINDOW, ls: ComplexChar, rs: ComplexChar, ts: Complex
     }
 }
 
-pub fn wchgat<A, P, T>(handle: WINDOW, number: i32, attrs: A, color_pair: P) -> result!(()) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn wchgat<A, P, T>(handle: WINDOW, number: i32, attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::wchgat(handle, number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
         ERR => Err(ncurses_function_error!("wchgat")),
         _   => Ok(())
@@ -2837,7 +2919,10 @@ basic_ncurses_function_with_window!(wclrtobot, "wclrtobot");
 
 basic_ncurses_function_with_window!(wclrtoeol, "wclrtoeol");
 
-pub fn wcolor_set<P, T>(handle: WINDOW, color_pair: P) -> result!(()) where P: ColorPairType<T>, T: ColorAttributeTypes {
+pub fn wcolor_set<P, T>(handle: WINDOW, color_pair: P) -> result!(())
+    where P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     match unsafe { ncurses::wcolor_set(handle, color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("wcolor_set")),
         _   => Ok(())

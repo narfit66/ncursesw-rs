@@ -22,6 +22,8 @@
 
 use gen::ColorAttributeTypes;
 
-pub trait ColorType<T> where T: ColorAttributeTypes {
+pub trait ColorType<T>
+    where T: ColorAttributeTypes
+{
     fn number(&self) -> i32;
 }

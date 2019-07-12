@@ -1,5 +1,5 @@
 /*
-    src/normal/colors.rs
+    src/gen/colorpaircolors.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,10 +20,13 @@
     IN THE SOFTWARE.
 */
 
-use gen::ColorsType;
-use normal::Color;
-use shims::ncurses::short_t;
+use ncurseswerror::NCurseswError;
+use gen::{ColorsType, ColorType, ColorAttributeTypes};
 
-include!("../include/colors.rs");
-
-define_colors!(short_t);
+pub trait ColorPairColors<S, C, T>
+    where S: ColorsType<C, T>,
+          C: ColorType<T>,
+          T: ColorAttributeTypes
+{
+    fn colors(&self) -> result!(S);
+}

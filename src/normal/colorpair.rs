@@ -25,8 +25,8 @@
 use std::convert::{From, Into};
 use std::ops::BitOr;
 
-use gen::{ColorPairType, ColorPairGeneric};
-use normal::{Attribute, Attributes, Colors};
+use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
+use normal::{Attribute, Attributes, Colors, Color};
 use ncurseswerror::NCurseswError;
 use shims::ncurses::{attr_t, short_t};
 use crate::{COLOR_PAIR, PAIR_NUMBER, init_pair, pair_content};
@@ -43,12 +43,14 @@ impl ColorPair {
         init_pair(pair, colors)
     }
 
-    pub fn colors(&self) -> result!(Colors) {
-        pair_content(*self)
-    }
-
     pub(crate) fn as_attr_t(&self) -> attr_t {
         COLOR_PAIR(*self)
+    }
+}
+
+impl ColorPairColors<Colors, Color, short_t> for ColorPair {
+    fn colors(&self) -> result!(Colors) {
+        pair_content(*self)
     }
 }
 

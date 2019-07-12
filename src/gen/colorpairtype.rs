@@ -22,6 +22,8 @@
 
 use gen::{ColorPairGeneric, ColorAttributeTypes};
 
-pub trait ColorPairType<T>: ColorPairGeneric<T> where T: ColorAttributeTypes {
+pub trait ColorPairType<T>: ColorPairGeneric<T>
+    where T: ColorAttributeTypes
+{
     fn number(&self) -> T;
 }

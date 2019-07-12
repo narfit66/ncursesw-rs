@@ -22,7 +22,11 @@
 
 use gen::{AttributesType, ColorPairType, ColorAttributeTypes};
 
-pub trait AttributesColorPairType<A, P, T> where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+pub trait AttributesColorPairType<A, P, T>
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
     fn new(_: A, _: P) -> Self;
     fn attributes(&self) -> A;
     fn color_pair(&self) -> P;
