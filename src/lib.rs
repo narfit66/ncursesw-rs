@@ -1025,7 +1025,7 @@ pub fn inchstr() -> result!(ChtypeString) {
 }
 
 pub fn init_color(color: short_t, rgb: normal::RGB) -> result!(normal::Color) {
-    if i32::from(color) > COLORS() {
+    if i32::from(color) >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_color(color, rgb.red(), rgb.green(), rgb.blue()) {
@@ -1036,7 +1036,7 @@ pub fn init_color(color: short_t, rgb: normal::RGB) -> result!(normal::Color) {
 }
 
 pub fn init_extended_color(color: i32, rgb: extend::RGB) -> result!(extend::Color) {
-    if color > COLORS() {
+    if color >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_extended_color(color, rgb.red(), rgb.green(), rgb.blue()) {
@@ -1047,9 +1047,9 @@ pub fn init_extended_color(color: i32, rgb: extend::RGB) -> result!(extend::Colo
 }
 
 pub fn init_extended_pair(pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if pair > COLOR_PAIRS() {
+    if pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
-    } else if colors.foreground().number() > COLORS() || colors.background().number() > COLORS() {
+    } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_extended_pair(pair, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
@@ -1060,9 +1060,9 @@ pub fn init_extended_pair(pair: i32, colors: extend::Colors) -> result!(extend::
 }
 
 pub fn init_pair(pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(pair) > COLOR_PAIRS() {
+    if i32::from(pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
-    } else if colors.foreground().number() > COLORS() || colors.background().number() > COLORS() {
+    } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_pair(pair, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
