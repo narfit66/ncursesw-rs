@@ -223,13 +223,12 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
     }
 }
 
-pub fn assume_default_colors<P, R, C, T>(color_pair: P) -> result!(())
-    where P: ColorPairColors<R, C, T>,
-          R: ColorsType<C, T>,
+pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
+    where S: ColorsType<C, T>,
           C: ColorType<T>,
           T: ColorAttributeTypes
 {
-    match ncurses::assume_default_colors(color_pair.colors()?.foreground().number(), color_pair.colors()?.background().number()) {
+    match ncurses::assume_default_colors(colors.foreground().number(), colors.background().number()) {
         ERR => Err(ncurses_function_error!("assume_default_colors")),
         _   => Ok(())
     }
@@ -342,7 +341,16 @@ pub fn bkgrndset(wch: ComplexChar) {
     ncurses::bkgrndset(&ComplexChar::into(wch))
 }
 
-pub fn border(ls: ChtypeChar, rs: ChtypeChar, ts: ChtypeChar, bs: ChtypeChar, tl: ChtypeChar, tr: ChtypeChar, bl: ChtypeChar, br: ChtypeChar) -> result!(()) {
+pub fn border(
+    ls: ChtypeChar,
+    rs: ChtypeChar,
+    ts: ChtypeChar,
+    bs: ChtypeChar,
+    tl: ChtypeChar,
+    tr: ChtypeChar,
+    bl: ChtypeChar,
+    br: ChtypeChar) -> result!(())
+{
     match ncurses::border(
         ChtypeChar::into(ls),
         ChtypeChar::into(rs),
@@ -358,7 +366,16 @@ pub fn border(ls: ChtypeChar, rs: ChtypeChar, ts: ChtypeChar, bs: ChtypeChar, tl
     }
 }
 
-pub fn border_set(ls: ComplexChar, rs: ComplexChar, ts: ComplexChar, bs: ComplexChar, tl: ComplexChar, tr: ComplexChar, bl: ComplexChar, br: ComplexChar) -> result!(()) {
+pub fn border_set(
+    ls: ComplexChar,
+    rs: ComplexChar,
+    ts: ComplexChar,
+    bs: ComplexChar,
+    tl: ComplexChar,
+    tr: ComplexChar,
+    bl: ComplexChar,
+    br: ComplexChar) -> result!(())
+{
     match ncurses::border_set(
         &ComplexChar::into(ls),
         &ComplexChar::into(rs),
@@ -439,7 +456,14 @@ pub fn color_set<P, T>(color_pair: P) -> result!(())
     }
 }
 
-pub fn copywin(src_handle: WINDOW, dst_handle: WINDOW, smin: Origin, dmin: Origin, dmax: Origin, overlay: bool) -> result!(()) {
+pub fn copywin(
+    src_handle: WINDOW,
+    dst_handle: WINDOW,
+    smin: Origin,
+    dmin: Origin,
+    dmax: Origin,
+    overlay: bool) -> result!(())
+{
     match ncurses::copywin(src_handle, dst_handle, smin.y, smin.x, dmin.y, dmin.x, dmax.y, dmax.x, if overlay {
         TRUE
     } else {
@@ -567,11 +591,11 @@ pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     }
 }
 
-pub fn extended_pair_content(pair: extend::ColorPair) -> result!(extend::Colors) {
+pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_pair_content(extend::ColorPair::into(pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+    match unsafe { ncurses::extended_pair_content(extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("extended_pair_content")),
         _   => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0])))
     }
@@ -1024,50 +1048,50 @@ pub fn inchstr() -> result!(ChtypeString) {
     }
 }
 
-pub fn init_color(color: short_t, rgb: normal::RGB) -> result!(normal::Color) {
-    if i32::from(color) >= COLORS() {
+pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
+    if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_color(color, rgb.red(), rgb.green(), rgb.blue()) {
+        match ncurses::init_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
             ERR => Err(ncurses_function_error!("init_color")),
-            _   => Ok(normal::Color::from(color))
+            _   => Ok(normal::Color::from(color_number))
         }
     }
 }
 
-pub fn init_extended_color(color: i32, rgb: extend::RGB) -> result!(extend::Color) {
-    if color >= COLORS() {
+pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
+    if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_extended_color(color, rgb.red(), rgb.green(), rgb.blue()) {
+        match ncurses::init_extended_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
             ERR => Err(ncurses_function_error!("init_extended_color")),
-            _   => Ok(extend::Color::from(color))
+            _   => Ok(extend::Color::from(color_number))
         }
     }
 }
 
-pub fn init_extended_pair(pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if pair >= COLOR_PAIRS() {
+pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
+    if pair_number >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_extended_pair(pair, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
+        match ncurses::init_extended_pair(pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
             ERR => Err(ncurses_function_error!("init_extended_pair")),
-            _   => Ok(extend::ColorPair::from(pair))
+            _   => Ok(extend::ColorPair::from(pair_number))
         }
     }
 }
 
-pub fn init_pair(pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(pair) >= COLOR_PAIRS() {
+pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
+    if i32::from(pair_number) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_pair(pair, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
+        match ncurses::init_pair(pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
             ERR => Err(ncurses_function_error!("init_pair")),
-            _   => Ok(normal::ColorPair::from(pair))
+            _   => Ok(normal::ColorPair::from(pair_number))
         }
     }
 }
@@ -2270,11 +2294,11 @@ pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     }
 }
 
-pub fn pair_content(pair: normal::ColorPair) -> result!(normal::Colors) {
+pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    match unsafe { ncurses::pair_content(normal::ColorPair::into(pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+    match unsafe { ncurses::pair_content(normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
         ERR => Err(ncurses_function_error!("pair_content")),
         _   => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0])))
     }
@@ -2868,7 +2892,17 @@ pub fn wbkgrndset(handle: WINDOW, wch: ComplexChar) {
     ncurses::wbkgrndset(handle, &ComplexChar::into(wch))
 }
 
-pub fn wborder(handle: WINDOW, ls: ChtypeChar, rs: ChtypeChar, ts: ChtypeChar, bs: ChtypeChar, tl: ChtypeChar, tr: ChtypeChar, bl: ChtypeChar, br: ChtypeChar) -> result!(()) {
+pub fn wborder(
+    handle: WINDOW,
+    ls: ChtypeChar,
+    rs: ChtypeChar,
+    ts: ChtypeChar,
+    bs: ChtypeChar,
+    tl: ChtypeChar,
+    tr: ChtypeChar,
+    bl: ChtypeChar,
+    br: ChtypeChar) -> result!(())
+{
     match ncurses::wborder(
         handle,
         ChtypeChar::into(ls),
@@ -2885,7 +2919,17 @@ pub fn wborder(handle: WINDOW, ls: ChtypeChar, rs: ChtypeChar, ts: ChtypeChar, b
     }
 }
 
-pub fn wborder_set(handle: WINDOW, ls: ComplexChar, rs: ComplexChar, ts: ComplexChar, bs: ComplexChar, tl: ComplexChar, tr: ComplexChar, bl: ComplexChar, br: ComplexChar) -> result!(()) {
+pub fn wborder_set(
+    handle: WINDOW,
+    ls: ComplexChar,
+    rs: ComplexChar,
+    ts: ComplexChar,
+    bs: ComplexChar,
+    tl: ComplexChar,
+    tr: ComplexChar,
+    bl: ComplexChar,
+    br: ComplexChar) -> result!(())
+{
     match ncurses::wborder_set(
         handle,
         &ComplexChar::into(ls),
