@@ -33,14 +33,22 @@ pub struct ComplexChar {
 }
 
 impl ComplexChar {
-    pub fn from_wide_char<A, P, T>(ch: WideChar, attrs: &A, color_pair: &P) -> result!(Self) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+    pub fn from_wide_char<A, P, T>(ch: WideChar, attrs: &A, color_pair: &P) -> result!(Self)
+        where A: AttributesType<T>,
+              P: ColorPairType<T>,
+              T: ColorAttributeTypes
+    {
         match crate::setcchar(WideChar::try_into(ch)?, attrs, color_pair) {
             Err(e)    => Err(e),
             Ok(cchar) => Ok(cchar)
         }
     }
 
-    pub fn from_char<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(Self) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+    pub fn from_char<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(Self)
+        where A: AttributesType<T>,
+              P: ColorPairType<T>,
+              T: ColorAttributeTypes
+    {
         match crate::setcchar(ch, attrs, color_pair) {
             Err(e)    => Err(e),
             Ok(cchar) => Ok(cchar)

@@ -33,12 +33,43 @@ use crate::{COLOR_PAIR, PAIR_NUMBER, init_pair, pair_content};
 
 include!("../include/colorpair.rs");
 
+/// A `normal` color pair.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ColorPair {
     raw: short_t
 }
 
 impl ColorPair {
+    /// Create a new `normal` color pair.
+    ///
+    /// ## Example
+    /// ```rust
+    /// extern crate ncursesw;
+    ///
+    /// # use std::error::Error;
+    /// use ncursesw::*;
+    /// use ncursesw::normal::*;
+    ///
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// #     let h = initscr()?;
+    /// #     if has_colors() {
+    /// start_color()?;
+    ///
+    /// let blue = Color::Dark(BaseColor::Blue);
+    /// let yellow = Color::Dark(BaseColor::Yellow);
+    ///
+    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
+    ///
+    /// let colors = color_pair1.colors()?;
+    ///
+    /// assert!(colors.foreground() == blue && colors.background() == yellow);
+    /// #     }
+    /// #
+    /// #     delwin(h)?;
+    /// #     // endwin()?;
+    /// #     Ok(())
+    /// # }
+    /// ```
     pub fn new(pair: short_t, colors: Colors) -> result!(Self) {
         init_pair(pair, colors)
     }
@@ -48,13 +79,71 @@ impl ColorPair {
     }
 }
 
+/// Return the colors (foreground and background) of the color pair.
 impl ColorPairColors<Colors, Color, short_t> for ColorPair {
+    /// ## Example
+    /// ```rust
+    /// extern crate ncursesw;
+    ///
+    /// # use std::error::Error;
+    /// use ncursesw::*;
+    /// use ncursesw::normal::*;
+    ///
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// #     let h = initscr()?;
+    /// #     if has_colors() {
+    /// start_color()?;
+    ///
+    /// let blue = Color::Dark(BaseColor::Blue);
+    /// let yellow = Color::Dark(BaseColor::Yellow);
+    ///
+    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
+    ///
+    /// let colors = color_pair1.colors()?;
+    ///
+    /// assert!(colors.foreground() == blue && colors.background() == yellow);
+    /// #     }
+    /// #
+    /// #     delwin(h)?;
+    /// #     // endwin()?;
+    /// #     Ok(())
+    /// # }
+    /// ```
     fn colors(&self) -> result!(Colors) {
         pair_content(*self)
     }
 }
 
+/// Return the number of the color pair.
 impl ColorPairType<short_t> for ColorPair {
+    /// ## Example
+    /// ```rust
+    /// extern crate ncursesw;
+    ///
+    /// # use std::error::Error;
+    /// use ncursesw::*;
+    /// use ncursesw::normal::*;
+    ///
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// #     let h = initscr()?;
+    /// #     if has_colors() {
+    /// start_color()?;
+    ///
+    /// let blue = Color::Dark(BaseColor::Blue);
+    /// let yellow = Color::Dark(BaseColor::Yellow);
+    ///
+    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
+    ///
+    /// let colors = color_pair1.colors()?;
+    ///
+    /// assert!(color_pair1.number() == 1);
+    /// #     }
+    /// #
+    /// #     delwin(h)?;
+    /// #     // endwin()?;
+    /// #     Ok(())
+    /// # }
+    /// ```
     fn number(&self) -> short_t {
         self.raw
     }
@@ -70,6 +159,33 @@ impl ColorPairGeneric<short_t> for ColorPair {
 impl BitOr<Attribute> for ColorPair {
     type Output = Attributes;
 
+    /// ## Example
+    /// ```rust
+    /// extern crate ncursesw;
+    ///
+    /// # use std::error::Error;
+    /// use ncursesw::*;
+    /// use ncursesw::normal::*;
+    ///
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// #     let h = initscr()?;
+    /// #     if has_colors() {
+    /// start_color()?;
+    ///
+    /// let blue = Color::Dark(BaseColor::Blue);
+    /// let yellow = Color::Dark(BaseColor::Yellow);
+    ///
+    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
+    /// let attrs = Attribute::Dim | color_pair1;
+    ///
+    /// assert!(attrs.color_pair() == color_pair1);
+    /// #     }
+    /// #
+    /// #     delwin(h)?;
+    /// #     // endwin()?;
+    /// #     Ok(())
+    /// # }
+    /// ```
     fn bitor(self, rhs: Attribute) -> Self::Output {
         Attributes::default() | self | rhs
     }

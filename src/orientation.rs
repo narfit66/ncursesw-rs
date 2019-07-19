@@ -20,9 +20,12 @@
     IN THE SOFTWARE.
 */
 
+/// The screen region (top or bottom) to rip a line off.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Orientation {
+    /// Rip a line from the top of the screen.
     Top,
+    /// Rip a line from the bottom of the screen.
     Bottom
 }
 

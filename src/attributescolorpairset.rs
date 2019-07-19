@@ -23,8 +23,11 @@
 use normal;
 use extend;
 
+/// Normal and extended attributes and color pair returned by ncurses functions.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AttributesColorPairSet {
+    /// `normal` attributes and color pair.
     Normal(normal::AttributesColorPair),
+    /// extended attributes and color pair.
     Extend(extend::AttributesColorPair)
 }

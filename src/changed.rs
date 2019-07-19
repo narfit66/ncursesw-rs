@@ -22,9 +22,12 @@
 
 use std::convert::Into;
 
+/// Make a line look like it's been touched since last `wrefresh`, used by `wtouchln`.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Changed {
+    /// Make line look like it has been touched.
     True,
+    /// Don't make line look like it has been touched.
     False
 }
 

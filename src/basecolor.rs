@@ -29,6 +29,7 @@ use shims::constants::{
     COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE,
     COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
 };
+use shims::ncurses::short_t;
 
 /// One of the 8 base colors.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -69,10 +70,12 @@ pub enum BaseColor {
 }
 
 impl BaseColor {
+    /// Return the `dark` value of the base color (the first 8 color's are considered dark colors).
     pub(crate) fn dark(&self) -> i16 {
         Self::into(*self)
     }
 
+    /// Return the `light` value of the base color (the first 8 color's are considered dark colors, the next 8 are the lighter/brighter equivilants).
     pub(crate) fn light(&self) -> i16 {
         self.dark() + COLOR_WHITE + 1
     }
@@ -81,6 +84,31 @@ impl BaseColor {
 impl FromStr for BaseColor {
     type Err = NCurseswError;
 
+    /// Parse a string to instance a base color.
+    ///
+    /// Valid values are 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'
+    ///
+    /// ## Example
+    /// ```rust
+    /// # extern crate ncursesw;
+    /// #
+    /// # use std::error::Error;
+    /// # use ncursesw::*;
+    /// use std::str::FromStr;
+    ///
+    /// #
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// let red = BaseColor::from_str("red")?;
+    /// let green = BaseColor::from_str("green")?;
+    /// let blue = BaseColor::from_str("blue")?;
+    ///
+    /// assert!(red == BaseColor::Red);
+    /// assert!(green == BaseColor::Green);
+    /// assert!(blue == BaseColor::Blue);
+    /// #
+    /// #     Ok(())
+    /// # }
+    /// ```
     fn from_str(color: &str) -> Result<Self, Self::Err> {
         match color {
             "black"   => Ok(BaseColor::Black),
@@ -96,8 +124,8 @@ impl FromStr for BaseColor {
     }
 }
 
-impl Into<i16> for BaseColor {
-    fn into(self) -> i16 {
+impl Into<short_t> for BaseColor {
+    fn into(self) -> short_t {
         match self {
             BaseColor::Black   => COLOR_BLACK,
             BaseColor::Red     => COLOR_RED,
@@ -111,8 +139,8 @@ impl Into<i16> for BaseColor {
     }
 }
 
-impl From<i16> for BaseColor {
-    fn from(color: i16) -> Self {
+impl From<short_t> for BaseColor {
+    fn from(color: short_t) -> Self {
         match color {
             COLOR_BLACK   => BaseColor::Black,
             COLOR_RED     => BaseColor::Red,
@@ -135,6 +163,6 @@ impl Into<i32> for BaseColor {
 
 impl From<i32> for BaseColor {
     fn from(color: i32) -> Self {
-        Self::from(color as i16)
+        Self::from(color as short_t)
     }
 }

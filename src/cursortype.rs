@@ -24,14 +24,28 @@ use std::convert::{TryFrom, Into};
 
 use ncurseswerror::NCurseswError;
 
+/// Cursor type.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CursorType {
+    /// Makes the cursor invisible. Supported on most terminals.
     Invisible,
+    /// Makes the cursor visible.
     Visible,
+    /// Makes the cursor "highly" visible in some way. Not supported on all terminals.
     VeryVisible
 }
 
 impl Default for CursorType {
+    /// The default cursor type
+    ///
+    /// ## Example
+    /// ```rust
+    /// extern crate ncursesw;
+    ///
+    /// use ncursesw::*;
+    ///
+    /// assert_eq!(CursorType::default(), CursorType::Visible);
+    /// ```
     fn default() -> Self {
         CursorType::Visible
     }

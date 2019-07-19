@@ -150,6 +150,7 @@ pub fn add_wch(wch: &cchar_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub fn add_wchnstr(wchstr: &[cchar_t], n: i32) -> i32 {
+eprintln!("wchstr={:?}", wchstr);
     unsafe {
         bindings::add_wchnstr(wchstr.as_ptr(), n)
     }
@@ -227,16 +228,23 @@ pub fn assume_default_colors(fg: i32, bg: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_get(attrs: *mut attr_t, pair: *mut short_t, opts: *mut libc::c_void) -> i32 {
+    assert!(!attrs.is_null(), "ncurses::attr_get() : attrs.is_null()");
+    assert!(!pair.is_null(), "ncurses::attr_get() : pair.is_null()");
+
     bindings::attr_get(attrs, pair, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_off(attrs: attr_t, opts: *mut libc::c_void) -> i32 {
+    assert!(opts.is_null(), "ncurses::attr_off() : !opts.is_null()");
+
     bindings::attr_off(attrs, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_on(attrs: attr_t, opts: *mut libc::c_void) -> i32 {
+    assert!(opts.is_null(), "ncurses::attr_on() : !opts.is_null()");
+
     bindings::attr_on(attrs, opts)
 }
 
@@ -2685,6 +2693,8 @@ pub fn waddwstr(win: WINDOW, wstr: &[wchar_t]) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_get(win: WINDOW, attrs: *mut attr_t, pair: *mut short_t, opts: *mut libc::c_void) -> i32 {
     assert!(!win.is_null(), "ncurses::wattr_get() : win.is_null()");
+    assert!(!attrs.is_null(), "ncurses::wattr_get() : attrs.is_null()");
+    assert!(!pair.is_null(), "ncurses::wattr_get() : pair.is_null()");
 
     bindings::wattr_get(win, attrs, pair, opts)
 }
@@ -2692,6 +2702,7 @@ pub unsafe fn wattr_get(win: WINDOW, attrs: *mut attr_t, pair: *mut short_t, opt
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_off(win: WINDOW, attrs: attr_t, opts: *mut libc::c_void) -> i32 {
     assert!(!win.is_null(), "ncurses::wattr_off() : win.is_null()");
+    assert!(opts.is_null(), "ncurses::wattr_off() : !opts.is_null()");
 
     bindings::wattr_off(win, attrs, opts)
 }
@@ -2699,6 +2710,7 @@ pub unsafe fn wattr_off(win: WINDOW, attrs: attr_t, opts: *mut libc::c_void) -> 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_on(win: WINDOW, attrs: attr_t, opts: *mut libc::c_void) -> i32 {
     assert!(!win.is_null(), "ncurses::wattr_on() : win.is_null()");
+    assert!(opts.is_null(), "ncurses::wattr_on() : !opts.is_null()");
 
     bindings::wattr_on(win, attrs, opts)
 }

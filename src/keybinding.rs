@@ -22,6 +22,7 @@
 
 use shims::constants::*;
 
+/// Keys returned by ncurses `get` functions.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum KeyBinding {
     /// Break key (unreliable)

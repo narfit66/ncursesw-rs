@@ -38,7 +38,11 @@ impl ComplexString {
         Self { raw: vec!() }
     }
 
-    pub fn from_wide_string<A, P, T>(str: &WideString, attrs: &A, color_pair: &P) -> result!(Self) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+    pub fn from_wide_string<A, P, T>(str: &WideString, attrs: &A, color_pair: &P) -> result!(Self)
+        where A: AttributesType<T>,
+              P: ColorPairType<T>,
+              T: ColorAttributeTypes
+    {
         let wch: Vec<wchar_t> = WideString::into(str.clone());
         let mut raw = vec!();
 
@@ -52,7 +56,11 @@ impl ComplexString {
         Ok(Self { raw })
     }
 
-    pub fn from_str<A, P, T>(str: &str, attrs: &A, color_pair: &P) -> result!(Self) where A: AttributesType<T>, P: ColorPairType<T>, T: ColorAttributeTypes {
+    pub fn from_str<A, P, T>(str: &str, attrs: &A, color_pair: &P) -> result!(Self)
+        where A: AttributesType<T>,
+              P: ColorPairType<T>,
+              T: ColorAttributeTypes
+    {
         let mut raw = vec!();
 
         for ch in str.chars() {

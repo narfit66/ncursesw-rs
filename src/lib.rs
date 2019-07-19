@@ -37,10 +37,15 @@ use std::slice;
 
 mod macros;
 
+/// Extended color's, color pairs and attributes module
 pub mod extend;
+/// Traits used by `ncursesw`
 pub mod gen;
+/// Normal color's, color pairs and attributes module
 pub mod normal;
+/// ncurses Panels module
 pub mod panels;
+/// ncurses API shims module
 pub mod shims;
 
 mod chtypet;
@@ -89,70 +94,296 @@ pub use chtypet::*;
 pub use complex::*;
 pub use wide::*;
 
-use constants::{ERR, KEY_CODE_YES, KEY_MOUSE, KEY_RESIZE, KEY_EVENT, TRUE, FALSE};
+use constants::{
+    ERR, KEY_CODE_YES, KEY_MOUSE, KEY_RESIZE,
+    KEY_EVENT, TRUE, FALSE
+};
 
+// The maximum buffer size used in a variety of functions.
 const LINE_MAX: usize = 4096;
 
-/// A ncurses window handle
+/// NCurses window raw pointer.
 pub type WINDOW = ncurses::WINDOW;
-/// A ncurses screen handle
+/// NCurses screen raw pointer.
 pub type SCREEN = ncurses::SCREEN;
-/// Ripoff line callback function signature
+/// Ripoff line callback function signature.
 pub type RipoffInit = shims::bindings::RipoffInit;
 
-type attr_t = ncurses::attr_t;
+/// Raw attribute type value.
+pub type attr_t = ncurses::attr_t;
 type cchar_t = ncurses::cchar_t;
 type chtype = ncurses::chtype;
 type short_t = ncurses::short_t;
 type wchar_t = ncurses::wchar_t;
 type wint_t = ncurses::wint_t;
 
+/// Return the raw pointer to the current screen.
 pub fn curscr() -> WINDOW {
     ncurses::curscr()
 }
 
+/// Return the raw pointer to the new screen.
 pub fn newscr() -> WINDOW {
     ncurses::newscr()
 }
 
+/// Return the raw pointer to the standard screen.
 pub fn stdscr() -> WINDOW {
     ncurses::stdscr()
 }
 
+/// Return the number of colors available.
+///
+/// This is initialized by `start_color` to the maximum number of colors the terminal can support.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let number_of_colors = COLORS();
+///
+/// assert!(number_of_colors > 0);
+/// #     }
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn COLORS() -> i32 {
     ncurses::COLORS()
 }
 
+/// Return the attribute value of a given `normal` color pair.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::str::FromStr;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let yellow = Color::from_str("yellow")?;
+/// let blue = Color::from_str("blue")?;
+/// 
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+///
+/// assert!(COLOR_PAIR(color_pair0) == 0b0000000000);
+/// assert!(COLOR_PAIR(color_pair1) == 0b0100000000);
+/// #     }
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t {
     ncurses::COLOR_PAIR(normal::ColorPair::into(color_pair)) as attr_t
 }
 
+/// Return the color pair from  given `normal` attributes value.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::str::FromStr;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let yellow = Color::from_str("yellow")?;
+/// let blue = Color::from_str("blue")?;
+/// 
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let attrs = Attribute::Bold | color_pair1;
+///
+/// assert!(PAIR_NUMBER(attrs) == color_pair1);
+/// #     }
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn PAIR_NUMBER(attrs: normal::Attributes) -> normal::ColorPair {
     normal::ColorPair::from(ncurses::PAIR_NUMBER(normal::Attributes::into(attrs)))
 }
 
+/// Return the number of color pairs available.
+///
+/// This is initialized by `start_color` to the maximum number of color pairs the terminal can support.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let number_of_color_pairs = COLOR_PAIRS();
+///
+/// assert!(number_of_color_pairs > 0);
+/// #     }
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn COLOR_PAIRS() -> i32 {
     ncurses::COLOR_PAIRS()
 }
 
+/// Return the number of columns (x-axis) available on the terminal.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let number_of_columns = COLS();
+///
+/// assert!(number_of_columns > 0);
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn COLS() -> i32 {
     ncurses::COLS()
 }
 
+/// Return the delay used to interpret termianl keyboard escape sequences.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// use std::time;
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let delay = ESCDELAY()?;
+///
+/// assert!(delay == time::Duration::from_millis(1000), "delay={:?}", delay);
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn ESCDELAY() -> result!(time::Duration) {
     let delay = time::Duration::from_millis(u64::try_from(ncurses::ESCDELAY())?);
 
     Ok(delay)
 }
 
+/// Return the number of lines (y-axis) available on the terminal.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let number_of_lines = LINES();
+///
+/// assert!(number_of_lines > 0);
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn LINES() -> i32 {
     ncurses::LINES()
 }
 
+/// Return the number of columns a tab represents on the terminal.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let tabsize = TABSIZE();
+///
+/// assert!(tabsize > 0);
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn TABSIZE() -> i32 {
     ncurses::TABSIZE()
 }
 
+/// Add/Output a complex character to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// add_wch(complex_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn add_wch(wch: ComplexChar) -> result!(()) {
     match ncurses::add_wch(&ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("add_wch")),
@@ -160,6 +391,31 @@ pub fn add_wch(wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Add/Output a complex character string of a given length to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing.."
+/// add_wchnstr(&complex_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn add_wchnstr(wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::add_wchnstr(raw_with_nul_as_slice!(wchstr), number) {
         ERR => Err(ncurses_function_error!("add_wchnstr")),
@@ -167,6 +423,31 @@ pub fn add_wchnstr(wchstr: &ComplexString, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a complex character string to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing..1..2..3.."
+/// add_wchstr(&complex_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn add_wchstr(wchstr: &ComplexString) -> result!(()) {
     match ncurses::add_wchstr(raw_with_nul_as_slice!(wchstr)) {
         ERR => Err(ncurses_function_error!("add_wchstr")),
@@ -174,6 +455,33 @@ pub fn add_wchstr(wchstr: &ComplexString) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character and `normal` attribute/color pair combination to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// addch(chtype_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addch(ch: ChtypeChar) -> result!(()) {
     match ncurses::addch(ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("addch")),
@@ -181,6 +489,34 @@ pub fn addch(ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination of a given length to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing.."
+/// addchnstr(&chtype_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addchnstr(chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::addchnstr(raw_with_nul_as_slice!(chstr), number) {
         ERR => Err(ncurses_function_error!("addchnstr")),
@@ -188,6 +524,34 @@ pub fn addchnstr(chstr: &ChtypeString, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing..1..2..3.."
+/// addchstr(&chtype_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
     match ncurses::addchstr(raw_with_nul_as_slice!(chstr)) {
         ERR => Err(ncurses_function_error!("addchstr")),
@@ -195,6 +559,31 @@ pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Add/Output a character string of a given length to the standard screen.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing.."
+/// addnstr(&s, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::addnstr(c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("addnstr")),
@@ -202,6 +591,27 @@ pub fn addnstr(str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string of a given length to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing.."
+/// addnwstr(&wide_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::addnwstr(raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("addnwstr")),
@@ -209,6 +619,31 @@ pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a character string to the standard screen.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing..1..2..3.."
+/// addstr(&s)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addstr(str: &str) -> result!(()) {
     match ncurses::addstr(c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("addstr")),
@@ -216,6 +651,27 @@ pub fn addstr(str: &str) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string to the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing..1..2..3.."
+/// addwstr(&wide_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn addwstr(wstr: &WideString) -> result!(()) {
     match ncurses::addwstr(raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("addwstr")),
@@ -223,6 +679,41 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Assign the colors given as the default foreground and background colors of color pair 0
+///
+/// For both normal and extended color types the foreground or background color may be set
+/// as `Color::TerminalDefault` this will default the color before `initscr()` was called.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let colors = Colors::new(yellow, blue);
+///
+/// assume_default_colors(colors)?;
+///
+/// let color_pair0 = ColorPair::default();
+///
+/// assert!(color_pair0.colors()?.foreground() == yellow);
+/// assert!(color_pair0.colors()?.background() == blue);
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
     where S: ColorsType<C, T>,
           C: ColorType<T>,
@@ -234,6 +725,58 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
     }
 }
 
+/// Return the current attributes and color pair on the standard screen.
+///
+/// Notes: This does *NOT* return the attribute and color pair rendition when defined
+///        by `chtype` and/or `cchar` type add/insert functions as these are cell based
+///        but when set by functions such as `attr_set`.
+///        When returning a `normal` attribute and color pair the attribute does *NOT*
+///        contain the color pair so this must be OR'd to back for some functions.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attr_set(attrs1, color_pair1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attr_get() -> result!(AttributesColorPairSet) {
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
@@ -261,6 +804,66 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
     }
 }
 
+/// Switch off the given attributes on the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | Attribute::Dim | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attr_set(attrs1, color_pair1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// attr_off(Attributes::default() | Attribute::Dim)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attr_off<A, T>(attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -271,6 +874,66 @@ pub fn attr_off<A, T>(attrs: A) -> result!(())
     }
 }
 
+/// Switch on the given attributes on the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attr_set(attrs1, color_pair1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// attr_on(Attributes::default() | Attribute::Dim)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attr_on<A, T>(attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -281,6 +944,52 @@ pub fn attr_on<A, T>(attrs: A) -> result!(())
     }
 }
 
+/// Set the current attributes and color pair on the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attr_set(attrs1, color_pair1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -292,6 +1001,66 @@ pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
     }
 }
 
+/// Switch off the given `normal` attributes on the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | Attribute::Dim | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attrset(attrs1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// attroff(Attributes::default() | Attribute::Dim)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attroff(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attroff(normal::Attributes::into(attrs)) {
         ERR => Err(ncurses_function_error!("attroff")),
@@ -299,6 +1068,66 @@ pub fn attroff(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Switch on the given `normal` attributes on the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attrset(attrs1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// attron(Attributes::default() | Attribute::Dim)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attron(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attron(normal::Attributes::into(attrs)) {
         ERR => Err(ncurses_function_error!("attron")),
@@ -306,6 +1135,52 @@ pub fn attron(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Set the current `normal` attributes and color pair on the standard screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// attrset(attrs1)?;
+/// addch(chtype_char | attrs0)?;
+///
+/// match attr_get()? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn attrset(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attrset(normal::Attributes::into(attrs)) {
         ERR => Err(ncurses_function_error!("attrset")),
@@ -313,12 +1188,53 @@ pub fn attrset(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Return the output speed of the terminal. The number returned is in bits per second, for example 9600.
 pub fn baudrate() -> i32 {
     ncurses::baudrate()
 }
 
-basic_ncurses_function!(beep, "beep");
+/// Sounds an audible alarm on the terminal, if possible; otherwise flashes the screen (visible bell).
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// beep()?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
+pub fn beep() -> result!(()) {
+    match ncurses::beep() {
+        ERR => Err(ncurses_function_error!("beep")),
+        _   => Ok(())
+    }
+}
 
+/// Set the background property on the standard screen and then apply this setting to every character position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::ACS_CKBOARD;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// bkgd(ChtypeChar::from_chtype(ACS_CKBOARD()))?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn bkgd(ch: ChtypeChar) -> result!(()) {
     match ncurses::bkgd(ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("bkgd")),
@@ -326,10 +1242,73 @@ pub fn bkgd(ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Manipulate the background of the standard screen.
+///
+/// The window background is a `chtype` consisting of any combination of attributes
+/// (i.e., rendition) and a character. The attribute part of the background is
+/// combined (OR'ed) with all non-blank characters that are written into the window
+/// with waddch. Both the character and attribute parts of the background are combined
+/// with the blank characters. The background becomes a property of the character and
+/// moves with the character through any scrolling and insert/delete line/character operations.
+///
+/// To the extent possible on a particular terminal, the attribute part of the
+/// background is displayed as the graphic rendition of the character put on the screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::ACS_CKBOARD;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// bkgdset(ChtypeChar::from_chtype(ACS_CKBOARD()));
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn bkgdset(ch: ChtypeChar) {
     ncurses::bkgdset(ChtypeChar::into(ch))
 }
 
+/// Set the background property on the standard screen and then apply this setting to every character position in that window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::extend::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let mut attrs = Attributes::default();
+/// attrs.set_dim(true);
+///
+/// match std::char::from_u32(0x20) {
+///     Some(c) => {
+///         let background_char = ComplexChar::from_char(c, &attrs, &color_pair1)?;
+///         bkgrnd(background_char)?;
+///     },
+///     None    => panic!("unable to convert to character!")
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn bkgrnd(wch: ComplexChar) -> result!(()) {
     match ncurses::bkgrnd(&ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("bkgrnd")),
@@ -337,10 +1316,105 @@ pub fn bkgrnd(wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Manipulate the background on the standard screen.
+///
+/// The window background is a `cchar_t` consisting of any combination of attributes
+/// (i.e., rendition) and a complex character. The attribute part of the background
+/// is combined (OR'ed) with all non-blank characters that are written into the window
+/// with `waddch`. Both the character and attribute parts of the background are combined
+/// with the blank characters. The background becomes a property of the character and moves
+/// with the character through any scrolling and insert/delete line/character operations.
+
+/// To the extent possible on a particular terminal, the attribute part of the background
+/// is displayed as the graphic rendition of the character put on the screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::extend::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let mut attrs = Attributes::default();
+/// attrs.set_dim(true);
+///
+/// match std::char::from_u32(0x20) {
+///     Some(c) => {
+///         let background_char = ComplexChar::from_char(c, &attrs, &color_pair1)?;
+///         bkgrndset(background_char);
+///     },
+///     None    => panic!("unable to convert to character!")
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn bkgrndset(wch: ComplexChar) {
     ncurses::bkgrndset(&ComplexChar::into(wch))
 }
 
+/// Draw a box around the edges of the standard screen.
+///
+/// ls - left side,
+/// rs - right side,
+/// ts - top side,
+/// bs - bottom side,
+/// tl - top left-hand corner,
+/// tr - top right-hand corner,
+/// bl - bottom left-hand corner, and
+/// br - bottom right-hand corner.
+///
+/// If any of these arguments is zero, then the corresponding
+/// default values are used instead:
+///     ACS_VLINE,
+///     ACS_VLINE,
+///     ACS_HLINE,
+///     ACS_HLINE,
+///     ACS_ULCORNER,
+///     ACS_URCORNER,
+///     ACS_LLCORNER,
+///     ACS_LRCORNER.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::{
+///     ACS_VLINE, ACS_HLINE, ACS_ULCORNER,
+///     ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER
+/// };
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let ls = ChtypeChar::from_chtype(ACS_VLINE());
+/// let rs = ChtypeChar::from_chtype(ACS_VLINE());
+/// let ts = ChtypeChar::from_chtype(ACS_HLINE());
+/// let bs = ChtypeChar::from_chtype(ACS_HLINE());
+/// let tl = ChtypeChar::from_chtype(ACS_ULCORNER());
+/// let tr = ChtypeChar::from_chtype(ACS_URCORNER());
+/// let bl = ChtypeChar::from_chtype(ACS_LLCORNER());
+/// let br = ChtypeChar::from_chtype(ACS_LRCORNER());
+///
+/// border(ls, rs, ts, bs, tl, tr, bl, br)?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn border(
     ls: ChtypeChar,
     rs: ChtypeChar,
@@ -610,7 +1684,29 @@ pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
 
 simple_ncurses_function!(filter);
 
-basic_ncurses_function!(flash, "flash");
+/// Flashes the screen (visible bell), and if that is not possible, audible alarm on the terminal.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// flash()?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
+pub fn flash() -> result!(()) {
+    match ncurses::flash() {
+        ERR => Err(ncurses_function_error!("flash")),
+        _   => Ok(())
+    }
+}
 
 basic_ncurses_function!(flushinp, "flushinp");
 
@@ -704,15 +1800,81 @@ pub fn getbegyx(handle: WINDOW) -> result!(Origin) {
     }
 }
 
+/// Returns the standard screen's current background character/attribute pair.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::ACS_CKBOARD;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let background_char = ChtypeChar::from_chtype(ACS_CKBOARD());
+///
+/// wbkgd(win, background_char)?;
+///
+/// assert!(getbkgd(win) == background_char);
+///
+/// delwin(win)?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn getbkgd(handle: WINDOW) -> ChtypeChar {
     ChtypeChar::from(ncurses::getbkgd(handle))
 }
 
+/// Returns the standard screen's current background character/attribute pair.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::extend::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let mut attrs = Attributes::default();
+/// attrs.set_dim(true);
+///
+/// match std::char::from_u32(0x20) {
+///     Some(c) => {
+///         let background_char = ComplexChar::from_char(c, &attrs, &color_pair1)?;
+///         bkgrndset(background_char);
+///
+///         assert!(getbkgrnd()? == background_char);
+///     },
+///     None    => panic!("unable to convert to character!")
+/// }
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn getbkgrnd() -> result!(ComplexChar) {
     let mut wch: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::getbkgrnd(wch.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("getbkgd")),
+        ERR => Err(ncurses_function_error!("getbkgrnd")),
         _   => Ok(ComplexChar::from(wch[0]))
     }
 }
@@ -1096,6 +2258,15 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
     }
 }
 
+/// Initialize the NCurses data structures and return the standard screen.
+///
+/// `initscr` is normally the first curses routine to call when initializing a program. A few special
+/// routines sometimes need to be called before it; these are `slk_init`, `filter`, `ripoffline`, `use_env`.
+/// For multiple-terminal applications, newterm may be called before `initscr`.
+///
+/// The `initscr` code determines the terminal type and initializes all curses data structures. `initscr`
+/// also causes the first call to `refresh` to clear the screen. If errors occur, `initscr` writes an
+/// appropriate error message to standard error and exits; otherwise, a pointer is returned to `stdscr`.
 pub fn initscr() -> result!(WINDOW) {
     match ncurses::initscr() {
         None      => Err(ncurses_function_error!("initscr")),
@@ -1137,6 +2308,30 @@ pub fn innwstr(number: i32) -> result!(WideString) {
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) of a given length on the standard screen.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing.."
+/// ins_nwstr(&wide_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::ins_nwstr(raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("ins_nwstr")),
@@ -1144,6 +2339,35 @@ pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
     }
 }
 
+/// Insert a complex character on the standard screen.
+///
+/// Insert the complex character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// ins_wch(complex_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn ins_wch(wch: ComplexChar) -> result!(()) {
     match ncurses::ins_wch(&ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("ins_wch")),
@@ -1151,6 +2375,30 @@ pub fn ins_wch(wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) on the standard screen.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing..1..2..3.."
+/// ins_wstr(&wide_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn ins_wstr(wstr: &WideString) -> result!(()) {
     match ncurses::ins_wstr(raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("ins_wstr")),
@@ -1356,6 +2604,32 @@ pub fn r#move(origin: Origin) -> result!(()) {
     }
 }
 
+/// Add/Output a complex character to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// mvadd_wch(origin, complex_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvadd_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvadd_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("mvadd_wch")),
@@ -1363,6 +2637,33 @@ pub fn mvadd_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Add/Output a complex character string of a given length to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing.." at line 5, column 10
+/// mvadd_wchnstr(origin, &complex_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvadd_wchnstr(origin: Origin, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::mvadd_wchnstr(origin.y, origin.x, raw_with_nul_as_slice!(wchstr), number) {
         ERR => Err(ncurses_function_error!("mvadd_wchnstr")),
@@ -1370,6 +2671,33 @@ pub fn mvadd_wchnstr(origin: Origin, wchstr: &ComplexString, number: i32) -> res
     }
 }
 
+/// Add/Output a complex character string to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10
+/// mvadd_wchstr(origin, &complex_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvadd_wchstr(origin: Origin, wchstr: &ComplexString) -> result!(()) {
     match ncurses::mvadd_wchstr(origin.y, origin.x, raw_with_nul_as_slice!(wchstr)) {
         ERR => Err(ncurses_function_error!("mvadd_wchstr")),
@@ -1377,6 +2705,35 @@ pub fn mvadd_wchstr(origin: Origin, wchstr: &ComplexString) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character and `normal` attribute/color pair combination to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// mvaddch(origin, chtype_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvaddch(origin.y, origin.x, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("mvaddch")),
@@ -1384,6 +2741,36 @@ pub fn mvaddch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination of a given length to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing.." at line 5, column 10
+/// mvaddchnstr(origin, &chtype_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddchnstr(origin: Origin, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::mvaddchnstr(origin.y, origin.x, raw_with_nul_as_slice!(chstr), number) {
         ERR => Err(ncurses_function_error!("mvaddchnstr")),
@@ -1391,6 +2778,36 @@ pub fn mvaddchnstr(origin: Origin, chstr: &ChtypeString, number: i32) -> result!
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10
+/// mvaddchstr(origin, &chtype_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
     match ncurses::mvaddchstr(origin.y, origin.x, raw_with_nul_as_slice!(chstr)) {
         ERR => Err(ncurses_function_error!("mvaddchstr")),
@@ -1398,6 +2815,33 @@ pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Add/Output a character string of a given length to the standard screen at a given origin.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing.." at line 5, column 10
+/// mvaddnstr(origin, &s, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvaddnstr(origin.y, origin.x, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("mvaddnstr")),
@@ -1405,6 +2849,29 @@ pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string of a given length to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing.." at line 5, column 10
+/// mvaddnwstr(origin, &wide_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvaddnwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("mvaddnwstr")),
@@ -1412,6 +2879,33 @@ pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(())
     }
 }
 
+/// Add/Output a character string to the standard screen at a given origin.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing..1..2..3.."
+/// mvaddstr(origin, &s)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvaddstr(origin.y, origin.x, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("mvaddstr")),
@@ -1419,6 +2913,29 @@ pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string to the standard screen at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10
+/// mvaddwstr(origin, &wide_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvaddwstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvaddwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("mvaddwstr")),
@@ -1706,6 +3223,32 @@ pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) of a given length on the standard screen at a given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing.." at line 5, column 10
+/// mvins_nwstr(origin, &wide_str, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvins_nwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("mvins_nwstr")),
@@ -1713,6 +3256,37 @@ pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()
     }
 }
 
+/// Insert a complex character on the standard screen at the given origin.
+///
+/// Insert the complex character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// mvins_wch(origin, complex_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvins_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("mvins_wch")),
@@ -1720,6 +3294,32 @@ pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) on the standard screen at a given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing..1..2..3.." at line 5, column 10
+/// mvins_wstr(origin, &wide_str)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvins_wstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvins_wstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("mvins_wstr")),
@@ -1794,6 +3394,39 @@ pub fn mvvline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(())
     }
 }
 
+/// Add/Output a complex character on a given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// mvwadd_wch(win, origin, complex_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwadd_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvwadd_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("mvwadd_wch")),
@@ -1801,6 +3434,40 @@ pub fn mvwadd_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!((
     }
 }
 
+/// Add/Output a complex character string of a given length on a given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing.." at line 5, column 10 on the window `win`.
+/// mvwadd_wchnstr(win, origin, &complex_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwadd_wchnstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::mvwadd_wchnstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wchstr), number) {
         ERR => Err(ncurses_function_error!("mvwadd_wchnstr")),
@@ -1808,6 +3475,40 @@ pub fn mvwadd_wchnstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString, nu
     }
 }
 
+/// Add/Output a complex character string on a given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10 on the window `win`.
+/// mvwadd_wchstr(win, origin, &complex_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwadd_wchstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString) -> result!(()) {
     match ncurses::mvwadd_wchstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wchstr)) {
         ERR => Err(ncurses_function_error!("mvwadd_wchstr")),
@@ -1815,6 +3516,42 @@ pub fn mvwadd_wchstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString) -> 
     }
 }
 
+/// Add/Output a ascii character and `normal` attribute/color pair combination on a given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// mvwaddch(win, origin, chtype_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvwaddch(handle, origin.y, origin.x, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("mvwaddch")),
@@ -1822,6 +3559,43 @@ pub fn mvwaddch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination of a given length on a given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+/// #
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing.." at line 5, column 10 on the window `win`.
+/// mvwaddchnstr(win, origin, &chtype_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddchnstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::mvwaddchnstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(chstr), number) {
         ERR => Err(ncurses_function_error!("mvwaddchnstr")),
@@ -1829,6 +3603,43 @@ pub fn mvwaddchnstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString, number
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination on a given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10 on the window `win`.
+/// mvwaddchstr(win, origin, &chtype_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> result!(()) {
     match ncurses::mvwaddchstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(chstr)) {
         ERR => Err(ncurses_function_error!("mvwaddchstr")),
@@ -1836,6 +3647,40 @@ pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> resu
     }
 }
 
+/// Add/Output a character string of a given length to a given window at a given origin.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing.." at line 5, column 10 on the window `win`.
+/// mvwaddnstr(win, origin, &s, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvwaddnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("mvwaddnstr")),
@@ -1843,6 +3688,36 @@ pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string of a given length on the given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing.." at line 5, column 10 on the window `win`
+/// mvwaddnwstr(win, origin, &wide_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvwaddnwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("mvwaddnwstr")),
@@ -1850,6 +3725,40 @@ pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i3
     }
 }
 
+/// Add/Output a character string on a given window at a given origin.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10 on the window `win`.
+/// mvwaddstr(win, origin, &s)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvwaddstr(handle, origin.y, origin.x, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("mvwaddstr")),
@@ -1857,6 +3766,36 @@ pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string on the given window at a given origin.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10 on the window `win`
+/// mvwaddwstr(win, origin, &wide_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwaddwstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvwaddwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("mvwaddwstr")),
@@ -2137,6 +4076,39 @@ pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideSt
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) of a given length on the given window at a given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing.." at line 5, column 10 on the window `win`
+/// mvwins_nwstr(win, origin, &wide_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvwins_nwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("mvwins_nwstr")),
@@ -2144,6 +4116,44 @@ pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i
     }
 }
 
+/// Insert a complex character on the given window at the given origin.
+///
+/// Insert the complex character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// mvwins_wch(win, origin, complex_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvwins_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("mvwins_wch")),
@@ -2151,6 +4161,39 @@ pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!((
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) on the given window at a given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing..1..2.3.." at line 5, column 10 on the window `win`
+/// mvwins_wstr(win, origin, &wide_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwins_wstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvwins_wstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("mvwins_wstr")),
@@ -2648,8 +4691,6 @@ pub fn tparm(_s: &str) -> String {
     unimplemented!();
 }
 
-//pub fn tputs
-
 pub fn typeahead(_fd: i32) -> i32 {
     unimplemented!();
 }
@@ -2721,6 +4762,37 @@ pub fn vline_set(wch: ComplexChar, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a complex character on a given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// wadd_wch(win, complex_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wadd_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wadd_wch(handle, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("wadd_wch")),
@@ -2728,6 +4800,38 @@ pub fn wadd_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Add/Output a complex character string of a given length on a given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing.." on the window `win`.
+/// wadd_wchnstr(win, &complex_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wadd_wchnstr(handle: WINDOW, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::wadd_wchnstr(handle, raw_with_nul_as_slice!(wchstr), number) {
         ERR => Err(ncurses_function_error!("wadd_wchnstr")),
@@ -2735,6 +4839,38 @@ pub fn wadd_wchnstr(handle: WINDOW, wchstr: &ComplexString, number: i32) -> resu
     }
 }
 
+/// Add/Output a complex character string on a given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_str = ComplexString::from_str("Testing..Testing..1..2..3..", &attrs, &color_pair0)?;
+///
+/// // this will output "Testing..Testing..1..2..3.." on the window `win`.
+/// wadd_wchstr(win, &complex_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wadd_wchstr(handle: WINDOW, wchstr: &ComplexString) -> result!(()) {
     match ncurses::wadd_wchstr(handle, raw_with_nul_as_slice!(wchstr)) {
         ERR => Err(ncurses_function_error!("wadd_wchstr")),
@@ -2742,6 +4878,40 @@ pub fn wadd_wchstr(handle: WINDOW, wchstr: &ComplexString) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character and `normal` attribute/color pair combination on a given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// waddch(win, chtype_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::waddch(handle, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("waddch")),
@@ -2749,6 +4919,41 @@ pub fn waddch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination of a given length on a given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing.." on the window `win`.
+/// waddchnstr(win, &chtype_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddchnstr(handle: WINDOW, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::waddchnstr(handle, raw_with_nul_as_slice!(chstr), number) {
         ERR => Err(ncurses_function_error!("waddchnstr")),
@@ -2756,6 +4961,41 @@ pub fn waddchnstr(handle: WINDOW, chstr: &ChtypeString, number: i32) -> result!(
     }
 }
 
+/// Add/Output a ascii character string and `normal` attribute/color pair combination on a given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// # use std::error::Error;
+/// use ascii::*;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default() | color_pair0;
+///
+/// let ascii_str = AsciiString::from_ascii("Testing..Testing..1..2..3..")?;
+/// let chtype_str = ChtypeString::from_ascii_string(&ascii_str) | attrs;
+///
+/// // this will output "Testing..Testing..1..2..3.." on the window `win`.
+/// waddchstr(win, &chtype_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
     match ncurses::waddchstr(handle, raw_with_nul_as_slice!(chstr)) {
         ERR => Err(ncurses_function_error!("waddchstr")),
@@ -2763,6 +5003,38 @@ pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Add/Output a character string of a given length to a given window.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing.." at line 5, column 10 on the window `win`.
+/// waddnstr(win, &s, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match ncurses::waddnstr(handle, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("waddnstr")),
@@ -2770,6 +5042,34 @@ pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string of a given length on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing.." on the window `win`
+/// waddnwstr(win, &wide_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::waddnwstr(handle, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("waddnwstr")),
@@ -2777,6 +5077,38 @@ pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) 
     }
 }
 
+/// Add/Output a character string on a given window.
+///
+/// Note: Originally this function whould just output characters in the ascii character
+///       set but as of ABI 6 (and maybe eariler) this function will output any unicode
+///       UTF-8 character string.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // this will output "Testing..Testing..1..2..3.." at line 5, column 10 on the window `win`.
+/// waddstr(win, &s)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     match ncurses::waddstr(handle, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("waddstr")),
@@ -2784,6 +5116,36 @@ pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     }
 }
 
+/// Add/Output a wide character unicode UTF-8 string on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let origin = Origin { y: 5, x: 10 };
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // this will output "Testing..Testing..1..2..3.." on the window `win`
+/// waddwstr(win, &wide_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match ncurses::waddwstr(handle, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("waddwstr")),
@@ -2791,6 +5153,65 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Return the current attributes and color pair on the given window.
+///
+/// Notes: This does *NOT* return the attribute and color pair rendition when defined
+///        by `chtype` and/or `cchar` type add/insert functions as these are cell based
+///        but when set by functions such as `wattr_set`.
+///        When returning a `normal` attribute and color pair the attribute does *NOT*
+///        contain the color pair so this must be OR'd to back for some functions.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattr_set(win, attrs1, color_pair1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
@@ -2818,6 +5239,73 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
     }
 }
 
+/// Switch off the given attributes on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | Attribute::Dim | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattr_set(win, attrs1, color_pair1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// wattr_off(win, Attributes::default() | Attribute::Dim)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -2828,6 +5316,73 @@ pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
     }
 }
 
+/// Switch on the given attributes on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattr_set(win, attrs1, color_pair1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// wattr_on(win, Attributes::default() | Attribute::Dim)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -2838,6 +5393,59 @@ pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
     }
 }
 
+/// Set the current attributes and color pair on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattr_set(win, attrs1, color_pair1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -2849,6 +5457,73 @@ pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()
     }
 }
 
+/// Switch off the given `normal` attributes on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | Attribute::Dim | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattrset(win, attrs1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// wattroff(win, Attributes::default() | Attribute::Dim)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match ncurses::wattroff(handle, normal::Attributes::into(attrs)) {
         ERR => Err(ncurses_function_error!("wattroff")),
@@ -2856,6 +5531,73 @@ pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Switch on the given `normal` attributes on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattrset(win, attrs1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(!s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// wattron(win, Attribute::Dim | color_pair1)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.attributes().is_dim());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match ncurses::wattron(handle, normal::Attributes::into(attrs)) {
         ERR => Err(ncurses_function_error!("wattron")),
@@ -2863,6 +5605,59 @@ pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Set the current `normal` attributes and color pair on the given window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// use_default_colors()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let color_pair1 = ColorPair::new(1, Colors::new(Color::Dark(BaseColor::Yellow), Color::Dark(BaseColor::Blue)))?;
+///
+/// let attrs0 = Attribute::Dim | color_pair0;
+/// let attrs1 = Attribute::Bold | color_pair1;
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char);
+///
+/// wattrset(win, attrs1)?;
+/// waddch(win, chtype_char | attrs0)?;
+///
+/// match wattr_get(win)? {
+///     AttributesColorPairSet::Normal(s) => {
+///         assert!(s.attributes().is_bold());
+///         assert!(s.color_pair() == color_pair1);
+///     },
+///     AttributesColorPairSet::Extend(_) => {
+///         panic!("not a extended attributes/color pair!");
+///     }
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wattrset(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match ncurses::wattrset(handle, normal::Attributes::into(attrs)) {
         ERR => Err(ncurses_function_error!("wattrset")),
@@ -2870,6 +5665,31 @@ pub fn wattrset(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Set the background property on the given window and then apply this setting to every character position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::ACS_CKBOARD;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// wbkgd(win, ChtypeChar::from_chtype(ACS_CKBOARD()))?;
+///
+/// delwin(win)?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wbkgd(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::wbkgd(handle, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("wbkgd")),
@@ -2877,10 +5697,87 @@ pub fn wbkgd(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Manipulate the background of the given window.
+///
+/// The window background is a `chtype` consisting of any combination of attributes
+/// (i.e., rendition) and a character. The attribute part of the background is
+/// combined (OR'ed) with all non-blank characters that are written into the window
+/// with waddch. Both the character and attribute parts of the background are combined
+/// with the blank characters. The background becomes a property of the character and
+/// moves with the character through any scrolling and insert/delete line/character operations.
+///
+/// To the extent possible on a particular terminal, the attribute part of the
+/// background is displayed as the graphic rendition of the character put on the screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::ACS_CKBOARD;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// wbkgdset(win, ChtypeChar::from_chtype(ACS_CKBOARD()));
+///
+/// delwin(win)?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wbkgdset(handle: WINDOW, ch: ChtypeChar) {
     ncurses::wbkgdset(handle, ChtypeChar::into(ch))
 }
 
+/// Set the background property on the given window and then apply this setting to every character position in that window.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::extend::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let mut attrs = Attributes::default();
+/// attrs.set_dim(true);
+///
+/// match std::char::from_u32(0x20) {
+///     Some(c) => {
+///         let background_char = ComplexChar::from_char(c, &attrs, &color_pair1)?;
+///         wbkgrnd(win, background_char)?;
+///     },
+///     None    => panic!("unable to convert to character!")
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wbkgrnd(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wbkgrnd(handle, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("wbkgrnd")),
@@ -2888,10 +5785,119 @@ pub fn wbkgrnd(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Manipulate the background on the given window.
+///
+/// The window background is a `cchar_t` consisting of any combination of attributes
+/// (i.e., rendition) and a complex character. The attribute part of the background
+/// is combined (OR'ed) with all non-blank characters that are written into the window
+/// with `waddch`. Both the character and attribute parts of the background are combined
+/// with the blank characters. The background becomes a property of the character and moves
+/// with the character through any scrolling and insert/delete line/character operations.
+///
+/// To the extent possible on a particular terminal, the attribute part of the background
+/// is displayed as the graphic rendition of the character put on the screen.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::extend::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let mut attrs = Attributes::default();
+/// attrs.set_dim(true);
+///
+/// match std::char::from_u32(0x20) {
+///     Some(c) => {
+///         let background_char = ComplexChar::from_char(c, &attrs, &color_pair1)?;
+///         wbkgrndset(win, background_char);
+///     },
+///     None    => panic!("unable to convert to character!")
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wbkgrndset(handle: WINDOW, wch: ComplexChar) {
     ncurses::wbkgrndset(handle, &ComplexChar::into(wch))
 }
 
+/// Draw a box around the edges of the given window.
+///
+/// ls - left side,
+/// rs - right side,
+/// ts - top side,
+/// bs - bottom side,
+/// tl - top left-hand corner,
+/// tr - top right-hand corner,
+/// bl - bottom left-hand corner, and
+/// br - bottom right-hand corner.
+///
+/// If any of these arguments is zero, then the corresponding
+/// default values are used instead:
+///     ACS_VLINE,
+///     ACS_VLINE,
+///     ACS_HLINE,
+///     ACS_HLINE,
+///     ACS_ULCORNER,
+///     ACS_URCORNER,
+///     ACS_LLCORNER,
+///     ACS_LRCORNER.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use shims::ncurses::{
+///     ACS_VLINE, ACS_HLINE, ACS_ULCORNER,
+///     ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER
+/// };
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let ls = ChtypeChar::from_chtype(ACS_VLINE());
+/// let rs = ChtypeChar::from_chtype(ACS_VLINE());
+/// let ts = ChtypeChar::from_chtype(ACS_HLINE());
+/// let bs = ChtypeChar::from_chtype(ACS_HLINE());
+/// let tl = ChtypeChar::from_chtype(ACS_ULCORNER());
+/// let tr = ChtypeChar::from_chtype(ACS_URCORNER());
+/// let bl = ChtypeChar::from_chtype(ACS_LLCORNER());
+/// let br = ChtypeChar::from_chtype(ACS_LRCORNER());
+///
+/// wborder(win, ls, rs, ts, bs, tl, tr, bl, br)?;
+///
+/// delwin(win)?;
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wborder(
     handle: WINDOW,
     ls: ChtypeChar,
@@ -3038,11 +6044,55 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
     }
 }
 
+/// Returns the given window's current background character/attribute pair.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::extend::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// #     if has_colors() {
+/// start_color()?;
+///
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let yellow = Color::Dark(BaseColor::Yellow);
+/// let blue = Color::Dark(BaseColor::Blue);
+///
+/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let mut attrs = Attributes::default();
+/// attrs.set_dim(true);
+///
+/// match std::char::from_u32(0x2764) {
+///     Some(c) => {
+///         let background_char = ComplexChar::from_char(c, &attrs, &color_pair1)?;
+///         wbkgrndset(win, background_char);
+///
+///         assert!(wgetbkgrnd(win)? == background_char);
+///     },
+///     None    => panic!("unable to convert to character!")
+/// }
+///
+/// delwin(win)?;
+/// #     }
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wgetbkgrnd(handle: WINDOW) -> result!(ComplexChar) {
     let mut wch: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::wgetbkgrnd(handle, wch.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("wgetbkgd")),
+        ERR => Err(ncurses_function_error!("wgetbkgrnd")),
         _   => Ok(ComplexChar::from(wch[0]))
     }
 }
@@ -3272,6 +6322,37 @@ pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) of a given length on the given window.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing.." on the window `win`
+/// wins_nwstr(win, &wide_str, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::wins_nwstr(handle, raw_with_nul_as_slice!(wstr), number) {
         ERR => Err(ncurses_function_error!("wins_nwstr")),
@@ -3279,6 +6360,42 @@ pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(())
     }
 }
 
+/// Insert a complex character on the given window.
+///
+/// Insert the complex character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let complex_char = ComplexChar::from_char('A', &attrs, &color_pair0)?;
+///
+/// wins_wch(win, complex_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wins_wch(handle, &ComplexChar::into(wch)) {
         ERR => Err(ncurses_function_error!("wins_wch")),
@@ -3286,6 +6403,37 @@ pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Insert a wide character string (unicode UTF-8) on the given window.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let wide_str = WideString::from_str("Testing..Testing..1..2..3..");
+///
+/// // insert "Testing..Testing..1..2..3.." on the window `win`
+/// wins_wstr(win, &wide_str)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn wins_wstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match ncurses::wins_wstr(handle, raw_with_nul_as_slice!(wstr)) {
         ERR => Err(ncurses_function_error!("wins_wstr")),

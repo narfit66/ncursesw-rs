@@ -22,6 +22,7 @@
 
 macro_rules! define_colors {
     ($type: ty) => {
+        /// Foreground and background colors.
         #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
         pub struct Colors {
             foreground: Color,
@@ -29,14 +30,17 @@ macro_rules! define_colors {
         }
 
         impl ColorsType<Color, $type> for Colors {
+            /// Create a new instance of foreground and background colors.
             fn new(foreground: Color, background: Color) -> Self {
                 Self { foreground, background }
             }
 
+            /// Foreground color.
             fn foreground(&self) -> Color {
                 self.foreground
             }
 
+            /// Background color.
             fn background(&self) -> Color {
                 self.background
             }

@@ -22,10 +22,14 @@
 
 use std::convert::Into;
 
+/// The soft-label layout type
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SoftLabelType {
+    /// a three-two-three layout
     ThreeTwoThree,
+    /// A four-four layout
     FourFour,
+    /// A four-four layout with an index
     FourFourIndex
 }
 

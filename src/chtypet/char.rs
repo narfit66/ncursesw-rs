@@ -39,6 +39,10 @@ impl ChtypeChar {
         Self { raw: chtype::from(ch.as_byte()) }
     }
 
+    pub fn from_chtype(raw: chtype) -> Self {
+        Self { raw }
+    }
+
     /// Converts a Chtype character into a `u8`.
     pub fn as_byte(self) -> u8 {
         self.raw.to_be_bytes()[3]

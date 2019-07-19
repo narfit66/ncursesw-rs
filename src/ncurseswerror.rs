@@ -23,7 +23,9 @@
 use std::{num, char};
 use crate::{COLORS, COLOR_PAIRS};
 
-custom_error::custom_error! { pub NCurseswError
+custom_error::custom_error! {
+/// NCursesw Errors/Events.
+pub NCurseswError
     NCursesFunction { func: String } = "ncurses::{func}()",
     AlreadyInitialized = "ncurses library already initialized",
     KeyMouse = "KEY_MOUSE",

@@ -22,9 +22,12 @@
 
 use std::fmt::{Display, Formatter, Result};
 
+/// A size (usually a window).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Size {
+    /// The number of lines (y-axis)
     pub lines:   i32,
+    /// The number of columns (x-axis)
     pub columns: i32
 }
 
