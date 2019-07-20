@@ -30,10 +30,13 @@ extern crate libc;
 extern crate custom_error;
 extern crate ascii;
 extern crate semver;
+#[macro_use]
+extern crate lazy_static;
 
 use std::{path, char, ptr, time, mem};
 use std::convert::{From, TryFrom};
 use std::slice;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 mod macros;
 
@@ -116,6 +119,19 @@ type chtype = ncurses::chtype;
 type short_t = ncurses::short_t;
 type wchar_t = ncurses::wchar_t;
 type wint_t = ncurses::wint_t;
+
+lazy_static! {
+    // Flag internally to the crate if extended or normal colors are being used,
+    // this is used by `attr_get()`, `wattr_get()` and `getcchar()` so that they
+    // can return the correct `attributes` and `colorpair` values.
+    //
+    // The flag is set by `init_extended_pair()`, `init_pair()`, `alloc_pair()`,
+    // `find_pair()`, `ColorPair::default()` and `Colors::new()`.
+    //
+    // This works on the assumption that the calling code will only ever use
+    // extended or normal colors but not both.
+    pub(crate) static ref EXTENDED_COLORS: AtomicBool = AtomicBool::new(false);
+}
 
 /// Return the raw pointer to the current screen.
 pub fn curscr() -> WINDOW {
@@ -780,12 +796,12 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
 pub fn attr_get() -> result!(AttributesColorPairSet) {
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
-    let opts: *mut libc::c_void = ptr::null_mut();
+    let mut opts: [i32; 1] = [0];
 
-    match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
+    match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut libc::c_void) } {
         ERR => Err(ncurses_function_error!("attr_get")),
         _   => {
-            Ok(if opts.is_null() {
+            Ok(if !EXTENDED_COLORS.load(Ordering::SeqCst) {
                    AttributesColorPairSet::Normal(
                        normal::AttributesColorPair::new(
                            normal::Attributes::from(attrs[0]),
@@ -796,7 +812,7 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
                    AttributesColorPairSet::Extend(
                        extend::AttributesColorPair::new(
                            extend::Attributes::from(attrs[0]),
-                           extend::ColorPair::from(unsafe { slice::from_raw_parts(opts as *mut i32, 1)[0] })
+                           extend::ColorPair::from(opts[0])
                        )
                    )
                })
@@ -1884,14 +1900,14 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
     let mut wch: [wchar_t; 1] = [0];
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
-    let opts: *mut libc::c_void = ptr::null_mut();
+    let mut opts: [i32; 1] = [0];
 
-    match unsafe { ncurses::getcchar(&wc, wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
+    match unsafe { ncurses::getcchar(&wc, wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut libc::c_void) } {
         ERR => Err(ncurses_function_error!("getcchar")),
         _   => {
             Ok(WideCharAndAttributes::new(
                    WideChar::from(wch[0]),
-                   if opts.is_null() {
+                   if !EXTENDED_COLORS.load(Ordering::SeqCst) {
                        AttributesColorPairSet::Normal(
                            normal::AttributesColorPair::new(
                                normal::Attributes::from(attrs[0]),
@@ -1902,7 +1918,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
                        AttributesColorPairSet::Extend(
                            extend::AttributesColorPair::new(
                                extend::Attributes::from(attrs[0]),
-                               extend::ColorPair::from(unsafe { slice::from_raw_parts(opts as *mut i32, 1)[0] })
+                               extend::ColorPair::from(opts[0])
                            )
                        )
                    }
@@ -2240,7 +2256,11 @@ pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(e
     } else {
         match ncurses::init_extended_pair(pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
             ERR => Err(ncurses_function_error!("init_extended_pair")),
-            _   => Ok(extend::ColorPair::from(pair_number))
+            _   => {
+                EXTENDED_COLORS.store(true, Ordering::SeqCst);
+
+                Ok(extend::ColorPair::from(pair_number))
+            }
         }
     }
 }
@@ -2253,7 +2273,11 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
     } else {
         match ncurses::init_pair(pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
             ERR => Err(ncurses_function_error!("init_pair")),
-            _   => Ok(normal::ColorPair::from(pair_number))
+            _   => {
+                EXTENDED_COLORS.store(false, Ordering::SeqCst);
+
+                Ok(normal::ColorPair::from(pair_number))
+            }
         }
     }
 }
@@ -5215,12 +5239,12 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
 pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
-    let opts: *mut libc::c_void = ptr::null_mut();
+    let mut opts: [i32; 1] = [0];
 
-    match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
+    match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut libc::c_void) } {
         ERR => Err(ncurses_function_error!("wattr_get")),
         _   => {
-            Ok(if opts.is_null() {
+            Ok(if !EXTENDED_COLORS.load(Ordering::SeqCst) {
                    AttributesColorPairSet::Normal(
                        normal::AttributesColorPair::new(
                            normal::Attributes::from(attrs[0]),
@@ -5231,7 +5255,7 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
                    AttributesColorPairSet::Extend(
                        extend::AttributesColorPair::new(
                            extend::Attributes::from(attrs[0]),
-                           extend::ColorPair::from(unsafe { slice::from_raw_parts(opts as *mut i32, 1)[0] })
+                           extend::ColorPair::from(opts[0])
                        )
                    )
                })

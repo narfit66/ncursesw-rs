@@ -33,6 +33,8 @@ use crate::{COLOR_PAIR, PAIR_NUMBER, init_pair, pair_content};
 
 include!("../include/colorpair.rs");
 
+extend_colorpair!(false);
+
 /// A `normal` color pair.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ColorPair {

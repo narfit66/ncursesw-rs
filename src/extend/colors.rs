@@ -25,4 +25,4 @@ use extend::Color;
 
 include!("../include/colors.rs");
 
-define_colors!(i32);
+define_colors!(i32, true);

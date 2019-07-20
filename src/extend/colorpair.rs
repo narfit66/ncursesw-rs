@@ -31,6 +31,8 @@ use crate::{init_extended_pair, extended_pair_content};
 
 include!("../include/colorpair.rs");
 
+extend_colorpair!(true);
+
 /// A extended color pair.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ColorPair {

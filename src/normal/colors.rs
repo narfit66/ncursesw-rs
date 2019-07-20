@@ -26,4 +26,4 @@ use shims::ncurses::short_t;
 
 include!("../include/colors.rs");
 
-define_colors!(short_t);
+define_colors!(short_t, false);

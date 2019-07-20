@@ -21,7 +21,10 @@
 */
 
 macro_rules! define_colors {
-    ($type: ty) => {
+    ($type: ty, $extend: expr) => {
+        use std::sync::atomic::Ordering;
+        use crate::EXTENDED_COLORS;
+
         /// Foreground and background colors.
         #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
         pub struct Colors {
@@ -32,6 +35,8 @@ macro_rules! define_colors {
         impl ColorsType<Color, $type> for Colors {
             /// Create a new instance of foreground and background colors.
             fn new(foreground: Color, background: Color) -> Self {
+                EXTENDED_COLORS.store($extend, Ordering::SeqCst);
+
                 Self { foreground, background }
             }
 

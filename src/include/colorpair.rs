@@ -20,26 +20,43 @@
     IN THE SOFTWARE.
 */
 
+use std::sync::atomic::Ordering;
+
 use shims::ncurses;
 use constants::ERR;
 use gen::{ColorType, ColorsType};
+use crate::EXTENDED_COLORS;
 
-impl Default for ColorPair {
-    fn default() -> Self {
-        Self { raw: 0 }
-    }
-}
+macro_rules! extend_colorpair {
+    ($extend: expr) => {
+        impl Default for ColorPair {
+            fn default() -> Self {
+                EXTENDED_COLORS.store($extend, Ordering::SeqCst);
 
-pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
-    match ncurses::alloc_pair(colors.foreground().number(), colors.background().number()) {
-        ERR  => Err(ncurses_function_error!("alloc_pair")),
-        pair => Ok(ColorPair::from(pair))
-    }
-}
+                Self { raw: 0 }
+            }
+        }
 
-pub fn find_pair(colors: Colors) -> Option<ColorPair> {
-    match ncurses::find_pair(colors.foreground().number(), colors.background().number()) {
-        ERR  => None,
-        pair => Some(ColorPair::from(pair))
+        pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
+            match ncurses::alloc_pair(colors.foreground().number(), colors.background().number()) {
+                ERR  => Err(ncurses_function_error!("alloc_pair")),
+                pair => {
+                    EXTENDED_COLORS.store($extend, Ordering::SeqCst);
+
+                    Ok(ColorPair::from(pair))
+                }
+            }
+        }
+
+        pub fn find_pair(colors: Colors) -> Option<ColorPair> {
+            match ncurses::find_pair(colors.foreground().number(), colors.background().number()) {
+                ERR  => None,
+                pair => {
+                    EXTENDED_COLORS.store($extend, Ordering::SeqCst);
+
+                    Some(ColorPair::from(pair))
+                }
+            }
+        }
     }
 }
