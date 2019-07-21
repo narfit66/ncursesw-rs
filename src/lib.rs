@@ -2430,6 +2430,38 @@ pub fn ins_wstr(wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Insert a ascii character and `normal` attribute/color pair combination to the standard screen.
+///
+/// Insert the character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// insch(chtype_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn insch(ch: ChtypeChar) -> result!(()) {
     match ncurses::insch(ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("insch")),
@@ -2446,6 +2478,30 @@ pub fn insdelln(n: i32) -> result!(()) {
 
 basic_ncurses_function!(insertln, "insertln");
 
+/// Insert a string of a given length on the standard screen.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing.."
+/// insnstr(&s, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn insnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::insnstr(c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("insnstr")),
@@ -2453,6 +2509,30 @@ pub fn insnstr(str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Insert a string on the standard screen.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing..1..2..3.."
+/// insstr(&s)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn insstr(str: &str) -> result!(()) {
     match ncurses::insstr(c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("insstr")),
@@ -3351,6 +3431,38 @@ pub fn mvins_wstr(origin: Origin, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Insert a ascii character and `normal` attribute/color pair combination to the standard screen at a given origin.
+///
+/// Insert the character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// mvinsch(Origin { y: 5, x: 10 }, chtype_char)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvinsch(origin.y, origin.x, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("mvinsch")),
@@ -3358,6 +3470,30 @@ pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Insert a string of a given length on the standard screen at the given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing.." at line 5, column 10
+/// mvinsnstr(Origin { y: 5, x: 10 }, &s, 18)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvinsnstr(origin.y, origin.x, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("mvinsnstr")),
@@ -3365,6 +3501,30 @@ pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Insert a string on the standard screen at the given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing..1..2..3.." at line 5, column 10
+/// mvinsstr(Origin { y: 5, x: 10 }, &s)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvinsstr(origin.y, origin.x, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("mvinsstr")),
@@ -4225,6 +4385,45 @@ pub fn mvwins_wstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!
     }
 }
 
+/// Insert a ascii character and `normal` attribute/color pair combination on the given window at a given origin.
+///
+/// Insert the character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// mvwinsch(win, Origin { y: 5, x: 10 }, chtype_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvwinsch(handle, origin.y, origin.x, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("mvwinsch")),
@@ -4232,6 +4431,37 @@ pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Insert a string of a given length on the given window at the given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing.." at line 5, column 10
+/// mvwinsnstr(win, Origin { y: 5, x: 10 }, &s, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvwinsnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("mvwinsnstr")),
@@ -4239,6 +4469,37 @@ pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
     }
 }
 
+/// Insert a string on the given window at the given origin.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing..1..2..3.." at line 5, column 10
+/// mvwinsstr(win, Origin { y: 5, x: 10 }, &s)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvwinsstr(handle, origin.y, origin.x, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("mvwinsstr")),
@@ -6465,6 +6726,45 @@ pub fn wins_wstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Insert a ascii character and `normal` attribute/color pair combination on the given window.
+///
+/// Insert the character with rendition before the character under the cursor.
+/// All characters to the right of the cursor are moved one space to the right, with
+/// the possibility of the rightmost character on the line being lost. The insertion
+/// operation does not change the cursor position.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+/// extern crate ascii;
+///
+/// use ascii::*;
+/// # use std::error::Error;
+/// use ncursesw::*;
+/// use ncursesw::normal::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let color_pair0 = ColorPair::default();
+/// let attrs = Attributes::default();
+///
+/// let ascii_char = AsciiChar::A;
+/// let chtype_char = ChtypeChar::new(ascii_char) | attrs;
+///
+/// winsch(win, chtype_char)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn winsch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::winsch(handle, ChtypeChar::into(ch)) {
         ERR => Err(ncurses_function_error!("winsch")),
@@ -6481,6 +6781,37 @@ pub fn winsdelln(handle: WINDOW, n: i32) -> result!(()) {
 
 basic_ncurses_function_with_window!(winsertln, "winsertln");
 
+/// Insert a string of a given length on the given window.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing.."
+/// winsnstr(win, &s, 18)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match ncurses::winsnstr(handle, c_str_with_nul!(str), number) {
         ERR => Err(ncurses_function_error!("winsnstr")),
@@ -6488,6 +6819,37 @@ pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Insert a string on the given window.
+///
+/// All characters to the right of the cursor are shifted right, with the possibility
+/// of the rightmost characters on the line being lost. No wrapping is performed.
+///
+/// ## Example
+/// ```rust
+/// extern crate ncursesw;
+///
+/// # use std::error::Error;
+/// use ncursesw::*;
+///
+/// # fn main() -> Result<(), Box<Error>> {
+/// #     let h = initscr()?;
+/// let win_size = Size { lines: 10, columns: 50 };
+/// let win_origin = Origin { y: 5, x: 5 };
+///
+/// let win = newwin(win_size, win_origin)?;
+///
+/// let s = "Testing..Testing..1..2..3..";
+///
+/// // insert "Testing..Testing..1..2..3.."
+/// winsstr(win, &s)?;
+///
+/// delwin(win)?;
+/// #
+/// #     delwin(h)?;
+/// #     // endwin()?;
+/// #     Ok(())
+/// # }
+/// ```
 pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
     match ncurses::winsstr(handle, c_str_with_nul!(str)) {
         ERR => Err(ncurses_function_error!("winsstr")),
