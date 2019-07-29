@@ -1,0 +1,4 @@
+cargo doc &&
+echo "<meta http-equiv=refresh content=0;url=ncursesw-rs/index.html>" > target/doc/index.html &&
+ghp-import -n target/doc &&
+git push -fq https://github.com/narfit66/ncursesw-rs.git gh-pages

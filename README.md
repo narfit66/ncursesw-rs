@@ -1,4 +1,4 @@
-ncursesw [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs)
+ncursesw [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw)
 ========
 
 This is a *fat* wrapper around the ncurses TUI library, it's purpose is too make the ncurses functionally safe to use but please be aware that there are certian functions within the native ncurses library that are inheritenly unsafe and under certian circumstances can cause unpredictable results, these functions have been implemented and can be called but have been marked as *depreciated* as of version 0.1.2/0.1.3.
@@ -9,7 +9,7 @@ There are actually three layers of ncurses functions exposed within this library
 
 ncurses modules implemented and rustified so far are the main ncurses library and panels, partial support for mouse (version 2 only) is provided and will be extended soon to be fully rustified, the menu module will probably be implement at some point but there are no plans at the moment to implement the forms module.
 
-There is a companion crate which acts as a wrapper around this crate `ncursesw-win`(https://crates.io/crates/ncursesw-win) which abstracts away the raw pointers that ncurses uses and functions in a more safe way, however a knowledge of how ncurses works is advised to use the true power of this library.
+There is a companion crate which acts as a wrapper around this crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which abstracts away the raw pointers that ncurses uses and functions in a more safe way, however a knowledge of how ncurses works is advised to use the true power of this library.
 
 ## Requirements
 
@@ -57,4 +57,12 @@ use ncursesw::normal::*; // for 'ansi' color pairs and attributes...
 use ncursesw::extend::*; // or for 'extended' color pairs and attributes.
 ```
 
-All features are supported as of ncurses ABI 6.1 including extended color pairs, soft labels and ripoff lines, i would suggest examining ncurses maintainer Thomas E. Dickey online documentation (https://invisible-island.net/ncurses/man/ncurses.3x.html) and read the excelent reference book `Dan Gookin's Guide to Ncurses Programming` to gain an understanding in how to use this library.
+All features are supported as of ncurses ABI 6.1 including extended color pairs, soft labels and ripoff lines, i would suggest examining ncurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and read the excelent reference book `Dan Gookin's Guide to Ncurses Programming` to gain an understanding in how to use this library.
+
+## [Documentation](https://narfit66.github.io/ncursesw-rs/ncursesw/index.html)
+
+This at the moment is only *partial* but the end objective is to document the whole library.
+
+## License
+
+Licensed under the MIT license, see [LICENSE.md](LICENSE.md)

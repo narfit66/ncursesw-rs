@@ -4,6 +4,7 @@ version = "0.1.6"
 authors = ["Steve Whittle <narfit66@googlemail.com>"]
 description = "A fat wrapper around the ncurses TUI library"
 repository = "https://github.com/narfit66/ncursesw-rs"
+documentation = "https://narfit66.github.io/ncursesw-rs/ncursesw/index.html"
 readme = "README.md"
 keywords = ["ncurses", "TUI"]
 license = "MIT"
