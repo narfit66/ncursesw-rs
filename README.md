@@ -61,8 +61,8 @@ All features are supported as of ncurses ABI 6.1 including extended color pairs,
 
 ## [Documentation](https://narfit66.github.io/ncursesw-rs/ncursesw/index.html)
 
-This at the moment is only *partial* but the end objective is to document the whole library.
+This at the moment is only *partial* but the end objective is to document the whole crate/library.
 
 ## License
 
-Licensed under the MIT license, see [LICENSE.md](LICENSE.md)
+Licensed under the MIT license, see [LICENSE](LICENSE)
