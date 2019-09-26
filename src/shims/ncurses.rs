@@ -150,7 +150,6 @@ pub fn add_wch(wch: &cchar_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub fn add_wchnstr(wchstr: &[cchar_t], n: i32) -> i32 {
-eprintln!("wchstr={:?}", wchstr);
     unsafe {
         bindings::add_wchnstr(wchstr.as_ptr(), n)
     }

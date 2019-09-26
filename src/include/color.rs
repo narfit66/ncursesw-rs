@@ -25,6 +25,34 @@ use std::str::FromStr;
 impl FromStr for Color {
     type Err = NCurseswError;
 
+    /// Parse a string to instance a base color.
+    ///
+    /// Valid values are 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
+    ///                  'light black', 'light red', 'light green', 'light yellow', 'light blue',
+    ///                  'light magenta', 'light cyan', 'light white'.
+    ///
+    /// ## Example
+    /// ```rust
+    /// # extern crate ncursesw;
+    /// #
+    /// # use std::error::Error;
+    /// # use ncursesw::*;
+    /// # use ncursesw::normal::*;
+    /// use std::str::FromStr;
+    ///
+    /// #
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// let red = Color::from_str("red")?;
+    /// let green = Color::from_str("green")?;
+    /// let blue = Color::from_str("blue")?;
+    ///
+    /// assert!(red == Color::Dark(BaseColor::Red));
+    /// assert!(green == Color::Dark(BaseColor::Green));
+    /// assert!(blue == Color::Dark(BaseColor::Blue));
+    /// #
+    /// #     Ok(())
+    /// # }
+    /// ```
     fn from_str(color: &str) -> Result<Self, Self::Err> {
         match color {
             "default"       => Ok(Color::TerminalDefault),
