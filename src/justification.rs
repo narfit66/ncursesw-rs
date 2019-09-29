@@ -21,6 +21,7 @@
 */
 
 use std::convert::Into;
+use std::fmt::{Display, Formatter, Result};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Justification {
@@ -36,5 +37,15 @@ impl Into<i32> for Justification {
             Justification::Centered => 1,
             Justification::Right    => 2
         }
+    }
+}
+
+impl Display for Justification {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{}", match self {
+            Justification::Left     => "Left",
+            Justification::Centered => "Centered",
+            Justification::Right    => "Right"
+        })
     }
 }
