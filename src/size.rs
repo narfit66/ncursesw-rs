@@ -33,7 +33,7 @@ pub struct Size {
 
 impl Default for Size {
     fn default() -> Self {
-        Self { lines: crate::LINES(), columns: crate::COLS() }
+        Self { lines: 0, columns: 0 }
     }
 }
 
