@@ -31,6 +31,12 @@ pub struct Size {
     pub columns: i32
 }
 
+impl Default for Size {
+    fn default() -> Self {
+        Self { lines: crate::LINES(), columns: crate::COLS() }
+    }
+}
+
 impl Display for Size {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "(lines: {}, columns: {})", self.lines, self.columns)

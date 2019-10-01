@@ -31,6 +31,12 @@ pub struct Origin {
     pub x: i32
 }
 
+impl Default for Origin {
+    fn default() -> Self {
+        Self { y: 0, x: 0 }
+    }
+}
+
 impl Display for Origin {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "(y: {}, x: {})", self.y, self.x)
