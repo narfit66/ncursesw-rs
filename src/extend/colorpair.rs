@@ -26,12 +26,13 @@ use std::convert::{From, Into};
 
 use extend::{Colors, Color};
 use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
+use ncursescolortype::NCursesColorType;
 use ncurseswerror::NCurseswError;
 use crate::{init_extended_pair, extended_pair_content};
 
 include!("../include/colorpair.rs");
 
-extend_colorpair!(true);
+extend_colorpair!(NCursesColorType::Extended);
 
 /// A extended color pair.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

@@ -22,7 +22,8 @@
 
 use gen::ColorsType;
 use extend::Color;
+use ncursescolortype::NCursesColorType;
 
 include!("../include/colors.rs");
 
-define_colors!(i32, true);
+define_colors!(i32, NCursesColorType::Extended);

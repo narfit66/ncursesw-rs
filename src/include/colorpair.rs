@@ -20,18 +20,16 @@
     IN THE SOFTWARE.
 */
 
-use std::sync::atomic::Ordering;
-
 use shims::ncurses;
 use constants::ERR;
 use gen::{ColorType, ColorsType};
-use crate::EXTENDED_COLORS;
+use ncursescolortype::set_ncurses_colortype;
 
 macro_rules! extend_colorpair {
     ($extend: expr) => {
         impl Default for ColorPair {
             fn default() -> Self {
-                EXTENDED_COLORS.store($extend, Ordering::SeqCst);
+                set_ncurses_colortype($extend);
 
                 Self { raw: 0 }
             }
@@ -41,7 +39,7 @@ macro_rules! extend_colorpair {
             match ncurses::alloc_pair(colors.foreground().number(), colors.background().number()) {
                 ERR  => Err(ncurses_function_error!("alloc_pair")),
                 pair => {
-                    EXTENDED_COLORS.store($extend, Ordering::SeqCst);
+                    set_ncurses_colortype($extend);
 
                     Ok(ColorPair::from(pair))
                 }
@@ -52,7 +50,7 @@ macro_rules! extend_colorpair {
             match ncurses::find_pair(colors.foreground().number(), colors.background().number()) {
                 ERR  => None,
                 pair => {
-                    EXTENDED_COLORS.store($extend, Ordering::SeqCst);
+                    set_ncurses_colortype($extend);
 
                     Some(ColorPair::from(pair))
                 }

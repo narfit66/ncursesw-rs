@@ -23,7 +23,8 @@
 use gen::ColorsType;
 use normal::Color;
 use shims::ncurses::short_t;
+use ncursescolortype::NCursesColorType;
 
 include!("../include/colors.rs");
 
-define_colors!(short_t, false);
+define_colors!(short_t, NCursesColorType::Normal);

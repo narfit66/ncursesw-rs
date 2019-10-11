@@ -27,13 +27,14 @@ use std::ops::BitOr;
 
 use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
 use normal::{Attribute, Attributes, Colors, Color};
+use ncursescolortype::NCursesColorType;
 use ncurseswerror::NCurseswError;
 use shims::ncurses::{attr_t, short_t};
 use crate::{COLOR_PAIR, PAIR_NUMBER, init_pair, pair_content};
 
 include!("../include/colorpair.rs");
 
-extend_colorpair!(false);
+extend_colorpair!(NCursesColorType::Normal);
 
 /// A `normal` color pair.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

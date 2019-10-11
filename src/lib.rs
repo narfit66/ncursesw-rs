@@ -36,7 +36,6 @@ extern crate lazy_static;
 use std::{path, char, ptr, time, mem};
 use std::convert::{From, TryFrom};
 use std::slice;
-use std::sync::atomic::{AtomicBool, Ordering};
 
 mod macros;
 
@@ -65,6 +64,7 @@ mod justification;
 mod keybinding;
 mod lccategory;
 mod legacy;
+mod ncursescolortype;
 mod ncurseswerror;
 mod orientation;
 mod origin;
@@ -84,6 +84,7 @@ pub use justification::*;
 pub use keybinding::*;
 pub use lccategory::*;
 pub use legacy::*;
+pub use ncursescolortype::*;
 pub use ncurseswerror::*;
 pub use origin::*;
 pub use orientation::*;
@@ -119,19 +120,6 @@ type chtype = ncurses::chtype;
 type short_t = ncurses::short_t;
 type wchar_t = ncurses::wchar_t;
 type wint_t = ncurses::wint_t;
-
-lazy_static! {
-    // Flag internally to the crate if extended or normal colors are being used,
-    // this is used by `attr_get()`, `wattr_get()` and `getcchar()` so that they
-    // can return the correct `attributes` and `colorpair` values.
-    //
-    // The flag is set by `init_extended_pair()`, `init_pair()`, `alloc_pair()`,
-    // `find_pair()`, `ColorPair::default()` and `Colors::new()`.
-    //
-    // This works on the assumption that the calling code will only ever use
-    // extended or normal colors but not both.
-    pub(crate) static ref EXTENDED_COLORS: AtomicBool = AtomicBool::new(false);
-}
 
 /// Return the raw pointer to the current screen.
 pub fn curscr() -> WINDOW {
@@ -800,23 +788,24 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
 
     match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut libc::c_void) } {
         ERR => Err(ncurses_function_error!("attr_get")),
-        _   => {
-            Ok(if !EXTENDED_COLORS.load(Ordering::SeqCst) {
-                   AttributesColorPairSet::Normal(
-                       normal::AttributesColorPair::new(
-                           normal::Attributes::from(attrs[0]),
-                           normal::ColorPair::from(color_pair[0])
-                       )
-                   )
-               } else {
-                   AttributesColorPairSet::Extend(
-                       extend::AttributesColorPair::new(
-                           extend::Attributes::from(attrs[0]),
-                           extend::ColorPair::from(opts[0])
-                       )
-                   )
+        _   => Ok(match ncurses_colortype() {
+                      NCursesColorType::Normal => {
+                          AttributesColorPairSet::Normal(
+                              normal::AttributesColorPair::new(
+                                  normal::Attributes::from(attrs[0]),
+                                  normal::ColorPair::from(color_pair[0])
+                              )
+                          )
+                      },
+                      NCursesColorType::Extended => {
+                          AttributesColorPairSet::Extend(
+                              extend::AttributesColorPair::new(
+                                  extend::Attributes::from(attrs[0]),
+                                  extend::ColorPair::from(opts[0])
+                              )
+                          )
+                      }
                })
-        }
     }
 }
 
@@ -1907,20 +1896,23 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
         _   => {
             Ok(WideCharAndAttributes::new(
                    WideChar::from(wch[0]),
-                   if !EXTENDED_COLORS.load(Ordering::SeqCst) {
-                       AttributesColorPairSet::Normal(
-                           normal::AttributesColorPair::new(
-                               normal::Attributes::from(attrs[0]),
-                               normal::ColorPair::from(color_pair[0])
+                   match ncurses_colortype() {
+                       NCursesColorType::Normal => {
+                           AttributesColorPairSet::Normal(
+                               normal::AttributesColorPair::new(
+                                   normal::Attributes::from(attrs[0]),
+                                   normal::ColorPair::from(color_pair[0])
+                               )
                            )
-                       )
-                   } else {
-                       AttributesColorPairSet::Extend(
-                           extend::AttributesColorPair::new(
-                               extend::Attributes::from(attrs[0]),
-                               extend::ColorPair::from(opts[0])
+                       },
+                       NCursesColorType::Extended => {
+                           AttributesColorPairSet::Extend(
+                               extend::AttributesColorPair::new(
+                                   extend::Attributes::from(attrs[0]),
+                                   extend::ColorPair::from(opts[0])
+                               )
                            )
-                       )
+                       }
                    }
                )
             )
@@ -2232,7 +2224,11 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
     } else {
         match ncurses::init_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
             ERR => Err(ncurses_function_error!("init_color")),
-            _   => Ok(normal::Color::from(color_number))
+            _   => {
+                set_ncurses_colortype(NCursesColorType::Normal);
+
+                Ok(normal::Color::from(color_number))
+            }
         }
     }
 }
@@ -2243,7 +2239,11 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(exten
     } else {
         match ncurses::init_extended_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
             ERR => Err(ncurses_function_error!("init_extended_color")),
-            _   => Ok(extend::Color::from(color_number))
+            _   => {
+                set_ncurses_colortype(NCursesColorType::Extended);
+
+                Ok(extend::Color::from(color_number))
+            }
         }
     }
 }
@@ -2257,7 +2257,7 @@ pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(e
         match ncurses::init_extended_pair(pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
             ERR => Err(ncurses_function_error!("init_extended_pair")),
             _   => {
-                EXTENDED_COLORS.store(true, Ordering::SeqCst);
+                set_ncurses_colortype(NCursesColorType::Extended);
 
                 Ok(extend::ColorPair::from(pair_number))
             }
@@ -2274,7 +2274,7 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
         match ncurses::init_pair(pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
             ERR => Err(ncurses_function_error!("init_pair")),
             _   => {
-                EXTENDED_COLORS.store(false, Ordering::SeqCst);
+                set_ncurses_colortype(NCursesColorType::Normal);
 
                 Ok(normal::ColorPair::from(pair_number))
             }
@@ -5504,23 +5504,24 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
 
     match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut libc::c_void) } {
         ERR => Err(ncurses_function_error!("wattr_get")),
-        _   => {
-            Ok(if !EXTENDED_COLORS.load(Ordering::SeqCst) {
-                   AttributesColorPairSet::Normal(
-                       normal::AttributesColorPair::new(
-                           normal::Attributes::from(attrs[0]),
-                           normal::ColorPair::from(color_pair[0])
-                       )
-                   )
-               } else {
-                   AttributesColorPairSet::Extend(
-                       extend::AttributesColorPair::new(
-                           extend::Attributes::from(attrs[0]),
-                           extend::ColorPair::from(opts[0])
-                       )
-                   )
+        _   => Ok(match ncurses_colortype() {
+                      NCursesColorType::Normal => {
+                          AttributesColorPairSet::Normal(
+                              normal::AttributesColorPair::new(
+                                  normal::Attributes::from(attrs[0]),
+                                  normal::ColorPair::from(color_pair[0])
+                              )
+                          )
+                      },
+                      NCursesColorType::Extended => {
+                          AttributesColorPairSet::Extend(
+                              extend::AttributesColorPair::new(
+                                  extend::Attributes::from(attrs[0]),
+                                  extend::ColorPair::from(opts[0])
+                              )
+                          )
+                      }
                })
-        }
     }
 }
 
