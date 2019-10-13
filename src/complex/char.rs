@@ -22,10 +22,11 @@
 
 use std::convert::{From, TryInto, Into};
 
-use gen::*;
+use gen::{AttributesType, ColorPairType, ColorAttributeTypes};
 use ncurseswerror::NCurseswError;
 use shims::bindings::cchar_t;
 use wide::WideChar;
+use crate::{setcchar, wunctrl};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ComplexChar {
@@ -38,7 +39,7 @@ impl ComplexChar {
               P: ColorPairType<T>,
               T: ColorAttributeTypes
     {
-        match crate::setcchar(WideChar::try_into(ch)?, attrs, color_pair) {
+        match setcchar(WideChar::try_into(ch)?, attrs, color_pair) {
             Err(e)    => Err(e),
             Ok(cchar) => Ok(cchar)
         }
@@ -49,14 +50,14 @@ impl ComplexChar {
               P: ColorPairType<T>,
               T: ColorAttributeTypes
     {
-        match crate::setcchar(ch, attrs, color_pair) {
+        match setcchar(ch, attrs, color_pair) {
             Err(e)    => Err(e),
             Ok(cchar) => Ok(cchar)
         }
     }
 
     pub fn as_wide_char(self) -> result!(WideChar) {
-        let ch = crate::wunctrl(self)?;
+        let ch = wunctrl(self)?;
 
         Ok(ch)
     }

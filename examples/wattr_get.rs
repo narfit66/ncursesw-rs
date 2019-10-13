@@ -30,13 +30,13 @@ fn main() -> Result<(), Box<Error>> {
         waddch(win, chtype_char | attrs0)?;
 
         match wattr_get(win)? {
-            AttributesColorPairSet::Normal(s) => {
+            AttributesColorPairSet::Normal(s)   => {
                 waddstr(win, "\n\nNormal attributes and color pair...\n\n")?;
                 waddstr(win, &format!("attributes.is_bold={}\n", s.attributes().is_bold()))?;
                 waddstr(win, &format!("attributes.is_dim={}\n", s.attributes().is_dim()))?;
                 waddstr(win, &format!("attributes.color_pair={:?}", s.color_pair()))?;
             },
-            AttributesColorPairSet::Extend(s) => {
+            AttributesColorPairSet::Extended(s) => {
                 waddstr(win, "\n\nExtended attributes and color pair...\n\n")?;
                 waddstr(win, &format!("attributes.is_bold={}\n", s.attributes().is_bold()))?;
                 waddstr(win, &format!("attributes.is_dim={}\n", s.attributes().is_dim()))?;

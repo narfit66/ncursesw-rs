@@ -767,11 +767,11 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -798,7 +798,7 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
                           )
                       },
                       NCursesColorType::Extended => {
-                          AttributesColorPairSet::Extend(
+                          AttributesColorPairSet::Extended(
                               extend::AttributesColorPair::new(
                                   extend::Attributes::from(attrs[0]),
                                   extend::ColorPair::from(opts[0])
@@ -841,12 +841,12 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -854,12 +854,12 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
 /// attr_off(Attributes::default() | Attribute::Dim)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -911,12 +911,12 @@ pub fn attr_off<A, T>(attrs: A) -> result!(())
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -924,12 +924,12 @@ pub fn attr_off<A, T>(attrs: A) -> result!(())
 /// attr_on(Attributes::default() | Attribute::Dim)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -981,11 +981,11 @@ pub fn attr_on<A, T>(attrs: A) -> result!(())
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -1038,12 +1038,12 @@ pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -1051,12 +1051,12 @@ pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
 /// attroff(Attributes::default() | Attribute::Dim)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -1105,12 +1105,12 @@ pub fn attroff(attrs: normal::Attributes) -> result!(()) {
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -1118,12 +1118,12 @@ pub fn attroff(attrs: normal::Attributes) -> result!(()) {
 /// attron(Attributes::default() | Attribute::Dim)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -1172,11 +1172,11 @@ pub fn attron(attrs: normal::Attributes) -> result!(()) {
 /// addch(chtype_char | attrs0)?;
 ///
 /// match attr_get()? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -1885,38 +1885,42 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
 }
 
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    let wc: [cchar_t; 1] = [ComplexChar::into(wcval)];
     let mut wch: [wchar_t; 1] = [0];
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
     let mut opts: [i32; 1] = [0];
+    let ncurses_colortype = ncurses_colortype();
 
-    match unsafe { ncurses::getcchar(&wc, wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut libc::c_void) } {
-        ERR => Err(ncurses_function_error!("getcchar")),
-        _   => {
-            Ok(WideCharAndAttributes::new(
-                   WideChar::from(wch[0]),
-                   match ncurses_colortype() {
-                       NCursesColorType::Normal => {
-                           AttributesColorPairSet::Normal(
-                               normal::AttributesColorPair::new(
-                                   normal::Attributes::from(attrs[0]),
-                                   normal::ColorPair::from(color_pair[0])
-                               )
-                           )
-                       },
-                       NCursesColorType::Extended => {
-                           AttributesColorPairSet::Extend(
-                               extend::AttributesColorPair::new(
-                                   extend::Attributes::from(attrs[0]),
-                                   extend::ColorPair::from(opts[0])
-                               )
-                           )
-                       }
-                   }
-               )
-            )
+    let mut opts_param = || -> Option<*mut i32> {
+        match ncurses_colortype {
+            NCursesColorType::Normal   => None,
+            NCursesColorType::Extended => Some(opts.as_mut_ptr())
         }
+    };
+    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, opts: i32| -> AttributesColorPairSet {
+        match ncurses_colortype {
+            NCursesColorType::Normal   => {
+                AttributesColorPairSet::Normal(
+                    normal::AttributesColorPair::new(
+                        normal::Attributes::from(attrs),
+                        normal::ColorPair::from(color_pair)
+                    )
+                )
+            },
+            NCursesColorType::Extended => {
+                AttributesColorPairSet::Extended(
+                    extend::AttributesColorPair::new(
+                        extend::Attributes::from(attrs),
+                        extend::ColorPair::from(opts)
+                    )
+                )
+            }
+        }
+    };
+
+    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts_param()) } {
+        ERR => Err(ncurses_function_error!("getcchar")),
+        _   => Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], opts[0])))
     }
 }
 
@@ -5485,7 +5489,7 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5514,7 +5518,7 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
                           )
                       },
                       NCursesColorType::Extended => {
-                          AttributesColorPairSet::Extend(
+                          AttributesColorPairSet::Extended(
                               extend::AttributesColorPair::new(
                                   extend::Attributes::from(attrs[0]),
                                   extend::ColorPair::from(opts[0])
@@ -5562,12 +5566,12 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
 /// waddch(win, chtype_char | attrs0)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5575,12 +5579,12 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
 /// wattr_off(win, Attributes::default() | Attribute::Dim)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5639,12 +5643,12 @@ pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
 /// waddch(win, chtype_char | attrs0)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5652,12 +5656,12 @@ pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
 /// wattr_on(win, Attributes::default() | Attribute::Dim)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5716,11 +5720,11 @@ pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
 /// waddch(win, chtype_char | attrs0)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5780,12 +5784,12 @@ pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()
 /// waddch(win, chtype_char | attrs0)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5793,12 +5797,12 @@ pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()
 /// wattroff(win, Attributes::default() | Attribute::Dim)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5854,12 +5858,12 @@ pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
 /// waddch(win, chtype_char | attrs0)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(!s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5867,12 +5871,12 @@ pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
 /// wattron(win, Attribute::Dim | color_pair1)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.attributes().is_dim());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }
@@ -5928,11 +5932,11 @@ pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
 /// waddch(win, chtype_char | attrs0)?;
 ///
 /// match wattr_get(win)? {
-///     AttributesColorPairSet::Normal(s) => {
+///     AttributesColorPairSet::Normal(s)   => {
 ///         assert!(s.attributes().is_bold());
 ///         assert!(s.color_pair() == color_pair1);
 ///     },
-///     AttributesColorPairSet::Extend(_) => {
+///     AttributesColorPairSet::Extended(_) => {
 ///         panic!("not a extended attributes/color pair!");
 ///     }
 /// }

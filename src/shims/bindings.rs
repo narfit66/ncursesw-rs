@@ -25,10 +25,16 @@
 #![allow(non_snake_case)]
 #![allow(clippy::all)]
 
+use std::os::raw::{c_short, c_int};
+
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 pub type RipoffInit = extern "C" fn(*mut WINDOW, i32) -> i32;
 
 extern "C" {
-     pub fn ripoffline(_: std::os::raw::c_int, _: RipoffInit) -> std::os::raw::c_int;
+    pub fn getcchar(_: *const cchar_t, _: *mut wchar_t, _: *mut attr_t, _: *mut c_short, _: *mut c_int) -> c_int;
+}
+
+extern "C" {
+     pub fn ripoffline(_: c_int, _: RipoffInit) -> c_int;
 }

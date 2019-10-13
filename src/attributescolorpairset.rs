@@ -29,5 +29,5 @@ pub enum AttributesColorPairSet {
     /// `normal` attributes and color pair.
     Normal(normal::AttributesColorPair),
     /// extended attributes and color pair.
-    Extend(extend::AttributesColorPair)
+    Extended(extend::AttributesColorPair)
 }

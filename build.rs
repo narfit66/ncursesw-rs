@@ -43,6 +43,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")                    // 'c' header file
         .blacklist_type("max_align_t")          // blacklisted to make cargo test pass
+        .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding

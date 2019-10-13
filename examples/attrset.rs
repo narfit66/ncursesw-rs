@@ -30,14 +30,14 @@ fn main() -> Result<(), Box<Error>> {
         addch(chtype_char | attrs0)?;
 
         match attr_get()? {
-            AttributesColorPairSet::Normal(s) => {
+            AttributesColorPairSet::Normal(s)   => {
                 addstr("\n\nNormal attributes and color pair...\n\n")?;
                 addstr(&format!("attributes.is_bold={}\n", s.attributes().is_bold()))?;
                 addstr(&format!("attributes.is_underline={}\n", s.attributes().is_underline()))?;
                 addstr(&format!("attributes.is_dim={}\n", s.attributes().is_dim()))?;
                 addstr(&format!("attributes.color_pair={:?}", s.color_pair()))?;
             },
-            AttributesColorPairSet::Extend(_) => {
+            AttributesColorPairSet::Extended(_) => {
                 panic!("not a extended attributes/color pair!");
             }
         }

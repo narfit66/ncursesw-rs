@@ -27,13 +27,13 @@ fn main() -> Result<(), Box<Error>> {
         add_wch(complex_char)?;
 
         match attr_get()? {
-            AttributesColorPairSet::Normal(s) => {
+            AttributesColorPairSet::Normal(s)   => {
                 addstr("\n\nNormal attributes and color pair...\n\n")?;
                 addstr(&format!("attributes.is_bold={}\n", s.attributes().is_bold()))?;
                 addstr(&format!("attributes.is_dim={}\n", s.attributes().is_dim()))?;
                 addstr(&format!("attributes.color_pair={:?}", s.color_pair()))?;
             },
-            AttributesColorPairSet::Extend(s) => {
+            AttributesColorPairSet::Extended(s) => {
                 addstr("\n\nExtended attributes and color pair...\n\n")?;
                 addstr(&format!("attributes.is_bold={}\n", s.attributes().is_bold()))?;
                 addstr(&format!("attributes.is_dim={}\n", s.attributes().is_dim()))?;
