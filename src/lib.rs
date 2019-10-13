@@ -103,6 +103,8 @@ use constants::{
     KEY_EVENT, TRUE, FALSE
 };
 
+use shims::bindings::CCHARW_MAX;
+
 // The maximum buffer size used in a variety of functions.
 const LINE_MAX: usize = 4096;
 
@@ -1885,7 +1887,7 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
 }
 
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    let mut wch: [wchar_t; 1] = [0];
+    let mut wch: [wchar_t; CCHARW_MAX as usize] = [0; CCHARW_MAX as usize];
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
     let mut opts: [i32; 1] = [0];
