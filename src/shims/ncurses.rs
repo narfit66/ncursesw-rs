@@ -695,25 +695,13 @@ pub unsafe fn getbkgrnd(wch: *mut cchar_t) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getcchar.3x.html>
-pub unsafe fn getcchar(wcval: &cchar_t, wch: *mut wchar_t, attrs: *mut attr_t, color_pair: *mut short_t, opts: Option<*mut i32>) -> i32 {
+pub unsafe fn getcchar(wcval: &cchar_t, wch: *mut wchar_t, attrs: *mut attr_t, color_pair: *mut short_t, opts: *mut i32) -> i32 {
     assert!(!wch.is_null(), "ncurses::getcchar() : wch.is_null()");
     assert!(!attrs.is_null(), "ncurses::getcchar() : attrs.is_null()");
     assert!(!color_pair.is_null(), "ncurses::getcchar() : color_pair.is_null()");
+    assert!(opts.is_null(), "ncurses::getcchar() : !opts.is_null()");
 
-    bindings::getcchar(
-        wcval,
-        wch,
-        attrs,
-        color_pair,
-        match opts {
-            Some(ptr) => {
-                assert!(!ptr.is_null(), "ncurses::getcchar() : opts.is_null()");
-
-                ptr
-            },
-            None      => ptr::null_mut()
-        }
-    )
+    bindings::getcchar(wcval, wch, attrs, color_pair, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>

@@ -1890,17 +1890,10 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
     let mut wch: [wchar_t; CCHARW_MAX as usize] = [0; CCHARW_MAX as usize];
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
-    let mut opts: [i32; 1] = [0];
-    let ncurses_colortype = ncurses_colortype();
+    let opts: *mut i32 = ptr::null_mut();
 
-    let mut opts_param = || -> Option<*mut i32> {
-        match ncurses_colortype {
-            NCursesColorType::Normal   => None,
-            NCursesColorType::Extended => Some(opts.as_mut_ptr())
-        }
-    };
-    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, opts: i32| -> AttributesColorPairSet {
-        match ncurses_colortype {
+    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, ext_color_pair: i32| -> AttributesColorPairSet {
+        match ncurses_colortype() {
             NCursesColorType::Normal   => {
                 AttributesColorPairSet::Normal(
                     normal::AttributesColorPair::new(
@@ -1913,16 +1906,25 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
                 AttributesColorPairSet::Extended(
                     extend::AttributesColorPair::new(
                         extend::Attributes::from(attrs),
-                        extend::ColorPair::from(opts)
+                        extend::ColorPair::from(ext_color_pair)
                     )
                 )
             }
         }
     };
 
-    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts_param()) } {
+    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
         ERR => Err(ncurses_function_error!("getcchar")),
-        _   => Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], opts[0])))
+        _   => {
+            // TODO : get opts working correct so not to rely on bodge!
+            //assert!(!opts.is_null(), "ncursesw::getcchar() : opts.is_null()");
+            //
+            //Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], unsafe { ptr::read(opts) })))
+
+            let c: cchar_t = ComplexChar::into(wcval); // bodge to get extended color pair.
+
+            Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
+        }
     }
 }
 
