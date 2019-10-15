@@ -42,7 +42,7 @@ mod macros;
 /// Extended color's, color pairs and attributes module
 pub mod extend;
 /// Traits used by `ncursesw`
-pub mod gen;
+mod gen;
 /// Normal color's, color pairs and attributes module
 pub mod normal;
 /// ncurses Panels module
