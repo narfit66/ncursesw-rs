@@ -19,7 +19,7 @@ At the moment this crate has only been tested on 64-bit Linux (Linux Mint 19.1) 
 
 ```
 [dependencies]
-ncursesw = "0.2"
+ncursesw = "0.3"
 ```
 Or to use the latest git version
 ```
