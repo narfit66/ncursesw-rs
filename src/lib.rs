@@ -45,6 +45,8 @@ pub mod extend;
 mod gen;
 /// Normal color's, color pairs and attributes module
 pub mod normal;
+/// ncurses Mouse module
+pub mod mouse;
 /// ncurses Panels module
 pub mod panels;
 /// ncurses API shims module
