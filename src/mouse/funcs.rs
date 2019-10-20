@@ -23,6 +23,7 @@
 use std::time;
 use std::convert::TryFrom;
 
+use mouse::constants::NCURSES_MOUSE_VERSION;
 use mouse::originresult::OriginResult;
 use ncurseswerror::NCurseswError;
 use origin::Origin;
@@ -94,4 +95,8 @@ pub fn mouse_trafo(origin: Origin, to_screen: bool) -> result!(OriginResult) {
     let result = unsafe { nmouse::mouse_trafo(y.as_mut_ptr(), x.as_mut_ptr(), to_screen) };
 
     Ok(OriginResult::new(y[0], x[0], to_screen, result))
+}
+
+pub fn mouse_version() -> i32 {
+    NCURSES_MOUSE_VERSION
 }

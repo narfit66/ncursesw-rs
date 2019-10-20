@@ -63,9 +63,7 @@ macro_rules! basic_ncurses_function_with_window {
 }
 
 macro_rules! ncurses_function_error { ($func: expr) => { NCurseswError::NCursesFunction { func: String::from($func) } } }
-
 macro_rules! panels_function_error { ($func: expr) => { NCurseswError::PanelFunction { func: String::from($func) } } }
-
 macro_rules! mouse_function_error { ($func: expr) => { NCurseswError::MouseFunction { func: String::from($func) } } }
 
 macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type = bindings::$name as $type; } }
