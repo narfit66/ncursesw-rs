@@ -71,6 +71,6 @@ pub const BUTTON5_TRIPLE_CLICKED: i32 = ncurses_mouse_mask!(5, NCURSES_TRIPLE_CL
 pub const BUTTON_CTRL: i32            = ncurses_mouse_mask!(MODIFIER_SHIFT, 0x001);
 pub const BUTTON_SHIFT: i32           = ncurses_mouse_mask!(MODIFIER_SHIFT, 0x002);
 pub const BUTTON_ALT: i32             = ncurses_mouse_mask!(MODIFIER_SHIFT, 0x004);
-pub const REPORT_MOUSE_POSITION: i32  = ncurses_mouse_mask!(MODIFIER_SHIFT, 0x008);
 
+pub const REPORT_MOUSE_POSITION: i32  = ncurses_mouse_mask!(MODIFIER_SHIFT, 0x008);
 pub const ALL_MOUSE_EVENTS: i32       = REPORT_MOUSE_POSITION - 1;

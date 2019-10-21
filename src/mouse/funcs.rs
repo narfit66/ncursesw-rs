@@ -47,7 +47,7 @@ pub fn getmouse(event: nmouse::MEVENT) -> result!(()) {
 
 pub fn ungetmouse(event: nmouse::MEVENT) -> result!(()) {
     match unsafe { nmouse::ungetmouse(event) } {
-        ERR => Err(mouse_function_error!("getmouse")),
+        ERR => Err(mouse_function_error!("ungetmouse")),
         _   => Ok(())
     }
 }
