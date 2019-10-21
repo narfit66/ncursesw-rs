@@ -28,7 +28,6 @@ custom_error::custom_error! {
 pub NCurseswError
     NCursesFunction { func: String } = "ncurses::{func}()",
     AlreadyInitialized = "ncurses library already initialized",
-    KeyMouse = "KEY_MOUSE",
     KeyReSize = "KEY_RESIZE",
     KeyEvent = "KEY_EVENT",
     PanelFunction { func: String } = "npanels::{func}()",

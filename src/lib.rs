@@ -101,7 +101,7 @@ pub use complex::*;
 pub use wide::*;
 
 use constants::{
-    ERR, KEY_CODE_YES, KEY_MOUSE, KEY_RESIZE,
+    ERR, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
     KEY_EVENT, TRUE, FALSE
 };
 
@@ -1744,7 +1744,6 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
         ERR          => Err(ncurses_function_error!("get_wch")),
         KEY_CODE_YES => {
             match wch[0] as i32 {
-                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
@@ -1761,7 +1760,6 @@ pub fn get_wstr() -> result!(WideString) {
 
     match unsafe { ncurses::get_wstr(ptr) } {
         ERR        => Err(ncurses_function_error!("get_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -1933,16 +1931,13 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
 pub fn getch() -> result!(CharacterResult<char>) {
     match ncurses::getch() {
         ERR        => Err(ncurses_function_error!("getch")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => {
-            if ch > i32::from(i8::max_value()) {
-                Ok(CharacterResult::Key(KeyBinding::from(ch)))
-            } else {
-                Ok(CharacterResult::Character(char::from(ch as i8 as u8)))
-            }
-        }
+        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
+                          CharacterResult::Key(KeyBinding::from(ch))
+                      } else {
+                          CharacterResult::Character(char::from(ch as i8 as u8))
+                      })
     }
 }
 
@@ -2004,7 +1999,6 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
 
     match unsafe { ncurses::getn_wstr(ptr, number) } {
         ERR        => Err(ncurses_function_error!("getn_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -2031,7 +2025,6 @@ pub fn getnstr(number: i32) -> result!(String) {
 
     match unsafe { ncurses::getnstr(ptr, number) } {
         ERR        => Err(ncurses_function_error!("getnstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -2074,7 +2067,6 @@ pub fn getstr() -> result!(String) {
 
     match unsafe { ncurses::getstr(ptr) } {
         ERR        => Err(ncurses_function_error!("getstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -3096,7 +3088,6 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
         ERR          => Err(ncurses_function_error!("mvget_wch")),
         KEY_CODE_YES => {
             match wch[0] as i32 {
-                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
@@ -3113,7 +3104,6 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
 
     match unsafe { ncurses::mvget_wstr(origin.y, origin.x, ptr) } {
         ERR        => Err(ncurses_function_error!("mvget_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -3135,16 +3125,13 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
 pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvgetch(origin.y, origin.x) {
         ERR        => Err(ncurses_function_error!("mvgetch")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => {
-            if ch > i32::from(i8::max_value()) {
-                Ok(CharacterResult::Key(KeyBinding::from(ch)))
-            } else {
-                Ok(CharacterResult::Character(char::from(ch as i8 as u8)))
-            }
-        }
+        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
+                          CharacterResult::Key(KeyBinding::from(ch))
+                      } else {
+                          CharacterResult::Character(char::from(ch as i8 as u8))
+                      })
     }
 }
 
@@ -3156,7 +3143,6 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
 
     match unsafe { ncurses::mvgetn_wstr(origin.y, origin.x, ptr, number) } {
         ERR        => Err(ncurses_function_error!("mvgetn_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -3183,7 +3169,6 @@ pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
 
     match unsafe { ncurses::mvgetnstr(origin.y, origin.x, ptr, number) } {
         ERR        => Err(ncurses_function_error!("mvgetnstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -3201,7 +3186,6 @@ pub fn mvgetstr(origin: Origin) -> result!(String) {
 
     match unsafe { ncurses::mvgetstr(origin.y, origin.x, ptr) } {
         ERR        => Err(ncurses_function_error!("mvgetstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -4022,7 +4006,6 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
         ERR          => Err(ncurses_function_error!("mvwget_wch")),
         KEY_CODE_YES => {
             match wch[0] as i32 {
-                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
@@ -4039,7 +4022,6 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
 
     match unsafe { ncurses::mvwget_wstr(handle, origin.y, origin.y, ptr) } {
         ERR        => Err(ncurses_function_error!("mvwget_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -4061,16 +4043,13 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
 pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvwgetch(handle, origin.y, origin.x) {
         ERR        => Err(ncurses_function_error!("mvwgetch")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => {
-            if ch > i32::from(i8::max_value()) {
-                Ok(CharacterResult::Key(KeyBinding::from(ch)))
-            } else {
-                Ok(CharacterResult::Character(char::from(ch as i8 as u8)))
-            }
-        }
+        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
+                          CharacterResult::Key(KeyBinding::from(ch))
+                      } else {
+                          CharacterResult::Character(char::from(ch as i8 as u8))
+                      })
     }
 }
 
@@ -4082,7 +4061,6 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
 
     match unsafe { ncurses::mvwgetn_wstr(handle, origin.y, origin.x, ptr, number) } {
         ERR        => Err(ncurses_function_error!("mvwgetn_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -4109,7 +4087,6 @@ pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String
 
     match unsafe { ncurses::mvwgetnstr(handle, origin.y, origin.x, ptr, number) } {
         ERR        => Err(ncurses_function_error!("mvwgetnstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -4127,7 +4104,6 @@ pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
 
     match unsafe { ncurses::mvwgetstr(handle, origin.y, origin.x, ptr) } {
         ERR        => Err(ncurses_function_error!("mvwgetstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -6304,7 +6280,6 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
         ERR          => Err(ncurses_function_error!("wget_wch")),
         KEY_CODE_YES => {
             match wch[0] as i32 {
-                KEY_MOUSE  => Err(NCurseswError::KeyMouse),
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
@@ -6321,7 +6296,6 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
 
     match unsafe { ncurses::wget_wstr(handle, ptr) } {
         ERR        => Err(ncurses_function_error!("wget_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -6396,16 +6370,13 @@ pub fn wgetbkgrnd(handle: WINDOW) -> result!(ComplexChar) {
 pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
     match ncurses::wgetch(handle) {
         ERR        => Err(ncurses_function_error!("wgetch")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => {
-            if ch > i32::from(i8::max_value()) {
-                Ok(CharacterResult::Key(KeyBinding::from(ch)))
-            } else {
-                Ok(CharacterResult::Character(char::from(ch as i8 as u8)))
-            }
-        }
+        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
+                          CharacterResult::Key(KeyBinding::from(ch))
+                      } else {
+                          CharacterResult::Character(char::from(ch as i8 as u8))
+                      })
     }
 }
 
@@ -6423,7 +6394,6 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
 
     match unsafe { ncurses::wgetn_wstr(handle, ptr, number) } {
         ERR        => Err(ncurses_function_error!("wgetn_wstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -6450,7 +6420,6 @@ pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
 
     match unsafe { ncurses::wgetnstr(handle, ptr, number) } {
         ERR        => Err(ncurses_function_error!("wgetnstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -6482,7 +6451,6 @@ pub fn wgetstr(handle: WINDOW) -> result!(String) {
 
     match unsafe { ncurses::wgetstr(handle, ptr) } {
         ERR        => Err(ncurses_function_error!("wgetstr")),
-        KEY_MOUSE  => Err(NCurseswError::KeyMouse),
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
