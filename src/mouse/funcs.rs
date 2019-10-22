@@ -100,3 +100,7 @@ pub fn mouse_trafo(origin: Origin, to_screen: bool) -> result!(OriginResult) {
 pub fn mouse_version() -> i32 {
     NCURSES_MOUSE_VERSION
 }
+
+pub fn has_mouse_interface() -> bool {
+    mouse_version() > 0
+}
