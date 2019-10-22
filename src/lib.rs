@@ -1743,9 +1743,15 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
 
     match unsafe { ncurses::get_wch(wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("get_wch")),
+        #[cfg(feature = "key_resize_as_error")]
+        KEY_RESIZE   => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
+        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match wch[0] as i32 {
+                #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
@@ -1933,7 +1939,9 @@ pub fn getch() -> result!(CharacterResult<char>) {
     match ncurses::getch() {
         ERR        => Err(ncurses_function_error!("getch")),
         EINTR      => Err(NCurseswError::InputInterupted),
+        #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
                           CharacterResult::Key(KeyBinding::from(ch))
@@ -3090,9 +3098,15 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
 
     match unsafe { ncurses::mvget_wch(origin.y, origin.x, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("mvget_wch")),
+        #[cfg(feature = "key_resize_as_error")]
+        KEY_RESIZE   => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
+        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match wch[0] as i32 {
+                #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
@@ -3130,7 +3144,9 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvgetch(origin.y, origin.x) {
         ERR        => Err(ncurses_function_error!("mvgetch")),
         EINTR      => Err(NCurseswError::InputInterupted),
+        #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
                           CharacterResult::Key(KeyBinding::from(ch))
@@ -4011,9 +4027,15 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
 
     match unsafe { ncurses::mvwget_wch(handle, origin.y, origin.x, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("mvwget_wch")),
+        #[cfg(feature = "key_resize_as_error")]
+        KEY_RESIZE   => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
+        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match wch[0] as i32 {
+                #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
@@ -4051,7 +4073,9 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
     match ncurses::mvwgetch(handle, origin.y, origin.x) {
         ERR        => Err(ncurses_function_error!("mvwgetch")),
         EINTR      => Err(NCurseswError::InputInterupted),
+        #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
                           CharacterResult::Key(KeyBinding::from(ch))
@@ -6288,9 +6312,15 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
 
     match unsafe { ncurses::wget_wch(handle, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("wget_wch")),
+        #[cfg(feature = "key_resize_as_error")]
+        KEY_RESIZE   => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
+        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match wch[0] as i32 {
+                #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyReSize),
+                #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
@@ -6381,7 +6411,9 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
     match ncurses::wgetch(handle) {
         ERR        => Err(ncurses_function_error!("wgetch")),
         EINTR      => Err(NCurseswError::InputInterupted),
+        #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyReSize),
+        #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
                           CharacterResult::Key(KeyBinding::from(ch))
