@@ -29,7 +29,7 @@ pub NCurseswError
     NCursesFunction { func: String } = "ncurses::{func}()",
     AlreadyInitialized = "ncurses library already initialized",
     InputInterupted = "ncurses input function has recieved an interrupt",
-    KeyReSize = "KEY_RESIZE",
+    KeyResize = "KEY_RESIZE",
     KeyEvent = "KEY_EVENT",
     PanelFunction { func: String } = "npanels::{func}()",
     MouseFunction { func: String } = "nmouse::{func}()",

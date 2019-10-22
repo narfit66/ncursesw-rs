@@ -21,7 +21,11 @@ lazy_static = "1.3.0"
 bindgen = "0.44.0"
 
 [features]
+# conditional compulation of KEY_RESIZE to return as a NCurseswError::KeyResize for getch(), mvgetch(),
+# mvwgetch(), wgetch(), get_wch(), mvget_wch(), mvwget_wch() and wget_ch().
 key_resize_as_error = []
+# conditional compulation of KEY_EVENT to return as a NCurseswError::KeyEvent for getch(), mvgetch(),
+# mvwgetch(), wgetch(), get_wch(), mvget_wch(), mvwget_wch() and wget_ch().
 key_event_as_error = []
 
 [lib]
