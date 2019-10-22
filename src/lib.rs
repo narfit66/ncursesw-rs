@@ -1743,6 +1743,7 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
 
     match unsafe { ncurses::get_wch(wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("get_wch")),
+        EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
@@ -1767,6 +1768,7 @@ pub fn get_wstr() -> result!(WideString) {
 
     match unsafe { ncurses::get_wstr(ptr) } {
         ERR        => Err(ncurses_function_error!("get_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -2009,6 +2011,7 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
 
     match unsafe { ncurses::getn_wstr(ptr, number) } {
         ERR        => Err(ncurses_function_error!("getn_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -3098,6 +3101,7 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
 
     match unsafe { ncurses::mvget_wch(origin.y, origin.x, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("mvget_wch")),
+        EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
@@ -3122,6 +3126,7 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
 
     match unsafe { ncurses::mvget_wstr(origin.y, origin.x, ptr) } {
         ERR        => Err(ncurses_function_error!("mvget_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -3164,6 +3169,7 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
 
     match unsafe { ncurses::mvgetn_wstr(origin.y, origin.x, ptr, number) } {
         ERR        => Err(ncurses_function_error!("mvgetn_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -4027,6 +4033,7 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
 
     match unsafe { ncurses::mvwget_wch(handle, origin.y, origin.x, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("mvwget_wch")),
+        EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
@@ -4051,6 +4058,7 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
 
     match unsafe { ncurses::mvwget_wstr(handle, origin.y, origin.y, ptr) } {
         ERR        => Err(ncurses_function_error!("mvwget_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -4093,6 +4101,7 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
 
     match unsafe { ncurses::mvwgetn_wstr(handle, origin.y, origin.x, ptr, number) } {
         ERR        => Err(ncurses_function_error!("mvwgetn_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -6312,6 +6321,7 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
 
     match unsafe { ncurses::wget_wch(handle, wch.as_mut_ptr()) } {
         ERR          => Err(ncurses_function_error!("wget_wch")),
+        EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
@@ -6336,6 +6346,7 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
 
     match unsafe { ncurses::wget_wstr(handle, ptr) } {
         ERR        => Err(ncurses_function_error!("wget_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
@@ -6437,6 +6448,7 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
 
     match unsafe { ncurses::wgetn_wstr(handle, ptr, number) } {
         ERR        => Err(ncurses_function_error!("wgetn_wstr")),
+        EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         _          => {
