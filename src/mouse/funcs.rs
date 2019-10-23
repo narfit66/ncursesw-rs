@@ -28,7 +28,7 @@ use mouse::originresult::OriginResult;
 use ncurseswerror::NCurseswError;
 use origin::Origin;
 use shims::{ncurses, nmouse, bindings};
-use shims::constants::ERR;
+use shims::constants::{OK, ERR};
 
 type WINDOW = ncurses::WINDOW;
 pub type MEVENT = bindings::MEVENT;
@@ -40,29 +40,35 @@ pub fn has_mouse() -> bool {
 
 pub fn getmouse(event: nmouse::MEVENT) -> result!(()) {
     match unsafe { nmouse::getmouse(event) } {
-        ERR => Err(mouse_function_error!("getmouse")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(mouse_function_error_with_rc!("getmouse", rc))
     }
 }
 
 pub fn ungetmouse(event: nmouse::MEVENT) -> result!(()) {
     match unsafe { nmouse::ungetmouse(event) } {
-        ERR => Err(mouse_function_error!("ungetmouse")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(mouse_function_error_with_rc!("ungetmouse", rc))
     }
 }
 
 pub fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> result!(mmask_t) {
-    match unsafe { nmouse::mousemask(newmask, oldmask) } {
-        0    => Err(mouse_function_error!("mousemask")),
-        mask => Ok(mask)
+    let mask = unsafe { nmouse::mousemask(newmask, oldmask) };
+
+    if mask <= 0 {
+        Err(mouse_function_error!("mousemask"))
+    } else {
+        Ok(mask)
     }
 }
 
 pub fn mouseinterval() -> result!(time::Duration) {
-    match nmouse::mouseinterval(-1) {
-        ERR => Err(mouse_function_error!("mouseinterval")),
-        ms  => Ok(time::Duration::from_millis(u64::try_from(ms)?))
+    let rc = nmouse::mouseinterval(-1);
+
+    if rc < 0 {
+        Err(mouse_function_error_with_rc!("mouseinterval", rc))
+    } else {
+        Ok(time::Duration::from_millis(u64::try_from(rc)?))
     }
 }
 
@@ -70,8 +76,8 @@ pub fn set_mouseinterval(delay: time::Duration) -> result!(()) {
     let ms = i32::try_from(delay.as_millis())?;
 
     match nmouse::mouseinterval(ms) {
-        ERR => Err(mouse_function_error!("mouseinterval")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(mouse_function_error_with_rc!("mouseinterval", rc))
     }
 }
 
@@ -79,22 +85,22 @@ pub fn wenclose(win: WINDOW, origin: Origin) -> bool {
     unsafe { nmouse::wenclose(win, origin.y, origin.x) }
 }
 
-pub fn wmouse_trafo(win: WINDOW, origin: Origin, to_screen: bool) -> result!(OriginResult) {
+pub fn wmouse_trafo(win: WINDOW, origin: Origin, to_screen: bool) -> OriginResult {
     let mut y: [i32; 1] = [origin.y];
     let mut x: [i32; 1] = [origin.x];
 
     let result = unsafe { nmouse::wmouse_trafo(win, y.as_mut_ptr(), x.as_mut_ptr(), to_screen) };
 
-    Ok(OriginResult::new(y[0], x[0], to_screen, result))
+    OriginResult::new(y[0], x[0], to_screen, result)
 }
 
-pub fn mouse_trafo(origin: Origin, to_screen: bool) -> result!(OriginResult) {
+pub fn mouse_trafo(origin: Origin, to_screen: bool) -> OriginResult {
     let mut y: [i32; 1] = [origin.y];
     let mut x: [i32; 1] = [origin.x];
 
     let result = unsafe { nmouse::mouse_trafo(y.as_mut_ptr(), x.as_mut_ptr(), to_screen) };
 
-    Ok(OriginResult::new(y[0], x[0], to_screen, result))
+    OriginResult::new(y[0], x[0], to_screen, result)
 }
 
 pub fn mouse_version() -> i32 {

@@ -24,7 +24,7 @@ use ncurseswerror::NCurseswError;
 use origin::Origin;
 use shims::ncurses;
 use shims::npanels;
-use shims::constants::ERR;
+use shims::constants::{OK, ERR};
 
 type WINDOW = ncurses::WINDOW;
 
@@ -42,24 +42,24 @@ pub fn new_panel(window_handle: WINDOW) -> result!(PANEL) {
 /// puts panel at the bottom of all panels.
 pub fn bottom_panel(handle: PANEL) -> result!(()) {
     match npanels::bottom_panel(handle) {
-        ERR => Err(panels_function_error!("bottom_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("bottom_panel", rc))
     }
 }
 
 /// puts the given visible panel on top of all panels in the stack.
 pub fn top_panel(handle: PANEL) -> result!(()) {
     match npanels::top_panel(handle) {
-        ERR => Err(panels_function_error!("top_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("top_panel", rc))
     }
 }
 
 /// makes a hidden panel visible by placing it on top of the panels in the panel stack.
 pub fn show_panel(handle: PANEL) -> result!(()) {
     match npanels::show_panel(handle) {
-        ERR => Err(panels_function_error!("show_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("show_panel", rc))
     }
 }
 
@@ -75,8 +75,8 @@ pub fn update_panels() {
 /// removes the given panel from the panel stack and thus hides it from view. The PANEL structure is not lost, merely removed from the stack.
 pub fn hide_panel(handle: PANEL) -> result!(()) {
     match npanels::hide_panel(handle) {
-        ERR => Err(panels_function_error!("hide_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("hide_panel", rc))
     }
 }
 
@@ -91,16 +91,16 @@ pub fn panel_window(handle: PANEL) -> result!(WINDOW) {
 /// replaces the current window of panel with window (useful, for example if you want to resize a panel; if you're using ncurses, you can call replace_panel on the output of wresize(3x)). It does not change the position of the panel in the stack.
 pub fn replace_panel(handle: PANEL, window_handle: WINDOW) -> result!(()) {
     match npanels::replace_panel(handle, window_handle) {
-        ERR => Err(panels_function_error!("replace_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("replace_panel", rc))
     }
 } 
 
 /// moves the given panel window so that its upper-left corner is at origin.y, origin.x. It does not change the position of the panel in the stack. Be sure to use this function, not mvwin(), to move a panel window.
 pub fn move_panel(handle: PANEL, origin: Origin) -> result!(()) {
     match npanels::move_panel(handle, origin.y, origin.x) {
-        ERR => Err(panels_function_error!("move_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("move_panel", rc))
     }
 } 
 
@@ -131,8 +131,8 @@ pub fn panel_below(handle: Option<PANEL>) -> result!(PANEL) {
 /// sets the panel's user pointer.
 pub fn set_panel_userptr(handle: PANEL, ptr: Option<PANEL_USERPTR>) -> result!(()) {
     match npanels::set_panel_userptr(handle, ptr) {
-        ERR => Err(panels_function_error!("set_panel_userptr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("set_panel_userptr", rc))
     }
 }
 
@@ -144,7 +144,7 @@ pub fn panel_userptr(handle: PANEL) -> Option<PANEL_USERPTR> {
 /// removes the given panel from the stack and deallocates the PANEL structure (but not its associated window).
 pub fn del_panel(handle: PANEL) -> result!(()) {
     match npanels::del_panel(handle) {
-        ERR => Err(panels_function_error!("del_panel")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(panels_function_error_with_rc!("del_panel", rc))
     }
 }

@@ -102,7 +102,7 @@ pub use wide::*;
 
 use libc::{c_void, EINTR};
 use constants::{
-    ERR, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
+    ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
     KEY_EVENT, TRUE, FALSE
 };
 
@@ -395,8 +395,8 @@ pub fn TABSIZE() -> i32 {
 /// ```
 pub fn add_wch(wch: ComplexChar) -> result!(()) {
     match ncurses::add_wch(&ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("add_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("add_wch", rc))
     }
 }
 
@@ -427,8 +427,8 @@ pub fn add_wch(wch: ComplexChar) -> result!(()) {
 /// ```
 pub fn add_wchnstr(wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::add_wchnstr(raw_with_nul_as_slice!(wchstr), number) {
-        ERR => Err(ncurses_function_error!("add_wchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("add_wchnstr", rc))
     }
 }
 
@@ -459,8 +459,8 @@ pub fn add_wchnstr(wchstr: &ComplexString, number: i32) -> result!(()) {
 /// ```
 pub fn add_wchstr(wchstr: &ComplexString) -> result!(()) {
     match ncurses::add_wchstr(raw_with_nul_as_slice!(wchstr)) {
-        ERR => Err(ncurses_function_error!("add_wchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("add_wchstr", rc))
     }
 }
 
@@ -493,8 +493,8 @@ pub fn add_wchstr(wchstr: &ComplexString) -> result!(()) {
 /// ```
 pub fn addch(ch: ChtypeChar) -> result!(()) {
     match ncurses::addch(ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("addch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addch", rc))
     }
 }
 
@@ -528,8 +528,8 @@ pub fn addch(ch: ChtypeChar) -> result!(()) {
 /// ```
 pub fn addchnstr(chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::addchnstr(raw_with_nul_as_slice!(chstr), number) {
-        ERR => Err(ncurses_function_error!("addchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addchnstr", rc))
     }
 }
 
@@ -563,8 +563,8 @@ pub fn addchnstr(chstr: &ChtypeString, number: i32) -> result!(()) {
 /// ```
 pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
     match ncurses::addchstr(raw_with_nul_as_slice!(chstr)) {
-        ERR => Err(ncurses_function_error!("addchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addchstr", rc))
     }
 }
 
@@ -595,8 +595,8 @@ pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
 /// ```
 pub fn addnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::addnstr(c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("addnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addnstr", rc)),
     }
 }
 
@@ -623,8 +623,8 @@ pub fn addnstr(str: &str, number: i32) -> result!(()) {
 /// ```
 pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::addnwstr(raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("addnwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addnwstr", rc))
     }
 }
 
@@ -655,8 +655,8 @@ pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
 /// ```
 pub fn addstr(str: &str) -> result!(()) {
     match ncurses::addstr(c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("addstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addstr", rc))
     }
 }
 
@@ -683,8 +683,8 @@ pub fn addstr(str: &str) -> result!(()) {
 /// ```
 pub fn addwstr(wstr: &WideString) -> result!(()) {
     match ncurses::addwstr(raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("addwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("addwstr", rc))
     }
 }
 
@@ -729,8 +729,8 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
           T: ColorAttributeTypes
 {
     match ncurses::assume_default_colors(colors.foreground().number(), colors.background().number()) {
-        ERR => Err(ncurses_function_error!("assume_default_colors")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("assume_default_colors", rc))
     }
 }
 
@@ -792,25 +792,25 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
     let mut opts: [i32; 1] = [0];
 
     match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
-        ERR => Err(ncurses_function_error!("attr_get")),
-        _   => Ok(match ncurses_colortype() {
-                      NCursesColorType::Normal => {
-                          AttributesColorPairSet::Normal(
-                              normal::AttributesColorPair::new(
-                                  normal::Attributes::from(attrs[0]),
-                                  normal::ColorPair::from(color_pair[0])
-                              )
-                          )
-                      },
-                      NCursesColorType::Extended => {
-                          AttributesColorPairSet::Extended(
-                              extend::AttributesColorPair::new(
-                                  extend::Attributes::from(attrs[0]),
-                                  extend::ColorPair::from(opts[0])
-                              )
-                          )
-                      }
-               })
+        OK => Ok(match ncurses_colortype() {
+                     NCursesColorType::Normal => {
+                         AttributesColorPairSet::Normal(
+                             normal::AttributesColorPair::new(
+                                 normal::Attributes::from(attrs[0]),
+                                 normal::ColorPair::from(color_pair[0])
+                             )
+                         )
+                     },
+                     NCursesColorType::Extended => {
+                         AttributesColorPairSet::Extended(
+                             extend::AttributesColorPair::new(
+                                 extend::Attributes::from(attrs[0]),
+                                 extend::ColorPair::from(opts[0])
+                             )
+                         )
+                     }
+              }),
+        rc => Err(ncurses_function_error_with_rc!("attr_get", rc))
     }
 }
 
@@ -879,8 +879,8 @@ pub fn attr_off<A, T>(attrs: A) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::attr_off(attrs.as_attr_t(), ptr::null_mut()) } {
-        ERR => Err(ncurses_function_error!("attr_off")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("attr_off", rc))
     }
 }
 
@@ -949,8 +949,8 @@ pub fn attr_on<A, T>(attrs: A) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::attr_on(attrs.as_attr_t(), ptr::null_mut()) } {
-        ERR => Err(ncurses_function_error!("attr_on")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("attr_on", rc))
     }
 }
 
@@ -1006,8 +1006,8 @@ pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::attr_set(attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("attr_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("attr_set", rc))
     }
 }
 
@@ -1073,8 +1073,8 @@ pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
 /// ```
 pub fn attroff(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attroff(normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("attroff")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("attroff", rc))
     }
 }
 
@@ -1140,8 +1140,8 @@ pub fn attroff(attrs: normal::Attributes) -> result!(()) {
 /// ```
 pub fn attron(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attron(normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("attron")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("attron", rc))
     }
 }
 
@@ -1193,8 +1193,8 @@ pub fn attron(attrs: normal::Attributes) -> result!(()) {
 /// ```
 pub fn attrset(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attrset(normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("attrset")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("attrset", rc))
     }
 }
 
@@ -1222,8 +1222,8 @@ pub fn baudrate() -> i32 {
 /// ```
 pub fn beep() -> result!(()) {
     match ncurses::beep() {
-        ERR => Err(ncurses_function_error!("beep")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("beep", rc))
     }
 }
 
@@ -1247,8 +1247,8 @@ pub fn beep() -> result!(()) {
 /// ```
 pub fn bkgd(ch: ChtypeChar) -> result!(()) {
     match ncurses::bkgd(ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("bkgd")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("bkgd", rc))
     }
 }
 
@@ -1321,8 +1321,8 @@ pub fn bkgdset(ch: ChtypeChar) {
 /// ```
 pub fn bkgrnd(wch: ComplexChar) -> result!(()) {
     match ncurses::bkgrnd(&ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("bkgrnd")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("bkgrnd", rc))
     }
 }
 
@@ -1445,8 +1445,8 @@ pub fn border(
         ChtypeChar::into(bl),
         ChtypeChar::into(br)
     ) {
-        ERR => Err(ncurses_function_error!("border")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("border", rc))
     }
 }
 
@@ -1470,22 +1470,22 @@ pub fn border_set(
         &ComplexChar::into(bl),
         &ComplexChar::into(br)
     ) {
-        ERR => Err(ncurses_function_error!("border_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("border_set", rc))
     }
 }
 
 pub fn r#box(handle: WINDOW, verch: ChtypeChar, horch: ChtypeChar) -> result!(()) {
     match ncurses::r#box(handle, ChtypeChar::into(verch), ChtypeChar::into(horch)) {
-        ERR => Err(ncurses_function_error!("box")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("box", rc))
     }
 }
 
 pub fn box_set(handle: WINDOW, verch: ComplexChar, horch: ComplexChar) -> result!(()) {
     match ncurses::box_set(handle, &ComplexChar::into(verch), &ComplexChar::into(horch)) {
-        ERR => Err(ncurses_function_error!("box_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("box_set", rc))
     }
 }
 
@@ -1501,8 +1501,8 @@ pub fn chgat<A, P, T>(number: i32, attrs: A, color_pair: P) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::chgat(number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
-        ERR => Err(ncurses_function_error!("chgat")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("chgat", rc))
     }
 }
 
@@ -1510,8 +1510,8 @@ basic_ncurses_function!(clear, "clear");
 
 pub fn clearok(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::clearok(handle, bf) {
-        ERR => Err(ncurses_function_error!("clearok")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("clearok", rc))
     }
 }
 
@@ -1525,8 +1525,8 @@ pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
     let mut b: [short_t; 1] = [0];
 
     match unsafe { ncurses::color_content(normal::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("color_content")),
-        _   => Ok(normal::RGB::new(r[0], g[0], b[0]))
+        OK => Ok(normal::RGB::new(r[0], g[0], b[0])),
+        rc => Err(ncurses_function_error_with_rc!("color_content", rc))
     }
 }
 
@@ -1535,8 +1535,8 @@ pub fn color_set<P, T>(color_pair: P) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::color_set(color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("color_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("color_set", rc))
     }
 }
 
@@ -1553,18 +1553,26 @@ pub fn copywin(
     } else {
         FALSE
     }) {
-        ERR => Err(ncurses_function_error!("copywin")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("copywin", rc))
     }
 }
 
 pub fn curs_set(cursor: CursorType) -> result!(CursorType) {
-    match ncurses::curs_set(CursorType::into(cursor)) {
-        ERR => Err(ncurses_function_error!("curs_set")),
-        rc  => {
-            let cur = CursorType::try_from(rc)?;
+    let rc = ncurses::curs_set(match cursor {
+        CursorType::Invisible   => 0,
+        CursorType::Visible     => 1,
+        CursorType::VeryVisible => 2
+    });
 
-            Ok(cur)
+    if rc < 0 {
+        Err(ncurses_function_error_with_rc!("curs_set", rc))
+    } else {
+        match rc {
+            0  => Ok(CursorType::Invisible),
+            1  => Ok(CursorType::Visible),
+            2  => Ok(CursorType::VeryVisible),
+            rc => Err(ncurses_function_error_with_rc!("curs_set", rc))
         }
     }
 }
@@ -1585,8 +1593,8 @@ pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) 
         },
         KeyBinding::into(keycode)
     )} {
-        ERR => Err(ncurses_function_error!("define_key")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("define_key", rc))
     }
 }
 
@@ -1594,8 +1602,8 @@ pub fn delay_output(ms: time::Duration) -> result!(()) {
     let ms = i32::try_from(ms.as_millis())?;
 
     match ncurses::delay_output(ms) {
-        ERR => Err(ncurses_function_error!("delay_output")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("delay_output", rc))
     }
 }
 
@@ -1629,15 +1637,15 @@ basic_ncurses_function!(echo, "echo");
 
 pub fn echo_wchar(wch: ComplexChar) -> result!(()) {
     match ncurses::echo_wchar(&ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("echo_wchar")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("echo_wchar", rc))
     }
 }
 
 pub fn echochar(ch: ChtypeChar) -> result!(()) {
     match ncurses::echochar(ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("echochar")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("echochar", rc))
     }
 }
 
@@ -1648,8 +1656,8 @@ basic_ncurses_function!(erase, "erase");
 pub fn erasechar() -> result!(char) {
     let rc = ncurses::erasechar();
 
-    if rc == ERR as i8 {
-        Err(ncurses_function_error!("erasechar"))
+    if rc < 0 {
+        Err(ncurses_function_error_with_rc!("erasechar", i32::from(rc)))
     } else {
         Ok(char::from(rc as u8))
     }
@@ -1659,8 +1667,8 @@ pub fn erasewchar() -> result!(WideChar) {
     let mut wch: [wchar_t; 1] = [0];
 
     match unsafe { ncurses::erasewchar(wch.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("erasewchar")),
-        _   => Ok(WideChar::from(wch[0]))
+        OK => Ok(WideChar::from(wch[0])),
+        rc => Err(ncurses_function_error_with_rc!("erasewchar", rc))
     }
 }
 
@@ -1670,8 +1678,8 @@ pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     let mut b: [i32; 1] = [0];
 
     match unsafe { ncurses::extended_color_content(extend::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("extended_color_content")),
-        _   => Ok(extend::RGB::new(r[0], g[0], b[0]))
+        OK => Ok(extend::RGB::new(r[0], g[0], b[0])),
+        rc => Err(ncurses_function_error_with_rc!("extended_color_content", rc))
     }
 }
 
@@ -1680,15 +1688,15 @@ pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::C
     let mut bg: [i32; 1] = [0];
 
     match unsafe { ncurses::extended_pair_content(extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("extended_pair_content")),
-        _   => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0])))
+        OK => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0]))),
+        rc => Err(ncurses_function_error_with_rc!("extended_pair_content", rc))
     }
 }
 
 pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
     match ncurses::extended_slk_color(color_pair.number()) {
-        ERR => Err(ncurses_function_error!("extended_slk_color")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("extended_slk_color", rc))
     }
 }
 
@@ -1713,8 +1721,8 @@ simple_ncurses_function!(filter);
 /// ```
 pub fn flash() -> result!(()) {
     match ncurses::flash() {
-        ERR => Err(ncurses_function_error!("flash")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("flash", rc))
     }
 }
 
@@ -1727,8 +1735,8 @@ pub fn free_pair<P, T>(color_pair: P) -> result!(())
           T: ColorAttributeTypes
 {
     match ncurses::free_pair(color_pair.into()) {
-        ERR => Err(ncurses_function_error!("free_pair")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("free_pair", rc))
     }
 }
 
@@ -1742,7 +1750,6 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::get_wch(wch.as_mut_ptr()) } {
-        ERR          => Err(ncurses_function_error!("get_wch")),
         EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
@@ -1757,7 +1764,13 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
+        rc           => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("get_wch", rc))
+            } else {
+                Ok(CharacterResult::Character(WideChar::from(wch[0])))
+            }
+        }
     }
 }
 
@@ -1767,22 +1780,25 @@ pub fn get_wstr() -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::get_wstr(ptr) } {
-        ERR        => Err(ncurses_function_error!("get_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::get_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("get_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::get_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
@@ -1792,16 +1808,22 @@ pub fn getattrs(handle: WINDOW) -> normal::Attributes {
 }
 
 pub fn getbegx(handle: WINDOW) -> result!(i32) {
-    match ncurses::getbegx(handle) {
-        ERR => Err(ncurses_function_error!("getbegx")),
-        x   => Ok(x)
+    let x = ncurses::getbegx(handle);
+
+    if x < 0 {
+        Err(ncurses_function_error_with_rc!("getbegx", x))
+    } else {
+        Ok(x)
     }
 }
 
 pub fn getbegy(handle: WINDOW) -> result!(i32) {
-    match ncurses::getbegy(handle) {
-        ERR => Err(ncurses_function_error!("getbegy")),
-        y   => Ok(y)
+    let y = ncurses::getbegy(handle);
+
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getbegy", y))
+    } else {
+        Ok(y)
     }
 }
 
@@ -1809,8 +1831,10 @@ pub fn getbegyx(handle: WINDOW) -> result!(Origin) {
     let y = ncurses::getbegy(handle);
     let x = ncurses::getbegx(handle);
 
-    if y == ERR || x == ERR {
-        Err(ncurses_function_error!("getbegyx"))
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getbegyx (y)", y))
+    } else if x < 0 {
+        Err(ncurses_function_error_with_rc!("getbegyx (x)", x))
     } else {
         Ok(Origin { y, x })
     }
@@ -1890,8 +1914,8 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
     let mut wch: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::getbkgrnd(wch.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("getbkgrnd")),
-        _   => Ok(ComplexChar::from(wch[0]))
+        OK => Ok(ComplexChar::from(wch[0])),
+        rc => Err(ncurses_function_error_with_rc!("getbkgrnd", rc))
     }
 }
 
@@ -1923,8 +1947,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
     };
 
     match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
-        ERR => Err(ncurses_function_error!("getcchar")),
-        _   => {
+        OK => {
             // TODO : get opts working correct so not to rely on bodge!
             //assert!(!opts.is_null(), "ncursesw::getcchar() : opts.is_null()");
             //
@@ -1934,36 +1957,46 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
 
             Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
         }
+        rc => Err(ncurses_function_error_with_rc!("getcchar", rc))
     }
 }
 
 pub fn getch() -> result!(CharacterResult<char>) {
     match ncurses::getch() {
-        ERR        => Err(ncurses_function_error!("getch")),
         EINTR      => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
-                          CharacterResult::Key(KeyBinding::from(ch))
-                      } else {
-                          CharacterResult::Character(char::from(ch as i8 as u8))
-                      })
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("getch", rc))
+            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+                Ok(CharacterResult::Key(KeyBinding::from(rc)))
+            } else {
+                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+            }
+        }
     }
 }
 
 pub fn getcurx(handle: WINDOW) -> result!(i32) {
-    match ncurses::getcurx(handle) {
-        ERR => Err(ncurses_function_error!("getcurx")),
-        x   => Ok(x)
+    let x = ncurses::getcurx(handle);
+
+    if x < 0 {
+        Err(ncurses_function_error_with_rc!("getcurx", x))
+    } else {
+        Ok(x)
     }
 }
 
 pub fn getcury(handle: WINDOW) -> result!(i32) {
-    match ncurses::getcury(handle) {
-        ERR => Err(ncurses_function_error!("getcury")),
-        y   => Ok(y)
+    let y = ncurses::getcury(handle);
+
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getcury", y))
+    } else {
+        Ok(y)
     }
 }
 
@@ -1971,24 +2004,32 @@ pub fn getcuryx(handle: WINDOW) -> result!(Origin) {
     let y = ncurses::getcury(handle);
     let x = ncurses::getcurx(handle);
 
-    if y == ERR || x == ERR {
-        Err(ncurses_function_error!("getcuryx"))
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getcuryx (y)", y))
+    } else if x < 0 {
+        Err(ncurses_function_error_with_rc!("getcuryx (x)", x))
     } else {
         Ok(Origin { y, x })
     }
 }
 
 pub fn getmaxx(handle: WINDOW) -> result!(i32) {
-    match ncurses::getmaxx(handle) {
-        ERR => Err(ncurses_function_error!("getmaxx")),
-        x   => Ok(x)
+    let x = ncurses::getmaxx(handle);
+
+    if x < 0 {
+        Err(ncurses_function_error_with_rc!("getmaxx", x))
+    } else {
+        Ok(x)
     }
 }
 
 pub fn getmaxy(handle: WINDOW) -> result!(i32) {
-    match ncurses::getmaxy(handle) {
-        ERR => Err(ncurses_function_error!("getmaxy")),
-        y   => Ok(y)
+    let y = ncurses::getmaxy(handle);
+
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getmaxy", y))
+    } else {
+        Ok(y)
     }
 }
 
@@ -1996,8 +2037,10 @@ pub fn getmaxyx(handle: WINDOW) -> result!(Size) {
     let lines = ncurses::getmaxy(handle);
     let columns = ncurses::getmaxx(handle);
 
-    if lines == ERR || columns == ERR {
-        Err(ncurses_function_error!("getmaxyx"))
+    if lines < 0 {
+        Err(ncurses_function_error_with_rc!("getmaxyx (y)", lines))
+    } else if columns < 0 {
+        Err(ncurses_function_error_with_rc!("getmaxyx (x)", columns))
     } else {
         Ok(Size { lines, columns })
     }
@@ -2010,22 +2053,25 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::getn_wstr(ptr, number) } {
-        ERR        => Err(ncurses_function_error!("getn_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::getn_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("getn_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::getn_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
@@ -2037,29 +2083,38 @@ pub fn getnstr(number: i32) -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::getnstr(ptr, number) } {
-        ERR        => Err(ncurses_function_error!("getnstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::getnstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("getnstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::getnstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
 
 pub fn getparx(handle: WINDOW) -> result!(i32) {
-    match ncurses::getparx(handle) {
-        ERR => Err(ncurses_function_error!("getparx")),
-        x   => Ok(x)
+    let x = ncurses::getparx(handle);
+
+    if x < 0 {
+        Err(ncurses_function_error_with_rc!("getparx", x))
+    } else {
+        Ok(x)
     }
 }
 
 pub fn getpary(handle: WINDOW) -> result!(i32) {
-    match ncurses::getpary(handle) {
-        ERR => Err(ncurses_function_error!("getpary")),
-        y   => Ok(y)
+    let y = ncurses::getpary(handle);
+
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getpary", y))
+    } else {
+        Ok(y)
     }
 }
 
@@ -2067,8 +2122,10 @@ pub fn getparyx(handle: WINDOW) -> result!(Origin) {
     let y = ncurses::getpary(handle);
     let x = ncurses::getparx(handle);
 
-    if y == ERR || x == ERR {
-        Err(ncurses_function_error!("getparyx"))
+    if y < 0 {
+        Err(ncurses_function_error_with_rc!("getparyx (y)", y))
+    } else if x < 0 {
+        Err(ncurses_function_error_with_rc!("getparyx (x)", x))
     } else {
         Ok(Origin { y, x })
     }
@@ -2080,14 +2137,17 @@ pub fn getstr() -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::getstr(ptr) } {
-        ERR        => Err(ncurses_function_error!("getstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::getstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("getstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::getstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
@@ -2108,8 +2168,8 @@ pub fn halfdelay(tenths: time::Duration) -> result!(()) {
     let delay = i32::try_from(tenths.as_secs())? / 10;
 
     match ncurses::halfdelay(delay) {
-        ERR => Err(ncurses_function_error!("delay_output")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("delay_output", rc))
     }
 }
 
@@ -2131,15 +2191,15 @@ pub fn has_key(ch: KeyBinding) -> bool {
 
 pub fn hline(ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::hline(ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("hline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("hline", rc))
     }
 }
 
 pub fn hline_set(wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::hline_set(&ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("hline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("hline_set", rc))
     }
 }
 
@@ -2149,8 +2209,8 @@ pub fn idcok(handle: WINDOW, bf: bool) {
 
 pub fn idlok(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::idlok(handle, bf) {
-        ERR => Err(ncurses_function_error!("idlok")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("idlok", rc))
     }
 }
 
@@ -2162,8 +2222,8 @@ pub fn in_wch() -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::in_wch(wcval.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("in_wch")),
-        _   => Ok(ComplexChar::from(wcval[0]))
+        OK => Ok(ComplexChar::from(wcval[0])),
+        rc => Err(ncurses_function_error_with_rc!("in_wch", rc))
     }
 }
 
@@ -2174,12 +2234,12 @@ pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::in_wchnstr(ptr, number) } {
-        ERR => Err(ncurses_function_error!("in_wchnstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::in_wchnstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("in_wchnstr", rc))
     }
 }
 
@@ -2189,12 +2249,12 @@ pub fn in_wchstr() -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::in_wchstr(ptr) } {
-        ERR => Err(ncurses_function_error!("in_wchstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::in_wchstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("in_wchstr", rc))
     }
 }
 
@@ -2208,14 +2268,15 @@ pub fn inchnstr(number: i32) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::inchnstr(ptr, number) } {
-        ERR => Err(ncurses_function_error!("inchnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::inchnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::inchnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::inchnstr(ptr, number) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("inchnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::inchnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::inchnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -2224,14 +2285,15 @@ pub fn inchstr() -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::inchstr(ptr) } {
-        ERR => Err(ncurses_function_error!("inchstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::inchstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::inchstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::inchstr(ptr) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("inchstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::inchstr() : ptr.is_null()");
+        assert!(len> 0 && len <= LINE_MAX as i32, "ncursesw::inchstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -2240,12 +2302,12 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
-            ERR => Err(ncurses_function_error!("init_color")),
-            _   => {
+            OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
                 Ok(normal::Color::from(color_number))
-            }
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_color", rc))
         }
     }
 }
@@ -2255,12 +2317,12 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(exten
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_extended_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
-            ERR => Err(ncurses_function_error!("init_extended_color")),
-            _   => {
+            OK => {
                 set_ncurses_colortype(NCursesColorType::Extended);
 
                 Ok(extend::Color::from(color_number))
-            }
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_extended_color", rc))
         }
     }
 }
@@ -2272,12 +2334,12 @@ pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(e
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_extended_pair(pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
-            ERR => Err(ncurses_function_error!("init_extended_pair")),
-            _   => {
+            OK => {
                 set_ncurses_colortype(NCursesColorType::Extended);
 
                 Ok(extend::ColorPair::from(pair_number))
-            }
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_extended_pair", rc))
         }
     }
 }
@@ -2289,12 +2351,12 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_pair(pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
-            ERR => Err(ncurses_function_error!("init_pair")),
-            _   => {
+            OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
                 Ok(normal::ColorPair::from(pair_number))
-            }
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_pair", rc))
         }
     }
 }
@@ -2321,14 +2383,15 @@ pub fn innstr(number: i32) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::innstr(ptr, number) } {
-        ERR => Err(ncurses_function_error!("innstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::innstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::innstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::innstr(ptr, number) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("innstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::innstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::innstr() : len={}, LINEMAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -2338,14 +2401,15 @@ pub fn innwstr(number: i32) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::innwstr(ptr, number) } {
-        ERR => Err(ncurses_function_error!("innwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::innwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::innwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::innwstr(ptr, number) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("innwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::innwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::innwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -2375,8 +2439,8 @@ pub fn innwstr(number: i32) -> result!(WideString) {
 /// ```
 pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::ins_nwstr(raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("ins_nwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ins_nwstr", rc))
     }
 }
 
@@ -2411,8 +2475,8 @@ pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
 /// ```
 pub fn ins_wch(wch: ComplexChar) -> result!(()) {
     match ncurses::ins_wch(&ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("ins_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ins_wch", rc))
     }
 }
 
@@ -2442,8 +2506,8 @@ pub fn ins_wch(wch: ComplexChar) -> result!(()) {
 /// ```
 pub fn ins_wstr(wstr: &WideString) -> result!(()) {
     match ncurses::ins_wstr(raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("ins_wstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ins_wstr", rc))
     }
 }
 
@@ -2481,15 +2545,15 @@ pub fn ins_wstr(wstr: &WideString) -> result!(()) {
 /// ```
 pub fn insch(ch: ChtypeChar) -> result!(()) {
     match ncurses::insch(ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("insch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("insch", rc))
     }
 }
 
 pub fn insdelln(n: i32) -> result!(()) {
     match ncurses::insdelln(n) {
-        ERR => Err(ncurses_function_error!("insdelln")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("insdelln", rc))
     }
 }
 
@@ -2521,8 +2585,8 @@ basic_ncurses_function!(insertln, "insertln");
 /// ```
 pub fn insnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::insnstr(c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("insnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("insnstr", rc))
     }
 }
 
@@ -2552,8 +2616,8 @@ pub fn insnstr(str: &str, number: i32) -> result!(()) {
 /// ```
 pub fn insstr(str: &str) -> result!(()) {
     match ncurses::insstr(c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("insstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("insstr", rc))
     }
 }
 
@@ -2562,21 +2626,22 @@ pub fn instr() -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::instr(ptr) } {
-        ERR => Err(ncurses_function_error!("instr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::instr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::instr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::instr(ptr) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("instr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::instr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::instr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
 pub fn intrflush(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::intrflush(handle, bf) {
-        ERR => Err(ncurses_function_error!("intrflush")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("intrflush", rc))
     }
 }
 
@@ -2585,14 +2650,15 @@ pub fn inwstr() -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::inwstr(ptr) } {
-        ERR => Err(ncurses_function_error!("inwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::inwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::inwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::inwstr(ptr) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("inwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::inwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::inwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -2633,9 +2699,12 @@ pub fn isendwin() -> bool {
 }
 
 pub fn key_defined(definition: &str) -> result!(KeyBinding) {
-    match ncurses::key_defined(c_str_with_nul!(definition)) {
-        ERR => Err(ncurses_function_error!("key_defined")),
-        c   => Ok(KeyBinding::from(c))
+    let c = ncurses::key_defined(c_str_with_nul!(definition));
+
+    if c < 0 {
+        Err(ncurses_function_error_with_rc!("key_defined", c))
+    } else {
+        Ok(KeyBinding::from(c))
     }
 }
 
@@ -2662,23 +2731,23 @@ pub fn keyname(c: KeyBinding) -> result!(String) {
 
 pub fn keyok(keycode: KeyBinding, enable: bool) -> result!(()) {
     match ncurses::keyok(KeyBinding::into(keycode), enable) {
-        ERR => Err(ncurses_function_error!("keyok")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("keyok", rc))
     }
 }
 
 pub fn keypad(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::keypad(handle, bf) {
-        ERR => Err(ncurses_function_error!("keypad")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("keypad", rc))
     }
 }
 
 pub fn killchar() -> result!(char) {
     let rc = ncurses::killchar();
 
-    if rc == ERR as i8 {
-        Err(ncurses_function_error!("killchar"))
+    if rc < 0 {
+        Err(ncurses_function_error_with_rc!("killchar", i32::from(rc)))
     } else {
         Ok(char::from(rc as u8))
     }
@@ -2688,15 +2757,15 @@ pub fn killwchar() -> result!(WideChar) {
     let mut wch: [wchar_t; 1] = [0];
 
     match unsafe { ncurses::killwchar(wch.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("killwchar")),
-        _   => Ok(WideChar::from(wch[0]))
+        OK => Ok(WideChar::from(wch[0])),
+        rc => Err(ncurses_function_error_with_rc!("killwchar", rc))
     }
 }
 
 pub fn leaveok(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::leaveok(handle, bf) {
-        ERR => Err(ncurses_function_error!("leaveok")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("leaveok", rc))
     }
 }
 
@@ -2713,15 +2782,15 @@ pub fn mcprint(_data: *mut i8, _len: i32) -> i32 {
 
 pub fn meta(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::meta(handle, bf) {
-        ERR => Err(ncurses_function_error!("meta")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("meta", rc))
     }
 }
 
 pub fn r#move(origin: Origin) -> result!(()) {
     match ncurses::r#move(origin.y, origin.x) {
-        ERR => Err(ncurses_function_error!("move")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("move", rc))
     }
 }
 
@@ -2753,8 +2822,8 @@ pub fn r#move(origin: Origin) -> result!(()) {
 /// ```
 pub fn mvadd_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvadd_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("mvadd_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvadd_wch", rc))
     }
 }
 
@@ -2787,8 +2856,8 @@ pub fn mvadd_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
 /// ```
 pub fn mvadd_wchnstr(origin: Origin, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::mvadd_wchnstr(origin.y, origin.x, raw_with_nul_as_slice!(wchstr), number) {
-        ERR => Err(ncurses_function_error!("mvadd_wchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvadd_wchnstr", rc))
     }
 }
 
@@ -2821,8 +2890,8 @@ pub fn mvadd_wchnstr(origin: Origin, wchstr: &ComplexString, number: i32) -> res
 /// ```
 pub fn mvadd_wchstr(origin: Origin, wchstr: &ComplexString) -> result!(()) {
     match ncurses::mvadd_wchstr(origin.y, origin.x, raw_with_nul_as_slice!(wchstr)) {
-        ERR => Err(ncurses_function_error!("mvadd_wchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvadd_wchstr", rc))
     }
 }
 
@@ -2857,8 +2926,8 @@ pub fn mvadd_wchstr(origin: Origin, wchstr: &ComplexString) -> result!(()) {
 /// ```
 pub fn mvaddch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvaddch(origin.y, origin.x, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("mvaddch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddch", rc))
     }
 }
 
@@ -2894,8 +2963,8 @@ pub fn mvaddch(origin: Origin, ch: ChtypeChar) -> result!(()) {
 /// ```
 pub fn mvaddchnstr(origin: Origin, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::mvaddchnstr(origin.y, origin.x, raw_with_nul_as_slice!(chstr), number) {
-        ERR => Err(ncurses_function_error!("mvaddchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddchnstr", rc))
     }
 }
 
@@ -2931,8 +3000,8 @@ pub fn mvaddchnstr(origin: Origin, chstr: &ChtypeString, number: i32) -> result!
 /// ```
 pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
     match ncurses::mvaddchstr(origin.y, origin.x, raw_with_nul_as_slice!(chstr)) {
-        ERR => Err(ncurses_function_error!("mvaddchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddchstr", rc))
     }
 }
 
@@ -2965,8 +3034,8 @@ pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
 /// ```
 pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvaddnstr(origin.y, origin.x, c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("mvaddnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddnstr", rc))
     }
 }
 
@@ -2995,8 +3064,8 @@ pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
 /// ```
 pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvaddnwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("mvaddnwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddnwstr", rc))
     }
 }
 
@@ -3029,8 +3098,8 @@ pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(())
 /// ```
 pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvaddstr(origin.y, origin.x, c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("mvaddstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddstr", rc))
     }
 }
 
@@ -3059,8 +3128,8 @@ pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
 /// ```
 pub fn mvaddwstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvaddwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("mvaddwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvaddwstr", rc))
     }
 }
 
@@ -3070,29 +3139,29 @@ pub fn mvchgat<A, P, T>(origin: Origin, number: i32, attrs: A, color_pair: P) ->
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::mvchgat(origin.y, origin.x, number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
-        ERR => Err(ncurses_function_error!("mvchgat")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvchgat", rc))
     }
 }
 
 pub fn mvcur(old: Origin, new: Origin) -> result!(()) {
     match ncurses::mvcur(old.y, old.x, new.y, new.x) {
-        ERR => Err(ncurses_function_error!("mvcur")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvcur", rc))
     }
 }
 
 pub fn mvdelch(origin: Origin) -> result!(()) {
     match ncurses::mvdelch(origin.y, origin.x) {
-        ERR => Err(ncurses_function_error!("mvdelch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvdelch", rc))
     }
 }
 
 pub fn mvderwin(handle: WINDOW, origin: Origin) -> result!(()) {
     match ncurses::mvderwin(handle, origin.y, origin.x) {
-        ERR => Err(ncurses_function_error!("mvderwin")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvderwin", rc))
     }
 }
 
@@ -3100,7 +3169,6 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::mvget_wch(origin.y, origin.x, wch.as_mut_ptr()) } {
-        ERR          => Err(ncurses_function_error!("mvget_wch")),
         EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
@@ -3115,7 +3183,13 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
+        rc           => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvget_wch", rc))
+            } else {
+                Ok(CharacterResult::Character(WideChar::from(wch[0])))
+            }
+        }
     }
 }
 
@@ -3125,39 +3199,45 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvget_wstr(origin.y, origin.x, ptr) } {
-        ERR        => Err(ncurses_function_error!("mvget_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvget_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvget_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvget_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
 
 pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvgetch(origin.y, origin.x) {
-        ERR        => Err(ncurses_function_error!("mvgetch")),
         EINTR      => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
-                          CharacterResult::Key(KeyBinding::from(ch))
-                      } else {
-                          CharacterResult::Character(char::from(ch as i8 as u8))
-                      })
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvgetch", rc))
+            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+                Ok(CharacterResult::Key(KeyBinding::from(rc)))
+            } else {
+                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+            }
+        }
     }
 }
 
@@ -3168,22 +3248,25 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvgetn_wstr(origin.y, origin.x, ptr, number) } {
-        ERR        => Err(ncurses_function_error!("mvgetn_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvgetn_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvgetn_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvgetn_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
@@ -3195,14 +3278,17 @@ pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvgetnstr(origin.y, origin.x, ptr, number) } {
-        ERR        => Err(ncurses_function_error!("mvgetnstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvgetnstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvgetnstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvgetnstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
@@ -3213,29 +3299,32 @@ pub fn mvgetstr(origin: Origin) -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvgetstr(origin.y, origin.x, ptr) } {
-        ERR        => Err(ncurses_function_error!("mvgetstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvgetstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvgetstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvgetstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
 
 pub fn mvhline(origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::mvhline(origin.y, origin.x, ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("mvhline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvhline", rc))
     }
 }
 
 pub fn mvhline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::mvhline_set(origin.y, origin.x, &ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("mvhline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvhline_set", rc))
     }
 }
 
@@ -3243,8 +3332,8 @@ pub fn mvin_wch(origin: Origin) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::mvin_wch(origin.y, origin.x, wcval.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("mvin_wch")),
-        _   => Ok(ComplexChar::from(wcval[0]))
+        OK => Ok(ComplexChar::from(wcval[0])),
+        rc => Err(ncurses_function_error_with_rc!("mvin_wch", rc))
     }
 }
 
@@ -3255,12 +3344,12 @@ pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvin_wchnstr(origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvin_wchnstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::mvin_wchnstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("mvin_wchnstr", rc))
     }
 }
 
@@ -3270,12 +3359,12 @@ pub fn mvin_wchstr(origin: Origin) -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvin_wchstr(origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvin_wchstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::mvin_wchstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("mvin_wchstr", rc))
     }
 }
 
@@ -3289,14 +3378,15 @@ pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvinchnstr(origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvinchnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvinchnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvinchnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvinchnstr(origin.y, origin.x, ptr, number) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvinchnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvinchnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinchnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -3305,14 +3395,15 @@ pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvinchstr(origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvinchstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvinchstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvinchstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvinchstr(origin.y, origin.x, ptr) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvinchstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvinchstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinchstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -3322,14 +3413,15 @@ pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvinnstr(origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvinnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvinnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvinnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvinnstr(origin.y, origin.x, ptr, number) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvinnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvinnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -3339,14 +3431,15 @@ pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvinnwstr(origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvinnwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvinnwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvinnwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvinnwstr(origin.y, origin.x, ptr, number) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvinnwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvinnwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinnwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -3378,8 +3471,8 @@ pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
 /// ```
 pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvins_nwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("mvins_nwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvins_nwstr", rc))
     }
 }
 
@@ -3416,8 +3509,8 @@ pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()
 /// ```
 pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvins_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("mvins_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvins_wch", rc))
     }
 }
 
@@ -3449,8 +3542,8 @@ pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
 /// ```
 pub fn mvins_wstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvins_wstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("mvins_wstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvins_wstr", rc))
     }
 }
 
@@ -3488,8 +3581,8 @@ pub fn mvins_wstr(origin: Origin, wstr: &WideString) -> result!(()) {
 /// ```
 pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvinsch(origin.y, origin.x, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("mvinsch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvinsch", rc))
     }
 }
 
@@ -3519,8 +3612,8 @@ pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
 /// ```
 pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvinsnstr(origin.y, origin.x, c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("mvinsnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvinsnstr", rc))
     }
 }
 
@@ -3550,8 +3643,8 @@ pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
 /// ```
 pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvinsstr(origin.y, origin.x, c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("mvinsstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvinsstr", rc))
     }
 }
 
@@ -3560,14 +3653,15 @@ pub fn mvinstr(origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvinstr(origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvinstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvinstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvinstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvinstr(origin.y, origin.x, ptr) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvinstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvinstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -3576,28 +3670,29 @@ pub fn mvinwstr(origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvinwstr(origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvinwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvinwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvinwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvinwstr(origin.y, origin.x, ptr) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvinwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvinwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
 pub fn mvvline(origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::mvvline(origin.y, origin.x, ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("mvvline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvvline", rc))
     }
 }
 
 pub fn mvvline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::mvvline_set(origin.y, origin.x, &ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("mvvline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvvline_set", rc))
     }
 }
 
@@ -3636,8 +3731,8 @@ pub fn mvvline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(())
 /// ```
 pub fn mvwadd_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvwadd_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("mvwadd_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwadd_wch", rc))
     }
 }
 
@@ -3677,8 +3772,8 @@ pub fn mvwadd_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!((
 /// ```
 pub fn mvwadd_wchnstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::mvwadd_wchnstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wchstr), number) {
-        ERR => Err(ncurses_function_error!("mvwadd_wchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwadd_wchnstr", rc))
     }
 }
 
@@ -3718,8 +3813,8 @@ pub fn mvwadd_wchnstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString, nu
 /// ```
 pub fn mvwadd_wchstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString) -> result!(()) {
     match ncurses::mvwadd_wchstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wchstr)) {
-        ERR => Err(ncurses_function_error!("mvwadd_wchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwadd_wchstr", rc))
     }
 }
 
@@ -3761,8 +3856,8 @@ pub fn mvwadd_wchstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString) -> 
 /// ```
 pub fn mvwaddch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvwaddch(handle, origin.y, origin.x, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("mvwaddch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddch", rc))
     }
 }
 
@@ -3805,8 +3900,8 @@ pub fn mvwaddch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
 /// ```
 pub fn mvwaddchnstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::mvwaddchnstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(chstr), number) {
-        ERR => Err(ncurses_function_error!("mvwaddchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddchnstr", rc))
     }
 }
 
@@ -3849,8 +3944,8 @@ pub fn mvwaddchnstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString, number
 /// ```
 pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> result!(()) {
     match ncurses::mvwaddchstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(chstr)) {
-        ERR => Err(ncurses_function_error!("mvwaddchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddchstr", rc))
     }
 }
 
@@ -3890,8 +3985,8 @@ pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> resu
 /// ```
 pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvwaddnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("mvwaddnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddnstr", rc))
     }
 }
 
@@ -3927,8 +4022,8 @@ pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
 /// ```
 pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvwaddnwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("mvwaddnwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddnwstr", rc))
     }
 }
 
@@ -3968,8 +4063,8 @@ pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i3
 /// ```
 pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvwaddstr(handle, origin.y, origin.x, c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("mvwaddstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddstr", rc))
     }
 }
 
@@ -4005,8 +4100,8 @@ pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
 /// ```
 pub fn mvwaddwstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvwaddwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("mvwaddwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwaddwstr", rc))
     }
 }
 
@@ -4016,15 +4111,15 @@ pub fn mvwchgat<A, P, T>(handle: WINDOW, origin: Origin, number: i32, attrs: A, 
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::mvwchgat(handle, origin.y, origin.x, number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
-        ERR => Err(ncurses_function_error!("mvwchgat")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwchgat", rc))
     }
 }
 
 pub fn mvwdelch(handle: WINDOW, origin: Origin) -> result!(()) {
     match ncurses::mvwdelch(handle, origin.y, origin.x) {
-        ERR => Err(ncurses_function_error!("mvwdelch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwdelch", rc))
     }
 }
 
@@ -4032,7 +4127,6 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::mvwget_wch(handle, origin.y, origin.x, wch.as_mut_ptr()) } {
-        ERR          => Err(ncurses_function_error!("mvwget_wch")),
         EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
@@ -4047,7 +4141,13 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
+        rc           => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvwget_wch", rc))
+            } else {
+                Ok(CharacterResult::Character(WideChar::from(wch[0])))
+            }
+        }
     }
 }
 
@@ -4057,39 +4157,45 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvwget_wstr(handle, origin.y, origin.y, ptr) } {
-        ERR        => Err(ncurses_function_error!("mvwget_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvwget_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvwget_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvwget_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
 
 pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvwgetch(handle, origin.y, origin.x) {
-        ERR        => Err(ncurses_function_error!("mvwgetch")),
         EINTR      => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
-                          CharacterResult::Key(KeyBinding::from(ch))
-                      } else {
-                          CharacterResult::Character(char::from(ch as i8 as u8))
-                      })
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvwgetch", rc))
+            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+                Ok(CharacterResult::Key(KeyBinding::from(rc)))
+            } else {
+                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+            }
+        }
     }
 }
 
@@ -4100,22 +4206,25 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvwgetn_wstr(handle, origin.y, origin.x, ptr, number) } {
-        ERR        => Err(ncurses_function_error!("mvwgetn_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvwgetn_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvwgetn_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvwgetn_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
@@ -4127,14 +4236,17 @@ pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvwgetnstr(handle, origin.y, origin.x, ptr, number) } {
-        ERR        => Err(ncurses_function_error!("mvwgetnstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvwgetnstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvwgetnstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvwgetnstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
@@ -4145,36 +4257,39 @@ pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvwgetstr(handle, origin.y, origin.x, ptr) } {
-        ERR        => Err(ncurses_function_error!("mvwgetstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::mvwgetstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("mvwgetstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::mvwgetstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
 
 pub fn mvwhline(handle: WINDOW, origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::mvwhline(handle, origin.y, origin.x, ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("mvwhline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwhline", rc))
     }
 }
 
 pub fn mvwhline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::mvwhline_set(handle, origin.y, origin.x, &ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("mvwhline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwhline_set", rc))
     }
 }
 
 pub fn mvwin(handle: WINDOW, origin: Origin) -> result!(()) {
     match ncurses::mvwin(handle, origin.y, origin.x) {
-        ERR => Err(ncurses_function_error!("mvwin")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwin", rc))
     }
 }
 
@@ -4182,8 +4297,8 @@ pub fn mvwin_wch(handle: WINDOW, origin: Origin) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::mvwin_wch(handle, origin.y, origin.x, wcval.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("mvwin_wch")),
-        _   => Ok(ComplexChar::from(wcval[0]))
+        OK => Ok(ComplexChar::from(wcval[0])),
+        rc => Err(ncurses_function_error_with_rc!("mvwin_wch", rc))
     }
 }
 
@@ -4194,12 +4309,12 @@ pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Com
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvwin_wchnstr(handle, origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvwin_wchnstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::mvwin_wchnstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("mvwin_wchnstr", rc))
     }
 }
 
@@ -4209,12 +4324,12 @@ pub fn mvwin_wchstr(handle: WINDOW, origin: Origin) -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::mvwin_wchstr(handle, origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvwin_wchstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::mvwin_wchstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("mvwin_wchstr", rc))
     }
 }
 
@@ -4228,14 +4343,15 @@ pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Chtyp
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvwinchnstr(handle, origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvwinchnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvwinchnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvwinchnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvwinchnstr(handle, origin.y, origin.x, ptr, number) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvwinchnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvwinchnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinchnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -4244,14 +4360,15 @@ pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvwinchstr(handle, origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvwinchstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvwinchstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvwinchstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvwinchstr(handle, origin.y, origin.x, ptr) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvwinchstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvwinchstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinchstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -4261,14 +4378,15 @@ pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String)
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvwinnstr(handle, origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvwinnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvwinnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvwinnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvwinnstr(handle, origin.y, origin.x, ptr, number) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvwinnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvwinnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -4278,14 +4396,15 @@ pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideSt
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvwinnwstr(handle, origin.y, origin.x, ptr, number) } {
-        ERR => Err(ncurses_function_error!("mvwinnwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvwinnwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvwinnwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvwinnwstr(handle, origin.y, origin.x, ptr, number) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvwinnwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvwinnwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinnwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -4324,8 +4443,8 @@ pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideSt
 /// ```
 pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvwins_nwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("mvwins_nwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwins_nwstr", rc))
     }
 }
 
@@ -4369,8 +4488,8 @@ pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i
 /// ```
 pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvwins_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("mvwins_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwins_wch", rc))
     }
 }
 
@@ -4409,8 +4528,8 @@ pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!((
 /// ```
 pub fn mvwins_wstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvwins_wstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("mvwins_wstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwins_wstr", rc))
     }
 }
 
@@ -4455,8 +4574,8 @@ pub fn mvwins_wstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!
 /// ```
 pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvwinsch(handle, origin.y, origin.x, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("mvwinsch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwinsch", rc))
     }
 }
 
@@ -4493,8 +4612,8 @@ pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
 /// ```
 pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvwinsnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("mvwinsnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwinsnstr", rc))
     }
 }
 
@@ -4531,8 +4650,8 @@ pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
 /// ```
 pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvwinsstr(handle, origin.y, origin.x, c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("mvwinsstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwinsstr", rc))
     }
 }
 
@@ -4541,14 +4660,15 @@ pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvwinstr(handle, origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvwinstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvwinstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvwinstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvwinstr(handle, origin.y, origin.x, ptr) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvwinstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvwinstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -4557,28 +4677,29 @@ pub fn mvwinwstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::mvwinwstr(handle, origin.y, origin.x, ptr) } {
-        ERR => Err(ncurses_function_error!("mvwinwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::mvwinwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::mvwinwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::mvwinwstr(handle, origin.y, origin.x, ptr) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("mvwinwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::mvwinwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
 pub fn mvwvline(handle: WINDOW, origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::mvwvline(handle, origin.y, origin.x, ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("mvwvline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwvline", rc))
     }
 }
 
 pub fn mvwvline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::mvwvline_set(handle, origin.y, origin.x, &ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("mvwvline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvwvline_set", rc))
     }
 }
 
@@ -4586,8 +4707,8 @@ pub fn napms(ms: time::Duration) -> result!(()) {
     let ms = i32::try_from(ms.as_millis())?;
 
     match ncurses::napms(ms) {
-        ERR => Err(ncurses_function_error!("napms")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("napms", rc))
     }
 }
 
@@ -4615,8 +4736,8 @@ basic_ncurses_function!(nocbreak, "nocbreak");
 
 pub fn nodelay(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::nodelay(handle, bf) {
-        ERR => Err(ncurses_function_error!("nodelay")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("nodelay", rc))
     }
 }
 
@@ -4632,22 +4753,22 @@ basic_ncurses_function!(noraw, "noraw");
 
 pub fn notimeout(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::notimeout(handle, bf) {
-        ERR => Err(ncurses_function_error!("notimeout")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("notimeout", rc))
     }
 }
 
 pub fn overlay(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     match ncurses::overlay(src_handle, dst_handle) {
-        ERR => Err(ncurses_function_error!("overlay")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("overlay", rc))
     }
 }
 
 pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     match ncurses::overwrite(src_handle, dst_handle) {
-        ERR => Err(ncurses_function_error!("overwrite")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("overwrite", rc))
     }
 }
 
@@ -4656,36 +4777,36 @@ pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
     let mut bg: [short_t; 1] = [0];
 
     match unsafe { ncurses::pair_content(normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("pair_content")),
-        _   => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0])))
+        OK => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0]))),
+        rc => Err(ncurses_function_error_with_rc!("pair_content", rc))
     }
 }
 
 pub fn pechochar(pad: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::pechochar(pad, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("pechochar")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("pechochar", rc))
     }
 }
 
 pub fn pecho_wchar(pad: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::pecho_wchar(pad, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("pecho_wchar")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("pecho_wchar", rc))
     }
 }
 
 pub fn pnoutrefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> result!(()) {
     match ncurses::pnoutrefresh(pad, pmin.y, pmin.x, smin.y, smin.x, smax.y, smax.x) {
-        ERR => Err(ncurses_function_error!("pnoutrefresh")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("pnoutrefresh", rc))
     }
 }
 
 pub fn prefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> result!(()) {
     match ncurses::prefresh(pad, pmin.y, pmin.x, smin.y, smin.x, smax.y, smax.x) {
-        ERR => Err(ncurses_function_error!("prefresh")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("prefresh", rc))
     }
 }
 
@@ -4699,10 +4820,9 @@ pub fn putwin(handle: WINDOW, path: &path::Path) -> result!(()) {
     match shims::utils::fopen(path, mode) {
         None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
         Some(fp) => {
-            if ncurses::putwin(handle, fp) == ERR {
-                Err(ncurses_function_error!("putwin"))
-            } else {
-                Ok(())
+            match ncurses::putwin(handle, fp) {
+                OK => Ok(()),
+                rc => Err(ncurses_function_error_with_rc!("putwin", rc))
             }
         }
     }
@@ -4726,22 +4846,22 @@ basic_ncurses_function!(resetty, "resetty");
 
 pub fn resize_term(size: Size) -> result!(()) {
     match ncurses::resize_term(size.lines, size.columns) {
-        ERR => Err(ncurses_function_error!("resize_term")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("resize_term", rc))
     }
 }
 
 pub fn resizeterm(size: Size) -> result!(()) {
     match ncurses::resizeterm(size.lines, size.columns) {
-        ERR => Err(ncurses_function_error!("resizeterm")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("resizeterm", rc))
     }
 }
 
 pub fn ripoffline(line: Orientation, init: RipoffInit) -> result!(()) {
     match ncurses::ripoffline(Orientation::into(line), init) {
-        ERR => Err(ncurses_function_error!("ripoffline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ripoffline", rc))
     }
 }
 
@@ -4765,8 +4885,8 @@ pub fn scr_set(_filename: &str) -> i32 {
 
 pub fn scrl(n: i32) -> result!(()) {
     match ncurses::scrl(n) {
-        ERR => Err(ncurses_function_error!("scrl")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scrl", rc))
     }
 }
 
@@ -4774,8 +4894,8 @@ basic_ncurses_function_with_window!(scroll, "scroll");
 
 pub fn scrollok(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::scrollok(handle, bf) {
-        ERR => Err(ncurses_function_error!("scrollok")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scrollok", rc))
     }
 }
 
@@ -4783,15 +4903,15 @@ pub fn set_escdelay(size: time::Duration) -> result!(()) {
     let ms = i32::try_from(size.as_millis())?;
 
     match ncurses::set_escdelay(ms) {
-        ERR => Err(ncurses_function_error!("set_escdelay")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("set_escdelay", rc))
     }
 }
 
 pub fn set_tabsize(size: i32) -> result!(()) {
     match ncurses::set_tabsize(size) {
-        ERR => Err(ncurses_function_error!("set_tabsize")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("set_tabsize", rc))
     }
 }
 
@@ -4813,19 +4933,19 @@ pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(Complex
     let cchar_ptr: *mut cchar_t = cchar_buf.as_mut_ptr();
 
     match unsafe { ncurses::setcchar(cchar_ptr, wchar_buf.as_ptr(), attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("setcchar")),
-        _   => {
+        OK => {
             assert!(!cchar_ptr.is_null(), "ncursesw::setcchar() : cchar_ptr.is_null()");
 
             Ok(ComplexChar::from(unsafe { slice::from_raw_parts(cchar_ptr, 1)[0] }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("setcchar", rc))
     }
 }
 
 pub fn setscrreg(region: Region) -> result!(()) {
     match ncurses::setscrreg(region.top, region.bottom) {
-        ERR => Err(ncurses_function_error!("setscrreg")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("setscrreg", rc))
     }
 }
 
@@ -4841,8 +4961,8 @@ pub fn slk_attr_off<A, T>(attrs: A) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::slk_attr_off(attrs.as_attr_t(), ptr::null_mut()) } {
-        ERR => Err(ncurses_function_error!("slk_attr_off")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attr_off", rc))
     }
 }
 
@@ -4851,8 +4971,8 @@ pub fn slk_attr_on<A, T>(attrs: A) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::slk_attr_on(attrs.as_attr_t(), ptr::null_mut()) } {
-        ERR => Err(ncurses_function_error!("slk_attr_on")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attr_on", rc))
     }
 }
 
@@ -4862,29 +4982,29 @@ pub fn slk_attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::slk_attr_set(attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("slk_attr_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attr_set", rc))
     }
 }
 
 pub fn slk_attroff(attrs: normal::Attributes) -> result!(()) {
     match ncurses::slk_attroff(normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("slk_attroff")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attroff", rc))
     }
 }
 
 pub fn slk_attron(attrs: normal::Attributes) -> result!(()) {
     match ncurses::slk_attron(normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("slk_attron")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attron", rc))
     }
 }
 
 pub fn slk_attrset(attrs: normal::Attributes) -> result!(()) {
     match ncurses::slk_attrset(normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("slk_attrset")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attrset", rc))
     }
 }
 
@@ -4892,15 +5012,15 @@ basic_ncurses_function!(slk_clear, "slk_clear");
 
 pub fn slk_color(color_pair: normal::ColorPair) -> result!(()) {
     match ncurses::slk_color(color_pair.number()) {
-        ERR => Err(ncurses_function_error!("slk_color")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_color", rc))
     }
 }
 
 pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
     match ncurses::slk_init(SoftLabelType::into(fmt)) {
-        ERR => Err(ncurses_function_error!("slk_init")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_init", rc))
     }
 }
 
@@ -4916,8 +5036,8 @@ basic_ncurses_function!(slk_restore, "slk_restore");
 
 pub fn slk_set(label_number: i32, label: &str, fmt: Justification) -> result!(()) {
     match ncurses::slk_set(label_number, label, Justification::into(fmt)) {
-        ERR => Err(ncurses_function_error!("slk_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
 }
 
@@ -4925,8 +5045,8 @@ basic_ncurses_function!(slk_touch, "slk_touch");
 
 pub fn slk_wset(label_number: i32, label: &WideString, fmt: Justification) -> result!(()) {
     match ncurses::slk_wset(label_number, raw_with_nul_as_slice!(label), Justification::into(fmt)) {
-        ERR => Err(ncurses_function_error!("slk_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
 }
 
@@ -4952,8 +5072,8 @@ pub fn subwin(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
 
 pub fn syncok(handle: WINDOW, bf: bool) -> result!(()) {
     match ncurses::syncok(handle, bf) {
-        ERR => Err(ncurses_function_error!("syncok")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("syncok", rc))
     }
 }
 
@@ -4994,8 +5114,8 @@ pub fn timeout(ms: time::Duration) -> result!(()) {
 
 pub fn touchline(handle: WINDOW, start: i32, count: i32) -> result!(()) {
     match ncurses::touchline(handle, start, count) {
-        ERR => Err(ncurses_function_error!("touchline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("touchline", rc))
     }
 }
 
@@ -5015,15 +5135,15 @@ pub fn unctrl(c: ChtypeChar) -> String {
 
 pub fn unget_wch(ch: WideChar) -> result!(()) {
     match ncurses::unget_wch(WideChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("unget_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("unget_wch", rc))
     }
 }
 
 pub fn ungetch(ch: char) -> result!(()) {
     match ncurses::ungetch(i32::from(ch as u8)) {
-        ERR => Err(ncurses_function_error!("ungetch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ungetch", rc))
     }
 }
 
@@ -5040,12 +5160,20 @@ pub fn use_extended_names(enable: bool) -> bool {
 }
 
 pub fn use_legacy_coding(level: Legacy) -> result!(Legacy) {
-    match ncurses::use_legacy_coding(Legacy::into(level)) {
-        ERR => Err(ncurses_function_error!("use_legacy_coding")),
-        rc  => {
-            let level = Legacy::try_from(rc)?;
+    let rc = ncurses::use_legacy_coding(match level {
+        Legacy::Level0 => 0,
+        Legacy::Level1 => 1,
+        Legacy::Level2 => 2
+    });
 
-            Ok(level)
+    if rc < 0 {
+        Err(ncurses_function_error_with_rc!("use_legacy_coding", rc))
+    } else {
+        match rc {
+            0 => Ok(Legacy::Level0),
+            1 => Ok(Legacy::Level1),
+            2 => Ok(Legacy::Level2),
+            e => Err(ncurses_function_error_with_rc!("use_legacy_coding", e))
         }
     }
 }
@@ -5064,15 +5192,15 @@ pub fn vidattr(_attrs: chtype) -> i32 {
 
 pub fn vline(ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::vline(ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("vline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("vline", rc))
     }
 }
 
 pub fn vline_set(wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::vline_set(&ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("vline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("vline_set", rc))
     }
 }
 
@@ -5109,8 +5237,8 @@ pub fn vline_set(wch: ComplexChar, number: i32) -> result!(()) {
 /// ```
 pub fn wadd_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wadd_wch(handle, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("wadd_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wadd_wch", rc))
     }
 }
 
@@ -5148,8 +5276,8 @@ pub fn wadd_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
 /// ```
 pub fn wadd_wchnstr(handle: WINDOW, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::wadd_wchnstr(handle, raw_with_nul_as_slice!(wchstr), number) {
-        ERR => Err(ncurses_function_error!("wadd_wchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wadd_wchnstr", rc))
     }
 }
 
@@ -5187,8 +5315,8 @@ pub fn wadd_wchnstr(handle: WINDOW, wchstr: &ComplexString, number: i32) -> resu
 /// ```
 pub fn wadd_wchstr(handle: WINDOW, wchstr: &ComplexString) -> result!(()) {
     match ncurses::wadd_wchstr(handle, raw_with_nul_as_slice!(wchstr)) {
-        ERR => Err(ncurses_function_error!("wadd_wchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wadd_wchstr", rc))
     }
 }
 
@@ -5228,8 +5356,8 @@ pub fn wadd_wchstr(handle: WINDOW, wchstr: &ComplexString) -> result!(()) {
 /// ```
 pub fn waddch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::waddch(handle, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("waddch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddch", rc))
     }
 }
 
@@ -5270,8 +5398,8 @@ pub fn waddch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
 /// ```
 pub fn waddchnstr(handle: WINDOW, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::waddchnstr(handle, raw_with_nul_as_slice!(chstr), number) {
-        ERR => Err(ncurses_function_error!("waddchnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddchnstr", rc))
     }
 }
 
@@ -5312,8 +5440,8 @@ pub fn waddchnstr(handle: WINDOW, chstr: &ChtypeString, number: i32) -> result!(
 /// ```
 pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
     match ncurses::waddchstr(handle, raw_with_nul_as_slice!(chstr)) {
-        ERR => Err(ncurses_function_error!("waddchstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddchstr", rc))
     }
 }
 
@@ -5351,8 +5479,8 @@ pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
 /// ```
 pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match ncurses::waddnstr(handle, c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("waddnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddnstr", rc))
     }
 }
 
@@ -5386,8 +5514,8 @@ pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
 /// ```
 pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::waddnwstr(handle, raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("waddnwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddnwstr", rc))
     }
 }
 
@@ -5425,8 +5553,8 @@ pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) 
 /// ```
 pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     match ncurses::waddstr(handle, c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("waddstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddstr", rc))
     }
 }
 
@@ -5462,8 +5590,8 @@ pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
 /// ```
 pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match ncurses::waddwstr(handle, raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("waddwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("waddwstr", rc))
     }
 }
 
@@ -5532,25 +5660,25 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
     let mut opts: [i32; 1] = [0];
 
     match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
-        ERR => Err(ncurses_function_error!("wattr_get")),
-        _   => Ok(match ncurses_colortype() {
-                      NCursesColorType::Normal => {
-                          AttributesColorPairSet::Normal(
-                              normal::AttributesColorPair::new(
-                                  normal::Attributes::from(attrs[0]),
-                                  normal::ColorPair::from(color_pair[0])
-                              )
-                          )
-                      },
-                      NCursesColorType::Extended => {
-                          AttributesColorPairSet::Extended(
-                              extend::AttributesColorPair::new(
-                                  extend::Attributes::from(attrs[0]),
-                                  extend::ColorPair::from(opts[0])
-                              )
-                          )
-                      }
-               })
+        OK => Ok(match ncurses_colortype() {
+                     NCursesColorType::Normal => {
+                         AttributesColorPairSet::Normal(
+                             normal::AttributesColorPair::new(
+                                 normal::Attributes::from(attrs[0]),
+                                 normal::ColorPair::from(color_pair[0])
+                             )
+                         )
+                     },
+                     NCursesColorType::Extended => {
+                         AttributesColorPairSet::Extended(
+                             extend::AttributesColorPair::new(
+                                 extend::Attributes::from(attrs[0]),
+                                 extend::ColorPair::from(opts[0])
+                             )
+                         )
+                     }
+              }),
+        rc => Err(ncurses_function_error_with_rc!("wattr_get", rc))
     }
 }
 
@@ -5626,8 +5754,8 @@ pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::wattr_off(handle, attrs.as_attr_t(), ptr::null_mut()) } {
-        ERR => Err(ncurses_function_error!("wattr_off")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wattr_off", rc))
     }
 }
 
@@ -5703,8 +5831,8 @@ pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::wattr_on(handle, attrs.as_attr_t(), ptr::null_mut()) } {
-        ERR => Err(ncurses_function_error!("wattr_on")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wattr_on", rc))
     }
 }
 
@@ -5767,8 +5895,8 @@ pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::wattr_set(handle, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("wattr_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wattr_set", rc))
     }
 }
 
@@ -5841,8 +5969,8 @@ pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()
 /// ```
 pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match ncurses::wattroff(handle, normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("wattroff")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wattroff", rc))
     }
 }
 
@@ -5915,8 +6043,8 @@ pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
 /// ```
 pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match ncurses::wattron(handle, normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("wattron")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wattron", rc))
     }
 }
 
@@ -5975,8 +6103,8 @@ pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
 /// ```
 pub fn wattrset(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match ncurses::wattrset(handle, normal::Attributes::into(attrs)) {
-        ERR => Err(ncurses_function_error!("wattrset")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wattrset", rc))
     }
 }
 
@@ -6007,8 +6135,8 @@ pub fn wattrset(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
 /// ```
 pub fn wbkgd(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::wbkgd(handle, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("wbkgd")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wbkgd", rc))
     }
 }
 
@@ -6095,8 +6223,8 @@ pub fn wbkgdset(handle: WINDOW, ch: ChtypeChar) {
 /// ```
 pub fn wbkgrnd(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wbkgrnd(handle, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("wbkgrnd")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wbkgrnd", rc))
     }
 }
 
@@ -6235,8 +6363,8 @@ pub fn wborder(
         ChtypeChar::into(bl),
         ChtypeChar::into(br)
     ) {
-        ERR => Err(ncurses_function_error!("wborder")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wborder", rc)),
     }
 }
 
@@ -6262,8 +6390,8 @@ pub fn wborder_set(
         &ComplexChar::into(bl),
         &ComplexChar::into(br)
     ) {
-        ERR => Err(ncurses_function_error!("wborder_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wborder_set", rc))
     }
 }
 
@@ -6273,8 +6401,8 @@ pub fn wchgat<A, P, T>(handle: WINDOW, number: i32, attrs: A, color_pair: P) -> 
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::wchgat(handle, number, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_const_ptr()) } {
-        ERR => Err(ncurses_function_error!("wchgat")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wchgat", rc))
     }
 }
 
@@ -6289,8 +6417,8 @@ pub fn wcolor_set<P, T>(handle: WINDOW, color_pair: P) -> result!(())
           T: ColorAttributeTypes
 {
     match unsafe { ncurses::wcolor_set(handle, color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("wcolor_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wcolor_set", rc))
     }
 }
 
@@ -6302,15 +6430,15 @@ basic_ncurses_function_with_window!(wdelch, "wdelch");
 
 pub fn wecho_wchar(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wecho_wchar(handle, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("wecho_wchar")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wecho_wchar", rc))
     }
 }
 
 pub fn wechochar(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::wechochar(handle, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("wechochar")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wechochar", rc))
     }
 }
 
@@ -6320,7 +6448,6 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
     match unsafe { ncurses::wget_wch(handle, wch.as_mut_ptr()) } {
-        ERR          => Err(ncurses_function_error!("wget_wch")),
         EINTR        => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
@@ -6335,7 +6462,13 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
                 _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
             }
         },
-        _            => Ok(CharacterResult::Character(WideChar::from(wch[0])))
+        rc           => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("wget_wch", rc))
+            } else {
+                Ok(CharacterResult::Character(WideChar::from(wch[0])))
+            }
+        }
     }
 }
 
@@ -6345,22 +6478,25 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::wget_wstr(handle, ptr) } {
-        ERR        => Err(ncurses_function_error!("wget_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::wget_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("wget_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::wget_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
@@ -6413,24 +6549,27 @@ pub fn wgetbkgrnd(handle: WINDOW) -> result!(ComplexChar) {
     let mut wch: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::wgetbkgrnd(handle, wch.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("wgetbkgrnd")),
-        _   => Ok(ComplexChar::from(wch[0]))
+        OK => Ok(ComplexChar::from(wch[0])),
+        rc => Err(ncurses_function_error_with_rc!("wgetbkgrnd", rc))
     }
 }
 
 pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
     match ncurses::wgetch(handle) {
-        ERR        => Err(ncurses_function_error!("wgetch")),
         EINTR      => Err(NCurseswError::InputInterupted),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        ch         => Ok(if ch >= KEY_MIN && ch <= KEY_MAX {
-                          CharacterResult::Key(KeyBinding::from(ch))
-                      } else {
-                          CharacterResult::Character(char::from(ch as i8 as u8))
-                      })
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("wgetch", rc))
+            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+                Ok(CharacterResult::Key(KeyBinding::from(rc)))
+            } else {
+                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+            }
+        }
     }
 }
 
@@ -6447,22 +6586,25 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
     let ptr: *mut wint_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::wgetn_wstr(handle, ptr, number) } {
-        ERR        => Err(ncurses_function_error!("wgetn_wstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::wgetn_wstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("wgetn_wstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::wgetn_wstr() : ptr.is_null()");
 
-            let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
+                let buf_as_bytes = unsafe { slice::from_raw_parts(ptr as *mut wchar_t, LINE_MAX) };
 
-            for (idx, &byte) in buf_as_bytes.iter().enumerate() {
-                if byte == 0x00 {
-                    return Ok(WideString::from(&buf_as_bytes[..idx]));
+                for (idx, &byte) in buf_as_bytes.iter().enumerate() {
+                    if byte == 0x00 {
+                        return Ok(WideString::from(&buf_as_bytes[..idx]));
+                    }
                 }
-            }
 
-            Ok(WideString::from(buf_as_bytes))
+                Ok(WideString::from(buf_as_bytes))
+            }
         }
     }
 }
@@ -6474,14 +6616,17 @@ pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::wgetnstr(handle, ptr, number) } {
-        ERR        => Err(ncurses_function_error!("wgetnstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::wgetnstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("wgetnstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::wgetnstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
@@ -6495,8 +6640,8 @@ pub fn wgetscrreg(handle: WINDOW) -> result!(Region) {
     let mut bottom: [i32; 1] = [0];
 
     match unsafe { ncurses::wgetscrreg(handle, top.as_mut_ptr(), bottom.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("wgetscrreg")),
-        _   => Ok(Region { top: top[0], bottom: bottom[0] })
+        OK => Ok(Region { top: top[0], bottom: bottom[0] }),
+        rc => Err(ncurses_function_error_with_rc!("wgetscrreg", rc))
     }
 }
 
@@ -6506,29 +6651,32 @@ pub fn wgetstr(handle: WINDOW) -> result!(String) {
     let ptr: *mut i8 = buf.as_mut_ptr();
 
     match unsafe { ncurses::wgetstr(handle, ptr) } {
-        ERR        => Err(ncurses_function_error!("wgetstr")),
         EINTR      => Err(NCurseswError::InputInterupted),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
-        _          => {
-            assert!(!ptr.is_null(), "ncursesw::wgetstr() : ptr.is_null()");
+        rc         => {
+            if rc < 0 {
+                Err(ncurses_function_error_with_rc!("wgetstr", rc))
+            } else {
+                assert!(!ptr.is_null(), "ncursesw::wgetstr() : ptr.is_null()");
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
+                Ok(unsafe { FromCStr::from_c_str(ptr) })
+            }
         }
     }
 }
 
 pub fn whline(handle: WINDOW, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::whline(handle, ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("whline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("whline", rc))
     }
 }
 
 pub fn whline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::whline_set(handle, &ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("whline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("whline_set", rc))
     }
 }
 
@@ -6536,8 +6684,8 @@ pub fn win_wch(handle: WINDOW) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
     match unsafe { ncurses::win_wch(handle, wcval.as_mut_ptr()) } {
-        ERR => Err(ncurses_function_error!("win_wch")),
-        _   => Ok(ComplexChar::from(wcval[0]))
+        OK => Ok(ComplexChar::from(wcval[0])),
+        rc => Err(ncurses_function_error_with_rc!("win_wch", rc))
     }
 }
 
@@ -6548,12 +6696,12 @@ pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::win_wchnstr(handle, ptr, number) } {
-        ERR => Err(ncurses_function_error!("win_wchnstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::win_wchnstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("win_wchnstr", rc))
     }
 }
 
@@ -6563,12 +6711,12 @@ pub fn win_wchstr(handle: WINDOW) -> result!(ComplexString) {
     let ptr: *mut cchar_t = buf.as_mut_ptr();
 
     match unsafe { ncurses::win_wchstr(handle, ptr) } {
-        ERR => Err(ncurses_function_error!("win_wchstr")),
-        _   => {
+        OK => {
             assert!(!ptr.is_null(), "ncursesw::win_wchstr() : ptr.is_null()");
 
             Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
-        }
+        },
+        rc => Err(ncurses_function_error_with_rc!("win_wchstr", rc))
     }
 }
 
@@ -6582,14 +6730,15 @@ pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::winchnstr(handle, ptr, number) } {
-        ERR => Err(ncurses_function_error!("winchnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::winchnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::winchnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::winchnstr(handle, ptr, number) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("winchnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::winchnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winchnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -6598,14 +6747,15 @@ pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
 
-    match unsafe { ncurses::winchstr(handle, ptr) } {
-        ERR => Err(ncurses_function_error!("inchstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::winchstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::winchstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::winchstr(handle, ptr) };
 
-            Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("inchstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::winchstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winchstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -6615,14 +6765,15 @@ pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::winnstr(handle, ptr, number) } {
-        ERR => Err(ncurses_function_error!("winnstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::winnstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::winnstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::winnstr(handle, ptr, number) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("winnstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::winnstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winnstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -6632,14 +6783,15 @@ pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::winnwstr(handle, ptr, number) } {
-        ERR => Err(ncurses_function_error!("winnwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::winnwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::winnwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::winnwstr(handle, ptr, number) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("winnwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::winnwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winnwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
@@ -6676,8 +6828,8 @@ pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
 /// ```
 pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::wins_nwstr(handle, raw_with_nul_as_slice!(wstr), number) {
-        ERR => Err(ncurses_function_error!("wins_nwstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wins_nwstr", rc))
     }
 }
 
@@ -6719,8 +6871,8 @@ pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(())
 /// ```
 pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match ncurses::wins_wch(handle, &ComplexChar::into(wch)) {
-        ERR => Err(ncurses_function_error!("wins_wch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wins_wch", rc))
     }
 }
 
@@ -6757,8 +6909,8 @@ pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
 /// ```
 pub fn wins_wstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match ncurses::wins_wstr(handle, raw_with_nul_as_slice!(wstr)) {
-        ERR => Err(ncurses_function_error!("wins_wstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wins_wstr", rc))
     }
 }
 
@@ -6803,15 +6955,15 @@ pub fn wins_wstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
 /// ```
 pub fn winsch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match ncurses::winsch(handle, ChtypeChar::into(ch)) {
-        ERR => Err(ncurses_function_error!("winsch")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("winsch", rc))
     }
 }
 
 pub fn winsdelln(handle: WINDOW, n: i32) -> result!(()) {
     match ncurses::winsdelln(handle, n) {
-        ERR => Err(ncurses_function_error!("winsdelln")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("winsdelln", rc))
     }
 }
 
@@ -6850,8 +7002,8 @@ basic_ncurses_function_with_window!(winsertln, "winsertln");
 /// ```
 pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match ncurses::winsnstr(handle, c_str_with_nul!(str), number) {
-        ERR => Err(ncurses_function_error!("winsnstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("winsnstr", rc))
     }
 }
 
@@ -6888,8 +7040,8 @@ pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
 /// ```
 pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
     match ncurses::winsstr(handle, c_str_with_nul!(str)) {
-        ERR => Err(ncurses_function_error!("winsstr")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("winsstr", rc))
     }
 }
 
@@ -6898,14 +7050,15 @@ pub fn winstr(handle: WINDOW) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
 
-    match unsafe { ncurses::winstr(handle, ptr) } {
-        ERR => Err(ncurses_function_error!("winstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::winstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::winstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::winstr(handle, ptr) };
 
-            Ok(unsafe { FromCStr::from_c_str(ptr) })
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("winstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::winstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(unsafe { FromCStr::from_c_str(ptr) })
     }
 }
 
@@ -6914,21 +7067,22 @@ pub fn winwstr(handle: WINDOW) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    match unsafe { ncurses::winwstr(handle, ptr) } {
-        ERR => Err(ncurses_function_error!("winwstr")),
-        len => {
-            assert!(!ptr.is_null(), "ncursesw::winwstr() : ptr.is_null()");
-            assert!(len <= LINE_MAX as i32, "ncursesw::winwstr() : len={} > {}", len, LINE_MAX);
+    let len = unsafe { ncurses::winwstr(handle, ptr) };
 
-            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
-        }
+    if len < 0 {
+        Err(ncurses_function_error_with_rc!("winwstr", len))
+    } else {
+        assert!(!ptr.is_null(), "ncursesw::winwstr() : ptr.is_null()");
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
 }
 
 pub fn wmove(handle: WINDOW, origin: Origin) -> result!(()) {
     match ncurses::wmove(handle, origin.y, origin.x) {
-        ERR => Err(ncurses_function_error!("wmove")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wmove", rc))
     }
 }
 
@@ -6936,8 +7090,8 @@ basic_ncurses_function_with_window!(wnoutrefresh, "wnoutrefresh");
 
 pub fn wredrawln(handle: WINDOW, beg_line: i32, num_lines: i32) -> result!(()) {
     match ncurses::wredrawln(handle, beg_line, num_lines) {
-        ERR => Err(ncurses_function_error!("wredrawln")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wredrawln", rc))
     }
 }
 
@@ -6945,22 +7099,22 @@ basic_ncurses_function_with_window!(wrefresh, "wrefresh");
 
 pub fn wresize(handle: WINDOW, size: Size) -> result!(()) {
     match ncurses::wresize(handle, size.lines, size.columns) {
-        ERR => Err(ncurses_function_error!("wresize")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wresize", rc))
     }
 }
 
 pub fn wscrl(handle: WINDOW, n: i32) -> result!(()) {
     match ncurses::wscrl(handle, n) {
-        ERR => Err(ncurses_function_error!("wscrl")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wscrl", rc))
     }
 }
 
 pub fn wsetscrreg(handle: WINDOW, region: Region) -> result!(()) {
     match ncurses::wsetscrreg(handle, region.top, region.bottom) {
-        ERR => Err(ncurses_function_error!("wsetscrreg")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wsetscrreg", rc))
     }
 }
 
@@ -6986,8 +7140,8 @@ pub fn wtimeout(handle: WINDOW, ms: time::Duration) -> result!(()) {
 
 pub fn wtouchln(handle: WINDOW, line: i32, n: i32, changed: Changed) -> result!(()) {
     match ncurses::wtouchln(handle, line, n, Changed::into(changed)) {
-        ERR => Err(ncurses_function_error!("wtouchln")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wtouchln", rc))
     }
 }
 
@@ -7007,14 +7161,14 @@ pub fn wunctrl(ch: ComplexChar) -> result!(WideChar) {
 
 pub fn wvline(handle: WINDOW, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::wvline(handle, ChtypeChar::into(ch), number) {
-        ERR => Err(ncurses_function_error!("wvline")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wvline", rc))
     }
 }
 
 pub fn wvline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::wvline_set(handle, &ComplexChar::into(wch), number) {
-        ERR => Err(ncurses_function_error!("wvline_set")),
-        _   => Ok(())
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("wvline_set", rc))
     }
 }

@@ -20,35 +20,9 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{Into, TryFrom};
-use ncurseswerror::NCurseswError;
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Legacy {
     Level0,
     Level1,
     Level2
-}
-
-impl TryFrom<i32> for Legacy {
-    type Error = NCurseswError;
-
-    fn try_from(cursor: i32) -> Result<Self, Self::Error> {
-        match cursor {
-            0 => Ok(Legacy::Level0),
-            1 => Ok(Legacy::Level1),
-            2 => Ok(Legacy::Level2),
-            _ => Err(NCurseswError::NCursesFunction { func: "use_legacy_level".to_string() })
-        }
-    }
-}
-
-impl Into<i32> for Legacy {
-    fn into(self) -> i32 {
-        match self {
-            Legacy::Level0 => 0,
-            Legacy::Level1 => 1,
-            Legacy::Level2 => 2
-        }
-    }
 }

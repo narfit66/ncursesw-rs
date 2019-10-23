@@ -26,13 +26,13 @@ use crate::{COLORS, COLOR_PAIRS};
 custom_error::custom_error! {
 /// NCursesw Errors/Events.
 pub NCurseswError
-    NCursesFunction { func: String } = "ncurses::{func}()",
+    NCursesFunction { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
+    PanelsFunction { func: String, rc: i32 } = "npanels::{func}(), rc={rc}",
+    MouseFunction { func: String, rc: i32 } = "nmouse::{func}(), rc={rc}",
     AlreadyInitialized = "ncurses library already initialized",
     InputInterupted = "ncurses input function has recieved an interrupt",
     KeyResize = "KEY_RESIZE",
     KeyEvent = "KEY_EVENT",
-    PanelFunction { func: String } = "npanels::{func}()",
-    MouseFunction { func: String } = "nmouse::{func}()",
     IntError { source: num::TryFromIntError } = "unable to convert",
     CharError { source: char::CharTryFromError } = "unable to convert",
     InternalError = "an internal error has occured",

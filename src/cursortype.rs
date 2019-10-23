@@ -20,10 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{TryFrom, Into};
-
-use ncurseswerror::NCurseswError;
-
 /// Cursor type.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CursorType {
@@ -48,28 +44,5 @@ impl Default for CursorType {
     /// ```
     fn default() -> Self {
         CursorType::Visible
-    }
-}
-
-impl TryFrom<i32> for CursorType {
-    type Error = NCurseswError;
-
-    fn try_from(cursor: i32) -> Result<Self, Self::Error> {
-        match cursor {
-            0 => Ok(CursorType::Invisible),
-            1 => Ok(CursorType::Visible),
-            2 => Ok(CursorType::VeryVisible),
-            _ => Err(NCurseswError::InternalError)
-        }
-    }
-}
-
-impl Into<i32> for CursorType {
-    fn into(self) -> i32 {
-        match self {
-            CursorType::Invisible   => 0,
-            CursorType::Visible     => 1,
-            CursorType::VeryVisible => 2
-        }
     }
 }

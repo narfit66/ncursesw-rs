@@ -21,7 +21,6 @@
 */
 
 use shims::ncurses;
-use constants::ERR;
 use gen::{ColorType, ColorsType};
 use ncursescolortype::set_ncurses_colortype;
 
@@ -36,24 +35,26 @@ macro_rules! extend_colorpair {
         }
 
         pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
-            match ncurses::alloc_pair(colors.foreground().number(), colors.background().number()) {
-                ERR  => Err(ncurses_function_error!("alloc_pair")),
-                pair => {
-                    set_ncurses_colortype($extend);
+            let pair = ncurses::alloc_pair(colors.foreground().number(), colors.background().number());
 
-                    Ok(ColorPair::from(pair))
-                }
+            if pair < 0 {
+                Err(ncurses_function_error_with_rc!("alloc_pair", pair))
+            } else {
+                set_ncurses_colortype($extend);
+
+                Ok(ColorPair::from(pair))
             }
         }
 
         pub fn find_pair(colors: Colors) -> Option<ColorPair> {
-            match ncurses::find_pair(colors.foreground().number(), colors.background().number()) {
-                ERR  => None,
-                pair => {
-                    set_ncurses_colortype($extend);
+            let pair = ncurses::find_pair(colors.foreground().number(), colors.background().number());
 
-                    Some(ColorPair::from(pair))
-                }
+            if pair < 0 {
+                None
+            } else {
+                set_ncurses_colortype($extend);
+
+                Some(ColorPair::from(pair))
             }
         }
     }
