@@ -2047,7 +2047,7 @@ pub fn getmaxyx(handle: WINDOW) -> result!(Size) {
 }
 
 pub fn getn_wstr(number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::getn_wstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::getn_wstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -2077,7 +2077,7 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
 }
 
 pub fn getnstr(number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::getnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::getnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2228,7 +2228,7 @@ pub fn in_wch() -> result!(ComplexChar) {
 }
 
 pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::in_wchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::in_wchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -2263,7 +2263,7 @@ pub fn inch() -> ChtypeChar {
 }
 
 pub fn inchnstr(number: i32) -> result!(ChtypeString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::inchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::inchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -2378,7 +2378,7 @@ pub fn initscr() -> result!(WINDOW) {
 }
 
 pub fn innstr(number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::innstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::innstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2396,7 +2396,7 @@ pub fn innstr(number: i32) -> result!(String) {
 }
 
 pub fn innwstr(number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::innwstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::innwstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -2650,15 +2650,13 @@ pub fn inwstr() -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    let len = unsafe { ncurses::inwstr(ptr) };
+    match unsafe { ncurses::inwstr(ptr) } {
+        OK => {
+            assert!(!ptr.is_null(), "ncursesw::inwstr() : ptr.is_null()");
 
-    if len < 0 {
-        Err(ncurses_function_error_with_rc!("inwstr", len))
-    } else {
-        assert!(!ptr.is_null(), "ncursesw::inwstr() : ptr.is_null()");
-        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::inwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
-
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
+        },
+        rc => Err(ncurses_function_error_with_rc!("inwstr", rc))
     }
 }
 
@@ -3242,7 +3240,7 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
 }
 
 pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvgetn_wstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvgetn_wstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -3272,7 +3270,7 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
 }
 
 pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvgetnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvgetnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -3338,7 +3336,7 @@ pub fn mvin_wch(origin: Origin) -> result!(ComplexChar) {
 }
 
 pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvin_wchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvin_wchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -3373,7 +3371,7 @@ pub fn mvinch(origin: Origin) -> ChtypeChar {
 }
 
 pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvinchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvinchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -3408,7 +3406,7 @@ pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
 }
 
 pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvinnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvinnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -3426,7 +3424,7 @@ pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
 }
 
 pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvinnwstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvinnwstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -3670,15 +3668,13 @@ pub fn mvinwstr(origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    let len = unsafe { ncurses::mvinwstr(origin.y, origin.x, ptr) };
+    match unsafe { ncurses::mvinwstr(origin.y, origin.x, ptr) } {
+        OK => {
+            assert!(!ptr.is_null(), "ncursesw::mvinwstr() : ptr.is_null()");
 
-    if len < 0 {
-        Err(ncurses_function_error_with_rc!("mvinwstr", len))
-    } else {
-        assert!(!ptr.is_null(), "ncursesw::mvinwstr() : ptr.is_null()");
-        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvinwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
-
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
+        },
+        rc => Err(ncurses_function_error_with_rc!("mvinwstr", rc))
     }
 }
 
@@ -4200,7 +4196,7 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
 }
 
 pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvwgetn_wstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvwgetn_wstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -4230,7 +4226,7 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
 }
 
 pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvwgetnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvwgetnstr() : number={}, LINE_MAX{}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -4303,7 +4299,7 @@ pub fn mvwin_wch(handle: WINDOW, origin: Origin) -> result!(ComplexChar) {
 }
 
 pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(ComplexString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvwin_wchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvwin_wchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -4338,7 +4334,7 @@ pub fn mvwinch(handle: WINDOW, origin: Origin) -> ChtypeChar {
 }
 
 pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(ChtypeString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvwinchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvwinchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -4373,7 +4369,7 @@ pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
 }
 
 pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvwinnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvwinnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -4391,7 +4387,7 @@ pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String)
 }
 
 pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::mvwinnwstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::mvwinnwstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -4677,15 +4673,13 @@ pub fn mvwinwstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    let len = unsafe { ncurses::mvwinwstr(handle, origin.y, origin.x, ptr) };
+    match unsafe { ncurses::mvwinwstr(handle, origin.y, origin.x, ptr) } {
+        OK => {
+            assert!(!ptr.is_null(), "ncursesw::mvwinwstr() : ptr.is_null()");
 
-    if len < 0 {
-        Err(ncurses_function_error_with_rc!("mvwinwstr", len))
-    } else {
-        assert!(!ptr.is_null(), "ncursesw::mvwinwstr() : ptr.is_null()");
-        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::mvwinwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
-
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
+        },
+        rc => Err(ncurses_function_error_with_rc!("mvwinwstr", rc))
     }
 }
 
@@ -6580,7 +6574,7 @@ pub fn wgetdelay(handle: WINDOW) -> result!(time::Duration) {
 }
 
 pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::wgetn_wstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::wgetn_wstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -6610,7 +6604,7 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
 }
 
 pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::wgetnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::wgetnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -6690,7 +6684,7 @@ pub fn win_wch(handle: WINDOW) -> result!(ComplexChar) {
 }
 
 pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::win_wchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::win_wchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -6725,7 +6719,7 @@ pub fn winch(handle: WINDOW) -> ChtypeChar {
 }
 
 pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::winchnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::winchnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -6760,7 +6754,7 @@ pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
 }
 
 pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::winnstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::winnstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -6778,7 +6772,7 @@ pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
 }
 
 pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
-    assert!(number <= LINE_MAX as i32, "ncursesw::winnwstr() : number={} > {}", number, LINE_MAX);
+    assert!(number > 0 && number <= LINE_MAX as i32, "ncursesw::winnwstr() : number={}, LINE_MAX={}", number, LINE_MAX);
 
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -7067,15 +7061,13 @@ pub fn winwstr(handle: WINDOW) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
 
-    let len = unsafe { ncurses::winwstr(handle, ptr) };
+    match unsafe { ncurses::winwstr(handle, ptr) } {
+        OK => {
+            assert!(!ptr.is_null(), "ncursesw::winwstr() : ptr.is_null()");
 
-    if len < 0 {
-        Err(ncurses_function_error_with_rc!("winwstr", len))
-    } else {
-        assert!(!ptr.is_null(), "ncursesw::winwstr() : ptr.is_null()");
-        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::winwstr() : len={}, LINE_MAX={}", len, LINE_MAX);
-
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+            Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, LINE_MAX) }))
+        },
+        rc => Err(ncurses_function_error_with_rc!("winwstr", rc))
     }
 }
 
