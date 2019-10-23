@@ -1559,21 +1559,15 @@ pub fn copywin(
 }
 
 pub fn curs_set(cursor: CursorType) -> result!(CursorType) {
-    let rc = ncurses::curs_set(match cursor {
+    match ncurses::curs_set(match cursor {
         CursorType::Invisible   => 0,
         CursorType::Visible     => 1,
         CursorType::VeryVisible => 2
-    });
-
-    if rc < 0 {
-        Err(ncurses_function_error_with_rc!("curs_set", rc))
-    } else {
-        match rc {
-            0  => Ok(CursorType::Invisible),
-            1  => Ok(CursorType::Visible),
-            2  => Ok(CursorType::VeryVisible),
-            rc => Err(ncurses_function_error_with_rc!("curs_set", rc))
-        }
+    }) {
+        0  => Ok(CursorType::Invisible),
+        1  => Ok(CursorType::Visible),
+        2  => Ok(CursorType::VeryVisible),
+        rc => Err(ncurses_function_error_with_rc!("curs_set", rc))
     }
 }
 
@@ -5154,21 +5148,15 @@ pub fn use_extended_names(enable: bool) -> bool {
 }
 
 pub fn use_legacy_coding(level: Legacy) -> result!(Legacy) {
-    let rc = ncurses::use_legacy_coding(match level {
+    match ncurses::use_legacy_coding(match level {
         Legacy::Level0 => 0,
         Legacy::Level1 => 1,
         Legacy::Level2 => 2
-    });
-
-    if rc < 0 {
-        Err(ncurses_function_error_with_rc!("use_legacy_coding", rc))
-    } else {
-        match rc {
-            0 => Ok(Legacy::Level0),
-            1 => Ok(Legacy::Level1),
-            2 => Ok(Legacy::Level2),
-            e => Err(ncurses_function_error_with_rc!("use_legacy_coding", e))
-        }
+    }) {
+        0  => Ok(Legacy::Level0),
+        1  => Ok(Legacy::Level1),
+        2  => Ok(Legacy::Level2),
+        rc => Err(ncurses_function_error_with_rc!("use_legacy_coding", rc))
     }
 }
 
