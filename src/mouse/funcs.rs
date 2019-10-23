@@ -55,7 +55,7 @@ pub fn ungetmouse(event: nmouse::MEVENT) -> result!(()) {
 pub fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> result!(mmask_t) {
     let mask = unsafe { nmouse::mousemask(newmask, oldmask) };
 
-    if mask <= 0 {
+    if mask == 0 {
         Err(mouse_function_error!("mousemask"))
     } else {
         Ok(mask)
