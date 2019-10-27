@@ -37,5 +37,15 @@ pub fn ncurses_version() -> Version {
 }
 
 pub fn setlocale(lc: LcCategory, locale: &str) -> String {
-    shims::utils::setlocale(LcCategory::into(lc), locale)
+    shims::utils::setlocale(match lc {
+            LcCategory::All      => bindings::LC_ALL,
+            LcCategory::Collate  => bindings::LC_COLLATE,
+            LcCategory::CType    => bindings::LC_CTYPE,
+            LcCategory::Monetary => bindings::LC_MONETARY,
+            LcCategory::Numeric  => bindings::LC_NUMERIC,
+            LcCategory::Time     => bindings::LC_TIME,
+            LcCategory::Messages => bindings::LC_MESSAGES
+        } as i32,
+        locale
+    )
 }

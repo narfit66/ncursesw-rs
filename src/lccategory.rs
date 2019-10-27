@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use crate::shims::*;
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum LcCategory {
     All,
@@ -31,18 +29,4 @@ pub enum LcCategory {
     Numeric,
     Time,
     Messages
-}
-
-impl Into<i32> for LcCategory {
-    fn into(self) -> i32 {
-        match self {
-            LcCategory::All      => bindings::LC_ALL as i32,
-            LcCategory::Collate  => bindings::LC_COLLATE as i32,
-            LcCategory::CType    => bindings::LC_CTYPE as i32,
-            LcCategory::Monetary => bindings::LC_MONETARY as i32,
-            LcCategory::Numeric  => bindings::LC_NUMERIC as i32,
-            LcCategory::Time     => bindings::LC_TIME as i32,
-            LcCategory::Messages => bindings::LC_MESSAGES as i32
-        }
-    }
 }
