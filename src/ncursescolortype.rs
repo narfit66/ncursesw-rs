@@ -21,7 +21,6 @@
 */
 
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::convert::From;
 use std::fmt::{Display, Formatter};
 
 lazy_static! {
@@ -50,16 +49,6 @@ pub enum NCursesColorType {
     Extended
 }
 
-impl From<bool> for NCursesColorType {
-    fn from(color_type: bool) -> NCursesColorType {
-        if color_type {
-            NCursesColorType::Extended
-        } else {
-            NCursesColorType::Normal
-        }
-    }
-}
-
 impl Display for NCursesColorType {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "{}", match self {
@@ -72,7 +61,11 @@ impl Display for NCursesColorType {
 /// Returns the color type that ncursesw is running under. by default it will be
 /// ColorType::Normal until a ColorPair structure is generated.
 pub fn ncurses_colortype() -> NCursesColorType {
-    NCursesColorType::from(EXTENDED_COLORS.load(Ordering::SeqCst))
+    if EXTENDED_COLORS.load(Ordering::SeqCst) {
+        NCursesColorType::Extended
+    } else {
+        NCursesColorType::Normal
+    }
 }
 
 /// Has the crates color type been set.
@@ -86,16 +79,16 @@ pub(crate) fn set_ncurses_colortype(colortype: NCursesColorType) {
     if colortype != set_colortype {
         if ncurses_colortype_set() {
             panic!("ncursesw color type already defined as {}!", set_colortype);
+        } else {
+            EXTENDED_COLORS_ALREADY_SET.store(true, Ordering::SeqCst);
+
+            EXTENDED_COLORS.store(
+                match colortype {
+                    NCursesColorType::Normal   => false,
+                    NCursesColorType::Extended => true
+                },
+                Ordering::SeqCst
+            );
         }
-
-        EXTENDED_COLORS_ALREADY_SET.store(true, Ordering::SeqCst);
-
-        EXTENDED_COLORS.store(
-            match colortype {
-                NCursesColorType::Normal   => false,
-                NCursesColorType::Extended => true
-            },
-            Ordering::SeqCst
-        );
     }
 }

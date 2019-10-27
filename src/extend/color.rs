@@ -66,9 +66,9 @@ impl From<i32> for Color {
         if color == -1 {
             Color::TerminalDefault
         } else if color <= EXT_COLOR_WHITE {
-            Color::Dark(BaseColor::from(color))
+            Color::Dark(BaseColor::from_i32(color))
         } else if color <= EXT_COLOR_WHITE + LIGHT_COLOR_OFFSET {
-            Color::Light(BaseColor::from(color - LIGHT_COLOR_OFFSET))
+            Color::Light(BaseColor::from_i32(color - LIGHT_COLOR_OFFSET))
         } else {
             Color::Custom(color)
         }

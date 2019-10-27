@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::Into;
-
 /// The soft-label layout type
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SoftLabelType {
@@ -31,14 +29,4 @@ pub enum SoftLabelType {
     FourFour,
     /// A four-four layout with an index
     FourFourIndex
-}
-
-impl Into<i32> for SoftLabelType {
-    fn into(self) -> i32 {
-        match self {
-            SoftLabelType::ThreeTwoThree => 0,
-            SoftLabelType::FourFour      => 1,
-            SoftLabelType::FourFourIndex => 2
-        }
-    }
 }

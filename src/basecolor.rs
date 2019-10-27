@@ -70,13 +70,40 @@ pub enum BaseColor {
 }
 
 impl BaseColor {
+    pub(in crate) fn from_short_t(color: short_t) -> Self {
+        match color {
+            COLOR_BLACK   => BaseColor::Black,
+            COLOR_RED     => BaseColor::Red,
+            COLOR_GREEN   => BaseColor::Green,
+            COLOR_YELLOW  => BaseColor::Yellow,
+            COLOR_BLUE    => BaseColor::Blue,
+            COLOR_MAGENTA => BaseColor::Magenta,
+            COLOR_CYAN    => BaseColor::Cyan,
+            COLOR_WHITE   => BaseColor::White,
+            _             => unreachable!()
+        }
+    }
+
+    pub(in crate) fn from_i32(color: i32) -> Self {
+        Self::from_short_t(color as short_t)
+    }
+
     /// Return the `dark` value of the base color (the first 8 color's are considered dark colors).
-    pub(crate) fn dark(&self) -> i16 {
-        Self::into(*self)
+    pub(in crate) fn dark(&self) -> i16 {
+        match self {
+            BaseColor::Black   => COLOR_BLACK,
+            BaseColor::Red     => COLOR_RED,
+            BaseColor::Green   => COLOR_GREEN,
+            BaseColor::Yellow  => COLOR_YELLOW,
+            BaseColor::Blue    => COLOR_BLUE,
+            BaseColor::Magenta => COLOR_MAGENTA,
+            BaseColor::Cyan    => COLOR_CYAN,
+            BaseColor::White   => COLOR_WHITE
+        }
     }
 
     /// Return the `light` value of the base color (the first 8 color's are considered dark colors, the next 8 are the lighter/brighter equivilants).
-    pub(crate) fn light(&self) -> i16 {
+    pub(in crate) fn light(&self) -> i16 {
         self.dark() + COLOR_WHITE + 1
     }
 }
@@ -121,48 +148,5 @@ impl FromStr for BaseColor {
             "white"   => Ok(BaseColor::White),
             _         => Err(NCurseswError::ColorParseError { color: color.to_string() })
         }
-    }
-}
-
-impl Into<short_t> for BaseColor {
-    fn into(self) -> short_t {
-        match self {
-            BaseColor::Black   => COLOR_BLACK,
-            BaseColor::Red     => COLOR_RED,
-            BaseColor::Green   => COLOR_GREEN,
-            BaseColor::Yellow  => COLOR_YELLOW,
-            BaseColor::Blue    => COLOR_BLUE,
-            BaseColor::Magenta => COLOR_MAGENTA,
-            BaseColor::Cyan    => COLOR_CYAN,
-            BaseColor::White   => COLOR_WHITE
-        }
-    }
-}
-
-impl From<short_t> for BaseColor {
-    fn from(color: short_t) -> Self {
-        match color {
-            COLOR_BLACK   => BaseColor::Black,
-            COLOR_RED     => BaseColor::Red,
-            COLOR_GREEN   => BaseColor::Green,
-            COLOR_YELLOW  => BaseColor::Yellow,
-            COLOR_BLUE    => BaseColor::Blue,
-            COLOR_MAGENTA => BaseColor::Magenta,
-            COLOR_CYAN    => BaseColor::Cyan,
-            COLOR_WHITE   => BaseColor::White,
-            _             => unreachable!()
-        }
-    }
-}
-
-impl Into<i32> for BaseColor {
-    fn into(self) -> i32 {
-        i32::from(self.dark())
-    }
-}
-
-impl From<i32> for BaseColor {
-    fn from(color: i32) -> Self {
-        Self::from(color as short_t)
     }
 }

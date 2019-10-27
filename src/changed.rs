@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::Into;
-
 /// Make a line look like it's been touched since last `wrefresh`, used by `wtouchln`.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Changed {
@@ -29,13 +27,4 @@ pub enum Changed {
     True,
     /// Don't make line look like it has been touched.
     False
-}
-
-impl Into<i32> for Changed {
-    fn into(self) -> i32 {
-        match self {
-            Changed::True  => 1,
-            Changed::False => 0
-        }
-    }
 }

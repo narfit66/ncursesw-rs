@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::Into;
 use std::fmt::{Display, Formatter, Result};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -30,8 +29,8 @@ pub enum Justification {
     Right
 }
 
-impl Into<i32> for Justification {
-    fn into(self) -> i32 {
+impl Justification {
+    pub(in crate) fn value(&self) -> i32 {
         match self {
             Justification::Left     => 0,
             Justification::Centered => 1,

@@ -28,12 +28,3 @@ pub enum Orientation {
     /// Rip a line from the bottom of the screen.
     Bottom
 }
-
-impl Into<i32> for Orientation {
-    fn into(self) -> i32 {
-        match self {
-            Orientation::Top    => 1,
-            Orientation::Bottom => -1
-        }
-    }
-}

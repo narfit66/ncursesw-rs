@@ -68,9 +68,9 @@ impl From<short_t> for Color {
         if color == -1 {
             Color::TerminalDefault
         } else if color <= COLOR_WHITE {
-            Color::Dark(BaseColor::from(color))
+            Color::Dark(BaseColor::from_short_t(color))
         } else if color <= COLOR_WHITE + LIGHT_COLOR_OFFSET {
-            Color::Light(BaseColor::from(color - LIGHT_COLOR_OFFSET))
+            Color::Light(BaseColor::from_short_t(color - LIGHT_COLOR_OFFSET))
         } else {
             Color::Custom(color)
         }
