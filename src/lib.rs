@@ -4691,6 +4691,7 @@ pub fn mvwvline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i3
     }
 }
 
+#[deprecated(since = "0.3.2", note = "ncurses library call superseeded by native rust call. Use std::thread::sleep(dur: std::time::Duration) instead")]
 pub fn napms(ms: time::Duration) -> result!(()) {
     let ms = i32::try_from(ms.as_millis())?;
 
