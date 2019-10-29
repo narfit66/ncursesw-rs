@@ -40,4 +40,4 @@ pub(crate) use gen::colorpairgeneric::*;
 pub use gen::colorpairtype::*;
 pub use gen::colorstype::*;
 pub use gen::colortype::*;
-pub use gen::rawwithnul::*;
+pub(in crate) use gen::rawwithnul::*;
