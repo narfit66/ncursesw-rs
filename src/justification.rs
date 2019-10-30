@@ -30,7 +30,7 @@ pub enum Justification {
 }
 
 impl Justification {
-    pub(in crate) fn value(&self) -> i32 {
+    pub(in crate) fn value(self) -> i32 {
         match self {
             Justification::Left     => 0,
             Justification::Centered => 1,
