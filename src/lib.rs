@@ -41,6 +41,8 @@ mod macros;
 
 /// Extended color's, color pairs and attributes module
 pub mod extend;
+/// Compiled in `ncursesw` features
+pub mod features;
 /// Traits used by `ncursesw`
 mod gen;
 /// Normal color's, color pairs and attributes module
