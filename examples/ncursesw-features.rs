@@ -1,5 +1,5 @@
 /*
-    src/features.rs
+    examples/ncursesw-features.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,18 +20,11 @@
     IN THE SOFTWARE.
 */
 
-/// Has the crate been compiled with the `key_resize_as_error` feature.
-pub fn key_resize_as_error() -> bool {
-    #[cfg(feature = "key_resize_as_error")]
-    return true;
-    #[cfg(not(feature = "key_resize_as_error"))]
-    return false;
-}
+extern crate ncursesw;
 
-/// Has the crate been compiled with the `key_event_as_error` feature.
-pub fn key_event_as_error() -> bool {
-    #[cfg(feature = "key_event_as_error")]
-    return true;
-    #[cfg(not(feature = "key_event_as_error"))]
-    return false;
+use ncursesw::features;
+
+fn main() {
+    println!("key_resize_as_error = {}", features::key_resize_as_error());
+    println!("key_event_as_error  = {}", features::key_event_as_error());
 }
