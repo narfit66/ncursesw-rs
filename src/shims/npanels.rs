@@ -36,41 +36,33 @@ pub type PANEL_USERPTR = *const libc::c_void;
 type WINDOW = ncurses::WINDOW;
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn new_panel(win: WINDOW) -> Option<PANEL> {
+pub unsafe fn new_panel(win: WINDOW) -> Option<PANEL> {
     assert!(!win.is_null(), "npanels::new_panel() : win.is_null()");
 
-    let pan = unsafe {
-        bindings::new_panel(win)
-    };
+    let pan = bindings::new_panel(win);
 
     return_optional_mut_ptr!(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn bottom_panel(pan: PANEL) -> i32 {
+pub unsafe fn bottom_panel(pan: PANEL) -> i32 {
     assert!(!pan.is_null(), "npanels::bottom_panel() : pan.is_null()");
 
-    unsafe {
-        bindings::bottom_panel(pan)
-    }
+    bindings::bottom_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn top_panel(pan: PANEL) -> i32 {
+pub unsafe fn top_panel(pan: PANEL) -> i32 {
     assert!(!pan.is_null(), "npanels::top_panel() : pan.is_null()");
 
-    unsafe {
-        bindings::top_panel(pan)
-    }
+    bindings::top_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn show_panel(pan: PANEL) -> i32 {
+pub unsafe fn show_panel(pan: PANEL) -> i32 {
     assert!(!pan.is_null(), "npanels::show_panel() : pan.is_null()");
 
-    unsafe {
-        bindings::show_panel(pan)
-    }
+    bindings::show_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
@@ -81,100 +73,80 @@ pub fn update_panels() {
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn hide_panel(pan: PANEL) -> i32 {
+pub unsafe fn hide_panel(pan: PANEL) -> i32 {
     assert!(!pan.is_null(), "npanels::hide_panel() : pan.is_null()");
 
-    unsafe {
-        bindings::hide_panel(pan)
-    }
+    bindings::hide_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn panel_window(pan: PANEL) -> Option<WINDOW> {
+pub unsafe fn panel_window(pan: PANEL) -> Option<WINDOW> {
     assert!(!pan.is_null(), "npanels::panel_window() : pan.is_null()");
 
-    let win = unsafe {
-        bindings::panel_window(pan)
-    };
+    let win = bindings::panel_window(pan);
 
     return_optional_mut_ptr!(win)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn replace_panel(pan: PANEL, win: WINDOW) -> i32 {
+pub unsafe fn replace_panel(pan: PANEL, win: WINDOW) -> i32 {
     assert!(!pan.is_null(), "npanels::replace_panel() : pan.is_null()");
     assert!(!win.is_null(), "npanels::replace_panel() : win.is_null()");
 
-    unsafe {
-        bindings::replace_panel(pan, win)
-    }
+    bindings::replace_panel(pan, win)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn move_panel(pan: PANEL, starty: i32, startx: i32) -> i32 {
+pub unsafe fn move_panel(pan: PANEL, starty: i32, startx: i32) -> i32 {
     assert!(!pan.is_null(), "npanels::move_panel() : pan.is_null()");
 
-    unsafe {
-        bindings::move_panel(pan, starty, startx)
-    }
+    bindings::move_panel(pan, starty, startx)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn panel_hidden(pan: PANEL) -> Option<bool> {
+pub unsafe fn panel_hidden(pan: PANEL) -> Option<bool> {
     assert!(!pan.is_null(), "npanels::panel_hidden() : pan.is_null()");
 
-    unsafe {
-        match bindings::panel_hidden(pan) {
-            TRUE  => Some(true),
-            FALSE => Some(false),
-            _     => None
-        }
+    match bindings::panel_hidden(pan) {
+        TRUE  => Some(true),
+        FALSE => Some(false),
+        _     => None
     }
 }
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn panel_above(pan: Option<PANEL>) -> Option<PANEL> {
-    let ptr = unsafe {
-        bindings::panel_above(return_mut_ptr!(pan))
-    };
+pub unsafe fn panel_above(pan: Option<PANEL>) -> Option<PANEL> {
+    let ptr = bindings::panel_above(return_mut_ptr!(pan));
 
     return_optional_mut_ptr!(ptr)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn panel_below(pan: Option<PANEL>) -> Option<PANEL> {
-    let ptr = unsafe {
-        bindings::panel_below(return_mut_ptr!(pan))
-    };
+pub unsafe fn panel_below(pan: Option<PANEL>) -> Option<PANEL> {
+    let ptr = bindings::panel_below(return_mut_ptr!(pan));
 
     return_optional_mut_ptr!(ptr)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn set_panel_userptr(pan: PANEL, ptr: Option<PANEL_USERPTR>) -> i32 {
+pub unsafe fn set_panel_userptr(pan: PANEL, ptr: Option<PANEL_USERPTR>) -> i32 {
     assert!(!pan.is_null(), "npanels::set_panel_userptr() : pan.is_null()");
 
-    unsafe {
-        bindings::set_panel_userptr(pan, return_mut_ptr!(ptr))
-    }
+    bindings::set_panel_userptr(pan, return_mut_ptr!(ptr))
 }
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn panel_userptr(pan: PANEL) -> Option<PANEL_USERPTR> {
+pub unsafe fn panel_userptr(pan: PANEL) -> Option<PANEL_USERPTR> {
     assert!(!pan.is_null(), "npanels::panel_userptr() : pan.is_null()");
 
-    let ptr = unsafe {
-        bindings::panel_userptr(pan)
-    };
+    let ptr = bindings::panel_userptr(pan);
 
     return_optional_mut_ptr!(ptr)
 }
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
-pub fn del_panel(pan: PANEL) -> i32 {
+pub unsafe fn del_panel(pan: PANEL) -> i32 {
     assert!(!pan.is_null(), "npanels::del_panel() : pan.is_null()");
 
-    unsafe {
-        bindings::del_panel(pan)
-    }
+    bindings::del_panel(pan)
 } 

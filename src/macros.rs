@@ -35,7 +35,9 @@ macro_rules! simple_ncurses_function {
 macro_rules! simple_ncurses_function_with_window_returns_bool {
     ($f: ident) => {
         pub fn $f(handle: WINDOW) -> bool {
-            ncurses::$f(handle)
+            unsafe {
+                ncurses::$f(handle)
+            }
         }
     }
 }
@@ -54,7 +56,7 @@ macro_rules! basic_ncurses_function {
 macro_rules! basic_ncurses_function_with_window {
     ($f: ident, $n: expr) => {
         pub fn $f(handle: WINDOW) -> result!(()) {
-            match ncurses::$f(handle) {
+            match unsafe { ncurses::$f(handle) } {
                 OK => Ok(()),
                 rc => Err(ncurses_function_error_with_rc!($n, rc))
             }
@@ -71,7 +73,7 @@ macro_rules! mouse_function_error_with_rc { ($func: expr, $rc: expr) => { NCurse
 
 macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type = bindings::$name as $type; } }
 
-macro_rules! c_str_with_nul { ($name: ident) => { unsafe { &*($name.to_c_str().as_bytes_with_nul() as *const [u8] as *const [i8]) } } }
+macro_rules! c_str_with_nul { ($name: ident) => { &*($name.to_c_str().as_bytes_with_nul() as *const [u8] as *const [i8]) } }
 
 macro_rules! raw_with_nul_as_slice { ($name: ident) => { $name.clone().raw_with_nul().as_slice() } }
 
