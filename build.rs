@@ -45,6 +45,14 @@ fn main() {
         .blacklist_function("wcstold")          // blacklisted to stop cargo build warning about unstable ABI for u128
         .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
+        .blacklist_function("item_init")        // blacklisted to implement our own function
+        .blacklist_function("item_term")        // blacklisted to implement our own function
+        .blacklist_function("menu_init")        // blacklisted to implement our own function
+        .blacklist_function("menu_term")        // blacklisted to implement our own function
+        .blacklist_function("set_item_init")    // blacklisted to implement our own function
+        .blacklist_function("set_item_term")    // blacklisted to implement our own function
+        .blacklist_function("set_menu_init")    // blacklisted to implement our own function
+        .blacklist_function("set_menu_term")    // blacklisted to implement our own function
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding
         .expect("Unable to generate bindings");

@@ -1,6 +1,6 @@
 [package]
 name = "ncursesw"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["Steve Whittle <narfit66@googlemail.com>"]
 description = "A fat wrapper around the ncurses TUI library"
 repository = "https://github.com/narfit66/ncursesw-rs"
@@ -12,6 +12,7 @@ build = "build.rs"
 
 [dependencies]
 libc = "0.2"
+errno = "*"
 custom_error = "1.7.0"
 ascii = "0.9.1"
 semver = "0.9.0"

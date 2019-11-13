@@ -30,6 +30,7 @@ extern crate libc;
 extern crate custom_error;
 extern crate ascii;
 extern crate semver;
+extern crate errno;
 #[macro_use]
 extern crate lazy_static;
 

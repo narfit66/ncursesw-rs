@@ -29,12 +29,25 @@ use std::os::raw::{c_short, c_int};
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
-pub type RipoffInit = extern "C" fn(*mut WINDOW, i32) -> i32;
+type _MENU = *mut tagMENU;
 
+pub type RipoffInit = extern "C" fn(*mut WINDOW, i32) -> i32;
+pub type MenuHook = extern "C" fn(_MENU);
+
+// ncurses core functions.
 extern "C" {
     pub fn getcchar(_: *const cchar_t, _: *mut wchar_t, _: *mut attr_t, _: *mut c_short, _: *mut c_int) -> c_int;
+    pub fn ripoffline(_: c_int, _: RipoffInit) -> c_int;
 }
 
+// ncurses menu functions.
 extern "C" {
-     pub fn ripoffline(_: c_int, _: RipoffInit) -> c_int;
+    pub fn item_init(_: _MENU) -> Option<MenuHook>;
+    pub fn item_term(_: _MENU) -> Option<MenuHook>;
+    pub fn menu_init(_: _MENU) -> Option<MenuHook>;
+    pub fn menu_term(_: _MENU) -> Option<MenuHook>;
+    pub fn set_item_init(_: _MENU, _: MenuHook) -> c_int;
+    pub fn set_item_term(_: _MENU, _: MenuHook) -> c_int;
+    pub fn set_menu_init(_: _MENU, _: MenuHook) -> c_int;
+    pub fn set_menu_term(_: _MENU, _: MenuHook) -> c_int;
 }

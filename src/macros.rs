@@ -76,18 +76,18 @@ macro_rules! c_str_with_nul { ($name: ident) => { unsafe { &*($name.to_c_str().a
 macro_rules! raw_with_nul_as_slice { ($name: ident) => { $name.clone().raw_with_nul().as_slice() } }
 
 macro_rules! return_optional_mut_ptr {
-    ($name: ident) => {
-        if $name.is_null() {
+    ($ptr: ident) => {
+        if $ptr.is_null() {
             None
         } else {
-            Some($name)
+            Some($ptr)
         }
     }
 }
 
 macro_rules! return_mut_ptr {
-    ($name: ident) => {
-        match $name {
+    ($ptr: ident) => {
+        match $ptr {
             Some(ptr) => ptr,
             None      => std::ptr::null_mut()
         }

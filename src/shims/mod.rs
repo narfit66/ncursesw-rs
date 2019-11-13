@@ -30,6 +30,10 @@ pub mod constants;
 ///
 /// Most of the functions are `unsafe`.
 pub mod ncurses;
+/// NCurses menu functions thin API wrapper with assertions as appropriate
+///
+/// Most of the functions are `unsafe`.
+pub mod nmenu;
 /// NCurses mouse functions thin API wrapper with assertions as appropriate
 ///
 /// Most of the functions are `unsafe`.

@@ -28,13 +28,13 @@ use bindings;
 
 type attr_t = bindings::attr_t;
 
-/* Success/Failure. */
+// Success/Failure.
 wrap_const!(ERR: i32);
 wrap_const!(OK: i32);
 wrap_const!(TRUE: i32);
 wrap_const!(FALSE: i32);
 
-/* Colors */
+// Colors.
 wrap_const!(COLOR_BLACK: i16);
 wrap_const!(COLOR_RED: i16);
 wrap_const!(COLOR_GREEN: i16);
@@ -56,9 +56,9 @@ wrap_const!(_NOCHANGE: i32);
  */
 wrap_const!(_NEWINDEX: i32);
 
-macro_rules! wrap_key_const{ ($key:ident, $n:expr) => { pub const $key: i32 = KEY_F0 + $n; } }
+macro_rules! wrap_key_const{ ($key: ident, $n: expr) => { pub const $key: i32 = KEY_F0 + $n; } }
 
-/* Keys */
+// Keys.
 wrap_const!(KEY_CODE_YES: i32);            // A wchar_t contains a key code
 wrap_const!(KEY_MIN: i32);                 // Minimum curses key
 wrap_const!(KEY_BREAK: i32);               // Break key(unreliable)
@@ -218,6 +218,7 @@ wrap_const!(KEY_RESIZE: i32);              // Terminal resize event
 wrap_const!(KEY_EVENT: i32);               // We were interrupted by an event
 wrap_const!(KEY_MAX: i32);                 // Maximum key value is 0633
 
+// Attributes.
 wrap_const!(A_NORMAL: attr_t);
 pub const A_ATTRIBUTES: attr_t = ((!0 as attr_t) << 8);
 //wrap_const!(A_ATTRIBUTES: attr_t);
@@ -240,3 +241,51 @@ wrap_const!(A_TOP: attr_t);
 wrap_const!(A_VERTICAL: attr_t);
 pub const A_ITALIC: attr_t = ((1 as attr_t) << 31);
 //wrap_const!(A_ITALIC: attr_t);
+
+// Menu Errors.
+wrap_const!(E_BAD_ARGUMENT: i32);
+wrap_const!(E_BAD_STATE: i32);
+wrap_const!(E_CONNECTED: i32);
+wrap_const!(E_CURRENT: i32);
+wrap_const!(E_INVALID_FIELD: i32);
+wrap_const!(E_NOT_CONNECTED: i32);
+wrap_const!(E_NOT_POSTED: i32);
+wrap_const!(E_NOT_SELECTABLE: i32);
+wrap_const!(E_NO_MATCH: i32);
+wrap_const!(E_NO_ROOM: i32);
+wrap_const!(E_OK: i32);
+wrap_const!(E_POSTED: i32);
+wrap_const!(E_REQUEST_DENIED: i32);
+wrap_const!(E_SYSTEM_ERROR: i32);
+wrap_const!(E_UNKNOWN_COMMAND: i32);
+
+wrap_const!(O_SELECTABLE: i32);
+
+wrap_const!(O_ONEVALUE: i32);
+wrap_const!(O_SHOWDESC: i32);
+wrap_const!(O_ROWMAJOR: i32);
+wrap_const!(O_IGNORECASE: i32);
+wrap_const!(O_SHOWMATCH: i32);
+wrap_const!(O_NONCYCLIC: i32);
+wrap_const!(O_MOUSE_MENU: i32);
+
+wrap_const!(REQ_LEFT_ITEM: i32);
+wrap_const!(REQ_RIGHT_ITEM: i32);
+wrap_const!(REQ_UP_ITEM: i32);
+wrap_const!(REQ_DOWN_ITEM: i32);
+wrap_const!(REQ_SCR_ULINE: i32);
+wrap_const!(REQ_SCR_DLINE: i32);
+wrap_const!(REQ_SCR_DPAGE: i32);
+wrap_const!(REQ_SCR_UPAGE: i32);
+wrap_const!(REQ_FIRST_ITEM: i32);
+wrap_const!(REQ_LAST_ITEM: i32);
+wrap_const!(REQ_NEXT_ITEM: i32);
+wrap_const!(REQ_PREV_ITEM: i32);
+wrap_const!(REQ_TOGGLE_ITEM: i32);
+wrap_const!(REQ_CLEAR_PATTERN: i32);
+wrap_const!(REQ_BACK_PATTERN: i32);
+wrap_const!(REQ_NEXT_MATCH: i32);
+wrap_const!(REQ_PREV_MATCH: i32);
+
+wrap_const!(MIN_MENU_COMMAND: i32);
+wrap_const!(MAX_MENU_COMMAND: i32);
