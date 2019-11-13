@@ -20,10 +20,11 @@
     IN THE SOFTWARE.
 */
 
+use gen::GetCharacterType;
 use keybinding::KeyBinding;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum CharacterResult<T> {
+pub enum CharacterResult<T: GetCharacterType> {
     Key(KeyBinding),
     Character(T)
 }

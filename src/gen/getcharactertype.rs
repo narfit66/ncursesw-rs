@@ -1,5 +1,5 @@
 /*
-    src/gen/mod.rs
+    src/gen/getcharactertype.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,26 +20,10 @@
     IN THE SOFTWARE.
 */
 
-mod attributescolorpairtype;
-mod attributesgeneric;
-mod attributestype;
-mod colorattributetypes;
-mod colorpaircolors;
-mod colorpairgeneric;
-mod colorpairtype;
-mod colorstype;
-mod colortype;
-mod getcharactertype;
-mod rawwithnul;
+use crate::wide::WideChar;
 
-pub use gen::attributescolorpairtype::*;
-pub use gen::attributesgeneric::*;
-pub use gen::attributestype::*;
-pub use gen::colorattributetypes::*;
-pub use gen::colorpaircolors::*;
-pub(crate) use gen::colorpairgeneric::*;
-pub use gen::colorpairtype::*;
-pub use gen::colorstype::*;
-pub use gen::colortype::*;
-pub use gen::getcharactertype::*;
-pub(in crate) use gen::rawwithnul::*;
+/// NCursesw get function type.
+pub trait GetCharacterType { }
+
+impl GetCharacterType for char { }
+impl GetCharacterType for WideChar { }
