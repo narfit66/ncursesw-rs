@@ -1,5 +1,5 @@
 /*
-    src/panels.rs
+    src/panels/panels.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -25,11 +25,11 @@ use origin::Origin;
 use shims::ncurses;
 use shims::npanels;
 use shims::constants::{OK, ERR};
+use panels::PanelUserPtr;
 
 type WINDOW = ncurses::WINDOW;
 
 pub type PANEL = npanels::PANEL;
-pub type PANEL_USERPTR = *const libc::c_void;
 
 /// allocates a PANEL structure, associates it with win, places the panel on the top of the stack (causes it to be displayed above any other panel) and returns a pointer to the new panel.
 pub fn new_panel(window_handle: WINDOW) -> result!(PANEL) {
@@ -129,7 +129,7 @@ pub fn panel_below(handle: Option<PANEL>) -> result!(PANEL) {
 } 
 
 /// sets the panel's user pointer.
-pub fn set_panel_userptr(handle: PANEL, ptr: Option<PANEL_USERPTR>) -> result!(()) {
+pub fn set_panel_userptr(handle: PANEL, ptr: PanelUserPtr) -> result!(()) {
     match unsafe { npanels::set_panel_userptr(handle, ptr) } {
         OK => Ok(()),
         rc => Err(panels_function_error_with_rc!("set_panel_userptr", rc))
@@ -137,7 +137,7 @@ pub fn set_panel_userptr(handle: PANEL, ptr: Option<PANEL_USERPTR>) -> result!((
 }
 
 /// returns the user pointer for a given panel.
-pub fn panel_userptr(handle: PANEL) -> Option<PANEL_USERPTR> {
+pub fn panel_userptr(handle: PANEL) -> PanelUserPtr {
     unsafe {
         npanels::panel_userptr(handle)
     }
