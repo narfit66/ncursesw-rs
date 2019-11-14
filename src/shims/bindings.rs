@@ -42,10 +42,10 @@ extern "C" {
 
 // ncurses menu functions.
 extern "C" {
-    pub fn item_init(_: _MENU) -> MenuHook;
-    pub fn item_term(_: _MENU) -> MenuHook;
-    pub fn menu_init(_: _MENU) -> MenuHook;
-    pub fn menu_term(_: _MENU) -> MenuHook;
+    pub fn item_init(_: _MENU) -> *const MenuHook;
+    pub fn item_term(_: _MENU) -> *const MenuHook;
+    pub fn menu_init(_: _MENU) -> *const MenuHook;
+    pub fn menu_term(_: _MENU) -> *const MenuHook;
     pub fn set_item_init(_: _MENU, _: MenuHook) -> c_int;
     pub fn set_item_term(_: _MENU, _: MenuHook) -> c_int;
     pub fn set_menu_init(_: _MENU, _: MenuHook) -> c_int;

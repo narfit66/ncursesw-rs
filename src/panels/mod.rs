@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::module_inception)]
+
 mod panels;
 mod paneluserptr;
 

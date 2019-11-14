@@ -20,9 +20,11 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::crosspointer_transmute)]
+
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
-use std::{ptr, slice};
+use std::{ptr, mem, slice};
 use libc::c_void;
 use std::ffi::CString;
 
@@ -100,10 +102,16 @@ pub unsafe fn item_index(item: ITEM) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn item_init(menu: MENU) -> MenuHook {
+pub unsafe fn item_init(menu: MENU) -> Option<MenuHook> {
     assert!(!menu.is_null(), "nmenu::item_init() : menu.is_null()");
 
-    bindings::item_init(menu)
+    let ptr = bindings::item_init(menu);
+
+    if ptr.is_null() {
+        None
+    } else {
+        Some(mem::transmute(ptr))
+    }
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_name.3x.html>
@@ -139,10 +147,16 @@ pub unsafe fn item_opts_on(item: ITEM, opts: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn item_term(menu: MENU) -> MenuHook {
+pub unsafe fn item_term(menu: MENU) -> Option<MenuHook> {
     assert!(!menu.is_null(), "nmenu::item_term() : menu.is_null()");
 
-    bindings::item_term(menu)
+    let ptr = bindings::item_term(menu);
+
+    if ptr.is_null() {
+        None
+    } else {
+        Some(mem::transmute(ptr))
+    }
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
@@ -206,10 +220,16 @@ pub unsafe fn menu_grey(menu: MENU) -> chtype {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn menu_init(menu: MENU) -> MenuHook {
+pub unsafe fn menu_init(menu: MENU) -> Option<MenuHook> {
     assert!(!menu.is_null(), "nmenu::menu_init() : menu.is_null()");
 
-    bindings::menu_init(menu)
+    let ptr = bindings::menu_init(menu);
+
+    if ptr.is_null() {
+        None
+    } else {
+        Some(mem::transmute(ptr))
+    }
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
@@ -326,10 +346,16 @@ pub unsafe fn menu_sub(menu: MENU) -> Option<WINDOW> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn menu_term(menu: MENU) -> MenuHook {
+pub unsafe fn menu_term(menu: MENU) -> Option<MenuHook> {
     assert!(!menu.is_null(), "nmenu::menu_term() : menu.is_null()");
 
-    bindings::menu_term(menu)
+    let ptr = bindings::menu_term(menu);
+
+    if ptr.is_null() {
+        None
+    } else {
+        Some(mem::transmute(ptr))
+    }
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>
