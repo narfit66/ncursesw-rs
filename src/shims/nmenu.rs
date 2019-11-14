@@ -25,11 +25,10 @@
 use std::{ptr, slice};
 use libc::c_void;
 use std::ffi::CString;
-use cstring::*;
 
 use bindings;
-
 use bindings::{MenuHook, chtype};
+use cstring::*;
 use ncurses::WINDOW;
 
 pub type MENU = *mut bindings::tagMENU;
@@ -101,7 +100,7 @@ pub unsafe fn item_index(item: ITEM) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn item_init(menu: MENU) -> Option<MenuHook> {
+pub unsafe fn item_init(menu: MENU) -> MenuHook {
     assert!(!menu.is_null(), "nmenu::item_init() : menu.is_null()");
 
     bindings::item_init(menu)
@@ -140,7 +139,7 @@ pub unsafe fn item_opts_on(item: ITEM, opts: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn item_term(menu: MENU) -> Option<MenuHook> {
+pub unsafe fn item_term(menu: MENU) -> MenuHook {
     assert!(!menu.is_null(), "nmenu::item_term() : menu.is_null()");
 
     bindings::item_term(menu)
@@ -207,7 +206,7 @@ pub unsafe fn menu_grey(menu: MENU) -> chtype {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn menu_init(menu: MENU) -> Option<MenuHook> {
+pub unsafe fn menu_init(menu: MENU) -> MenuHook {
     assert!(!menu.is_null(), "nmenu::menu_init() : menu.is_null()");
 
     bindings::menu_init(menu)
@@ -327,7 +326,7 @@ pub unsafe fn menu_sub(menu: MENU) -> Option<WINDOW> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn menu_term(menu: MENU) -> Option<MenuHook> {
+pub unsafe fn menu_term(menu: MENU) -> MenuHook {
     assert!(!menu.is_null(), "nmenu::menu_term() : menu.is_null()");
 
     bindings::menu_term(menu)
@@ -359,12 +358,12 @@ pub unsafe fn new_item(name: &[i8], description: &[i8]) -> Option<ITEM> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
-pub unsafe fn new_menu(items: &mut Vec<ITEM>) -> Option<MENU> {
+pub unsafe fn new_menu(items: Vec<ITEM>) -> Option<MENU> {
+    let mut items = items;
+
     items.push(ptr::null_mut());
 
     let menu = bindings::new_menu(items.as_mut_ptr());
-
-    items.pop();
 
     return_optional_mut_ptr!(menu)
 }
@@ -471,16 +470,14 @@ pub unsafe fn set_menu_init(menu: MENU, hook: MenuHook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
-pub unsafe fn set_menu_items(menu: MENU, items: &mut Vec<ITEM>) -> i32 {
+pub unsafe fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> i32 {
     assert!(!menu.is_null(), "nmenu::set_menu_items() : menu.is_null()");
+
+    let mut items = items;
 
     items.push(ptr::null_mut());
 
-    let ret = bindings::set_menu_items(menu, items.as_mut_ptr());
-
-    items.pop();
-
-    ret
+    bindings::set_menu_items(menu, items.as_mut_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_mark.3x.html>
