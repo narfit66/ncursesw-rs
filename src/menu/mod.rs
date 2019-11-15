@@ -1,5 +1,5 @@
 /*
-    src/ncurseswerror.rs
+    src/menu/mod.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,25 +20,24 @@
     IN THE SOFTWARE.
 */
 
-use std::{num, char};
-use crate::{COLORS, COLOR_PAIRS};
-use menu::NCurseswMenuError;
+mod constants;
+mod funcs;
+mod itemoption;
+mod itemoptions;
+mod menuoption;
+mod menuoptions;
+mod menurequest;
+mod menuspacing;
+mod menusize;
+mod ncurseswmenuerror;
 
-custom_error::custom_error! {
-/// NCursesw Errors/Events.
-pub NCurseswError
-    NCursesFunction { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
-    PanelsFunction { func: String, rc: i32 } = "npanels::{func}(), rc={rc}",
-    MouseFunction { func: String, rc: i32 } = "nmouse::{func}(), rc={rc}",
-    MenuFunction { func: String, rc: NCurseswMenuError } = "nmenu::{func}(), rc={rc}",
-    InterruptedCall = "interrupted system call (EINTR)",
-    KeyResize = "KEY_RESIZE",
-    KeyEvent = "KEY_EVENT",
-    IntError { source: num::TryFromIntError } = "{source}",
-    CharError { source: char::CharTryFromError } = "{source}",
-    ColorParseError { color: String } = "'{color}' is not a known color",
-    ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
-    ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
-
-    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
-}
+pub use menu::constants::*;
+pub use menu::funcs::*;
+pub use menu::itemoption::*;
+pub use menu::itemoptions::*;
+pub use menu::menuoption::*;
+pub use menu::menuoptions::*;
+pub use menu::menurequest::*;
+pub use menu::menuspacing::*;
+pub use menu::menusize::*;
+pub use menu::ncurseswmenuerror::*;

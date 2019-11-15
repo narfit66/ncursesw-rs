@@ -1,5 +1,5 @@
 /*
-    src/ncurseswerror.rs
+    src/menu/menuspacing.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,25 +20,11 @@
     IN THE SOFTWARE.
 */
 
-use std::{num, char};
-use crate::{COLORS, COLOR_PAIRS};
-use menu::NCurseswMenuError;
+use menu::MenuSize;
 
-custom_error::custom_error! {
-/// NCursesw Errors/Events.
-pub NCurseswError
-    NCursesFunction { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
-    PanelsFunction { func: String, rc: i32 } = "npanels::{func}(), rc={rc}",
-    MouseFunction { func: String, rc: i32 } = "nmouse::{func}(), rc={rc}",
-    MenuFunction { func: String, rc: NCurseswMenuError } = "nmenu::{func}(), rc={rc}",
-    InterruptedCall = "interrupted system call (EINTR)",
-    KeyResize = "KEY_RESIZE",
-    KeyEvent = "KEY_EVENT",
-    IntError { source: num::TryFromIntError } = "{source}",
-    CharError { source: char::CharTryFromError } = "{source}",
-    ColorParseError { color: String } = "'{color}' is not a known color",
-    ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
-    ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
-
-    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
+/// Menu spacing (layout spacing).
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct MenuSpacing {
+    pub description: i32,
+    pub menu_size:   MenuSize
 }

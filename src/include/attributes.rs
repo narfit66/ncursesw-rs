@@ -26,24 +26,28 @@ use std::ops::{BitOr, BitXor};
 use gen::{AttributesType, AttributesGeneric};
 
 use shims::ncurses::attr_t;
-use shims::constants::{A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE, A_REVERSE, A_BLINK, A_DIM, A_BOLD, A_ALTCHARSET, A_INVIS, A_PROTECT, A_HORIZONTAL, A_LEFT, A_LOW, A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC};
+use shims::constants::{
+    A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE, A_REVERSE, A_BLINK, A_DIM,
+    A_BOLD, A_ALTCHARSET, A_INVIS, A_PROTECT, A_HORIZONTAL, A_LEFT, A_LOW,
+    A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC
+};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Attributes {
     raw: attr_t
 }
 
-macro_rules! getter {
-    ($name: ident, $attr: ident) => {
-        fn $name(&self) -> bool {
+macro_rules! attributes_getter {
+    ($func: ident, $attr: ident) => {
+        fn $func(&self) -> bool {
             (self.raw & $attr) > 0
         }
     };
 }
 
-macro_rules! setter {
-    ($name: ident, $attr: ident) => {
-        fn $name(&mut self, enabled: bool) {
+macro_rules! attributes_setter {
+    ($func: ident, $attr: ident) => {
+        fn $func(&mut self, enabled: bool) {
             if enabled {
                 self.raw |= $attr;
             } else {
@@ -52,6 +56,7 @@ macro_rules! setter {
         }
     };
 }
+
 macro_rules! impl_attributes_type {
     ($type: ty) => {
         impl AttributesType<$type> for Attributes {
@@ -63,56 +68,56 @@ macro_rules! impl_attributes_type {
                 self.raw = A_NORMAL
             }
 
-            getter!(is_char_text, A_CHARTEXT);
-            setter!(set_char_text, A_CHARTEXT);
+            attributes_getter!(is_char_text, A_CHARTEXT);
+            attributes_setter!(set_char_text, A_CHARTEXT);
 
-            getter!(is_standout, A_STANDOUT);
-            setter!(set_standout, A_STANDOUT);
+            attributes_getter!(is_standout, A_STANDOUT);
+            attributes_setter!(set_standout, A_STANDOUT);
 
-            getter!(is_underline, A_UNDERLINE);
-            setter!(set_underline, A_UNDERLINE);
+            attributes_getter!(is_underline, A_UNDERLINE);
+            attributes_setter!(set_underline, A_UNDERLINE);
 
-            getter!(is_reverse, A_REVERSE);
-            setter!(set_reverse, A_REVERSE);
+            attributes_getter!(is_reverse, A_REVERSE);
+            attributes_setter!(set_reverse, A_REVERSE);
 
-            getter!(is_blink, A_BLINK);
-            setter!(set_blink, A_BLINK);
+            attributes_getter!(is_blink, A_BLINK);
+            attributes_setter!(set_blink, A_BLINK);
 
-            getter!(is_dim, A_DIM);
-            setter!(set_dim, A_DIM);
+            attributes_getter!(is_dim, A_DIM);
+            attributes_setter!(set_dim, A_DIM);
 
-            getter!(is_bold, A_BOLD);
-            setter!(set_bold, A_BOLD);
+            attributes_getter!(is_bold, A_BOLD);
+            attributes_setter!(set_bold, A_BOLD);
 
-            getter!(is_alternate_char_set, A_ALTCHARSET);
-            setter!(set_alternative_char_set, A_ALTCHARSET);
+            attributes_getter!(is_alternate_char_set, A_ALTCHARSET);
+            attributes_setter!(set_alternative_char_set, A_ALTCHARSET);
 
-            getter!(is_invisible, A_INVIS);
-            setter!(set_invisible, A_INVIS);
+            attributes_getter!(is_invisible, A_INVIS);
+            attributes_setter!(set_invisible, A_INVIS);
 
-            getter!(is_protected, A_PROTECT);
-            setter!(set_protected, A_PROTECT);
+            attributes_getter!(is_protected, A_PROTECT);
+            attributes_setter!(set_protected, A_PROTECT);
 
-            getter!(is_horizontal, A_HORIZONTAL);
-            setter!(set_horizontal, A_HORIZONTAL);
+            attributes_getter!(is_horizontal, A_HORIZONTAL);
+            attributes_setter!(set_horizontal, A_HORIZONTAL);
 
-            getter!(is_left, A_LEFT);
-            setter!(set_left, A_LEFT);
+            attributes_getter!(is_left, A_LEFT);
+            attributes_setter!(set_left, A_LEFT);
 
-            getter!(is_low, A_LOW);
-            setter!(set_low, A_LOW);
+            attributes_getter!(is_low, A_LOW);
+            attributes_setter!(set_low, A_LOW);
 
-            getter!(is_right, A_RIGHT);
-            setter!(set_right, A_RIGHT);
+            attributes_getter!(is_right, A_RIGHT);
+            attributes_setter!(set_right, A_RIGHT);
 
-            getter!(is_top, A_TOP);
-            setter!(set_top, A_TOP);
+            attributes_getter!(is_top, A_TOP);
+            attributes_setter!(set_top, A_TOP);
 
-            getter!(is_vertical, A_VERTICAL);
-            setter!(set_vertical, A_VERTICAL);
+            attributes_getter!(is_vertical, A_VERTICAL);
+            attributes_setter!(set_vertical, A_VERTICAL);
 
-            getter!(is_italic, A_ITALIC);
-            setter!(set_italic, A_ITALIC);
+            attributes_getter!(is_italic, A_ITALIC);
+            attributes_setter!(set_italic, A_ITALIC);
         }
     };
 }

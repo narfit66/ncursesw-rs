@@ -48,6 +48,8 @@ pub mod features;
 mod gen;
 /// Normal color's, color pairs and attributes module
 pub mod normal;
+/// ncurses Menu module
+pub mod menu;
 /// ncurses Mouse module
 pub mod mouse;
 /// ncurses Panels module

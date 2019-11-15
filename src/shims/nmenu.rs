@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::crosspointer_transmute)]
-
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
 use std::{ptr, mem, slice};
@@ -35,7 +33,7 @@ use ncurses::WINDOW;
 
 pub type MENU = *mut bindings::tagMENU;
 pub type ITEM = *mut bindings::tagITEM;
-pub type MENU_USERPTR = *mut c_void;
+pub type MENU_USERPTR = Option<*mut c_void>;
 
 /// <https://invisible-island.net/ncurses/man/mitem_current.3x.html>
 pub unsafe fn current_item(menu: MENU) -> Option<ITEM> {
@@ -160,7 +158,7 @@ pub unsafe fn item_term(menu: MENU) -> Option<MenuHook> {
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
-pub unsafe fn item_userptr(item: ITEM) -> Option<MENU_USERPTR> {
+pub unsafe fn item_userptr(item: ITEM) -> MENU_USERPTR {
     assert!(!item.is_null(), "nmenu::item_userptr() : item.is_null()");
 
     let ptr = bindings::item_userptr(item);
@@ -359,7 +357,7 @@ pub unsafe fn menu_term(menu: MENU) -> Option<MenuHook> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>
-pub unsafe fn menu_userptr(menu: MENU) -> Option<MENU_USERPTR> {
+pub unsafe fn menu_userptr(menu: MENU) -> MENU_USERPTR {
     assert!(!menu.is_null(), "nmenu::menu_userptr() : menu.is_null()");
 
     let ptr = bindings::menu_userptr(menu);
@@ -447,7 +445,7 @@ pub unsafe fn set_item_term(menu: MENU, hook: MenuHook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
-pub unsafe fn set_item_userptr(item: ITEM, userptr: Option<MENU_USERPTR>) -> i32 {
+pub unsafe fn set_item_userptr(item: ITEM, userptr: MENU_USERPTR) -> i32 {
     assert!(!item.is_null(), "nmenu::set_item_userptr() : item.is_null()");
 
     bindings::set_item_userptr(item, return_mut_ptr!(userptr))
@@ -475,10 +473,8 @@ pub unsafe fn set_menu_fore(menu: MENU, attr: chtype) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_format.3x.html>
-pub unsafe fn set_menu_format(menu: MENU, rows: i32, cols: i32) -> i32 {
-    assert!(!menu.is_null(), "nmenu::set_menu_format() : menu.is_null()");
-
-    bindings::set_menu_format(menu, rows, cols)
+pub unsafe fn set_menu_format(menu: Option<MENU>, rows: i32, cols: i32) -> i32 {
+    bindings::set_menu_format(return_mut_ptr!(menu), rows, cols)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
@@ -547,11 +543,10 @@ pub unsafe fn set_menu_spacing(
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_win.3x.html>
-pub unsafe fn set_menu_sub(menu: MENU, win: WINDOW) -> i32 {
+pub unsafe fn set_menu_sub(menu: MENU, win: Option<WINDOW>) -> i32 {
     assert!(!menu.is_null(), "nmenu::set_menu_sub() : menu.is_null()");
-    assert!(!win.is_null(), "nmenu::set_menu_sub() : win.is_null()");
 
-    bindings::set_menu_sub(menu, win)
+    bindings::set_menu_sub(menu, return_mut_ptr!(win))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
@@ -562,18 +557,17 @@ pub unsafe fn set_menu_term(menu: MENU, hook: MenuHook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>
-pub unsafe fn set_menu_userptr(menu: MENU, userptr: Option<MENU_USERPTR>) -> i32 {
+pub unsafe fn set_menu_userptr(menu: MENU, userptr: MENU_USERPTR) -> i32 {
     assert!(!menu.is_null(), "nmenu::set_menu_userptr() : menu.is_null()");
 
     bindings::set_menu_userptr(menu, return_mut_ptr!(userptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_win.3x.html>
-pub unsafe fn set_menu_win(menu: MENU, win: WINDOW) -> i32 {
+pub unsafe fn set_menu_win(menu: MENU, win: Option<WINDOW>) -> i32 {
     assert!(!menu.is_null(), "nmenu::set_menu_win() : menu.is_null()");
-    assert!(!win.is_null(), "nmenu::set_menu_win() : win.is_null()");
 
-    bindings::set_menu_win(menu, win)
+    bindings::set_menu_win(menu, return_mut_ptr!(win))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_current.3x.html>

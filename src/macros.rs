@@ -22,43 +22,44 @@
 
 #![macro_use]
 
-macro_rules! result { ($t: ty) => { Result<$t, NCurseswError> } }
+macro_rules! result { ($type: ty) => { Result<$type, NCurseswError> } }
+macro_rules! menu_result { ($type: ty) => { Result<$type, NCurseswMenuError> } }
 
 macro_rules! simple_ncurses_function {
-    ($f: ident) => {
-        pub fn $f() {
-            ncurses::$f()
+    ($func: ident) => {
+        pub fn $func() {
+            ncurses::$func()
         }
     }
 }
 
 macro_rules! simple_ncurses_function_with_window_returns_bool {
-    ($f: ident) => {
-        pub fn $f(handle: WINDOW) -> bool {
+    ($func: ident) => {
+        pub fn $func(handle: WINDOW) -> bool {
             unsafe {
-                ncurses::$f(handle)
+                ncurses::$func(handle)
             }
         }
     }
 }
 
 macro_rules! basic_ncurses_function {
-    ($f: ident, $n: expr) => {
-        pub fn $f() -> result!(()) {
-            match ncurses::$f() {
+    ($func: ident, $rc: expr) => {
+        pub fn $func() -> result!(()) {
+            match ncurses::$func() {
                 OK => Ok(()),
-                rc => Err(ncurses_function_error_with_rc!($n, rc))
+                rc => Err(ncurses_function_error_with_rc!($rc, rc))
             }
         }
     }
 }
 
 macro_rules! basic_ncurses_function_with_window {
-    ($f: ident, $n: expr) => {
-        pub fn $f(handle: WINDOW) -> result!(()) {
-            match unsafe { ncurses::$f(handle) } {
+    ($func: ident, $rc: expr) => {
+        pub fn $func(handle: WINDOW) -> result!(()) {
+            match unsafe { ncurses::$func(handle) } {
                 OK => Ok(()),
-                rc => Err(ncurses_function_error_with_rc!($n, rc))
+                rc => Err(ncurses_function_error_with_rc!($rc, rc))
             }
         }
     }
@@ -70,11 +71,12 @@ macro_rules! panels_function_error { ($func: expr) => { NCurseswError::PanelsFun
 macro_rules! panels_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswError::PanelsFunction { func: String::from($func), rc: $rc } } }
 macro_rules! mouse_function_error { ($func: expr) => { NCurseswError::MouseFunction { func: String::from($func), rc: ERR } } }
 macro_rules! mouse_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswError::MouseFunction { func: String::from($func), rc: $rc } } }
+macro_rules! menu_function_error { ($func: expr) => { ncursesw_menu_error_system_error($func) } }
+macro_rules! menu_function_error_with_rc { ($func: expr, $rc: expr) => { ncursesw_menu_error_from_rc($func, $rc) } }
 
 macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type = bindings::$name as $type; } }
 
 macro_rules! c_str_with_nul { ($name: ident) => { &*($name.to_c_str().as_bytes_with_nul() as *const [u8] as *const [i8]) } }
-
 macro_rules! raw_with_nul_as_slice { ($name: ident) => { $name.clone().raw_with_nul().as_slice() } }
 
 macro_rules! return_optional_mut_ptr {
@@ -94,4 +96,24 @@ macro_rules! return_mut_ptr {
             None      => std::ptr::null_mut()
         }
     }
+}
+
+macro_rules! option_getter {
+    ($func: ident, $attr: ident) => {
+        pub fn $func(&self) -> bool {
+            (self.raw & constants::$attr) > 0
+        }
+    };
+}
+
+macro_rules! option_setter {
+    ($func: ident, $attr: ident) => {
+        pub fn $func(&mut self, enabled: bool) {
+            if enabled {
+                self.raw |= constants::$attr;
+            } else {
+                self.raw ^= constants::$attr;
+            }
+        }
+    };
 }

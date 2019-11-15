@@ -1,5 +1,5 @@
 /*
-    src/ncurseswerror.rs
+    src/menu/menuoption.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,25 +20,25 @@
     IN THE SOFTWARE.
 */
 
-use std::{num, char};
-use crate::{COLORS, COLOR_PAIRS};
-use menu::NCurseswMenuError;
-
-custom_error::custom_error! {
-/// NCursesw Errors/Events.
-pub NCurseswError
-    NCursesFunction { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
-    PanelsFunction { func: String, rc: i32 } = "npanels::{func}(), rc={rc}",
-    MouseFunction { func: String, rc: i32 } = "nmouse::{func}(), rc={rc}",
-    MenuFunction { func: String, rc: NCurseswMenuError } = "nmenu::{func}(), rc={rc}",
-    InterruptedCall = "interrupted system call (EINTR)",
-    KeyResize = "KEY_RESIZE",
-    KeyEvent = "KEY_EVENT",
-    IntError { source: num::TryFromIntError } = "{source}",
-    CharError { source: char::CharTryFromError } = "{source}",
-    ColorParseError { color: String } = "'{color}' is not a known color",
-    ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
-    ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
-
-    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
+/// Menu option.
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum MenuOption {
+    /// Only one item can be selected for this menu.
+    OneValue,
+    /// Display the item descriptions when the menu is posted.
+    ShowDescription,
+    /// Display the menu in row-major order.
+    RowMajor,
+    /// Ignore the case when pattern-matching.
+    IgnoreCase,
+    /// Move the cursor to within the item name while pattern-matching.
+    ShowMatch,
+    /// Don't wrap around next-item and previous-item, requests to the
+    /// other end of the menu.
+    NonCyclic,
+    /// If user clicks with the mouse and it does not fall on the
+    /// currently active menu, push KEY_MOUSE and the MEVENT data
+    /// back on the queue to allow processing in another part of
+    /// the calling program.
+    MouseMenu
 }
