@@ -1,5 +1,17 @@
 #!/bin/sh
 set -ex
-wget https://github.com/mirror/ncurses/archive/v6.1.tar.gz
-tar -zxvf v6.1.tar.gz
-cd ncurses-6.1 && ./configure --prefix=/usr --enable-pc-files --with-shared --enable-widec --enable-ext-colors --enable-ext-mouse --enable-ext-putwin CPPFLAGS="-P" && make && sudo make install && sudo ldconfig
+
+wget https://github.com/mirror/ncurses/archive/v6.1.tar.gz && \
+tar -zxvf v6.1.tar.gz && \
+cd ncurses-6.1 && \
+./configure --prefix=/usr \
+            --enable-pc-files \
+            --with-shared \
+            --enable-widec \
+            --enable-ext-colors \
+            --enable-ext-mouse \
+            --enable-ext-putwin \
+            CPPFLAGS="-P" && \
+make && \
+sudo make install && \
+sudo ldconfig

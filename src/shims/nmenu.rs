@@ -474,6 +474,10 @@ pub unsafe fn set_menu_fore(menu: MENU, attr: chtype) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/menu_format.3x.html>
 pub unsafe fn set_menu_format(menu: Option<MENU>, rows: i32, cols: i32) -> i32 {
+    if let Some(ptr) = menu {
+        assert!(!ptr.is_null(), "nmenu::set_menu_format() : menu.is_null()");
+    }
+
     bindings::set_menu_format(return_mut_ptr!(menu), rows, cols)
 }
 
