@@ -30,7 +30,7 @@ pub NCurseswError
     NCursesFunction { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
     PanelsFunction { func: String, rc: i32 } = "npanels::{func}(), rc={rc}",
     MouseFunction { func: String, rc: i32 } = "nmouse::{func}(), rc={rc}",
-    MenuFunction { func: String, rc: NCurseswMenuError } = "nmenu::{func}(), rc={rc}",
+    MenuFunction { func: String, error: NCurseswMenuError } = "nmenu::{func}(), error={error}",
     InterruptedCall = "interrupted system call (EINTR)",
     KeyResize = "KEY_RESIZE",
     KeyEvent = "KEY_EVENT",

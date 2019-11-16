@@ -24,7 +24,6 @@ use libc::c_void;
 
 use cstring::*;
 use shims::nmenu;
-use shims::bindings::MenuHook;
 use shims::ncurses::WINDOW;
 use menu::ncurseswmenuerror::{
     NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
@@ -37,6 +36,7 @@ use normal;
 pub type MENU = nmenu::MENU;
 pub type ITEM = nmenu::ITEM;
 pub type MENU_USERPTR = Option<*mut c_void>;
+pub type MenuHook = crate::shims::bindings::MenuHook;
 
 pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
     match unsafe { nmenu::current_item(menu) } {
