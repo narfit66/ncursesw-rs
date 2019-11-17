@@ -52,10 +52,6 @@ fn main() {
     find_library("menuw");
     find_library("panelw");
 
-    if let Ok(value) = std::env::var("NCURSES_RS_RUSTC_FLAGS") {
-        println!("cargo:rustc-flags={}", value);
-    }
-
     //
 
     let bindings = bindgen::Builder::default()
