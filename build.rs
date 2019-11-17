@@ -21,7 +21,9 @@
 */
 
 extern crate bindgen;
+extern crate pkg_config;
 
+use pkg_config::Library;
 use std::env;
 use std::path::PathBuf;
 
@@ -35,10 +37,26 @@ impl bindgen::callbacks::ParseCallbacks for Fix753 {
     }
 }
 
-fn main() {
-    let lib_name = "ncursesw";
+fn find_library(name: &str) -> Option<Library> {
+    if let Ok(lib) = pkg_config::probe_library(name) {
+        return Some(lib);
+    }
 
-    println!("cargo:rustc-link-lib={}", lib_name);
+    None
+}
+
+fn main() {
+    println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
+
+    find_library("ncursesw");
+    find_library("menuw");
+    find_library("panelw");
+
+    if let Ok(value) = std::env::var("NCURSES_RS_RUSTC_FLAGS") {
+        println!("cargo:rustc-flags={}", value);
+    }
+
+    //
 
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")                    // 'c' header file
