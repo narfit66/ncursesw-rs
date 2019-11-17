@@ -72,8 +72,9 @@ To use the menu functions
 use ncursesw::menu::*;
 ```
 
-All features are supported as of ncurses ABI 6.1 including extended color pairs, soft labels, ripoff lines, panels, mouse and menus, i would suggest examining ncurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html) and [menu](https://invisible-island.net/ncurses/man/mitem_current.3x.html) documentation, if you get the chance have a read of the book `Dan Gookin's Guide to Ncurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
-Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate.
+All features are supported as of ncurses ABI 6.1 including extended color pairs, soft labels, ripoff lines, panels, mouse and menus, i would suggest examining ncurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html) and [menu](https://invisible-island.net/ncurses/man/menu.3x.html) documentation, if you get the chance have a read of the book `Dan Gookin's Guide to Ncurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
+
+Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate safely by not exposing any of the ncurses library raw pointers and by containing them in formalised structures.
 
 ## [Documentation](https://narfit66.github.io/ncursesw-rs/ncursesw/index.html)
 

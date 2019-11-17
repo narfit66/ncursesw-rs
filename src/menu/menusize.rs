@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+use std::fmt::{Display, Formatter, Result};
+
 /// Menu size (rows and columns).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct MenuSize {
@@ -27,4 +29,17 @@ pub struct MenuSize {
     pub rows:    i32,
     /// Number of columns.
     pub columns: i32
+}
+
+/// The default NCurses menu size (16 rows and 1 column).
+impl Default for MenuSize {
+    fn default() -> Self {
+        Self { rows: 16, columns: 1 }
+    }
+}
+
+impl Display for MenuSize {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "(rows: {}, columns: {})", self.rows, self.columns)
+    }
 }

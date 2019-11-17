@@ -31,6 +31,7 @@ pub struct Size {
     pub columns: i32
 }
 
+/// Default size of 0 lines and 0 columns.
 impl Default for Size {
     fn default() -> Self {
         Self { lines: 0, columns: 0 }

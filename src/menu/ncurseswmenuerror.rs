@@ -27,11 +27,11 @@ use shims::constants;
 custom_error::custom_error! {
 /// NCursesw menu errors.
 pub NCurseswMenuError
-    /// Routine detected an incorrect or out-of-range argument.,
-    BadArgument { func: String } = "nmenu::{func}() : routine detected an incorrect or out-of-range argument.",
+    /// Routine detected an incorrect or out-of-range argument.
+    BadArgument { func: String } = "nmenu::{func}()",
     BadState { func: String } = "nmenu::{func}()",
-    /// Item is connected to a menu.,
-    Connected { func: String } = "nmenu::{func}() : item is connected to a menu.",
+    /// Item is connected to a menu.
+    Connected { func: String } = "nmenu::{func}()",
     Current { func: String } = "nmenu::{func}()",
     InvalidField { func: String } = "nmenu::{func}()",
     NotConnected { func: String } = "nmenu::{func}()",
@@ -44,7 +44,7 @@ pub NCurseswMenuError
     Posted { func: String } = "nmenu::{func}()",
     RequestDenied { func: String } = "nmenu::{func}()",
     /// System error occurred, (see errno)
-    SystemError { func: String, errno: Errno } = @{ format!("nmenu::{}() : {} (#{}", func, errno, errno.0) },
+    SystemError { func: String, errno: Errno } = @{ format!("nmenu::{}() : {} (#{})", func, errno, errno.0) },
     UnknownCommand { func: String } = "nmenu::{func}()",
     UnknownError { func: String, errno: i32 } = "nmenu::{func} : error number {errno}"
 }

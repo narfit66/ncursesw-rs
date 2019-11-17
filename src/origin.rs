@@ -31,6 +31,7 @@ pub struct Origin {
     pub x: i32
 }
 
+/// Default origin of 0,0.
 impl Default for Origin {
     fn default() -> Self {
         Self { y: 0, x: 0 }
