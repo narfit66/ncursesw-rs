@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::crosspointer_transmute)]
+
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
 use std::{ptr, mem, slice};
