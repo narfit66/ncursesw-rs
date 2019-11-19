@@ -293,15 +293,6 @@ pub fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> menu_result!(ITEM)
     }
 }
 
-/*
-pub fn new_item(name: &str, description: &str) -> menu_result!(ITEM) {
-    match unsafe { nmenu::new_item(c_str_with_nul!(name), c_str_with_nul!(description)) } {
-        Some(item) => Ok(item),
-        None       => Err(menu_function_error!("new_item"))
-    }
-}
-*/
-
 pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
     match unsafe { nmenu::new_menu(items) } {
         Some(menu) => Ok(menu),

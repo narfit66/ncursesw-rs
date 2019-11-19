@@ -91,7 +91,6 @@ pub unsafe fn item_description(item: ITEM) -> Option<String> {
     if ptr.is_null() {
         None
     } else {
-        //Some(FromCStr::from_c_str(ptr))
         Some(ptr_to_string!(ptr))
     }
 }
@@ -123,7 +122,6 @@ pub unsafe fn item_name(item: ITEM) -> Option<String> {
     if ptr.is_null() {
         None
     } else {
-        //Some(FromCStr::from_c_str(ptr))
         Some(ptr_to_string!(ptr))
     }
 }
@@ -263,8 +261,7 @@ pub unsafe fn menu_mark(menu: MENU) -> Option<String> {
     if ptr.is_null() {
         None
     } else {
-        //Some(FromCStr::from_c_str(ptr))
-        Some(ptr_to_string!(ptr))
+        Some(FromCStr::from_c_str(ptr))
     }
 }
 
@@ -306,7 +303,6 @@ pub unsafe fn menu_pattern(menu: MENU) -> Option<String> {
         None
     } else {
         Some(FromCStr::from_c_str(ptr))
-        //Some(ptr_to_string!(ptr))
     }
 }
 
@@ -387,14 +383,6 @@ pub unsafe fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> Option<ITEM
 
     return_optional_mut_ptr!(item)
 }
-
-/*
-pub unsafe fn new_item(name: &[i8], description: &[i8]) -> Option<ITEM> {
-    let item = bindings::new_item(name.as_ptr(), description.as_ptr());
-
-    return_optional_mut_ptr!(item)
-}
-*/
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
 pub unsafe fn new_menu(items: Vec<ITEM>) -> Option<MENU> {
