@@ -1,5 +1,5 @@
 /*
-    src/normal/attributescolorpair.rs
+    src/cstring/fromcstr.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,10 +20,26 @@
     IN THE SOFTWARE.
 */
 
-use gen::*;
-use normal::*;
-use shims::ncurses::short_t;
+use std::ffi;
 
-include!("../include/attributescolorpair.rs");
+pub trait FromCStr {
+    unsafe fn from_c_str(_: *const libc::c_char) -> Self;
+}
 
-define_attributescolorpairtype!(short_t);
+impl FromCStr for String {
+    unsafe fn from_c_str(ptr: *const libc::c_char) -> Self {
+        let bytes = ffi::CStr::from_ptr(ptr).to_bytes();
+
+        String::from_utf8_unchecked(bytes.to_vec())
+    }
+}
+
+impl FromCStr for Option<String> {
+    unsafe fn from_c_str(ptr: *const libc::c_char) -> Self {
+        if ptr.is_null() {
+            None
+        } else {
+            Some(FromCStr::from_c_str(ptr))
+        }
+    }
+}

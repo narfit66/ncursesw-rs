@@ -26,7 +26,7 @@ use ascii::AsciiString;
 
 use gen::*;
 use chtypet::ChtypeChar;
-use ncurses::{chtype, attr_t};
+use shims::ncurses::{chtype, attr_t};
 use normal::{Attribute, Attributes};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

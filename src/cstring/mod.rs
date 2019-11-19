@@ -1,5 +1,5 @@
 /*
-    src/cstring.rs
+    src/cstring/mod.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,36 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use std::ffi;
+mod fromcstr;
+mod tocstr;
 
-pub trait FromCStr {
-    unsafe fn from_c_str(_: *const libc::c_char) -> Self;
-}
-
-impl FromCStr for String {
-    unsafe fn from_c_str(str: *const libc::c_char) -> Self {
-        let bytes = ffi::CStr::from_ptr(str).to_bytes();
-
-        String::from_utf8_unchecked(bytes.to_vec())
-    }
-}
-
-impl FromCStr for Option<String> {
-    unsafe fn from_c_str(str: *const libc::c_char) -> Self {
-        if str.is_null() {
-            None
-        } else {
-            Some(FromCStr::from_c_str(str))
-        }
-    }
-}
-
-pub trait ToCStr {
-    fn to_c_str(&self) -> ffi::CString;
-}
-
-impl <'a>ToCStr for &'a str {
-    fn to_c_str(&self) -> ffi::CString {
-        ffi::CString::new(*self).unwrap()
-    }
-}
+pub use cstring::fromcstr::*;
+pub use cstring::tocstr::*;

@@ -10,5 +10,5 @@ matrix:
 install:
     ./.travis/ncurses-install
 script:
-    - cargo build --verbose
+    - cargo build -vv
     - cargo run --example ncursesw-version

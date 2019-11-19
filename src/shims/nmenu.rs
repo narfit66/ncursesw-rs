@@ -21,6 +21,7 @@
 */
 
 #![allow(clippy::crosspointer_transmute)]
+#![allow(non_camel_case_types)]
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
@@ -31,7 +32,7 @@ use std::ffi::CString;
 use bindings;
 use bindings::{MenuHook, chtype};
 use cstring::*;
-use ncurses::WINDOW;
+use crate::shims::ncurses::WINDOW;
 
 pub type MENU = *mut bindings::tagMENU;
 pub type ITEM = *mut bindings::tagITEM;

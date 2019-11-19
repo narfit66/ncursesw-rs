@@ -20,10 +20,12 @@
     IN THE SOFTWARE.
 */
 
-use bindings;
-use ncurses;
+#![allow(non_camel_case_types)]
 
-type WINDOW = ncurses::WINDOW;
+use bindings;
+use shims;
+
+type WINDOW = shims::ncurses::WINDOW;
 
 pub type mmask_t = bindings::mmask_t;
 pub type MEVENT = *mut bindings::MEVENT;

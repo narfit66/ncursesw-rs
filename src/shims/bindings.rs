@@ -25,6 +25,8 @@
 #![allow(non_snake_case)]
 #![allow(clippy::all)]
 
+#![allow(improper_ctypes)]
+
 use std::os::raw::{c_short, c_int};
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));

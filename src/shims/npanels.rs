@@ -26,14 +26,14 @@
 #![warn(missing_debug_implementations)]
 
 use bindings;
-use ncurses;
+use shims;
 
 use constants::{TRUE, FALSE};
 
 pub type PANEL = *mut bindings::PANEL;
 pub type PANEL_USERPTR = *const libc::c_void;
 
-type WINDOW = ncurses::WINDOW;
+type WINDOW = shims::ncurses::WINDOW;
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn new_panel(win: WINDOW) -> Option<PANEL> {

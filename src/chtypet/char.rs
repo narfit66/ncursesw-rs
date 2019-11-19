@@ -25,7 +25,7 @@ use std::ops::{BitOr, BitXor};
 use ascii::AsciiChar;
 
 use gen::*;
-use ncurses::{chtype, attr_t};
+use shims::ncurses::{chtype, attr_t};
 use normal::{Attribute, Attributes};
 use shims::constants::A_ATTRIBUTES;
 

@@ -1,5 +1,5 @@
 /*
-    src/normal/attributescolorpair.rs
+    src/cstring/tocstr.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,10 +20,14 @@
     IN THE SOFTWARE.
 */
 
-use gen::*;
-use normal::*;
-use shims::ncurses::short_t;
+use std::ffi;
 
-include!("../include/attributescolorpair.rs");
+pub trait ToCStr {
+    fn to_c_str(&self) -> ffi::CString;
+}
 
-define_attributescolorpairtype!(short_t);
+impl <'a>ToCStr for &'a str {
+    fn to_c_str(&self) -> ffi::CString {
+        ffi::CString::new(*self).unwrap()
+    }
+}

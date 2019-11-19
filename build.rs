@@ -56,7 +56,6 @@ fn main() {
 
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")                    // 'c' header file
-        .blacklist_function("wcstold")          // blacklisted to stop cargo build warning about unstable ABI for u128
         .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
         .blacklist_function("item_init")        // blacklisted to implement our own function

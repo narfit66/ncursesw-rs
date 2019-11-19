@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(non_camel_case_types)]
+
 use std::time;
 use std::convert::TryFrom;
 
