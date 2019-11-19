@@ -28,24 +28,24 @@ custom_error::custom_error! {
 /// NCursesw menu errors.
 pub NCurseswMenuError
     /// Routine detected an incorrect or out-of-range argument.
-    BadArgument { func: String } = "nmenu::{func}()",
-    BadState { func: String } = "nmenu::{func}()",
+    BadArgument { func: String } = "nmenu::{func}() : bad argument",
+    BadState { func: String } = "nmenu::{func}() : bad state",
     /// Item is connected to a menu.
-    Connected { func: String } = "nmenu::{func}()",
-    Current { func: String } = "nmenu::{func}()",
-    InvalidField { func: String } = "nmenu::{func}()",
-    NotConnected { func: String } = "nmenu::{func}()",
-    NotPosted { func: String } = "nmenu::{func}()",
-    NotSelectable { func: String } = "nmenu::{func}()",
-    NoMatch { func: String } = "nmenu::{func}()",
-    NoRoom { func: String } = "nmenu::{func}()",
+    Connected { func: String } = "nmenu::{func}() : connected",
+    Current { func: String } = "nmenu::{func}() : current",
+    InvalidField { func: String } = "nmenu::{func}() : invalid field",
+    NotConnected { func: String } = "nmenu::{func}() : not connected",
+    NotPosted { func: String } = "nmenu::{func}() : not posted",
+    NotSelectable { func: String } = "nmenu::{func}() : not selectable",
+    NoMatch { func: String } = "nmenu::{func}() : no match",
+    NoRoom { func: String } = "nmenu::{func}() : no room",
     /// The routine succeeded.
-    Ok { func: String } = "nmenu::{func}()",
-    Posted { func: String } = "nmenu::{func}()",
-    RequestDenied { func: String } = "nmenu::{func}()",
+    Ok { func: String } = "nmenu::{func}() : ok",
+    Posted { func: String } = "nmenu::{func}() : posted",
+    RequestDenied { func: String } = "nmenu::{func}() : request denied",
     /// System error occurred, (see errno)
     SystemError { func: String, errno: Errno } = @{ format!("nmenu::{}() : {} (#{})", func, errno, errno.0) },
-    UnknownCommand { func: String } = "nmenu::{func}()",
+    UnknownCommand { func: String } = "nmenu::{func}() : unknown command",
     UnknownError { func: String, errno: i32 } = "nmenu::{func} : error number {errno}"
 }
 

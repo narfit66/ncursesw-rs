@@ -286,12 +286,21 @@ pub fn menu_userptr(menu: MENU) -> MENU_USERPTR {
     }
 }
 
+pub fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> menu_result!(ITEM) {
+    match unsafe { nmenu::new_item(name, description) } {
+        Some(item) => Ok(item),
+        None       => Err(menu_function_error!("new_item"))
+    }
+}
+
+/*
 pub fn new_item(name: &str, description: &str) -> menu_result!(ITEM) {
     match unsafe { nmenu::new_item(c_str_with_nul!(name), c_str_with_nul!(description)) } {
         Some(item) => Ok(item),
         None       => Err(menu_function_error!("new_item"))
     }
 }
+*/
 
 pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
     match unsafe { nmenu::new_menu(items) } {
@@ -408,6 +417,12 @@ pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
 }
 
 pub fn set_menu_mark(menu: MENU, mark: &str) -> menu_result!(()) {
+    if let Some(mark) = menu_mark(menu) {
+        if mark != '-'.to_string() {
+            return Err(NCurseswMenuError::BadArgument { func: "set_menu_mark".to_string() });
+        }
+    }
+
     match unsafe { nmenu::set_menu_mark(menu, c_str_with_nul!(mark)) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_mark", rc))
