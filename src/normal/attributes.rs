@@ -21,6 +21,7 @@
 */
 
 #![allow(clippy::trivially_copy_pass_by_ref)]
+#![allow(deprecated)]
 
 use normal::{Attribute, ColorPair};
 use crate::{COLOR_PAIR, PAIR_NUMBER};

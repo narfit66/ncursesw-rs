@@ -125,6 +125,7 @@ pub fn COLORS() -> i32 {
     ncurses::COLORS()
 }
 
+#[deprecated(since = "0.3.3", note = "no publicly exposed equivalent.")]
 /// Return the attribute value of a given `normal` color pair.
 ///
 /// ## Example
@@ -160,6 +161,7 @@ pub fn COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t {
     ncurses::COLOR_PAIR(normal::ColorPair::into(color_pair)) as attr_t
 }
 
+#[deprecated(since = "0.3.3", note = "use normal::Attributes::color_pair() instead")]
 /// Return the color pair from  given `normal` attributes value.
 ///
 /// ## Example
@@ -747,23 +749,23 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
 
     match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
         OK => Ok(match ncurses_colortype() {
-                     NCursesColorType::Normal => {
-                         AttributesColorPairSet::Normal(
-                             normal::AttributesColorPair::new(
-                                 normal::Attributes::from(attrs[0]),
-                                 normal::ColorPair::from(color_pair[0])
-                             )
-                         )
-                     },
-                     NCursesColorType::Extended => {
-                         AttributesColorPairSet::Extended(
-                             extend::AttributesColorPair::new(
-                                 extend::Attributes::from(attrs[0]),
-                                 extend::ColorPair::from(opts[0])
-                             )
-                         )
-                     }
-              }),
+            NCursesColorType::Normal => {
+                AttributesColorPairSet::Normal(
+                    normal::AttributesColorPair::new(
+                        normal::Attributes::from(attrs[0]),
+                        normal::ColorPair::from(color_pair[0])
+                    )
+                )
+            },
+            NCursesColorType::Extended => {
+                AttributesColorPairSet::Extended(
+                    extend::AttributesColorPair::new(
+                        extend::Attributes::from(attrs[0]),
+                        extend::ColorPair::from(opts[0])
+                    )
+                )
+            }
+        }),
         rc => Err(ncurses_function_error_with_rc!("attr_get", rc))
     }
 }
@@ -1473,6 +1475,7 @@ basic_ncurses_function!(clrtobot, "clrtobot");
 
 basic_ncurses_function!(clrtoeol, "clrtoeol");
 
+#[deprecated(since = "0.3.3", note = "Use normal::Color::rgb() instead")]
 pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
@@ -1497,10 +1500,10 @@ pub fn color_set<P, T>(color_pair: P) -> result!(())
 pub fn copywin(
     src_handle: WINDOW,
     dst_handle: WINDOW,
-    smin: Origin,
-    dmin: Origin,
-    dmax: Origin,
-    overlay: bool) -> result!(())
+    smin:       Origin,
+    dmin:       Origin,
+    dmax:       Origin,
+    overlay:    bool) -> result!(())
 {
     match unsafe { ncurses::copywin(src_handle, dst_handle, smin.y, smin.x, dmin.y, dmin.x, dmax.y, dmax.x, if overlay {
         TRUE
@@ -1620,6 +1623,7 @@ pub fn erasewchar() -> result!(WideChar) {
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use extend::Color::rgb() instead")]
 pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
@@ -1631,6 +1635,7 @@ pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use extend::ColorPair::colors() instead")]
 pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
@@ -1678,9 +1683,9 @@ basic_ncurses_function!(flushinp, "flushinp");
 
 #[deprecated(since = "0.1.3", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
 pub fn free_pair<P, T>(color_pair: P) -> result!(())
-    where P: ColorPairType<T>,
+    where P:   ColorPairType<T>,
           i32: From<P>,
-          T: ColorAttributeTypes
+          T:   ColorAttributeTypes
 {
     match ncurses::free_pair(color_pair.into()) {
         OK => Ok(()),
@@ -1904,7 +1909,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
             let c: cchar_t = ComplexChar::into(wcval); // bodge to get extended color pair.
 
             Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
-        }
+        },
         rc => Err(ncurses_function_error_with_rc!("getcchar", rc))
     }
 }
@@ -2247,6 +2252,7 @@ pub fn inchstr() -> result!(ChtypeString) {
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use normal::Color::new() instead")]
 pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -2262,6 +2268,7 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use extend::Color::new() instead")]
 pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -2277,6 +2284,7 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(exten
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use extend::ColorPair::new() instead")]
 pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
     if pair_number >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -2294,6 +2302,7 @@ pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(e
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use normal::ColorPair::new() instead")]
 pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
     if i32::from(pair_number) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -4719,6 +4728,7 @@ pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     }
 }
 
+#[deprecated(since = "0.3.3", note = "Use normal::ColorPair::colors() instead")]
 pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
