@@ -288,8 +288,11 @@ pub fn menu_userptr(menu: MENU) -> MENU_USERPTR {
 
 pub fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> menu_result!(ITEM) {
     match unsafe { nmenu::new_item(name, description) } {
-        Some(item) => Ok(item),
-        None       => Err(menu_function_error!("new_item"))
+        Ok(result)  => match result {
+            Some(item) => Ok(item),
+            None       => Err(menu_function_error!("new_item"))
+        },
+        Err(source) => Err(source)
     }
 }
 

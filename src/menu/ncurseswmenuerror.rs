@@ -46,7 +46,9 @@ pub NCurseswMenuError
     /// System error occurred, (see errno)
     SystemError { func: String, errno: Errno } = @{ format!("nmenu::{}() : {} (#{})", func, errno, errno.0) },
     UnknownCommand { func: String } = "nmenu::{func}() : unknown command",
-    UnknownError { func: String, errno: i32 } = "nmenu::{func} : error number {errno}"
+    UnknownError { func: String, errno: i32 } = "nmenu::{func} : error number {errno}",
+
+    NulError { source: std::ffi::NulError } = "{source}"
 }
 
 pub(in crate::menu) fn ncursesw_menu_error_from_rc(func: &str, err: i32) -> NCurseswMenuError {

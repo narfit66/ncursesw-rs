@@ -33,6 +33,7 @@ use bindings;
 use bindings::{MenuHook, chtype};
 use cstring::*;
 use crate::shims::ncurses::WINDOW;
+use crate::menu::NCurseswMenuError;
 
 pub type MENU = *mut bindings::tagMENU;
 pub type ITEM = *mut bindings::tagITEM;
@@ -378,10 +379,13 @@ pub unsafe fn menu_win(menu: MENU) -> Option<WINDOW> {
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_new.3x.html>
-pub unsafe fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> Option<ITEM> {
-    let item = bindings::new_item(CString::new(name).unwrap().into_raw(), CString::new(description).unwrap().into_raw());
+pub unsafe fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> menu_result!(Option<ITEM>) {
+    let name = CString::new(name)?;
+    let description = CString::new(description)?;
 
-    return_optional_mut_ptr!(item)
+    let item = bindings::new_item(name.into_raw(), description.into_raw());
+
+    Ok(return_optional_mut_ptr!(item))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
