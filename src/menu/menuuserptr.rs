@@ -1,5 +1,5 @@
 /*
-    src/panels/mod.rs
+    src/menu/menuuserptr.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,12 +20,4 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::module_inception)]
-
-mod funcs;
-mod ncurseswpanelserror;
-mod paneluserptr;
-
-pub use panels::funcs::*;
-pub use panels::ncurseswpanelserror::*;
-pub use panels::paneluserptr::*;
+pub type MenuUserPtr = Option<*mut libc::c_void>;

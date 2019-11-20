@@ -20,9 +20,6 @@
     IN THE SOFTWARE.
 */
 
-#![allow(non_camel_case_types)]
-
-use libc::c_void;
 use std::ffi::CString;
 
 use cstring::*;
@@ -32,13 +29,14 @@ use menu::ncurseswmenuerror::{
     NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
 };
 use shims::constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND};
-use crate::menu::{ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize};
+use crate::menu::{
+    ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr
+};
 
 use normal;
 
 pub type MENU = nmenu::MENU;
 pub type ITEM = nmenu::ITEM;
-pub type MENU_USERPTR = Option<*mut c_void>;
 pub type MenuHook = crate::shims::bindings::MenuHook;
 
 pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
@@ -128,7 +126,7 @@ pub fn item_term(menu: MENU) -> menu_result!(MenuHook) {
     }
 }
 
-pub fn item_userptr(item: ITEM) -> MENU_USERPTR {
+pub fn item_userptr(item: ITEM) -> MenuUserPtr {
     unsafe {
         nmenu::item_userptr(item)
     }
@@ -281,7 +279,7 @@ pub fn menu_term(menu: MENU) -> menu_result!(MenuHook) {
     }
 }
 
-pub fn menu_userptr(menu: MENU) -> MENU_USERPTR {
+pub fn menu_userptr(menu: MENU) -> MenuUserPtr {
     unsafe {
         nmenu::menu_userptr(menu)
     }
@@ -356,7 +354,7 @@ pub fn set_item_term(menu: MENU, hook: MenuHook) -> menu_result!(()) {
     }
 }
 
-pub fn set_item_userptr(item: ITEM, userptr: MENU_USERPTR) {
+pub fn set_item_userptr(item: ITEM, userptr: MenuUserPtr) {
     unsafe {
         nmenu::set_item_userptr(item, userptr)
     };
@@ -471,7 +469,7 @@ pub fn set_menu_term(menu: MENU, hook: MenuHook) -> menu_result!(()) {
     }
 }
 
-pub fn set_menu_userptr(menu: MENU, userptr: MENU_USERPTR) {
+pub fn set_menu_userptr(menu: MENU, userptr: MenuUserPtr) {
     unsafe {
         nmenu::set_menu_userptr(menu, userptr)
     };

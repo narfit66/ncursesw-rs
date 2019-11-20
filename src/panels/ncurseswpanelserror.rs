@@ -1,5 +1,5 @@
 /*
-    src/ncurseswerror.rs
+    src/panels/ncurseswpanelserror.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,32 +20,9 @@
     IN THE SOFTWARE.
 */
 
-use std::{num, char, ffi};
-use crate::{
-    COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
-    menu::NCurseswMenuError
-};
 
 custom_error::custom_error! {
-/// NCursesw Errors/Events.
-pub NCurseswError
-    LibraryError { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
-    InterruptedCall = "interrupted system call (EINTR)",
-    KeyResize = "KEY_RESIZE",
-    KeyEvent = "KEY_EVENT",
-    ColorParseError { color: String } = "'{color}' is not a known color",
-    ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
-    ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
-
-    IntError { source: num::TryFromIntError } = "{source}",
-    CharError { source: char::CharTryFromError } = "{source}",
-    NulError { source: ffi::NulError } = "{source}",
-
-    // Error types for internal module errors.
-
-    PanelsError { source: NCurseswPanelsError } = "{source}",
-    MouseError { source: NCurseswMouseError } = "{source}",
-    MenuError { source: NCurseswMenuError } = "{source}",
-
-    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
+/// NCursesw panels errors.
+pub NCurseswPanelsError
+    LibraryError { func: String, rc: i32 } = "npanels::{func}() (#{rc})"
 }

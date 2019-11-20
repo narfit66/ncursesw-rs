@@ -25,9 +25,7 @@
 use std::time;
 use std::convert::TryFrom;
 
-use mouse::constants::NCURSES_MOUSE_VERSION;
-use mouse::originresult::OriginResult;
-use ncurseswerror::NCurseswError;
+use mouse::{NCurseswMouseError, OriginResult, constants::NCURSES_MOUSE_VERSION};
 use origin::Origin;
 use shims::{ncurses, nmouse, bindings};
 use shims::constants::{OK, ERR};
@@ -40,21 +38,21 @@ pub fn has_mouse() -> bool {
     nmouse::has_mouse()
 }
 
-pub fn getmouse(event: nmouse::MEVENT) -> result!(()) {
+pub fn getmouse(event: nmouse::MEVENT) -> mouse_result!(()) {
     match unsafe { nmouse::getmouse(event) } {
         OK => Ok(()),
         rc => Err(mouse_function_error_with_rc!("getmouse", rc))
     }
 }
 
-pub fn ungetmouse(event: nmouse::MEVENT) -> result!(()) {
+pub fn ungetmouse(event: nmouse::MEVENT) -> mouse_result!(()) {
     match unsafe { nmouse::ungetmouse(event) } {
         OK => Ok(()),
         rc => Err(mouse_function_error_with_rc!("ungetmouse", rc))
     }
 }
 
-pub fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> result!(mmask_t) {
+pub fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mouse_result!(mmask_t) {
     let mask = unsafe { nmouse::mousemask(newmask, oldmask) };
 
     if mask == 0 {
@@ -64,7 +62,7 @@ pub fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> result!(mma
     }
 }
 
-pub fn mouseinterval() -> result!(time::Duration) {
+pub fn mouseinterval() -> mouse_result!(time::Duration) {
     let rc = nmouse::mouseinterval(-1);
 
     if rc < 0 {
@@ -74,7 +72,7 @@ pub fn mouseinterval() -> result!(time::Duration) {
     }
 }
 
-pub fn set_mouseinterval(delay: time::Duration) -> result!(()) {
+pub fn set_mouseinterval(delay: time::Duration) -> mouse_result!(()) {
     let ms = i32::try_from(delay.as_millis())?;
 
     match nmouse::mouseinterval(ms) {

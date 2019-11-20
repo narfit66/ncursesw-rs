@@ -29,6 +29,7 @@ mod menuoptions;
 mod menurequest;
 mod menuspacing;
 mod menusize;
+mod menuuserptr;
 mod ncurseswmenuerror;
 
 pub use menu::constants::*;
@@ -40,4 +41,5 @@ pub use menu::menuoptions::*;
 pub use menu::menurequest::*;
 pub use menu::menuspacing::*;
 pub use menu::menusize::*;
+pub use menu::menuuserptr::*;
 pub use menu::ncurseswmenuerror::*;

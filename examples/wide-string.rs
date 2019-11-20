@@ -22,7 +22,9 @@
 
 extern crate ncursesw;
 
-use ncursesw::{initscr, endwin, setlocale, addwstr, WideString, refresh, getch, LcCategory, NCurseswError};
+use ncursesw::{
+    initscr, endwin, setlocale, addwstr, WideString, refresh, getch, LcCategory, NCurseswError
+};
 
 pub fn main() {
     if let Err(e) = main_routine() {
@@ -32,7 +34,7 @@ pub fn main() {
 }
 
 pub fn main_routine() -> Result<(), NCurseswError> {
-    setlocale(LcCategory::All, "");
+    setlocale(LcCategory::All, "")?;
 
     initscr()?;
 

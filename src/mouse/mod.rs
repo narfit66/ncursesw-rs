@@ -22,8 +22,10 @@
 
 mod constants;
 mod funcs;
+mod ncurseswmouseerror;
 mod originresult;
 
 pub use mouse::constants::*;
 pub use mouse::funcs::*;
+pub use mouse::ncurseswmouseerror::*;
 pub use mouse::originresult::*;
