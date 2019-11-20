@@ -55,7 +55,7 @@ impl ChtypeChar {
 
     /// Converts a Chtype character into a `AsciiChar`.
     pub fn as_ascii_char(self) -> AsciiChar {
-        AsciiChar::from(self.as_byte()).unwrap()
+        AsciiChar::new(self.as_char())
     }
 
     /// Check if the character is a letter (a-z, A-Z).
@@ -65,7 +65,7 @@ impl ChtypeChar {
 
     /// Check if the character is a number (0-9).
     pub fn is_digit(self) -> bool {
-        self.as_ascii_char().is_digit()
+        self.as_ascii_char().is_ascii_digit()
     }
 
     /// Check if the character is a letter or number.
@@ -75,7 +75,7 @@ impl ChtypeChar {
 
     /// Check if the character is a space or horizontal tab.
     pub fn is_blank(self) -> bool {
-        self.as_ascii_char().is_blank()
+        self.as_ascii_char().is_ascii_blank()
     }
 
     /// Check if the character is a ' ', '\t', '\n' or '\r'.
@@ -85,7 +85,7 @@ impl ChtypeChar {
 
     /// Check if the character is a control character.
     pub fn is_control(self) -> bool {
-        self.as_ascii_char().is_control()
+        self.as_ascii_char().is_ascii_control()
     }
 
     /// Get the attributes of the Chtype character.
