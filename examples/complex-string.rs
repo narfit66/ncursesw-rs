@@ -33,7 +33,7 @@ pub fn main() {
 }
 
 pub fn main_routine() -> Result<(), NCurseswError> {
-    setlocale(LcCategory::All, "");
+    setlocale(LcCategory::All, "")?;
 
     initscr()?;
 

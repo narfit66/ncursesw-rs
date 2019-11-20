@@ -23,11 +23,11 @@
 use std::ffi;
 
 pub trait ToCStr {
-    fn to_c_str(&self) -> ffi::CString;
+    fn to_c_str(&self) -> Result<ffi::CString, ffi::NulError>;
 }
 
 impl <'a>ToCStr for &'a str {
-    fn to_c_str(&self) -> ffi::CString {
-        ffi::CString::new(*self).unwrap()
+    fn to_c_str(&self) -> Result<ffi::CString, ffi::NulError> {
+        ffi::CString::new(*self)
     }
 }

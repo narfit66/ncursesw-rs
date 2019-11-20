@@ -23,6 +23,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![warn(missing_debug_implementations)]
+#![allow(clippy::too_many_arguments)]
 
 use std::{char, ptr};
 
@@ -1793,10 +1794,10 @@ pub unsafe fn newpad(lines: i32, cols: i32) -> Option<WINDOW> {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
-pub unsafe fn newterm(ty: Option<&str>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
+pub unsafe fn newterm(ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
     let ptr = bindings::newterm(
         match ty {
-            Some(s) => s.to_c_str().as_ptr(),
+            Some(s) => s.as_ptr(),
             None    => ptr::null()
         },
         outfd,
@@ -1945,9 +1946,9 @@ pub unsafe fn prefresh(
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn putp(str: &str) -> i32 {
+pub fn putp(str: &[i8]) -> i32 {
     unsafe {
-        bindings::putp(str.to_c_str().as_ptr())
+        bindings::putp(str.as_ptr())
     }
 }
 
@@ -2044,30 +2045,30 @@ pub fn savetty() -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
-pub fn scr_dump(filename: &str) -> i32 {
+pub fn scr_dump(filename: &[i8]) -> i32 {
     unsafe {
-        bindings::scr_dump(filename.to_c_str().as_ptr())
+        bindings::scr_dump(filename.as_ptr())
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
-pub fn scr_init(filename: &str) -> i32 {
+pub fn scr_init(filename: &[i8]) -> i32 {
     unsafe {
-        bindings::scr_init(filename.to_c_str().as_ptr())
+        bindings::scr_init(filename.as_ptr())
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
-pub fn scr_restore(filename: &str) -> i32 {
+pub fn scr_restore(filename: &[i8]) -> i32 {
     unsafe {
-        bindings::scr_restore(filename.to_c_str().as_ptr())
+        bindings::scr_restore(filename.as_ptr())
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
-pub fn scr_set(filename: &str) -> i32 {
+pub fn scr_set(filename: &[i8]) -> i32 {
     unsafe {
-        bindings::scr_set(filename.to_c_str().as_ptr())
+        bindings::scr_set(filename.as_ptr())
     }
 }
 
@@ -2223,9 +2224,9 @@ pub fn slk_restore() -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
-pub fn slk_set(n: i32, label: &str, fmt: i32) -> i32 {
+pub fn slk_set(n: i32, label: &[i8], fmt: i32) -> i32 {
     unsafe {
-        bindings::slk_set(n, label.to_c_str().as_ptr(), fmt)
+        bindings::slk_set(n, label.as_ptr(), fmt)
     }
 }
 
@@ -2311,23 +2312,23 @@ pub fn termname() -> Option<String> {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn tigetflag(capname: &str) -> i32 {
+pub fn tigetflag(capname: &[i8]) -> i32 {
     unsafe {
-        bindings::tigetflag(capname.to_c_str().as_ptr())
+        bindings::tigetflag(capname.as_ptr())
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn tigetnum(capname: &str) -> i32 {
+pub fn tigetnum(capname: &[i8]) -> i32 {
     unsafe {
-        bindings::tigetnum(capname.to_c_str().as_ptr())
+        bindings::tigetnum(capname.as_ptr())
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn tigetstr(capname: &str) -> String {
+pub fn tigetstr(capname: &[i8]) -> String {
     unsafe {
-        FromCStr::from_c_str(bindings::tigetstr(capname.to_c_str().as_ptr()))
+        FromCStr::from_c_str(bindings::tigetstr(capname.as_ptr()))
     }
 }
 
@@ -2353,9 +2354,9 @@ pub unsafe fn touchwin(win: WINDOW) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn tparm(s: &str) -> String {
+pub fn tparm(s: &[i8]) -> String {
     unsafe {
-        FromCStr::from_c_str(bindings::tparm(s.to_c_str().as_ptr()))
+        FromCStr::from_c_str(bindings::tparm(s.as_ptr()))
     }
 }
 

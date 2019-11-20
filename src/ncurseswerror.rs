@@ -40,5 +40,7 @@ pub NCurseswError
     ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
     ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
 
-    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
+    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})",
+
+    NulError { source: std::ffi::NulError } = "{source}"
 }

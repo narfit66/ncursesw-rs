@@ -20,28 +20,21 @@
     IN THE SOFTWARE.
 */
 
-use std::path;
-
 use bindings;
 use crate::cstring::*;
 
 type FILE = *mut bindings::FILE;
 
-pub fn fopen(path: &path::Path, mode: &str) -> Option<FILE> {
-    let fname = match path.to_str() {
-        Some(str) => str,
-        None      => return None
-    };
-
+pub fn fopen(path: &[i8], mode: &[i8]) -> Option<FILE> {
     let fp = unsafe {
-        bindings::fopen(fname.to_c_str().as_ptr(), mode.to_c_str().as_ptr())
+        bindings::fopen(path.as_ptr(), mode.as_ptr())
     };
 
     return_optional_mut_ptr!(fp)
 }
 
-pub fn setlocale(lc: i32, locale: &str) -> String {
+pub fn setlocale(lc: i32, locale: &[i8]) -> String {
     unsafe {
-        FromCStr::from_c_str(bindings::setlocale(lc, locale.to_c_str().as_ptr()))
+        FromCStr::from_c_str(bindings::setlocale(lc, locale.as_ptr()))
     }
 }

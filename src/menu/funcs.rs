@@ -23,6 +23,7 @@
 #![allow(non_camel_case_types)]
 
 use libc::c_void;
+use std::ffi::CString;
 
 use cstring::*;
 use shims::nmenu;
@@ -287,12 +288,12 @@ pub fn menu_userptr(menu: MENU) -> MENU_USERPTR {
 }
 
 pub fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> menu_result!(ITEM) {
+    let name = CString::new(name)?;
+    let description = CString::new(description)?;
+
     match unsafe { nmenu::new_item(name, description) } {
-        Ok(result)  => match result {
-            Some(item) => Ok(item),
-            None       => Err(menu_function_error!("new_item"))
-        },
-        Err(source) => Err(source)
+        Some(item) => Ok(item),
+        None       => Err(menu_function_error!("new_item"))
     }
 }
 

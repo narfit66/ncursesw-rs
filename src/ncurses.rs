@@ -1540,7 +1540,7 @@ pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) 
     match unsafe { ncurses::define_key(
         match definition {
             None    => ptr::null_mut(),
-            Some(s) => s.to_c_str().as_ptr() as *mut i8
+            Some(s) => s.to_c_str()?.as_ptr() as *mut i8
         },
         KeyBinding::into(keycode)
     )} {
@@ -2106,14 +2106,19 @@ pub fn getstr() -> result!(String) {
 }
 
 pub fn getwin(path: &path::Path) -> result!(WINDOW) {
-    let mode = "r";
+    match path.to_str() {
+        Some(path_str) => {
+            let mode = "r";
 
-    match crate::shims::utils::fopen(path, mode) {
-        None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
-        Some(fp) => match unsafe { ncurses::getwin(fp) } {
-            None      => Err(ncurses_function_error!("getwin")),
-            Some(win) => Ok(win)
-        }
+            match crate::shims::utils::fopen(unsafe { c_str_with_nul!(path_str) }, unsafe { c_str_with_nul!(mode) }) {
+                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
+                Some(fp) => match unsafe { ncurses::getwin(fp) } {
+                    None      => Err(ncurses_function_error!("getwin")),
+                    Some(win) => Ok(win)
+                }
+            }
+        },
+        None           => Err(ncurses_function_error!("getwin"))
     }
 }
 
@@ -4772,16 +4777,21 @@ pub fn putp(_str: &str) -> i32 {
 }
 
 pub fn putwin(handle: WINDOW, path: &path::Path) -> result!(()) {
-    let mode = "w";
+    match path.to_str() {
+        Some(path_str) => {
+            let mode = "w";
 
-    match crate::shims::utils::fopen(path, mode) {
-        None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
-        Some(fp) => {
-            match unsafe { ncurses::putwin(handle, fp) } {
-                OK => Ok(()),
-                rc => Err(ncurses_function_error_with_rc!("putwin", rc))
+            match crate::shims::utils::fopen(unsafe { c_str_with_nul!(path_str) }, unsafe { c_str_with_nul!(mode) }) {
+                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
+                Some(fp) => {
+                    match unsafe { ncurses::putwin(handle, fp) } {
+                        OK => Ok(()),
+                        rc => Err(ncurses_function_error_with_rc!("putwin", rc))
+                    }
+                }
             }
-        }
+        },
+        None => Err(ncurses_function_error!("putwin"))
     }
 }
 
@@ -5002,7 +5012,7 @@ basic_ncurses_function!(slk_refresh, "slk_refresh");
 basic_ncurses_function!(slk_restore, "slk_restore");
 
 pub fn slk_set(label_number: i32, label: &str, fmt: Justification) -> result!(()) {
-    match ncurses::slk_set(label_number, label, fmt.value()) {
+    match ncurses::slk_set(label_number, unsafe { c_str_with_nul!(label) }, fmt.value()) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
