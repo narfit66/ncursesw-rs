@@ -381,6 +381,9 @@ pub unsafe fn menu_win(menu: MENU) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/mitem_new.3x.html>
 pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
+    assert!(!name.is_null(), "nmenu::new_item() : name.is_null()");
+    assert!(!description.is_null(), "nmenu::new_item() : description.is_null()");
+
     let item = bindings::new_item(name, description);
 
     return_optional_mut_ptr!(item)
