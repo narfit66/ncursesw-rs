@@ -25,7 +25,7 @@
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
-use std::{ptr, mem, slice};
+use std::{mem, slice};
 use libc::c_void;
 use std::ffi::{CStr, CString};
 
@@ -390,12 +390,10 @@ pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
-pub unsafe fn new_menu(items: Vec<ITEM>) -> Option<MENU> {
-    let mut items = items;
+pub unsafe fn new_menu(items: *mut ITEM) -> Option<MENU> {
+    assert!(!items.is_null(), "nmenu::new_menu() : items.is_null()");
 
-    items.push(ptr::null_mut());
-
-    let menu = bindings::new_menu(items.as_mut_ptr());
+    let menu = bindings::new_menu(items);
 
     return_optional_mut_ptr!(menu)
 }
@@ -504,14 +502,11 @@ pub unsafe fn set_menu_init(menu: MENU, hook: MenuHook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
-pub unsafe fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> i32 {
+pub unsafe fn set_menu_items(menu: MENU, items: *mut ITEM) -> i32 {
     assert!(!menu.is_null(), "nmenu::set_menu_items() : menu.is_null()");
+    assert!(!items.is_null(), "nmenu::set_menu_items() : items.is_null()");
 
-    let mut items = items;
-
-    items.push(ptr::null_mut());
-
-    bindings::set_menu_items(menu, items.as_mut_ptr())
+    bindings::set_menu_items(menu, items)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_mark.3x.html>

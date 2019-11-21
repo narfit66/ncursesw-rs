@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::ffi::CString;
+use std::{ptr, ffi::CString};
 
 use cstring::*;
 use shims::nmenu;
@@ -303,7 +303,11 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 }
 
 pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
-    match unsafe { nmenu::new_menu(items) } {
+    let mut items = items;
+
+    items.push(ptr::null_mut());
+
+    match unsafe { nmenu::new_menu(items.as_mut_ptr()) } {
         Some(menu) => Ok(menu),
         None       => Err(menu_function_error!("new_menu"))
     }
@@ -410,7 +414,11 @@ pub fn set_menu_init(menu: MENU, hook: MenuHook) -> menu_result!(()) {
 }
 
 pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
-    match unsafe { nmenu::set_menu_items(menu, items) } {
+    let mut items = items;
+
+    items.push(ptr::null_mut());
+
+    match unsafe { nmenu::set_menu_items(menu, items.as_mut_ptr()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_items", rc))
     }
