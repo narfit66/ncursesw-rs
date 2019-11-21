@@ -117,6 +117,8 @@ pub unsafe fn item_init(menu: MENU) -> Option<MenuHook> {
 
 /// <https://invisible-island.net/ncurses/man/mitem_name.3x.html>
 pub unsafe fn item_name(item: ITEM) -> Option<String> {
+    assert!(!item.is_null(), "nmenu::item_name() : item.is_null()");
+
     let ptr = bindings::item_name(item);
 
     if ptr.is_null() {
@@ -378,8 +380,8 @@ pub unsafe fn menu_win(menu: MENU) -> Option<WINDOW> {
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_new.3x.html>
-pub unsafe fn new_item(name: CString, description: CString) -> Option<ITEM> {
-    let item = bindings::new_item(name.into_raw(), description.into_raw());
+pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
+    let item = bindings::new_item(name, description);
 
     return_optional_mut_ptr!(item)
 }

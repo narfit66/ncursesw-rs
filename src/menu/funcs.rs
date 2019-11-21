@@ -70,9 +70,10 @@ pub fn item_count(menu: MENU) -> menu_result!(i32) {
     }
 }
 
-pub fn item_description(item: ITEM) -> Option<String> {
-    unsafe {
-        nmenu::item_description(item)
+pub fn item_description(item: ITEM) -> menu_result!(String) {
+    match unsafe { nmenu::item_description(item) } {
+        Some(description) => Ok(description),
+        None              => Err(menu_function_error!("item_description"))
     }
 }
 
@@ -93,9 +94,10 @@ pub fn item_init(menu: MENU) -> menu_result!(MenuHook) {
     }
 }
 
-pub fn item_name(item: ITEM) -> Option<String> {
-    unsafe {
-        nmenu::item_name(item)
+pub fn item_name(item: ITEM) -> menu_result!(String) {
+    match unsafe { nmenu::item_name(item) } {
+        Some(name) => Ok(name),
+        None       => Err(menu_function_error!("item_name"))
     }
 }
 
@@ -195,15 +197,17 @@ pub fn menu_init(menu: MENU) -> menu_result!(MenuHook) {
     }
 }
 
-pub fn menu_items(menu: MENU) -> Option<Vec<ITEM>> {
-    unsafe {
-        nmenu::menu_items(menu)
+pub fn menu_items(menu: MENU) -> menu_result!(Vec<ITEM>) {
+    match unsafe { nmenu::menu_items(menu) } {
+        Some(items) => Ok(items),
+        None        => Err(menu_function_error!("menu_items"))
     }
 }
 
-pub fn menu_mark(menu: MENU) -> Option<String> {
-    unsafe {
-        nmenu::menu_mark(menu)
+pub fn menu_mark(menu: MENU) -> menu_result!(String) {
+    match unsafe { nmenu::menu_mark(menu) } {
+        Some(mark) => Ok(mark),
+        None       => Err(menu_function_error!("menu_mark"))
     }
 }
 
@@ -233,9 +237,10 @@ pub fn menu_pad(menu: MENU) -> char {
     }
 }
 
-pub fn menu_pattern(menu: MENU) -> Option<String> {
-    unsafe {
-        nmenu::menu_pattern(menu)
+pub fn menu_pattern(menu: MENU) -> menu_result!(String) {
+    match unsafe { nmenu::menu_pattern(menu) } {
+        Some(pattern) => Ok(pattern),
+        None          => Err(menu_function_error!("menu_pattern"))
     }
 }
 
@@ -285,11 +290,13 @@ pub fn menu_userptr(menu: MENU) -> MenuUserPtr {
     }
 }
 
-pub fn new_item<T: Into<Vec<u8>>>(name: T, description: T) -> menu_result!(ITEM) {
+pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
+    where T: Into<Vec<u8>>
+{
     let name = CString::new(name)?;
     let description = CString::new(description)?;
 
-    match unsafe { nmenu::new_item(name, description) } {
+    match unsafe { nmenu::new_item(name.into_raw(), description.into_raw()) } {
         Some(item) => Ok(item),
         None       => Err(menu_function_error!("new_item"))
     }
@@ -410,15 +417,13 @@ pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
 }
 
 pub fn set_menu_mark(menu: MENU, mark: &str) -> menu_result!(()) {
-    if let Some(mark) = menu_mark(menu) {
-        if mark != '-'.to_string() {
-            return Err(NCurseswMenuError::BadArgument { func: "set_menu_mark".to_string() });
+    if menu_mark(menu)? != '-'.to_string() {
+        Err(NCurseswMenuError::BadArgument { func: "set_menu_mark".to_string() })
+    } else {
+        match unsafe { nmenu::set_menu_mark(menu, c_str_with_nul!(mark)) } {
+            E_OK => Ok(()),
+            rc   => Err(menu_function_error_with_rc!("set_menu_mark", rc))
         }
-    }
-
-    match unsafe { nmenu::set_menu_mark(menu, c_str_with_nul!(mark)) } {
-        E_OK => Ok(()),
-        rc   => Err(menu_function_error_with_rc!("set_menu_mark", rc))
     }
 }
 
