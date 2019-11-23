@@ -303,11 +303,16 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 }
 
 pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
-    let mut items = items;
+    let mut item_handles = items;
 
-    items.push(ptr::null_mut());
+    item_handles.push(ptr::null_mut());
 
-    match unsafe { nmenu::new_menu(items.as_mut_ptr()) } {
+    /*
+    eprintln!("ncursesw::menu::new_menu()");
+    eprintln!("item_handles: {:?}", item_handles);
+    */
+
+    match unsafe { nmenu::new_menu(item_handles.as_mut_ptr()) } {
         Some(menu) => Ok(menu),
         None       => Err(menu_function_error!("new_menu"))
     }
@@ -417,6 +422,11 @@ pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
     let mut items = items;
 
     items.push(ptr::null_mut());
+
+    /*
+    eprintln!("ncursesw::menu::set_menu_items({:p})", menu);
+    eprintln!("items: {:?}", items);
+    */
 
     match unsafe { nmenu::set_menu_items(menu, items.as_mut_ptr()) } {
         E_OK => Ok(()),

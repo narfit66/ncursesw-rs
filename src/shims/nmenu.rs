@@ -25,9 +25,8 @@
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
-use std::{mem, slice};
+use std::{mem, slice, ffi::{CStr, CString}};
 use libc::c_void;
-use std::ffi::{CStr, CString};
 
 use bindings;
 use bindings::{MenuHook, chtype};
@@ -249,6 +248,14 @@ pub unsafe fn menu_items(menu: MENU) -> Option<Vec<ITEM>> {
         if item_count <= 0 {
             None
         } else {
+            /*
+            let item_handles = slice::from_raw_parts(ptr, item_count as usize).to_vec();
+
+            eprintln!("ncursesw::shims::nmenu::menu_items({:p})", menu);
+            eprintln!("item_handles: {:?}", item_handles);
+
+            Some(item_handles)
+            */
             Some(slice::from_raw_parts(ptr, item_count as usize).to_vec())
         }
     }
@@ -393,6 +400,23 @@ pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
 pub unsafe fn new_menu(items: *mut ITEM) -> Option<MENU> {
     assert!(!items.is_null(), "nmenu::new_menu() : items.is_null()");
 
+    /*
+    eprintln!("ncursesw::shims::nmenu::new_menu({:p})", items);
+    let mut i = 0;
+
+    loop {
+        let ptr = std::ptr::read(items.offset(i));
+
+        eprintln!("items[{}]: {:p}", i, ptr);
+
+        if ptr.is_null() {
+            break;
+        }
+
+        i += 1;
+    }
+    */
+
     let menu = bindings::new_menu(items);
 
     return_optional_mut_ptr!(menu)
@@ -505,6 +529,23 @@ pub unsafe fn set_menu_init(menu: MENU, hook: MenuHook) -> i32 {
 pub unsafe fn set_menu_items(menu: MENU, items: *mut ITEM) -> i32 {
     assert!(!menu.is_null(), "nmenu::set_menu_items() : menu.is_null()");
     assert!(!items.is_null(), "nmenu::set_menu_items() : items.is_null()");
+
+    /*
+    eprintln!("ncursesw::shims::nmenu::set_menu_items({:p})", items);
+    let mut i = 0;
+
+    loop {
+        let ptr = std::ptr::read(items.offset(i));
+
+        eprintln!("items[{}]: {:p}", i, ptr);
+
+        if ptr.is_null() {
+            break;
+        }
+
+        i += 1;
+    }
+    */
 
     bindings::set_menu_items(menu, items)
 }
