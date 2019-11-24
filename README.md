@@ -19,7 +19,7 @@ At the moment this crate has only been tested on 64-bit Linux (Linux Mint 19.1) 
 
 ```
 [dependencies]
-ncursesw = "0.3"
+ncursesw = "0.4"
 ```
 Or to use the latest git version
 ```
@@ -47,7 +47,7 @@ extern crate ncursesw;
 use ncursesw::*;
 ```
 
-This library follows the basic principles that are used when using ncurses with `C`, it supports the standard ascii functions (the add function seem to support unicode characters out of the box in ABI 6 if not earlier), ascii characters with attributes and/or color (chtype), wide characters (wchar_t/wint_t) and complex characters with attributes and color (cchar_t).
+This library follows the basic principles that are used when using ncurses with `C`, it supports the standard ascii functions (the add function seem to support unicode characters out of the box in ABI 6 if not earlier), ascii characters with attributes and/or color (`chtype`), wide characters (`wchar_t`/`wint_t`) and complex characters with attributes and color (`cchar_t`).
 
 Color pairs and attributes are dealt with in two modules. The `normal` module deals with the standard `ansi` color pairs defined internally within ncurses as `short_t/i16` and the `extend` module is for extended color pairs that are defined internally within ncurses as `i32`. Because the `normal` color pairs are actually an attribute within ncurses both modules also implement there own `attribute` and `attributes` types.
 
