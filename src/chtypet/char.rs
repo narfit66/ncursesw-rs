@@ -144,12 +144,12 @@ impl Into<chtype> for ChtypeChar {
 
 #[test]
 fn chtype_char_test() {
-    assert_eq!(ChtypeChar::new(AsciiChar::from('s').unwrap()).as_ascii_char(), AsciiChar::from('s').unwrap());
+    assert_eq!(ChtypeChar::new(AsciiChar::new('s')).as_ascii_char(), AsciiChar::new('s'));
 }
 
 #[test]
 fn chtype_char_get_attributes() {
-    let ch = ChtypeChar::new(AsciiChar::from('s').unwrap());
+    let ch = ChtypeChar::new(AsciiChar::new('s'));
     let mut attrs = Attributes::default();
 
     attrs.set_bold(true);
