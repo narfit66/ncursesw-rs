@@ -24,9 +24,9 @@
 #![allow(non_snake_case)]
 #![allow(clippy::too_many_arguments)]
 
+use libc::{c_void, EINTR};
 use std::{convert::{From, TryFrom}, path, char, ptr, slice, time, mem};
 
-use libc::{c_void, EINTR};
 use constants::{
     ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
     KEY_EVENT, TRUE, FALSE
@@ -52,9 +52,7 @@ use ncurseswerror::*;
 use region::*;
 use size::*;
 use softlabeltype::*;
-
-use shims::ncurses;
-use shims::bindings::CCHARW_MAX;
+use shims::{ncurses, bindings::CCHARW_MAX};
 
 // The maximum buffer size used in a variety of functions.
 const LINE_MAX: usize = 4096;
@@ -5089,8 +5087,8 @@ pub fn timeout(ms: time::Duration) -> result!(()) {
     Ok(())
 }
 
-pub fn touchline(handle: WINDOW, start: i32, count: i32) -> result!(()) {
-    match unsafe { ncurses::touchline(handle, start, count) } {
+pub fn touchline(handle: WINDOW, region: Region) -> result!(()) {
+    match unsafe { ncurses::touchline(handle, region.top, region.bottom) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("touchline", rc))
     }
@@ -7065,8 +7063,8 @@ pub fn wmove(handle: WINDOW, origin: Origin) -> result!(()) {
 
 basic_ncurses_function_with_window!(wnoutrefresh, "wnoutrefresh");
 
-pub fn wredrawln(handle: WINDOW, beg_line: i32, num_lines: i32) -> result!(()) {
-    match unsafe { ncurses::wredrawln(handle, beg_line, num_lines) } {
+pub fn wredrawln(handle: WINDOW, region: Region) -> result!(()) {
+    match unsafe { ncurses::wredrawln(handle, region.top, region.bottom) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("wredrawln", rc))
     }

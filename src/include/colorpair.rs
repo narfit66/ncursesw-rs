@@ -22,7 +22,7 @@
 
 use shims::ncurses;
 use gen::{ColorType, ColorsType};
-use ncursescolortype::set_ncurses_colortype;
+use ncursescolortype::*;
 
 macro_rules! extend_colorpair {
     ($extend: expr) => {

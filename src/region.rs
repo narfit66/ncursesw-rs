@@ -24,7 +24,7 @@ use std::fmt::{Display, Formatter, Result};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Region {
-    pub top: i32,
+    pub top:    i32,
     pub bottom: i32
 }
 

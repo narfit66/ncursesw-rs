@@ -25,11 +25,13 @@
 use std::str::FromStr;
 
 use ncurseswerror::NCurseswError;
-use shims::constants::{
-    COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE,
-    COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+use shims::{
+    constants::{
+        COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+        COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+    },
+    ncurses::short_t
 };
-use shims::ncurses::short_t;
 
 /// One of the 8 base colors.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

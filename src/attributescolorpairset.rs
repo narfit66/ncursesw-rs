@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use normal;
-use extend;
+use {normal, extend};
 
 /// Normal and extended attributes and color pair returned by ncurses functions.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

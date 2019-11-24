@@ -1,5 +1,5 @@
 /*
-    src/ncursescolortype.rs
+    src/ncursescolortype/funcs.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::fmt::{Display, Formatter};
+use std::{fmt::{Display, Formatter}, sync::atomic::{AtomicBool, Ordering}};
 
 lazy_static! {
     // Flag internally to the crate if ansi or extended colors are being used,
@@ -73,12 +72,12 @@ pub fn ncurses_colortype_set() -> bool {
     EXTENDED_COLORS_ALREADY_SET.load(Ordering::SeqCst)
 }
 
-pub(crate) fn set_ncurses_colortype(colortype: NCursesColorType) {
+pub(in crate) fn set_ncurses_colortype(colortype: NCursesColorType) {
     let set_colortype = ncurses_colortype();
 
     if colortype != set_colortype {
         if ncurses_colortype_set() {
-            panic!("ncursesw color type already defined as {}!", set_colortype);
+            panic!("ncursesw color type already set as {}!", set_colortype);
         } else {
             EXTENDED_COLORS_ALREADY_SET.store(true, Ordering::SeqCst);
 

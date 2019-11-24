@@ -59,6 +59,7 @@ mod characterresult;
 mod cstring;
 mod changed;
 mod cursortype;
+mod funcs;
 mod justification;
 mod keybinding;
 mod lccategory;
@@ -71,13 +72,17 @@ mod origin;
 mod region;
 mod size;
 mod softlabeltype;
-mod utils;
+
+pub use chtypet::*;
+pub use complex::*;
+pub use wide::*;
 
 pub use attributescolorpairset::*;
 pub use basecolor::*;
 pub use characterresult::*;
 pub use changed::*;
 pub use cursortype::*;
+pub use funcs::*;
 pub use gen::*;
 pub use justification::*;
 pub use keybinding::*;
@@ -92,11 +97,6 @@ pub use region::*;
 use shims::*;
 pub use size::*;
 pub use softlabeltype::*;
-pub use utils::*;
-
-pub use chtypet::*;
-pub use complex::*;
-pub use wide::*;
 
 /// NCurses window raw pointer.
 pub type WINDOW = shims::ncurses::WINDOW;

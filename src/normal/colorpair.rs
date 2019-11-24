@@ -23,8 +23,7 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::convert::{From, Into};
-use std::ops::BitOr;
+use std::{convert::{From, Into}, ops::BitOr};
 
 use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
 use normal::{Attribute, Attributes, Colors, Color};

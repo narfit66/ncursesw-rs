@@ -1,5 +1,5 @@
 /*
-    src/utils.rs
+    src/funcs.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -26,7 +26,7 @@ use lccategory::LcCategory;
 use shims;
 use shims::bindings;
 use cstring::*;
-use crate::ncurseswerror::NCurseswError;
+use ncurseswerror::NCurseswError;
 
 pub fn ncurses_version() -> Version {
     Version {
