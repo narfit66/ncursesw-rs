@@ -20,24 +20,24 @@
     IN THE SOFTWARE.
 */
 
-use std::{ptr, ffi::CString};
+use std::{ptr, convert::TryFrom, ffi::CString};
 
-use cstring::*;
-use shims::nmenu;
-use shims::ncurses::WINDOW;
-use menu::ncurseswmenuerror::{
-    NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
-};
-use shims::constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND};
-use crate::menu::{
-    ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr
-};
+use errno::errno;
 
 use normal;
 
+use cstring::*;
+use shims::{nmenu, ncurses::WINDOW, constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND}};
+use menu::ncurseswmenuerror::{
+    NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
+};
+use menu::{
+    ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr
+};
+
 pub type MENU = nmenu::MENU;
 pub type ITEM = nmenu::ITEM;
-pub type MenuHook = crate::shims::bindings::MenuHook;
+pub type Menu_Hook = crate::shims::bindings::Menu_Hook;
 
 pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
     match unsafe { nmenu::current_item(menu) } {
@@ -60,13 +60,13 @@ pub fn free_menu(menu: MENU) -> menu_result!(()) {
     }
 } 
 
-pub fn item_count(menu: MENU) -> menu_result!(i32) {
+pub fn item_count(menu: MENU) -> menu_result!(usize) {
     let rc = unsafe { nmenu::item_count(menu) };
 
     if rc < 0 {
         Err(NCurseswMenuError::UnknownError { func: "item_count".to_string(), errno: rc })
     } else {
-        Ok(rc)
+        Ok(usize::try_from(rc)?)
     }
 }
 
@@ -77,20 +77,20 @@ pub fn item_description(item: ITEM) -> menu_result!(String) {
     }
 }
 
-pub fn item_index(item: ITEM) -> menu_result!(i32) {
+pub fn item_index(item: ITEM) -> menu_result!(usize) {
     let rc = unsafe { nmenu::item_index(item) };
 
     if rc < 0 {
         Err(NCurseswMenuError::UnknownError { func: "item_index".to_string(), errno: rc })
     } else {
-        Ok(rc)
+        Ok(usize::try_from(rc)?)
     }
 } 
 
-pub fn item_init(menu: MENU) -> menu_result!(MenuHook) {
+pub fn item_init(menu: MENU) -> menu_result!(Menu_Hook) {
     match unsafe { nmenu::item_init(menu) } {
         Some(func) => Ok(func),
-        None       => Err(menu_function_error!("item_init"))
+        None       => Err(menu_function_error_with_rc!("item_init", errno().into()))
     }
 }
 
@@ -121,10 +121,10 @@ pub fn item_opts_on(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
     }
 }
 
-pub fn item_term(menu: MENU) -> menu_result!(MenuHook) {
+pub fn item_term(menu: MENU) -> menu_result!(Menu_Hook) {
     match unsafe { nmenu::item_term(menu) } {
         Some(func) => Ok(func),
-        None       => Err(menu_function_error!("item_term"))
+        None       => Err(menu_function_error_with_rc!("item_term", errno().into()))
     }
 }
 
@@ -190,10 +190,10 @@ pub fn menu_grey(menu: MENU) -> normal::Attributes {
     }
 }
 
-pub fn menu_init(menu: MENU) -> menu_result!(MenuHook) {
+pub fn menu_init(menu: MENU) -> menu_result!(Menu_Hook) {
     match unsafe { nmenu::menu_init(menu) } {
         Some(func) => Ok(func),
-        None       => Err(menu_function_error!("menu_init"))
+        None       => Err(menu_function_error_with_rc!("menu_init", errno().into()))
     }
 }
 
@@ -255,7 +255,7 @@ pub fn menu_request_by_name(name: &str) -> menu_result!(bool) {
 pub fn menu_request_name(request: i32) -> menu_result!(String) {
     match unsafe { nmenu::menu_request_name(request) } {
         Some(name) => Ok(name),
-        None       => Err(menu_function_error!("menu_request_name"))
+        None       => Err(menu_function_error_with_rc!("menu_request_name", errno().into()))
     }
 }
 
@@ -277,10 +277,10 @@ pub fn menu_sub(menu: MENU) -> menu_result!(WINDOW) {
     }
 }
 
-pub fn menu_term(menu: MENU) -> menu_result!(MenuHook) {
+pub fn menu_term(menu: MENU) -> menu_result!(Menu_Hook) {
     match unsafe { nmenu::menu_term(menu) } {
         Some(func) => Ok(func),
-        None       => Err(menu_function_error!("menu_term"))
+        None       => Err(menu_function_error_with_rc!("menu_term", errno().into()))
     }
 }
 
@@ -298,7 +298,7 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 
     match unsafe { nmenu::new_item(name.into_raw(), description.into_raw()) } {
         Some(item) => Ok(item),
-        None       => Err(menu_function_error!("new_item"))
+        None       => Err(menu_function_error_with_rc!("new_item", errno().into()))
     }
 }
 
@@ -307,14 +307,9 @@ pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
 
     item_handles.push(ptr::null_mut());
 
-    /*
-    eprintln!("ncursesw::menu::new_menu()");
-    eprintln!("item_handles: {:?}", item_handles);
-    */
-
-    match unsafe { nmenu::new_menu(item_handles.as_mut_ptr()) } {
+    match unsafe { nmenu::new_menu(item_handles.as_mut_slice()) } {
         Some(menu) => Ok(menu),
-        None       => Err(menu_function_error!("new_menu"))
+        None       => Err(menu_function_error_with_rc!("new_menu", errno().into()))
     }
 }
 
@@ -349,7 +344,7 @@ pub fn set_current_item(menu: MENU, item: ITEM) -> menu_result!(()) {
     }
 }
 
-pub fn set_item_init(menu: MENU, hook: MenuHook) -> menu_result!(()) {
+pub fn set_item_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_item_init(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_item_init", rc))
@@ -363,7 +358,7 @@ pub fn set_item_opts(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
     }
 }
 
-pub fn set_item_term(menu: MENU, hook: MenuHook) -> menu_result!(()) {
+pub fn set_item_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_item_term(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_item_term", rc))
@@ -411,7 +406,7 @@ pub fn set_menu_grey(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
     }
 }
 
-pub fn set_menu_init(menu: MENU, hook: MenuHook) -> menu_result!(()) {
+pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_init(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_init", rc))
@@ -423,12 +418,7 @@ pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
 
     items.push(ptr::null_mut());
 
-    /*
-    eprintln!("ncursesw::menu::set_menu_items({:p})", menu);
-    eprintln!("items: {:?}", items);
-    */
-
-    match unsafe { nmenu::set_menu_items(menu, items.as_mut_ptr()) } {
+    match unsafe { nmenu::set_menu_items(menu, items.as_mut_slice()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_items", rc))
     }
@@ -485,7 +475,7 @@ pub fn set_menu_sub(menu: MENU, win: Option<WINDOW>) -> menu_result!(()) {
     }
 }
 
-pub fn set_menu_term(menu: MENU, hook: MenuHook) -> menu_result!(()) {
+pub fn set_menu_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_term(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_term", rc))

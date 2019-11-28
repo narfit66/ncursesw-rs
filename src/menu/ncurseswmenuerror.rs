@@ -20,6 +20,7 @@
     IN THE SOFTWARE.
 */
 
+use std::{num, ffi};
 
 use errno::{Errno, errno};
 use shims::constants;
@@ -48,7 +49,8 @@ pub NCurseswMenuError
     UnknownCommand { func: String } = "nmenu::{func}() : unknown command",
     UnknownError { func: String, errno: i32 } = "nmenu::{func} : error number {errno}",
 
-    NulError { source: std::ffi::NulError } = "{source}"
+    IntError { source: num::TryFromIntError } = "{source}",
+    NulError { source: ffi::NulError } = "{source}"
 }
 
 pub(in crate::menu) fn ncursesw_menu_error_from_rc(func: &str, err: i32) -> NCurseswMenuError {

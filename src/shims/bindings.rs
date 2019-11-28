@@ -23,18 +23,15 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![allow(clippy::all)]
-
 #![allow(improper_ctypes)]
 
 use std::os::raw::{c_short, c_int};
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-
-type _MENU = *mut tagMENU;
+pub type ITEM = tagITEM;
+pub type MENU = tagMENU;
 
 pub type RipoffInit = extern "C" fn(*mut WINDOW, i32) -> i32;
-pub type MenuHook = extern "C" fn(_MENU);
+pub type Menu_Hook = extern "C" fn(*mut MENU);
 
 // ncurses core functions.
 extern "C" {
@@ -44,12 +41,15 @@ extern "C" {
 
 // ncurses menu functions.
 extern "C" {
-    pub fn item_init(_: _MENU) -> *const MenuHook;
-    pub fn item_term(_: _MENU) -> *const MenuHook;
-    pub fn menu_init(_: _MENU) -> *const MenuHook;
-    pub fn menu_term(_: _MENU) -> *const MenuHook;
-    pub fn set_item_init(_: _MENU, _: MenuHook) -> c_int;
-    pub fn set_item_term(_: _MENU, _: MenuHook) -> c_int;
-    pub fn set_menu_init(_: _MENU, _: MenuHook) -> c_int;
-    pub fn set_menu_term(_: _MENU, _: MenuHook) -> c_int;
+    pub fn item_init(_: *mut MENU) -> *const Menu_Hook;
+    pub fn item_term(_: *mut MENU) -> *const Menu_Hook;
+    pub fn menu_init(_: *mut MENU) -> *const Menu_Hook;
+    pub fn menu_term(_: *mut MENU) -> *const Menu_Hook;
+    pub fn set_item_init(_: *mut MENU, _: Menu_Hook) -> c_int;
+    pub fn set_item_term(_: *mut MENU, _: Menu_Hook) -> c_int;
+    pub fn set_menu_init(_: *mut MENU, _: Menu_Hook) -> c_int;
+    pub fn set_menu_term(_: *mut MENU, _: Menu_Hook) -> c_int;
 }
+
+// bingen output.
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));

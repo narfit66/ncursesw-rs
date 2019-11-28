@@ -30,14 +30,16 @@ use shims;
 
 use constants::{TRUE, FALSE};
 
-pub type PANEL = *mut bindings::PANEL;
+pub type PANEL = *mut bindings::panel;
 pub type PANEL_USERPTR = *const libc::c_void;
 
 type WINDOW = shims::ncurses::WINDOW;
 
+static MODULE_PATH: &str = "ncursesw::shims::npanels::";
+
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn new_panel(win: WINDOW) -> Option<PANEL> {
-    assert!(!win.is_null(), "npanels::new_panel() : win.is_null()");
+    assert!(!win.is_null(), "{}new_panel() : win.is_null()", MODULE_PATH);
 
     let pan = bindings::new_panel(win);
 
@@ -46,21 +48,21 @@ pub unsafe fn new_panel(win: WINDOW) -> Option<PANEL> {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn bottom_panel(pan: PANEL) -> i32 {
-    assert!(!pan.is_null(), "npanels::bottom_panel() : pan.is_null()");
+    assert!(!pan.is_null(), "{}bottom_panel() : pan.is_null()", MODULE_PATH);
 
     bindings::bottom_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn top_panel(pan: PANEL) -> i32 {
-    assert!(!pan.is_null(), "npanels::top_panel() : pan.is_null()");
+    assert!(!pan.is_null(), "{}top_panel() : pan.is_null()", MODULE_PATH);
 
     bindings::top_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn show_panel(pan: PANEL) -> i32 {
-    assert!(!pan.is_null(), "npanels::show_panel() : pan.is_null()");
+    assert!(!pan.is_null(), "{}show_panel() : pan.is_null()", MODULE_PATH);
 
     bindings::show_panel(pan)
 } 
@@ -74,14 +76,14 @@ pub fn update_panels() {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn hide_panel(pan: PANEL) -> i32 {
-    assert!(!pan.is_null(), "npanels::hide_panel() : pan.is_null()");
+    assert!(!pan.is_null(), "{}hide_panel() : pan.is_null()", MODULE_PATH);
 
     bindings::hide_panel(pan)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn panel_window(pan: PANEL) -> Option<WINDOW> {
-    assert!(!pan.is_null(), "npanels::panel_window() : pan.is_null()");
+    assert!(!pan.is_null(), "{}panel_window() : pan.is_null()", MODULE_PATH);
 
     let win = bindings::panel_window(pan);
 
@@ -90,22 +92,22 @@ pub unsafe fn panel_window(pan: PANEL) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn replace_panel(pan: PANEL, win: WINDOW) -> i32 {
-    assert!(!pan.is_null(), "npanels::replace_panel() : pan.is_null()");
-    assert!(!win.is_null(), "npanels::replace_panel() : win.is_null()");
+    assert!(!pan.is_null(), "{}replace_panel() : pan.is_null()", MODULE_PATH);
+    assert!(!win.is_null(), "{}replace_panel() : win.is_null()", MODULE_PATH);
 
     bindings::replace_panel(pan, win)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn move_panel(pan: PANEL, starty: i32, startx: i32) -> i32 {
-    assert!(!pan.is_null(), "npanels::move_panel() : pan.is_null()");
+    assert!(!pan.is_null(), "{}move_panel() : pan.is_null()", MODULE_PATH);
 
     bindings::move_panel(pan, starty, startx)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn panel_hidden(pan: PANEL) -> Option<bool> {
-    assert!(!pan.is_null(), "npanels::panel_hidden() : pan.is_null()");
+    assert!(!pan.is_null(), "{}panel_hidden() : pan.is_null()", MODULE_PATH);
 
     match bindings::panel_hidden(pan) {
         TRUE  => Some(true),
@@ -130,14 +132,14 @@ pub unsafe fn panel_below(pan: Option<PANEL>) -> Option<PANEL> {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn set_panel_userptr(pan: PANEL, ptr: Option<PANEL_USERPTR>) -> i32 {
-    assert!(!pan.is_null(), "npanels::set_panel_userptr() : pan.is_null()");
+    assert!(!pan.is_null(), "{}set_panel_userptr() : pan.is_null()", MODULE_PATH);
 
     bindings::set_panel_userptr(pan, return_mut_ptr!(ptr))
 }
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn panel_userptr(pan: PANEL) -> Option<PANEL_USERPTR> {
-    assert!(!pan.is_null(), "npanels::panel_userptr() : pan.is_null()");
+    assert!(!pan.is_null(), "{}panel_userptr() : pan.is_null()", MODULE_PATH);
 
     let ptr = bindings::panel_userptr(pan);
 
@@ -146,7 +148,7 @@ pub unsafe fn panel_userptr(pan: PANEL) -> Option<PANEL_USERPTR> {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn del_panel(pan: PANEL) -> i32 {
-    assert!(!pan.is_null(), "npanels::del_panel() : pan.is_null()");
+    assert!(!pan.is_null(), "{}del_panel() : pan.is_null()", MODULE_PATH);
 
     bindings::del_panel(pan)
 } 

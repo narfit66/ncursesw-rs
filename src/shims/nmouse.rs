@@ -30,9 +30,11 @@ type WINDOW = shims::ncurses::WINDOW;
 pub type mmask_t = bindings::mmask_t;
 pub type MEVENT = *mut bindings::MEVENT;
 
+static MODULE_PATH: &str = "ncursesw::shims::nmouse::";
+
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn getmouse(event: MEVENT) -> i32 {
-    assert!(!event.is_null(), "nmouse::getmouse() : event.is_null()");
+    assert!(!event.is_null(), "{}getmouse() : event.is_null()", MODULE_PATH);
 
     bindings::getmouse(event)
 }
@@ -46,8 +48,8 @@ pub fn has_mouse() -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn mouse_trafo(py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
-    assert!(!py.is_null(), "nmouse::mouse_trafo : py.is_null()");
-    assert!(!px.is_null(), "nmouse::mouse_trafo : px.is_null()");
+    assert!(!py.is_null(), "{}mouse_trafo : py.is_null()", MODULE_PATH);
+    assert!(!px.is_null(), "{}mouse_trafo : px.is_null()", MODULE_PATH);
 
     bindings::mouse_trafo(py, px, to_screen)
 }
@@ -66,23 +68,23 @@ pub unsafe fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmas
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn ungetmouse(event: MEVENT) -> i32 {
-    assert!(!event.is_null(), "nmouse::ungetmouse() : event.is_null()");
+    assert!(!event.is_null(), "{}ungetmouse() : event.is_null()", MODULE_PATH);
 
     bindings::ungetmouse(event)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn wenclose(win: WINDOW, y: i32, x: i32) -> bool {
-    assert!(!win.is_null(), "nmouse::wenclose() : win.is_null()");
+    assert!(!win.is_null(), "{}wenclose() : win.is_null()", MODULE_PATH);
 
     bindings::wenclose(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn wmouse_trafo(win: WINDOW, py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
-    assert!(!win.is_null(), "nmouse::wmouse_trafo() : win.is_null()");
-    assert!(!py.is_null(), "nmouse::wmouse_trafo : py.is_null()");
-    assert!(!px.is_null(), "nmouse::wmouse_trafo : px.is_null()");
+    assert!(!win.is_null(), "{}wmouse_trafo() : win.is_null()", MODULE_PATH);
+    assert!(!py.is_null(), "{}wmouse_trafo : py.is_null()", MODULE_PATH);
+    assert!(!px.is_null(), "{}wmouse_trafo : px.is_null()", MODULE_PATH);
 
     bindings::wmouse_trafo(win, py, px, to_screen)
 }

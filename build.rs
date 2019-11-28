@@ -48,9 +48,9 @@ fn find_library(name: &str) -> Option<Library> {
 fn main() {
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
 
-    find_library("ncursesw");
     find_library("menuw");
     find_library("panelw");
+    find_library("ncursesw");
 
     //
 
@@ -58,6 +58,9 @@ fn main() {
         .header("wrapper.h")                    // 'c' header file
         .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
+        .blacklist_type("ITEM")                 // blacklisted to implement our own type
+        .blacklist_type("MENU")                 // blacklisted to implement our own type
+        .blacklist_type("Menu_Hook")            // blacklisted to implement our own type
         .blacklist_function("item_init")        // blacklisted to implement our own function
         .blacklist_function("item_term")        // blacklisted to implement our own function
         .blacklist_function("menu_init")        // blacklisted to implement our own function

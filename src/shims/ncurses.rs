@@ -41,6 +41,8 @@ pub type FILE = *mut bindings::_IO_FILE;
 pub type WINDOW = *mut bindings::_win_st;
 pub type SCREEN = *mut bindings::screen;
 
+static MODULE_PATH: &str = "ncursesw::shims::ncurses::";
+
 mod wrapped {
     use libc::c_int;
     use bindings::chtype;
@@ -222,22 +224,22 @@ pub fn assume_default_colors(fg: i32, bg: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_get(attrs: *mut attr_t, pair: *mut short_t, opts: *mut libc::c_void) -> i32 {
-    assert!(!attrs.is_null(), "ncurses::attr_get() : attrs.is_null()");
-    assert!(!pair.is_null(), "ncurses::attr_get() : pair.is_null()");
+    assert!(!attrs.is_null(), "{}attr_get() : attrs.is_null()", MODULE_PATH);
+    assert!(!pair.is_null(), "{}attr_get() : pair.is_null()", MODULE_PATH);
 
     bindings::attr_get(attrs, pair, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_off(attrs: attr_t, opts: *mut libc::c_void) -> i32 {
-    assert!(opts.is_null(), "ncurses::attr_off() : !opts.is_null()");
+    assert!(opts.is_null(), "{}attr_off() : !opts.is_null()", MODULE_PATH);
 
     bindings::attr_off(attrs, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_on(attrs: attr_t, opts: *mut libc::c_void) -> i32 {
-    assert!(opts.is_null(), "ncurses::attr_on() : !opts.is_null()");
+    assert!(opts.is_null(), "{}attr_on() : !opts.is_null()");
 
     bindings::attr_on(attrs, opts)
 }
@@ -344,14 +346,14 @@ pub fn border_set(
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub unsafe fn r#box(win: WINDOW, verch: chtype, horch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::box() : win.is_null()");
+    assert!(!win.is_null(), "{}box() : win.is_null()", MODULE_PATH);
 
     bindings::box_(win, verch, horch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub unsafe fn box_set(win: WINDOW, verch: &cchar_t, horch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::box_set() : win.is_null()");
+    assert!(!win.is_null(), "{}box_set() : win.is_null()", MODULE_PATH);
 
     bindings::box_set(win, verch, horch)
 }
@@ -384,7 +386,7 @@ pub fn clear() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn clearok(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::clear_ok() : win.is_null()");
+    assert!(!win.is_null(), "{}clear_ok() : win.is_null()", MODULE_PATH);
 
     bindings::clearok(win, bf)
 }
@@ -405,9 +407,9 @@ pub fn clrtoeol() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub unsafe fn color_content(color: short_t, r: *mut short_t, g: *mut short_t, b: *mut short_t) -> i32 {
-    assert!(!r.is_null(), "ncurses::color_content() : r.is_null()");
-    assert!(!g.is_null(), "ncurses::color_content() : g.is_null()");
-    assert!(!b.is_null(), "ncurses::color_content() : b.is_null()");
+    assert!(!r.is_null(), "{}color_content() : r.is_null()", MODULE_PATH);
+    assert!(!g.is_null(), "{}color_content() : g.is_null()", MODULE_PATH);
+    assert!(!b.is_null(), "{}color_content() : b.is_null()", MODULE_PATH);
 
     bindings::color_content(color, r, g, b)
 }
@@ -429,8 +431,8 @@ pub unsafe fn copywin(
     dmaxcol: i32,
     overlay: i32
 ) -> i32 {
-    assert!(!srcwin.is_null(), "ncurses::copy_win() : srcwin.is_null()");
-    assert!(!dstwin.is_null(), "ncurses::copy_win() : dstwin.is_null()");
+    assert!(!srcwin.is_null(), "{}copy_win() : srcwin.is_null()", MODULE_PATH);
+    assert!(!dstwin.is_null(), "{}copy_win() : dstwin.is_null()", MODULE_PATH);
 
     bindings::copywin(srcwin, dstwin, sminrow, smincol, dminrow, dmincol, dmaxrow, dmaxcol, overlay)
 }
@@ -491,21 +493,21 @@ pub fn deleteln() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub unsafe fn delscreen(sp: SCREEN) {
-    assert!(!sp.is_null(), "ncurses::delscreen() : sp.is_null()");
+    assert!(!sp.is_null(), "{}delscreen() : sp.is_null()", MODULE_PATH);
 
     bindings::delscreen(sp)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn delwin(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::delwin() : win.is_null()");
+    assert!(!win.is_null(), "{}delwin() : win.is_null()", MODULE_PATH);
 
     bindings::delwin(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn derwin(orig: WINDOW, nlines: i32, ncols: i32, begin_y: i32, begin_x: i32) -> Option<WINDOW> {
-    assert!(!orig.is_null(), "ncurses::derwin() : orig.is_null()");
+    assert!(!orig.is_null(), "{}derwin() : orig.is_null()", MODULE_PATH);
 
     let win = bindings::derwin(orig, nlines, ncols, begin_y, begin_x);
 
@@ -521,7 +523,7 @@ pub fn doupdate() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn dupwin(win: WINDOW) -> Option<WINDOW> {
-    assert!(!win.is_null(), "ncurses::dupwin() : win.is_null()");
+    assert!(!win.is_null(), "{}dupwin() : win.is_null()", MODULE_PATH);
 
     let ptr = bindings::dupwin(win);
 
@@ -573,24 +575,24 @@ pub fn erasechar() -> i8 {
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub unsafe fn erasewchar(ch: *mut wchar_t) -> i32 {
-    assert!(!ch.is_null(), "ncurses::erasewchar() : ch.is_null()");
+    assert!(!ch.is_null(), "{}erasewchar() : ch.is_null()");
 
     bindings::erasewchar(ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub unsafe fn extended_color_content(color: i32, r: *mut i32, g: *mut i32, b: *mut i32) -> i32 {
-    assert!(!r.is_null(), "ncurses::extended_color_content() : r.is_null()");
-    assert!(!g.is_null(), "ncurses::extended_color_content() : g.is_null()");
-    assert!(!b.is_null(), "ncurses::extended_color_content() : b.is_null()");
+    assert!(!r.is_null(), "{}extended_color_content() : r.is_null()", MODULE_PATH);
+    assert!(!g.is_null(), "{}extended_color_content() : g.is_null()", MODULE_PATH);
+    assert!(!b.is_null(), "{}extended_color_content() : b.is_null()", MODULE_PATH);
 
     bindings::extended_color_content(color, r, g, b)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub unsafe fn extended_pair_content(pair: i32, fg: *mut i32, bg: *mut i32) -> i32 {
-    assert!(!fg.is_null(), "ncurses::extended_pair_content() : fg.is_null()");
-    assert!(!bg.is_null(), "ncurses::extended_pair_content() : bg.is_null()");
+    assert!(!fg.is_null(), "{}extended_pair_content() : fg.is_null()", MODULE_PATH);
+    assert!(!bg.is_null(), "{}extended_pair_content() : bg.is_null()", MODULE_PATH);
 
     bindings::extended_pair_content(pair, fg, bg)
 }
@@ -646,59 +648,59 @@ pub fn get_escdelay() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wch.3x.html>
 pub unsafe fn get_wch(wch: *mut wint_t) -> i32 {
-    assert!(!wch.is_null(), "ncurses::get_wch() : wch.is_null()");
+    assert!(!wch.is_null(), "{}get_wch() : wch.is_null()", MODULE_PATH);
 
     bindings::get_wch(wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn get_wstr(wstr: *mut wint_t) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::get_wstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}get_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::get_wstr(wstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn getattrs(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getattrs() : win.is_null()");
+    assert!(!win.is_null(), "{}getattrs() : win.is_null()", MODULE_PATH);
 
     bindings::getattrs(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getbegx(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getbegx() : win.is_null()");
+    assert!(!win.is_null(), "{}getbegx() : win.is_null()", MODULE_PATH);
 
     bindings::getbegx(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getbegy(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getbegy() : win.is_null()");
+    assert!(!win.is_null(), "{}getbegy() : win.is_null()", MODULE_PATH);
 
     bindings::getbegy(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgd.3x.html>
 pub unsafe fn getbkgd(win: WINDOW) -> chtype {
-    assert!(!win.is_null(), "ncurses::getbkgd() : win.is_null()");
+    assert!(!win.is_null(), "{}getbkgd() : win.is_null()", MODULE_PATH);
 
     bindings::getbkgd(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgrnd.3x.html>
 pub unsafe fn getbkgrnd(wch: *mut cchar_t) -> i32 {
-    assert!(!wch.is_null(), "ncurses::getbkgrnd() : wch.is_null()");
+    assert!(!wch.is_null(), "{}getbkgrnd() : wch.is_null()", MODULE_PATH);
 
     bindings::getbkgrnd(wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getcchar.3x.html>
 pub unsafe fn getcchar(wcval: &cchar_t, wch: *mut wchar_t, attrs: *mut attr_t, color_pair: *mut short_t, opts: *mut i32) -> i32 {
-    assert!(!wch.is_null(), "ncurses::getcchar() : wch.is_null()");
-    assert!(!attrs.is_null(), "ncurses::getcchar() : attrs.is_null()");
-    assert!(!color_pair.is_null(), "ncurses::getcchar() : color_pair.is_null()");
-    assert!(opts.is_null(), "ncurses::getcchar() : !opts.is_null()");
+    assert!(!wch.is_null(), "{}getcchar() : wch.is_null()", MODULE_PATH);
+    assert!(!attrs.is_null(), "{}getcchar() : attrs.is_null()", MODULE_PATH);
+    assert!(!color_pair.is_null(), "{}getcchar() : color_pair.is_null()", MODULE_PATH);
+    assert!(opts.is_null(), "{}getcchar() : !opts.is_null()", MODULE_PATH);
 
     bindings::getcchar(wcval, wch, attrs, color_pair, opts)
 }
@@ -712,63 +714,63 @@ pub fn getch() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getcurx(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getcurx() : win.is_null()");
+    assert!(!win.is_null(), "{}getcurx() : win.is_null()", MODULE_PATH);
 
     bindings::getcurx(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getcury(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getcury() : win.is_null()");
+    assert!(!win.is_null(), "{}getcury() : win.is_null()", MODULE_PATH);
 
     bindings::getcury(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getmaxx(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getmaxx() : win.is_null()");
+    assert!(!win.is_null(), "{}getmaxx() : win.is_null()", MODULE_PATH);
 
     bindings::getmaxx(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getmaxy(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getmaxy() : win.is_null()");
+    assert!(!win.is_null(), "{}getmaxy() : win.is_null()", MODULE_PATH);
 
     bindings::getmaxy(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn getn_wstr(wstr: *mut wint_t, n: i32) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::getn_wstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}getn_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::getn_wstr(wstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn getnstr(str: *mut i8, n: i32) -> i32 {
-    assert!(!str.is_null(), "ncurses::getnstr() : str.is_null()");
+    assert!(!str.is_null(), "{}getnstr() : str.is_null()", MODULE_PATH);
 
     bindings::getnstr(str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getparx(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getparx() : win.is_null()");
+    assert!(!win.is_null(), "{}getparx() : win.is_null()", MODULE_PATH);
 
     bindings::getparx(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
 pub unsafe fn getpary(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::getpary() : win.is_null()");
+    assert!(!win.is_null(), "{}getpary() : win.is_null()", MODULE_PATH);
 
     bindings::getpary(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn getstr(str: *mut i8) -> i32 {
-    assert!(!str.is_null(), "ncurses::getstr() : str.is_null()");
+    assert!(!str.is_null(), "{}getstr() : str.is_null()", MODULE_PATH);
 
     bindings::getstr(str)
 }
@@ -831,42 +833,42 @@ pub fn hline_set(wch: &cchar_t, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn idcok(win: WINDOW, bf: bool) {
-    assert!(!win.is_null(), "ncurses::idcok() : win.is_null()");
+    assert!(!win.is_null(), "{}idcok() : win.is_null()", MODULE_PATH);
 
     bindings::idcok(win, bf)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn idlok(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::idlcok() : win.is_null()");
+    assert!(!win.is_null(), "{}idlcok() : win.is_null()", MODULE_PATH);
 
     bindings::idlok(win, bf)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn immedok(win: WINDOW, bf: bool) {
-    assert!(!win.is_null(), "ncurses::immedok() : win.is_null()");
+    assert!(!win.is_null(), "{}immedok() : win.is_null()", MODULE_PATH);
 
     bindings::immedok(win, bf)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wch.3x.html>
 pub unsafe fn in_wch(wcval: *mut cchar_t) -> i32 {
-    assert!(!wcval.is_null(), "ncurses::in_wch() : wcval.is_null()");
+    assert!(!wcval.is_null(), "{}in_wch() : wcval.is_null()", MODULE_PATH);
 
     bindings::in_wch(wcval)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn in_wchnstr(wchstr: *mut cchar_t, n: i32) -> i32 {
-    assert!(!wchstr.is_null(), "ncurses::in_wchnstr() : wchstr.is_null()");
+    assert!(!wchstr.is_null(), "{}in_wchnstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::in_wchnstr(wchstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn in_wchstr(wchstr: *mut cchar_t) -> i32 {
-    assert!(!wchstr.is_null(), "ncurses::in_wchstr() : wchstr.is_null()");
+    assert!(!wchstr.is_null(), "{}in_wchstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::in_wchstr(wchstr)
 }
@@ -880,14 +882,14 @@ pub fn inch() -> chtype {
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn inchnstr(chstr: *mut chtype, n: i32) -> i32 {
-    assert!(!chstr.is_null(), "ncurses::inchnstr() : chstr.is_null()");
+    assert!(!chstr.is_null(), "{}inchnstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::inchnstr(chstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn inchstr(chstr: *mut chtype) -> i32 {
-    assert!(!chstr.is_null(), "ncurses::inchstr() : chstr.is_null()");
+    assert!(!chstr.is_null(), "{}inchstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::inchstr(chstr)
 }
@@ -929,14 +931,14 @@ pub unsafe fn initscr() -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn innstr(str: *mut i8, n: i32) -> i32 {
-    assert!(!str.is_null(), "ncurses::innstr() : str.is_null()");
+    assert!(!str.is_null(), "{}innstr() : str.is_null()", MODULE_PATH);
 
     bindings::innstr(str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn innwstr(wstr: *mut wchar_t, n: i32) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::innwstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}innwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::innwstr(wstr, n)
 }
@@ -999,105 +1001,105 @@ pub fn insstr(str: &[i8]) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn instr(str: *mut i8) -> i32 {
-    assert!(!str.is_null(), "ncurses::instr() : str.is_null()");
+    assert!(!str.is_null(), "{}instr() : str.is_null()", MODULE_PATH);
 
     bindings::instr(str)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn intrflush(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::intrflush() : win.is_null()");
+    assert!(!win.is_null(), "{}intrflush() : win.is_null()", MODULE_PATH);
 
     bindings::intrflush(win, bf)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn inwstr(wstr: *mut wchar_t) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::inwstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}inwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::inwstr(wstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_cleared(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_cleared() : win.is_null()");
+    assert!(!win.is_null(), "{}is_cleared() : win.is_null()", MODULE_PATH);
 
     bindings::is_cleared(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_idcok(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_idcok() : win.is_null()");
+    assert!(!win.is_null(), "{}is_idcok() : win.is_null()", MODULE_PATH);
 
     bindings::is_idcok(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_idlok(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_idlcok() : win.is_null()");
+    assert!(!win.is_null(), "{}is_idlcok() : win.is_null()", MODULE_PATH);
 
     bindings::is_idlok(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_immedok(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_immedok() : win.is_null()");
+    assert!(!win.is_null(), "{}is_immedok() : win.is_null()", MODULE_PATH);
 
     bindings::is_immedok(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_keypad(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_keypad() : win.is_null()");
+    assert!(!win.is_null(), "{}is_keypad() : win.is_null()", MODULE_PATH);
 
     bindings::is_keypad(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_leaveok(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_leaveok() : win.is_null()");
+    assert!(!win.is_null(), "{}is_leaveok() : win.is_null()", MODULE_PATH);
 
     bindings::is_leaveok(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
 pub unsafe fn is_linetouched(win: WINDOW, l: i32) -> bool {
-    assert!(!win.is_null(), "ncurses::is_linetouched() : win.is_null()");
+    assert!(!win.is_null(), "{}is_linetouched() : win.is_null()", MODULE_PATH);
 
     bindings::is_linetouched(win, l)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_nodelay(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_nodelay() : win.is_null()");
+    assert!(!win.is_null(), "{}is_nodelay() : win.is_null()", MODULE_PATH);
 
     bindings::is_nodelay(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_notimeout(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_notimeout() : win.is_null()");
+    assert!(!win.is_null(), "{}is_notimeout() : win.is_null()", MODULE_PATH);
 
     bindings::is_notimeout(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_pad(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_pad() : win.is_null()");
+    assert!(!win.is_null(), "{}is_pad() : win.is_null()", MODULE_PATH);
 
     bindings::is_pad(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_scrollok(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_scrollok() : win.is_null()");
+    assert!(!win.is_null(), "{}is_scrollok() : win.is_null()", MODULE_PATH);
 
     bindings::is_scrollok(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn is_syncok(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_syncok() : win.is_null()");
+    assert!(!win.is_null(), "{}is_syncok() : win.is_null()", MODULE_PATH);
 
     bindings::is_syncok(win)
 }
@@ -1111,7 +1113,7 @@ pub fn is_term_resized(lines: i32, cols: i32) -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
 pub unsafe fn is_wintouched(win: WINDOW) -> bool {
-    assert!(!win.is_null(), "ncurses::is_wintouched() : win.is_null()");
+    assert!(!win.is_null(), "{}is_wintouched() : win.is_null()", MODULE_PATH);
 
     bindings::is_wintouched(win)
 }
@@ -1160,7 +1162,7 @@ pub fn keyok(keycode: i32, enable: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn keypad(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::keypad() : win.is_null()");
+    assert!(!win.is_null(), "{}keypad() : win.is_null()", MODULE_PATH);
 
     bindings::keypad(win, bf)
 }
@@ -1174,14 +1176,14 @@ pub fn killchar() -> i8 {
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub unsafe fn killwchar(ch: *mut wchar_t) -> i32 {
-    assert!(!ch.is_null(), "ncurses::killwchar() : ch.is_null()");
+    assert!(!ch.is_null(), "{}killwchar() : ch.is_null()", MODULE_PATH);
 
     bindings::killwchar(ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn leaveok(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::leaveok() : win.is_null()");
+    assert!(!win.is_null(), "{}leaveok() : win.is_null()", MODULE_PATH);
 
     bindings::leaveok(win, bf)
 }
@@ -1195,14 +1197,14 @@ pub fn longname() -> Option<String> {
 
 /// <https://invisible-island.net/ncurses/man/curs_print.3x.html>
 pub unsafe fn mcprint(data: *mut i8, len: i32) -> i32 {
-    assert!(!data.is_null(), "ncurses::mcprint() : data.is_null()");
+    assert!(!data.is_null(), "{}mcprint() : data.is_null()", MODULE_PATH);
 
     bindings::mcprint(data, len)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn meta(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::meta() : win.is_null()");
+    assert!(!win.is_null(), "{}meta() : win.is_null()", MODULE_PATH);
 
     bindings::meta(win, bf)
 }
@@ -1305,21 +1307,21 @@ pub fn mvdelch(y: i32, x: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn mvderwin(win: WINDOW, y: i32, x: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvderwin() : win.is_null()");
+    assert!(!win.is_null(), "{}mvderwin() : win.is_null()", MODULE_PATH);
 
     bindings::mvderwin(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wch.3x.html>
 pub unsafe fn mvget_wch(y: i32, x: i32, wch: *mut wint_t) -> i32 {
-    assert!(!wch.is_null(), "ncurses::mvget_wch() : wch.is_null()");
+    assert!(!wch.is_null(), "{}mvget_wch() : wch.is_null()", MODULE_PATH);
 
     bindings::mvget_wch(y, x, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn mvget_wstr(y: i32, x: i32, wstr: *mut wint_t) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::mvget_wstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}mvget_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvget_wstr(y, x, wstr)
 }
@@ -1333,21 +1335,21 @@ pub fn mvgetch(y: i32, x: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn mvgetn_wstr(y: i32, x: i32, wstr: *mut wint_t, n: i32) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::mvgetn_wstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}mvgetn_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvgetn_wstr(y, x, wstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn mvgetnstr(y: i32, x: i32, str: *mut i8, n: i32) -> i32 {
-    assert!(!str.is_null(), "ncurses::mvgetnstr() : str.is_null()");
+    assert!(!str.is_null(), "{}mvgetnstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvgetnstr(y, x, str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn mvgetstr(y: i32, x: i32, str: *mut i8) -> i32 {
-    assert!(!str.is_null(), "ncurses::mvgetstr() : str.is_null()");
+    assert!(!str.is_null(), "{}mvgetstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvgetstr(y, x, str)
 }
@@ -1368,21 +1370,21 @@ pub fn mvhline_set(y: i32, x: i32, wch: &cchar_t, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wch.3x.html>
 pub unsafe fn mvin_wch(y: i32, x: i32, wcval: *mut cchar_t) -> i32 {
-    assert!(!wcval.is_null(), "ncurses::mvin_wch() : wcval.is_null()");
+    assert!(!wcval.is_null(), "{}mvin_wch() : wcval.is_null()", MODULE_PATH);
 
     bindings::mvin_wch(y, x, wcval)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn mvin_wchnstr(y: i32, x: i32, wchstr: *mut cchar_t, n: i32) -> i32 {
-    assert!(!wchstr.is_null(), "ncurses::mvin_wchnstr() : wchstr.is_null()");
+    assert!(!wchstr.is_null(), "{}mvin_wchnstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::mvin_wchnstr(y, x, wchstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn mvin_wchstr(y: i32, x: i32, wchstr: *mut cchar_t) -> i32 {
-    assert!(!wchstr.is_null(), "ncurses::in_mvchstr() : wchstr.is_null()");
+    assert!(!wchstr.is_null(), "{}in_mvchstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::mvin_wchstr(y, x, wchstr)
 }
@@ -1396,28 +1398,28 @@ pub fn mvinch(y: i32, x: i32) -> chtype {
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn mvinchnstr(y: i32, x: i32, chstr: *mut chtype, n: i32) -> i32 {
-    assert!(!chstr.is_null(), "ncurses::mvinchnstr() : chstr.is_null()");
+    assert!(!chstr.is_null(), "{}mvinchnstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::mvinchnstr(y, x, chstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn mvinchstr(y: i32, x: i32, chstr: *mut chtype) -> i32 {
-    assert!(!chstr.is_null(), "ncurses::mvinchstr() : chstr.is_null()");
+    assert!(!chstr.is_null(), "{}mvinchstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::mvinchstr(y, x, chstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn mvinnstr(y: i32, x: i32, str: *mut i8, n: i32) -> i32 {
-    assert!(!str.is_null(), "ncurses::mvinnstr() : str.is_null()");
+    assert!(!str.is_null(), "{}mvinnstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvinnstr(y, x, str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn mvinnwstr(y: i32, x: i32, wstr: *mut wchar_t, n: i32) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::mvinnwstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}mvinnwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvinnwstr(y, x, wstr, n)
 }
@@ -1466,14 +1468,14 @@ pub fn mvinsstr(y: i32, x: i32, str: &[i8]) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn mvinstr(y: i32, x: i32, str: *mut i8) -> i32 {
-    assert!(!str.is_null(), "ncurses::mvinstr() : str.is_null()");
+    assert!(!str.is_null(), "{}mvinstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvinstr(y, x, str)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn mvinwstr(y: i32, x: i32, wstr: *mut wchar_t) -> i32 {
-    assert!(!wstr.is_null(), "ncurses::mvinwstr() : wstr.is_null()");
+    assert!(!wstr.is_null(), "{}mvinwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvinwstr(y, x, wstr)
 }
@@ -1494,287 +1496,287 @@ pub fn mvvline_set(y: i32, x: i32, wch: &cchar_t, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub unsafe fn mvwadd_wch(win: WINDOW, y: i32, x: i32, wch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwadd_wch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwadd_wch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwadd_wch(win, y, x, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub unsafe fn mvwadd_wchnstr(win: WINDOW, y: i32, x: i32, wchstr: &[cchar_t], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwadd_wchnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwadd_wchnstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwadd_wchnstr(win, y, x, wchstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub unsafe fn mvwadd_wchstr(win: WINDOW, y: i32, x: i32, wchstr: &[cchar_t]) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwadd_wchstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwadd_wchstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwadd_wchstr(win, y, x, wchstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addch.3x.html>
 pub unsafe fn mvwaddch(win: WINDOW, y: i32, x: i32, ch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddch(win, y, x, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub unsafe fn mvwaddchnstr(win: WINDOW, y: i32, x: i32, chstr: &[chtype], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddchnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddchnstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddchnstr(win, y, x, chstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub unsafe fn mvwaddchstr(win: WINDOW, y: i32, x: i32, chstr: &[chtype]) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddchstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddchstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddchstr(win, y, x, chstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub unsafe fn mvwaddnstr(win: WINDOW, y: i32, x: i32, str: &[i8], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddnstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddnstr(win, y, x, str.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub unsafe fn mvwaddnwstr(win: WINDOW, y: i32, x: i32, wstr: &[wchar_t], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddnwstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddnwstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddnwstr(win, y, x, wstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub unsafe fn mvwaddstr(win: WINDOW, y: i32, x: i32, str: &[i8]) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddstr(win, y, x, str.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub unsafe fn mvwaddwstr(win: WINDOW, y: i32, x: i32, wstr: &[wchar_t]) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwaddwstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwaddwstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwaddwstr(win, y, x, wstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn mvwchgat(win: WINDOW, y: i32, x: i32, n: i32, attr: attr_t, color: short_t, opts: *const libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwchgat() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwchgat() : win.is_null()", MODULE_PATH);
 
     bindings::mvwchgat(win, y, x, n, attr, color, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_delch.3x.html>
 pub unsafe fn mvwdelch(win: WINDOW, y: i32, x: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwdelch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwdelch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwdelch(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wch.3x.html>
 pub unsafe fn mvwget_wch(win: WINDOW, y: i32, x: i32, wch: *mut wint_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwget_wch() : win.is_null()");
-    assert!(!wch.is_null(), "ncurses::mvwget_wch() : wch.is_null()");
+    assert!(!win.is_null(), "{}mvwget_wch() : win.is_null()", MODULE_PATH);
+    assert!(!wch.is_null(), "{}mvwget_wch() : wch.is_null()", MODULE_PATH);
 
     bindings::mvwget_wch(win, y, x, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn mvwget_wstr(win: WINDOW, y: i32, x: i32, wstr: *mut wint_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwget_wstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::mvwget_wstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}mvwget_wstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}mvwget_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvwget_wstr(win, y, x, wstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub unsafe fn mvwgetch(win: WINDOW, y: i32, x: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwgetch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwgetch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwgetch(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn mvwgetn_wstr(win: WINDOW, y: i32, x: i32, wstr: *mut wint_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwgetn_wstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::mvwgetn_wstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}mvwgetn_wstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}mvwgetn_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvwgetn_wstr(win, y, x, wstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn mvwgetnstr(win: WINDOW, y: i32, x: i32, str: *mut i8, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwgetnstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::mvwgetnstr() : str.is_null()");
+    assert!(!win.is_null(), "{}mvwgetnstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}mvwgetnstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvwgetnstr(win, y, x, str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn mvwgetstr(win: WINDOW, y: i32, x: i32, str: *mut i8) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwgetstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::mvwgetstr() : str.is_null()");
+    assert!(!win.is_null(), "{}mvwgetstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}mvwgetstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvwgetstr(win, y, x, str)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub unsafe fn mvwhline(win: WINDOW, y: i32, x: i32, ch: chtype, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwhline() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwhline() : win.is_null()", MODULE_PATH);
 
     bindings::mvwhline(win, y, x, ch, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub unsafe fn mvwhline_set(win: WINDOW, y: i32, x: i32, wch: &cchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwhline_set() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwhline_set() : win.is_null()", MODULE_PATH);
 
     bindings::mvwhline_set(win, y, x, wch, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn mvwin(win: WINDOW, y: i32, x: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwin() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwin() : win.is_null()", MODULE_PATH);
 
     bindings::mvwin(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wch.3x.html>
 pub unsafe fn mvwin_wch(win: WINDOW, y: i32, x: i32, wcval: *mut cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwin_wch() : win.is_null()");
-    assert!(!wcval.is_null(), "ncurses::mvwin_wch() : wcval.is_null()");
+    assert!(!win.is_null(), "{}mvwin_wch() : win.is_null()", MODULE_PATH);
+    assert!(!wcval.is_null(), "{}mvwin_wch() : wcval.is_null()", MODULE_PATH);
 
     bindings::mvwin_wch(win, y, x, wcval)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn mvwin_wchnstr(win: WINDOW, y: i32, x: i32, wchstr: *mut cchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwin_wchnstr() : win.is_null()");
-    assert!(!wchstr.is_null(), "ncurses::mvwin_wchnstr() : wchstr.is_null()");
+    assert!(!win.is_null(), "{}mvwin_wchnstr() : win.is_null()", MODULE_PATH);
+    assert!(!wchstr.is_null(), "{}mvwin_wchnstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::mvwin_wchnstr(win, y, x, wchstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn mvwin_wchstr(win: WINDOW, y: i32, x: i32, wchstr: *mut cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwin_wchstr() : win.is_null()");
-    assert!(!wchstr.is_null(), "ncurses::mvwin_wchstr() : wchstr.is_null()");
+    assert!(!win.is_null(), "{}mvwin_wchstr() : win.is_null()", MODULE_PATH);
+    assert!(!wchstr.is_null(), "{}mvwin_wchstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::mvwin_wchstr(win, y, x, wchstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inch.3x.html>
 pub unsafe fn mvwinch(win: WINDOW, y: i32, x: i32) -> chtype {
-    assert!(!win.is_null(), "ncurses::mvwinch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwinch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwinch(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn mvwinchnstr(win: WINDOW, y: i32, x: i32, chstr: *mut chtype, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinchnstr() : win.is_null()");
-    assert!(!chstr.is_null(), "ncurses::mvwinchnstr() : chstr.is_null()");
+    assert!(!win.is_null(), "{}mvwinchnstr() : win.is_null()", MODULE_PATH);
+    assert!(!chstr.is_null(), "{}mvwinchnstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::mvwinchnstr(win, y, x, chstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn mvwinchstr(win: WINDOW, y: i32, x: i32, chstr: *mut chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinchstr() : win.is_null()");
-    assert!(!chstr.is_null(), "ncurses::mvwinchstr() : chstr.is_null()");
+    assert!(!win.is_null(), "{}mvwinchstr() : win.is_null()", MODULE_PATH);
+    assert!(!chstr.is_null(), "{}mvwinchstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::mvwinchstr(win, y, x, chstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn mvwinnstr(win: WINDOW, y: i32, x: i32, str: *mut i8, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinnstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::mvwinnstr() : str.is_null()");
+    assert!(!win.is_null(), "{}mvwinnstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}mvwinnstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvwinnstr(win, y, x, str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn mvwinnwstr(win: WINDOW, y: i32, x: i32, wstr: *mut wchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinnwstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::mvwinnwstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}mvwinnwstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}mvwinnwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvwinnwstr(win, y, x, wstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub unsafe fn mvwins_nwstr(win: WINDOW, y: i32, x: i32, wstr: &[wchar_t], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwins_nwstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwins_nwstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwins_nwstr(win, y, x, wstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wch.3x.html>
 pub unsafe fn mvwins_wch(win: WINDOW, y: i32, x: i32, wch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwins_wch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwins_wch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwins_wch(win, y, x, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub unsafe fn mvwins_wstr(win: WINDOW, y: i32, x: i32, wstr: &[wchar_t]) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwins_wstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwins_wstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwins_wstr(win, y, x, wstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insch.3x.html>
 pub unsafe fn mvwinsch(win: WINDOW, y: i32, x: i32, ch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinsch() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwinsch() : win.is_null()", MODULE_PATH);
 
     bindings::mvwinsch(win, y, x, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub unsafe fn mvwinsnstr(win: WINDOW, y: i32, x: i32, str: &[i8], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinsnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwinsnstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwinsnstr(win, y, x, str.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub unsafe fn mvwinsstr(win: WINDOW, y: i32, x: i32, str: &[i8]) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinsstr() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwinsstr() : win.is_null()", MODULE_PATH);
 
     bindings::mvwinsstr(win, y, x, str.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn mvwinstr(win: WINDOW, y: i32, x: i32, str: *mut i8) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::mvwinstr() : str.is_null()");
+    assert!(!win.is_null(), "{}mvwinstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}mvwinstr() : str.is_null()", MODULE_PATH);
 
     bindings::mvwinstr(win, y, x, str)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn mvwinwstr(win: WINDOW, y: i32, x: i32, wstr: *mut wchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwinwstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::mvwinwstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}mvwinwstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}mvwinwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::mvwinwstr(win, y, x, wstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub unsafe fn mvwvline(win: WINDOW, y: i32, x: i32, ch: chtype, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwvline() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwvline() : win.is_null()", MODULE_PATH);
 
     bindings::mvwvline(win, y, x, ch, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub unsafe fn mvwvline_set(win: WINDOW, y: i32, x: i32, wch: &cchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::mvwvline_set() : win.is_null()");
+    assert!(!win.is_null(), "{}mvwvline_set() : win.is_null()", MODULE_PATH);
 
     bindings::mvwvline_set(win, y, x, wch, n)
 }
@@ -1830,7 +1832,7 @@ pub fn nocbreak() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn nodelay(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::nodelay() : win.is_null()");
+    assert!(!win.is_null(), "{}nodelay() : win.is_null()", MODULE_PATH);
 
     bindings::nodelay(win, bf)
 }
@@ -1872,45 +1874,45 @@ pub fn noraw() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn notimeout(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::notimeout() : win.is_null()");
+    assert!(!win.is_null(), "{}notimeout() : win.is_null()", MODULE_PATH);
 
     bindings::notimeout(win, bf)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_overlay.3x.html>
 pub unsafe fn overlay(srcwin: WINDOW, dstwin: WINDOW) -> i32 {
-    assert!(!srcwin.is_null(), "ncurses::overlay() : srcwin.is_null()");
-    assert!(!dstwin.is_null(), "ncurses::overlay() : dstwin.is_null()");
+    assert!(!srcwin.is_null(), "{}overlay() : srcwin.is_null()", MODULE_PATH);
+    assert!(!dstwin.is_null(), "{}overlay() : dstwin.is_null()", MODULE_PATH);
 
     bindings::overlay(srcwin, dstwin)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_overlay.3x.html>
 pub unsafe fn overwrite(srcwin: WINDOW, dstwin: WINDOW) -> i32 {
-    assert!(!srcwin.is_null(), "ncurses::overwrite() : srcwin.is_null()");
-    assert!(!dstwin.is_null(), "ncurses::overwrite() : dstwin.is_null()");
+    assert!(!srcwin.is_null(), "{}overwrite() : srcwin.is_null()", MODULE_PATH);
+    assert!(!dstwin.is_null(), "{}overwrite() : dstwin.is_null()", MODULE_PATH);
 
     bindings::overwrite(srcwin, dstwin)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub unsafe fn pair_content(pair: short_t, fg: *mut short_t, bg: *mut short_t) -> i32 {
-    assert!(!fg.is_null(), "ncurses::pair_content() : fg.is_null()");
-    assert!(!bg.is_null(), "ncurses::pair_content() : bg.is_null()");
+    assert!(!fg.is_null(), "{}pair_content() : fg.is_null()", MODULE_PATH);
+    assert!(!bg.is_null(), "{}pair_content() : bg.is_null()", MODULE_PATH);
 
     bindings::pair_content(pair, fg, bg)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>
 pub unsafe fn pechochar(pad: WINDOW, ch: chtype) -> i32 {
-    assert!(!pad.is_null(), "ncurses::pechochar() : pad.is_null()");
+    assert!(!pad.is_null(), "{}pechochar() : pad.is_null()", MODULE_PATH);
 
     bindings::pechochar(pad, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>
 pub unsafe fn pecho_wchar(pad: WINDOW, wch: &cchar_t) -> i32 {
-    assert!(!pad.is_null(), "ncurses::pecho_wchar() : pad.is_null()");
+    assert!(!pad.is_null(), "{}pecho_wchar() : pad.is_null()", MODULE_PATH);
 
     bindings::pecho_wchar(pad, wch)
 }
@@ -1925,7 +1927,7 @@ pub unsafe fn pnoutrefresh(
     smaxrow: i32,
     smaxcol: i32
 ) -> i32 {
-    assert!(!pad.is_null(), "ncurses::pnoutrefresh() : pad.is_null()");
+    assert!(!pad.is_null(), "{}pnoutrefresh() : pad.is_null()", MODULE_PATH);
 
     bindings::pnoutrefresh(pad, pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol)
 }
@@ -1940,7 +1942,7 @@ pub unsafe fn prefresh(
     smaxrow: i32,
     smaxcol: i32
 ) -> i32 {
-    assert!(!pad.is_null(), "ncurses::prefresh() : pad.is_null()");
+    assert!(!pad.is_null(), "{}prefresh() : pad.is_null()", MODULE_PATH);
 
     bindings::prefresh(pad, pminrow, pmincol, sminrow, smincol, smaxrow, smaxcol)
 }
@@ -1954,8 +1956,8 @@ pub fn putp(str: &[i8]) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub unsafe fn putwin(win: WINDOW, filep: FILE) -> i32 {
-    assert!(!win.is_null(), "ncurses::putwin() : win.is_null()");
-    assert!(!filep.is_null(), "ncurses::putwin() : filep.is_null()");
+    assert!(!win.is_null(), "{}putwin() : win.is_null()", MODULE_PATH);
+    assert!(!filep.is_null(), "{}putwin() : filep.is_null()", MODULE_PATH);
 
     bindings::putwin(win, filep)
 }
@@ -1976,7 +1978,7 @@ pub fn raw() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
 pub unsafe fn redrawwin(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::redrawwin() : win.is_null()");
+    assert!(!win.is_null(), "{}redrawwin() : win.is_null()", MODULE_PATH);
 
     bindings::redrawwin(win)
 }
@@ -2081,14 +2083,14 @@ pub fn scrl(n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_scroll.3x.html>
 pub unsafe fn scroll(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::scroll() : win.is_null()");
+    assert!(!win.is_null(), "{}scroll() : win.is_null()", MODULE_PATH);
 
     bindings::scroll(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn scrollok(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::scrollok() : win.is_null()");
+    assert!(!win.is_null(), "{}scrollok() : win.is_null()", MODULE_PATH);
 
     bindings::scrollok(win, bf)
 }
@@ -2109,7 +2111,7 @@ pub fn set_tabsize(size: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub unsafe fn set_term(scr: SCREEN) -> Option<SCREEN> {
-    assert!(!scr.is_null(), "ncurses::set_term() : scr.is_null()");
+    assert!(!scr.is_null(), "{}set_term() : scr.is_null()", MODULE_PATH);
 
     let ptr = bindings::set_term(scr);
 
@@ -2118,8 +2120,8 @@ pub unsafe fn set_term(scr: SCREEN) -> Option<SCREEN> {
 
 /// <https://invisible-island.net/ncurses/man/curs_getcchar.3x.html>
 pub unsafe fn setcchar(wcval: *mut cchar_t, wch: *const wchar_t, attrs: attr_t, color_pair: short_t, opts: *const libc::c_void) -> i32 {
-    assert!(!wcval.is_null(), "ncurses::setcchar() : wcval.is_null()");
-    assert!(!wch.is_null(), "ncurses::setcchar() : wch.is_null()");
+    assert!(!wcval.is_null(), "{}setcchar() : wcval.is_null()", MODULE_PATH);
+    assert!(!wch.is_null(), "{}setcchar() : wch.is_null()", MODULE_PATH);
 
     bindings::setcchar(wcval, wch, attrs, color_pair, opts)
 }
@@ -2267,7 +2269,7 @@ pub fn start_color() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>
 pub unsafe fn subpad(win: WINDOW, lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
-    assert!(!win.is_null(), "ncurses::subpad() : win.is_null()");
+    assert!(!win.is_null(), "{}subpad() : win.is_null()", MODULE_PATH);
 
     let ptr = bindings::subpad(win, lines, cols, y, x);
 
@@ -2276,7 +2278,7 @@ pub unsafe fn subpad(win: WINDOW, lines: i32, cols: i32, y: i32, x: i32) -> Opti
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn subwin(win: WINDOW, lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
-    assert!(!win.is_null(), "ncurses::subwin() : win.is_null()");
+    assert!(!win.is_null(), "{}subwin() : win.is_null()", MODULE_PATH);
 
     let ptr = bindings::subwin(win, lines, cols, y, x);
 
@@ -2285,7 +2287,7 @@ pub unsafe fn subwin(win: WINDOW, lines: i32, cols: i32, y: i32, x: i32) -> Opti
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn syncok(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "ncurses::syncok() : win.is_null()");
+    assert!(!win.is_null(), "{}syncok() : win.is_null()", MODULE_PATH);
 
     bindings::syncok(win, bf)
 }
@@ -2341,14 +2343,14 @@ pub fn timeout(delay: i32) {
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
 pub unsafe fn touchline(win: WINDOW, start: i32, count: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::touchline() : win.is_null()");
+    assert!(!win.is_null(), "{}touchline() : win.is_null()", MODULE_PATH);
 
     bindings::touchline(win, start, count)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
 pub unsafe fn touchwin(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::touchwin() : win.is_null()");
+    assert!(!win.is_null(), "{}touchwin() : win.is_null()", MODULE_PATH);
 
     bindings::touchwin(win)
 }
@@ -2393,7 +2395,7 @@ pub fn ungetch(ch: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
 pub unsafe fn untouchwin(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::untouchwin() : win.is_null()");
+    assert!(!win.is_null(), "{}untouchwin() : win.is_null()", MODULE_PATH);
 
     bindings::untouchwin(win)
 }
@@ -2467,151 +2469,151 @@ pub fn vline_set(wch: &cchar_t, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub unsafe fn wadd_wch(win: WINDOW, wch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wadd_wch() : win.is_null()");
+    assert!(!win.is_null(), "{}wadd_wch() : win.is_null()", MODULE_PATH);
 
     bindings::wadd_wch(win, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub unsafe fn wadd_wchnstr(win: WINDOW, wchstr: &[cchar_t], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wadd_wchnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}wadd_wchnstr() : win.is_null()", MODULE_PATH);
 
     bindings::wadd_wchnstr(win, wchstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub unsafe fn wadd_wchstr(win: WINDOW, wchstr: &[cchar_t]) -> i32 {
-    assert!(!win.is_null(), "ncurses::wadd_wchstr() : win.is_null()");
+    assert!(!win.is_null(), "{}wadd_wchstr() : win.is_null()", MODULE_PATH);
 
     bindings::wadd_wchstr(win, wchstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addch.3x.html>
 pub unsafe fn waddch(win: WINDOW, ch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddch() : win.is_null()");
+    assert!(!win.is_null(), "{}waddch() : win.is_null()", MODULE_PATH);
 
     bindings::waddch(win, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub unsafe fn waddchnstr(win: WINDOW, chstr: &[chtype], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddchnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}waddchnstr() : win.is_null()", MODULE_PATH);
 
     bindings::waddchnstr(win, chstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub unsafe fn waddchstr(win: WINDOW, chstr: &[chtype]) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddchstr() : win.is_null()");
+    assert!(!win.is_null(), "{}waddchstr() : win.is_null()", MODULE_PATH);
 
     bindings::waddchstr(win, chstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub unsafe fn waddnstr(win: WINDOW, str: &[i8], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}waddnstr() : win.is_null()", MODULE_PATH);
 
     bindings::waddnstr(win, str.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub unsafe fn waddnwstr(win: WINDOW, wstr: &[wchar_t], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddnwstr() : win.is_null()");
+    assert!(!win.is_null(), "{}waddnwstr() : win.is_null()", MODULE_PATH);
 
     bindings::waddnwstr(win, wstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub unsafe fn waddstr(win: WINDOW, str: &[i8]) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddstr() : win.is_null()");
+    assert!(!win.is_null(), "{}waddstr() : win.is_null()", MODULE_PATH);
 
     bindings::waddstr(win, str.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub unsafe fn waddwstr(win: WINDOW, wstr: &[wchar_t]) -> i32 {
-    assert!(!win.is_null(), "ncurses::waddwstr() : win.is_null()");
+    assert!(!win.is_null(), "{}waddwstr() : win.is_null()", MODULE_PATH);
 
     bindings::waddwstr(win, wstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_get(win: WINDOW, attrs: *mut attr_t, pair: *mut short_t, opts: *mut libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattr_get() : win.is_null()");
-    assert!(!attrs.is_null(), "ncurses::wattr_get() : attrs.is_null()");
-    assert!(!pair.is_null(), "ncurses::wattr_get() : pair.is_null()");
+    assert!(!win.is_null(), "{}wattr_get() : win.is_null()", MODULE_PATH);
+    assert!(!attrs.is_null(), "{}wattr_get() : attrs.is_null()", MODULE_PATH);
+    assert!(!pair.is_null(), "{}wattr_get() : pair.is_null()", MODULE_PATH);
 
     bindings::wattr_get(win, attrs, pair, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_off(win: WINDOW, attrs: attr_t, opts: *mut libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattr_off() : win.is_null()");
-    assert!(opts.is_null(), "ncurses::wattr_off() : !opts.is_null()");
+    assert!(!win.is_null(), "{}wattr_off() : win.is_null()", MODULE_PATH);
+    assert!(opts.is_null(), "{}wattr_off() : !opts.is_null()", MODULE_PATH);
 
     bindings::wattr_off(win, attrs, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_on(win: WINDOW, attrs: attr_t, opts: *mut libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattr_on() : win.is_null()");
-    assert!(opts.is_null(), "ncurses::wattr_on() : !opts.is_null()");
+    assert!(!win.is_null(), "{}wattr_on() : win.is_null()", MODULE_PATH);
+    assert!(opts.is_null(), "{}wattr_on() : !opts.is_null()", MODULE_PATH);
 
     bindings::wattr_on(win, attrs, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattr_set(win: WINDOW, attrs: attr_t, pair: short_t, opts: *mut libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattr_set() : win.is_null()");
+    assert!(!win.is_null(), "{}wattr_set() : win.is_null()", MODULE_PATH);
 
     bindings::wattr_set(win, attrs, pair, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattroff(win: WINDOW, attrs: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattroff() : win.is_null()");
+    assert!(!win.is_null(), "{}wattroff() : win.is_null()", MODULE_PATH);
 
     bindings::wattroff(win, attrs)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattron(win: WINDOW, attrs: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattron() : win.is_null()");
+    assert!(!win.is_null(), "{}wattron() : win.is_null()", MODULE_PATH);
 
     bindings::wattron(win, attrs)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wattrset(win: WINDOW, attrs: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wattrset() : win.is_null()");
+    assert!(!win.is_null(), "{}wattrset() : win.is_null()", MODULE_PATH);
 
     bindings::wattrset(win, attrs)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgd.3x.html>
 pub unsafe fn wbkgd(win: WINDOW, ch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::wbkgd() : win.is_null()");
+    assert!(!win.is_null(), "{}wbkgd() : win.is_null()", MODULE_PATH);
 
     bindings::wbkgd(win, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgd.3x.html>
 pub unsafe fn wbkgdset(win: WINDOW, ch: chtype) {
-    assert!(!win.is_null(), "ncurses::wbkgdset() : win.is_null()");
+    assert!(!win.is_null(), "{}wbkgdset() : win.is_null()", MODULE_PATH);
 
     bindings::wbkgdset(win, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgrnd.3x.html>
 pub unsafe fn wbkgrnd(win: WINDOW, wch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wbkgrnd() : win.is_null()");
+    assert!(!win.is_null(), "{}wbkgrnd() : win.is_null()", MODULE_PATH);
 
     bindings::wbkgrnd(win, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgrnd.3x.html>
 pub unsafe fn wbkgrndset(win: WINDOW, wch: &cchar_t) {
-    assert!(!win.is_null(), "ncurses::wbkgrndset() : win.is_null()");
+    assert!(!win.is_null(), "{}wbkgrndset() : win.is_null()", MODULE_PATH);
 
     bindings::wbkgrndset(win, wch)
 }
@@ -2628,7 +2630,7 @@ pub unsafe fn wborder(
     bl: chtype,
     br: chtype
 ) -> i32 {
-    assert!(!win.is_null(), "ncurses::wborder() : win.is_null()");
+    assert!(!win.is_null(), "{}wborder() : win.is_null()", MODULE_PATH);
 
     bindings::wborder(win, ls, rs, ts, bs, tl, tr, bl, br)
 }
@@ -2645,138 +2647,138 @@ pub unsafe fn wborder_set(
     bl: &cchar_t,
     br: &cchar_t
 ) -> i32 {
-    assert!(!win.is_null(), "ncurses::wborder_set() : win.is_null()");
+    assert!(!win.is_null(), "{}wborder_set() : win.is_null()", MODULE_PATH);
 
     bindings::wborder_set(win, ls, rs, ts, bs, tl, tr, bl, br)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wchgat(win: WINDOW, n: i32, attr: attr_t, color: short_t, opts: *const libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::wchgat() : win.is_null()");
+    assert!(!win.is_null(), "{}wchgat() : win.is_null()", MODULE_PATH);
 
     bindings::wchgat(win, n, attr, color, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub unsafe fn wclear(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wclear() : win.is_null()");
+    assert!(!win.is_null(), "{}wclear() : win.is_null()", MODULE_PATH);
 
     bindings::wclear(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub unsafe fn wclrtobot(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wclrtobot() : win.is_null()");
+    assert!(!win.is_null(), "{}wclrtobot() : win.is_null()", MODULE_PATH);
 
     bindings::wclrtobot(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub unsafe fn wclrtoeol(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wclrtoeol() : win.is_null()");
+    assert!(!win.is_null(), "{}wclrtoeol() : win.is_null()", MODULE_PATH);
 
     bindings::wclrtoeol(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wcolor_set(win: WINDOW, pair: short_t, opts: *mut libc::c_void) -> i32 {
-    assert!(!win.is_null(), "ncurses::wcolor_set() : win.is_null()");
+    assert!(!win.is_null(), "{}wcolor_set() : win.is_null()", MODULE_PATH);
 
     bindings::wcolor_set(win, pair, opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn wcursyncup(win: WINDOW) {
-    assert!(!win.is_null(), "ncurses::wcursyncup() : win.is_null()");
+    assert!(!win.is_null(), "{}wcursyncup() : win.is_null()", MODULE_PATH);
 
     bindings::wcursyncup(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_delch.3x.html>
 pub unsafe fn wdelch(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wdelch() : win.is_null()");
+    assert!(!win.is_null(), "{}wdelch() : win.is_null()", MODULE_PATH);
 
     bindings::wdelch(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub unsafe fn wecho_wchar(win: WINDOW, wch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wecho_wchar() : win.is_null()");
+    assert!(!win.is_null(), "{}wecho_wchar() : win.is_null()", MODULE_PATH);
 
     bindings::wecho_wchar(win, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addch.3x.html>
 pub unsafe fn wechochar(win: WINDOW, ch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::wechochar() : win.is_null()");
+    assert!(!win.is_null(), "{}wechochar() : win.is_null()", MODULE_PATH);
 
     bindings::wechochar(win, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub unsafe fn werase(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::werase() : win.is_null()");
+    assert!(!win.is_null(), "{}werase() : win.is_null()", MODULE_PATH);
 
     bindings::werase(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wch.3x.html>
 pub unsafe fn wget_wch(win: WINDOW, wch: *mut wint_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wget_wch() : win.is_null()");
-    assert!(!wch.is_null(), "ncurses::wget_wch() : wch.is_null()");
+    assert!(!win.is_null(), "{}wget_wch() : win.is_null()", MODULE_PATH);
+    assert!(!wch.is_null(), "{}wget_wch() : wch.is_null()", MODULE_PATH);
 
     bindings::wget_wch(win, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn wget_wstr(win: WINDOW, wstr: *mut wint_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wget_wstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::wget_wstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}wget_wstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}wget_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::wget_wstr(win, wstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgrnd.3x.html>
 pub unsafe fn wgetbkgrnd(win: WINDOW, wch: *mut cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetbkgrnd() : win.is_null()");
-    assert!(!wch.is_null(), "ncurses::wgetbkgrnd() : wch.is_null()");
+    assert!(!win.is_null(), "{}wgetbkgrnd() : win.is_null()", MODULE_PATH);
+    assert!(!wch.is_null(), "{}wgetbkgrnd() : wch.is_null()", MODULE_PATH);
 
     bindings::wgetbkgrnd(win, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub unsafe fn wgetch(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetch() : win.is_null()");
+    assert!(!win.is_null(), "{}wgetch() : win.is_null()", MODULE_PATH);
 
     bindings::wgetch(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn wgetdelay(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetdelay() : win.is_null()");
+    assert!(!win.is_null(), "{}wgetdelay() : win.is_null()", MODULE_PATH);
 
     bindings::wgetdelay(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
 pub unsafe fn wgetn_wstr(win: WINDOW, wstr: *mut wint_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetn_wstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::wgetn_wstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}wgetn_wstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}wgetn_wstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::wgetn_wstr(win, wstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn wgetnstr(win: WINDOW, str: *mut i8, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetnstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::wgetnstr() : str.is_null()");
+    assert!(!win.is_null(), "{}wgetnstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}wgetnstr() : str.is_null()", MODULE_PATH);
 
     bindings::wgetnstr(win, str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn wgetparent(win: WINDOW) -> Option<WINDOW> {
-    assert!(!win.is_null(), "ncurses::wgetparent() : win.is_null()");
+    assert!(!win.is_null(), "{}wgetparent() : win.is_null()", MODULE_PATH);
 
     let ptr = bindings::wgetparent(win);
 
@@ -2785,278 +2787,278 @@ pub unsafe fn wgetparent(win: WINDOW) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
 pub unsafe fn wgetscrreg(win: WINDOW, top: *mut i32, bot: *mut i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetscrreg() : win.is_null()");
-    assert!(!top.is_null(), "ncurses::wgetscrreg() : top.is_null()");
-    assert!(!bot.is_null(), "ncurses::wgetscrreg() : bot.is_null()");
+    assert!(!win.is_null(), "{}wgetscrreg() : win.is_null()", MODULE_PATH);
+    assert!(!top.is_null(), "{}wgetscrreg() : top.is_null()", MODULE_PATH);
+    assert!(!bot.is_null(), "{}wgetscrreg() : bot.is_null()", MODULE_PATH);
 
     bindings::wgetscrreg(win, top, bot)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getstr.3x.html>
 pub unsafe fn wgetstr(win: WINDOW, str: *mut i8) -> i32 {
-    assert!(!win.is_null(), "ncurses::wgetstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::wgetstr() : str.is_null()");
+    assert!(!win.is_null(), "{}wgetstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}wgetstr() : str.is_null()", MODULE_PATH);
 
     bindings::wgetstr(win, str)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub unsafe fn whline(win: WINDOW, ch: chtype, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::whline() : win.is_null()");
+    assert!(!win.is_null(), "{}whline() : win.is_null()", MODULE_PATH);
 
     bindings::whline(win, ch, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub unsafe fn whline_set(win: WINDOW, wch: &cchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::whline_set() : win.is_null()");
+    assert!(!win.is_null(), "{}whline_set() : win.is_null()", MODULE_PATH);
 
     bindings::whline_set(win, wch, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wch.3x.html>
 pub unsafe fn win_wch(win: WINDOW, wcval: *mut cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::win_wch() : win.is_null()");
-    assert!(!wcval.is_null(), "ncurses::win_wch() : wcval.is_null()");
+    assert!(!win.is_null(), "{}win_wch() : win.is_null()", MODULE_PATH);
+    assert!(!wcval.is_null(), "{}win_wch() : wcval.is_null()", MODULE_PATH);
 
     bindings::win_wch(win, wcval)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn win_wchnstr(win: WINDOW, wchstr: *mut cchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::win_wchnstr() : win.is_null()");
-    assert!(!wchstr.is_null(), "ncurses::win_wchnstr() : wchstr.is_null()");
+    assert!(!win.is_null(), "{}win_wchnstr() : win.is_null()", MODULE_PATH);
+    assert!(!wchstr.is_null(), "{}win_wchnstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::win_wchnstr(win, wchstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wchstr.3x.html>
 pub unsafe fn win_wchstr(win: WINDOW, wchstr: *mut cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::win_wchstr() : win.is_null()");
-    assert!(!wchstr.is_null(), "ncurses::win_wchstr() : wchstr.is_null()");
+    assert!(!win.is_null(), "{}win_wchstr() : win.is_null()", MODULE_PATH);
+    assert!(!wchstr.is_null(), "{}win_wchstr() : wchstr.is_null()", MODULE_PATH);
 
     bindings::win_wchstr(win, wchstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inch.3x.html>
 pub unsafe fn winch(win: WINDOW) -> chtype {
-    assert!(!win.is_null(), "ncurses::winch() : win.is_null()");
+    assert!(!win.is_null(), "{}winch() : win.is_null()", MODULE_PATH);
 
     bindings::winch(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn winchnstr(win: WINDOW, chstr: *mut chtype, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::winchnstr() : win.is_null()");
-    assert!(!chstr.is_null(), "ncurses::winchnstr() : chstr.is_null()");
+    assert!(!win.is_null(), "{}winchnstr() : win.is_null()", MODULE_PATH);
+    assert!(!chstr.is_null(), "{}winchnstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::winchnstr(win, chstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
 pub unsafe fn winchstr(win: WINDOW, chstr: *mut chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::winchstr() : win.is_null()");
-    assert!(!chstr.is_null(), "ncurses::winchstr() : chstr.is_null()");
+    assert!(!win.is_null(), "{}winchstr() : win.is_null()", MODULE_PATH);
+    assert!(!chstr.is_null(), "{}winchstr() : chstr.is_null()", MODULE_PATH);
 
     bindings::winchstr(win, chstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn winnstr(win: WINDOW, str: *mut i8, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::winnstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::winnstr() : str.is_null()");
+    assert!(!win.is_null(), "{}winnstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}winnstr() : str.is_null()", MODULE_PATH);
 
     bindings::winnstr(win, str, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn winnwstr(win: WINDOW, wstr: *mut wchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::winnwstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::winnwstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}winnwstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}winnwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::winnwstr(win, wstr, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub unsafe fn wins_nwstr(win: WINDOW, wstr: &[wchar_t], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wins_nwstr() : win.is_null()");
+    assert!(!win.is_null(), "{}wins_nwstr() : win.is_null()", MODULE_PATH);
 
     bindings::wins_nwstr(win, wstr.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wch.3x.html>
 pub unsafe fn wins_wch(win: WINDOW, wch: &cchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::wins_wch() : win.is_null()");
+    assert!(!win.is_null(), "{}wins_wch() : win.is_null()", MODULE_PATH);
 
     bindings::wins_wch(win, wch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub unsafe fn wins_wstr(win: WINDOW, wstr: &[wchar_t]) -> i32 {
-    assert!(!win.is_null(), "ncurses::wins_wstr() : win.is_null()");
+    assert!(!win.is_null(), "{}wins_wstr() : win.is_null()", MODULE_PATH);
 
     bindings::wins_wstr(win, wstr.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insch.3x.html>
 pub unsafe fn winsch(win: WINDOW, ch: chtype) -> i32 {
-    assert!(!win.is_null(), "ncurses::winsch() : win.is_null()");
+    assert!(!win.is_null(), "{}winsch() : win.is_null()", MODULE_PATH);
 
     bindings::winsch(win, ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_deleteln.3x.html>
 pub unsafe fn winsdelln(win: WINDOW, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::winsdelln() : win.is_null()");
+    assert!(!win.is_null(), "{}winsdelln() : win.is_null()", MODULE_PATH);
 
     bindings::winsdelln(win, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_deleteln.3x.html>
 pub unsafe fn winsertln(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::winsertln() : win.is_null()");
+    assert!(!win.is_null(), "{}winsertln() : win.is_null()", MODULE_PATH);
 
     bindings::winsertln(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub unsafe fn winsnstr(win: WINDOW, str: &[i8], n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::winsnstr() : win.is_null()");
+    assert!(!win.is_null(), "{}winsnstr() : win.is_null()", MODULE_PATH);
 
     bindings::winsnstr(win, str.as_ptr(), n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub unsafe fn winsstr(win: WINDOW, str: &[i8]) -> i32 {
-    assert!(!win.is_null(), "ncurses::winsstr() : win.is_null()");
+    assert!(!win.is_null(), "{}winsstr() : win.is_null()", MODULE_PATH);
 
     bindings::winsstr(win, str.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
 pub unsafe fn winstr(win: WINDOW, str: *mut i8) -> i32 {
-    assert!(!win.is_null(), "ncurses::winstr() : win.is_null()");
-    assert!(!str.is_null(), "ncurses::winstr() : str.is_null()");
+    assert!(!win.is_null(), "{}winstr() : win.is_null()", MODULE_PATH);
+    assert!(!str.is_null(), "{}winstr() : str.is_null()", MODULE_PATH);
 
     bindings::winstr(win, str)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inwstr.3x.html>
 pub unsafe fn winwstr(win: WINDOW, wstr: *mut wchar_t) -> i32 {
-    assert!(!win.is_null(), "ncurses::winwstr() : win.is_null()");
-    assert!(!wstr.is_null(), "ncurses::winwstr() : wstr.is_null()");
+    assert!(!win.is_null(), "{}winwstr() : win.is_null()", MODULE_PATH);
+    assert!(!wstr.is_null(), "{}winwstr() : wstr.is_null()", MODULE_PATH);
 
     bindings::winwstr(win, wstr)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_move.3x.html>
 pub unsafe fn wmove(win: WINDOW, y: i32, x: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wmove() : win.is_null()");
+    assert!(!win.is_null(), "{}wmove() : win.is_null()", MODULE_PATH);
 
     bindings::wmove(win, y, x)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
 pub unsafe fn wnoutrefresh(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wnoutrefresh() : win.is_null()");
+    assert!(!win.is_null(), "{}wnoutrefresh() : win.is_null()", MODULE_PATH);
 
     bindings::wnoutrefresh(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
 pub unsafe fn wredrawln(win: WINDOW, beg_line: i32, num_lines: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wredrawln() : win.is_null()");
+    assert!(!win.is_null(), "{}wredrawln() : win.is_null()", MODULE_PATH);
 
     bindings::wredrawln(win, beg_line, num_lines)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
 pub unsafe fn wrefresh(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wrefresh() : win.is_null()");
+    assert!(!win.is_null(), "{}wrefresh() : win.is_null()", MODULE_PATH);
 
     bindings::wrefresh(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/wresize.3x.html>
 pub unsafe fn wresize(win: WINDOW, lines: i32, columns: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wresize() : win.is_null()");
+    assert!(!win.is_null(), "{}wresize() : win.is_null()", MODULE_PATH);
 
     bindings::wresize(win, lines, columns)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scroll.3x.html>
 pub unsafe fn wscrl(win: WINDOW, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wscrl() : win.is_null()");
+    assert!(!win.is_null(), "{}wscrl() : win.is_null()", MODULE_PATH);
 
     bindings::wscrl(win, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub unsafe fn wsetscrreg(win: WINDOW, top: i32, bot: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wsetscrreg() : win.is_null()");
+    assert!(!win.is_null(), "{}wsetscrreg() : win.is_null()", MODULE_PATH);
 
     bindings::wsetscrreg(win, top, bot)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wstandend(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wstandend() : win.is_null()");
+    assert!(!win.is_null(), "{}wstandend() : win.is_null()", MODULE_PATH);
 
     bindings::wstandend(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn wstandout(win: WINDOW) -> i32 {
-    assert!(!win.is_null(), "ncurses::wstandout() : win.is_null()");
+    assert!(!win.is_null(), "{}wstandout() : win.is_null()", MODULE_PATH);
 
     bindings::wstandout(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn wsyncdown(win: WINDOW) {
-    assert!(!win.is_null(), "ncurses::wsyncdown() : win.is_null()");
+    assert!(!win.is_null(), "{}wsyncdown() : win.is_null()", MODULE_PATH);
 
     bindings::wsyncdown(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn wsyncup(win: WINDOW) {
-    assert!(!win.is_null(), "ncurses::wsyncup() : win.is_null()");
+    assert!(!win.is_null(), "{}wsyncup() : win.is_null()", MODULE_PATH);
 
     bindings::wsyncup(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn wtimeout(win: WINDOW, delay: i32) {
-    assert!(!win.is_null(), "ncurses::wtimeout() : win.is_null()");
+    assert!(!win.is_null(), "{}wtimeout() : win.is_null()", MODULE_PATH);
 
     bindings::wtimeout(win, delay)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
 pub unsafe fn wtouchln(win: WINDOW, y: i32, n: i32, changed: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wtouchln() : win.is_null()");
+    assert!(!win.is_null(), "{}wtouchln() : win.is_null()", MODULE_PATH);
 
     bindings::wtouchln(win, y, n, changed)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub unsafe fn wunctrl(ch: *mut cchar_t) -> *mut wchar_t {
-    assert!(!ch.is_null(), "ncurses::wunctrl() : ch.is_null()");
+    assert!(!ch.is_null(), "{}wunctrl() : ch.is_null()", MODULE_PATH);
 
     bindings::wunctrl(ch)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub unsafe fn wvline(win: WINDOW, ch: chtype, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wvline() : win.is_null()");
+    assert!(!win.is_null(), "{}wvline() : win.is_null()", MODULE_PATH);
 
     bindings::wvline(win, ch, n)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub unsafe fn wvline_set(win: WINDOW, wch: &cchar_t, n: i32) -> i32 {
-    assert!(!win.is_null(), "ncurses::wvline_set() : win.is_null()");
+    assert!(!win.is_null(), "{}wvline_set() : win.is_null()", MODULE_PATH);
 
     bindings::wvline_set(win, wch, n)
 }
