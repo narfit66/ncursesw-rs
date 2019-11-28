@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{ptr, convert::TryFrom, ffi::CString};
+use std::ffi::CString;
 
 use errno::errno;
 
@@ -38,6 +38,8 @@ use menu::{
 pub type MENU = nmenu::MENU;
 pub type ITEM = nmenu::ITEM;
 pub type Menu_Hook = crate::shims::bindings::Menu_Hook;
+
+static MODULE_PATH: &str = "ncursesw::menu::funcs::";
 
 pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
     match unsafe { nmenu::current_item(menu) } {
@@ -60,13 +62,13 @@ pub fn free_menu(menu: MENU) -> menu_result!(()) {
     }
 } 
 
-pub fn item_count(menu: MENU) -> menu_result!(usize) {
+pub fn item_count(menu: MENU) -> menu_result!(i32) {
     let rc = unsafe { nmenu::item_count(menu) };
 
     if rc < 0 {
         Err(NCurseswMenuError::UnknownError { func: "item_count".to_string(), errno: rc })
     } else {
-        Ok(usize::try_from(rc)?)
+        Ok(rc)
     }
 }
 
@@ -77,13 +79,13 @@ pub fn item_description(item: ITEM) -> menu_result!(String) {
     }
 }
 
-pub fn item_index(item: ITEM) -> menu_result!(usize) {
+pub fn item_index(item: ITEM) -> menu_result!(i32) {
     let rc = unsafe { nmenu::item_index(item) };
 
     if rc < 0 {
         Err(NCurseswMenuError::UnknownError { func: "item_index".to_string(), errno: rc })
     } else {
-        Ok(usize::try_from(rc)?)
+        Ok(rc)
     }
 } 
 
@@ -303,11 +305,7 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 }
 
 pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
-    let mut item_handles = items;
-
-    item_handles.push(ptr::null_mut());
-
-    match unsafe { nmenu::new_menu(item_handles.as_mut_slice()) } {
+    match unsafe { nmenu::new_menu(items.as_slice()) } {
         Some(menu) => Ok(menu),
         None       => Err(menu_function_error_with_rc!("new_menu", errno().into()))
     }
@@ -414,11 +412,7 @@ pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
-    let mut items = items;
-
-    items.push(ptr::null_mut());
-
-    match unsafe { nmenu::set_menu_items(menu, items.as_mut_slice()) } {
+    match unsafe { nmenu::set_menu_items(menu, items.as_slice()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_items", rc))
     }
@@ -496,7 +490,7 @@ pub fn set_menu_win(menu: MENU, win: Option<WINDOW>) -> menu_result!(()) {
 }
 
 pub fn set_top_row(menu: MENU, row: i32) -> menu_result!(()) {
-    assert!(row >= 0, "menu::set_top_row() : row={}", row);
+    assert!(row >= 0, "{}set_top_row() : row={}", MODULE_PATH, row);
 
     match unsafe { nmenu::set_top_row(menu, row) } {
         E_OK => Ok(()),

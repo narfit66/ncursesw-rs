@@ -28,8 +28,6 @@
 use std::{mem, slice, ffi::{CStr, CString}};
 use libc::c_void;
 
-use errno::errno;
-
 use bindings;
 use bindings::{Menu_Hook, chtype};
 use cstring::*;
@@ -389,18 +387,26 @@ pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
 
     let item = bindings::new_item(name, description);
 
-    eprintln!("errno: {:?}", errno());
-
     return_optional_mut_ptr!(item)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
-pub unsafe fn new_menu(items: &mut [ITEM]) -> Option<MENU> {
-    assert!(items.len() > 0, "{}new_menu() : items.len() <= 0", MODULE_PATH);
+pub unsafe fn new_menu(items: &[ITEM]) -> Option<MENU> {
+    // let's guarantee that we atleast pass `bindings::new_menu` with a null pointer
+    // by allocating at least one more pointer than required that will be reserved
+    // and all of them set to null.
+    let item_handles = libc::calloc(items.len() + 1, mem::size_of::<ITEM>()) as *mut ITEM;
 
-    let menu = bindings::new_menu(items.as_mut_ptr());
+    assert!(!item_handles.is_null(), "{}new_menu() : item_handles.is_null()", MODULE_PATH);
 
-    eprintln!("errno: {:?}", errno());
+    // copy our passed menu item pointers to our memory buffer.
+    item_handles.copy_from(items.as_ptr(), items.len());
+
+    // pass our menu item pointers.
+    let menu = bindings::new_menu(item_handles);
+
+    // free our allocated memory.
+    libc::free(item_handles as *mut libc::c_void);
 
     return_optional_mut_ptr!(menu)
 }
@@ -509,12 +515,25 @@ pub unsafe fn set_menu_init(menu: MENU, hook: Menu_Hook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
-pub unsafe fn set_menu_items(menu: MENU, items: &mut [ITEM]) -> i32 {
+pub unsafe fn set_menu_items(menu: MENU, items: &[ITEM]) -> i32 {
     assert!(!menu.is_null(), "{}set_menu_items() : menu.is_null()", MODULE_PATH);
-    assert!(items.len() > 0, "{}set_menu_items() : items.len() <= 0", MODULE_PATH);
 
+    // let's guarantee that we atleast pass `bindings::new_menu` with a null pointer
+    // by allocating at least one more pointer than required that will be reserved
+    // and all of them set to null.
+    let item_handles = libc::calloc(items.len() + 1, mem::size_of::<ITEM>()) as *mut ITEM;
 
-    bindings::set_menu_items(menu, items.as_mut_ptr())
+    assert!(!item_handles.is_null(), "{}set_menu_items() : item_handles.is_null()", MODULE_PATH);
+
+    // copy our passed menu item pointers to our memory buffer.
+    item_handles.copy_from(items.as_ptr(), items.len());
+
+    let rc = bindings::set_menu_items(menu, item_handles);
+
+    // free our allocated memory.
+    libc::free(item_handles as *mut libc::c_void);
+
+    rc
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_mark.3x.html>
