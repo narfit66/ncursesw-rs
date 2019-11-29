@@ -298,6 +298,8 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
     let name = CString::new(name)?;
     let description = CString::new(description)?;
 
+    assert!(name != description, "{}new_item() : name == description", MODULE_PATH);
+
     match unsafe { nmenu::new_item(name.into_raw(), description.into_raw()) } {
         Some(item) => Ok(item),
         None       => Err(menu_function_error_with_rc!("new_item", errno().into()))
@@ -305,7 +307,7 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 }
 
 pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
-    match unsafe { nmenu::new_menu(items.as_slice()) } {
+    match unsafe { nmenu::new_menu(&mut items.iter().map(|&item| item).collect()) } {
         Some(menu) => Ok(menu),
         None       => Err(menu_function_error_with_rc!("new_menu", errno().into()))
     }
@@ -412,7 +414,7 @@ pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
-    match unsafe { nmenu::set_menu_items(menu, items.as_slice()) } {
+    match unsafe { nmenu::set_menu_items(menu, &mut items.iter().map(|&item| item).collect()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_items", rc))
     }

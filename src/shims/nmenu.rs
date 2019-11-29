@@ -25,7 +25,7 @@
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
-use std::{mem, slice, ffi::{CStr, CString}};
+use std::{mem, ptr, slice, ffi::{CStr, CString}};
 use libc::c_void;
 
 use bindings;
@@ -250,7 +250,11 @@ pub unsafe fn menu_items(menu: MENU) -> Option<Vec<ITEM>> {
         if item_count <= 0 {
             None
         } else {
-            Some(slice::from_raw_parts(ptr, item_count as usize).to_vec())
+            let items = slice::from_raw_parts(ptr, item_count as usize).to_vec();
+            eprintln!("items: {:?}", items);
+
+            Some(items)
+            //Some(slice::from_raw_parts(ptr, item_count as usize).to_vec())
         }
     }
 }
@@ -384,6 +388,7 @@ pub unsafe fn menu_win(menu: MENU) -> Option<WINDOW> {
 pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
     assert!(!name.is_null(), "{}new_item() : name.is_null()", MODULE_PATH);
     assert!(!description.is_null(), "{}new_item() : description.is_null()", MODULE_PATH);
+    assert!(name != description, "{}new_item() : name == description", MODULE_PATH);
 
     let item = bindings::new_item(name, description);
 
@@ -391,22 +396,38 @@ pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
-pub unsafe fn new_menu(items: &[ITEM]) -> Option<MENU> {
-    // let's guarantee that we atleast pass `bindings::new_menu` with a null pointer
-    // by allocating at least one more pointer than required that will be reserved
-    // and all of them set to null.
-    let item_handles = libc::calloc(items.len() + 1, mem::size_of::<ITEM>()) as *mut ITEM;
+pub unsafe fn new_menu(items: &mut Vec<ITEM>) -> Option<MENU> {
+    // Always make sure that the last pointer is a null. If this is the only `items`
+    // pointer then `new_menu()` should according to documentation return a null
+    // pointer and set `errno` to `E_NOT_CONNECTED`.
+    items.push(ptr::null_mut());
 
-    assert!(!item_handles.is_null(), "{}new_menu() : item_handles.is_null()", MODULE_PATH);
+    items.shrink_to_fit();
 
-    // copy our passed menu item pointers to our memory buffer.
-    item_handles.copy_from(items.as_ptr(), items.len());
+    // TODO: This is still not working, trying to cast a double pointer is proving a
+    //       bit of a mare! The issue seems to be fat to 'thin' pointer conversion
+    //       as first item pointer is always invalid. In all the documentation i can
+    //       find `&Vec` should be a 'thin' pointer so just passing to `new_menu()`
+    //       an `.as_mut_ptr()` of `items` i thought should work!
+    //
+    //       The `items.shrink_to_fit()` seems to stop the first item pointer always
+    //       being null, would like to know why as i don't have a scooby to what's
+    //       going on here!!!  The only other example i can find that does the call
+    //       to `new_menu()` is in the 'ncurses-rs' crate and it works (without the
+    //       `shrink_to_fit()` and passing `items` using the `as_mut_ptr()`).
+    //
+    // It seems that all these are not fixing the issue...
+    //
+    // let menu = bindings::new_menu(items.as_mut_ptr());
+    // let menu = bindings::new_menu(items.as_mut_ptr() as *mut _ as *mut ITEM);
+    // let menu = bindings::new_menu(items.as_mut_ptr() as *mut usize as *mut ITEM);
+    // let menu = bindings::new_menu(*(&items.as_mut_ptr()));
+    // let menu = bindings::new_menu(*(&items.as_mut_ptr()) as *mut _ as *mut ITEM);
+    // let menu = bindings::new_menu(*(&items.as_mut_ptr()) as *mut usize as *mut ITEM);
 
-    // pass our menu item pointers.
-    let menu = bindings::new_menu(item_handles);
+    let menu = bindings::new_menu(items.as_mut_ptr());
 
-    // free our allocated memory.
-    libc::free(item_handles as *mut libc::c_void);
+    items.pop();
 
     return_optional_mut_ptr!(menu)
 }
@@ -515,23 +536,15 @@ pub unsafe fn set_menu_init(menu: MENU, hook: Menu_Hook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
-pub unsafe fn set_menu_items(menu: MENU, items: &[ITEM]) -> i32 {
+pub unsafe fn set_menu_items(menu: MENU, items: &mut Vec<ITEM>) -> i32 {
     assert!(!menu.is_null(), "{}set_menu_items() : menu.is_null()", MODULE_PATH);
 
-    // let's guarantee that we atleast pass `bindings::new_menu` with a null pointer
-    // by allocating at least one more pointer than required that will be reserved
-    // and all of them set to null.
-    let item_handles = libc::calloc(items.len() + 1, mem::size_of::<ITEM>()) as *mut ITEM;
+    items.push(ptr::null_mut());
+    items.shrink_to_fit();
 
-    assert!(!item_handles.is_null(), "{}set_menu_items() : item_handles.is_null()", MODULE_PATH);
+    let rc = bindings::set_menu_items(menu, items.as_mut_ptr());
 
-    // copy our passed menu item pointers to our memory buffer.
-    item_handles.copy_from(items.as_ptr(), items.len());
-
-    let rc = bindings::set_menu_items(menu, item_handles);
-
-    // free our allocated memory.
-    libc::free(item_handles as *mut libc::c_void);
+    items.pop();
 
     rc
 }
