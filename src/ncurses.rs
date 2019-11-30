@@ -1526,8 +1526,11 @@ pub fn curs_set(cursor: CursorType) -> result!(CursorType) {
     }
 }
 
-pub fn curses_version() -> String {
-    ncurses::curses_version()
+pub fn curses_version() -> result!(String) {
+    match ncurses::curses_version() {
+        Some(version) => Ok(version),
+        None          => Err(ncurses_function_error!("curses_version"))
+    }
 }
 
 basic_ncurses_function!(def_prog_mode, "def_prog_mode");
@@ -2108,11 +2111,13 @@ pub fn getwin(path: &path::Path) -> result!(WINDOW) {
         Some(path_str) => {
             let mode = "r";
 
-            match crate::shims::utils::fopen(unsafe { c_str_with_nul!(path_str) }, unsafe { c_str_with_nul!(mode) }) {
-                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
-                Some(fp) => match unsafe { ncurses::getwin(fp) } {
-                    None      => Err(ncurses_function_error!("getwin")),
-                    Some(win) => Ok(win)
+            unsafe {
+                match crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) {
+                    None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
+                    Some(fp) => match ncurses::getwin(fp) {
+                        None      => Err(ncurses_function_error!("getwin")),
+                        Some(win) => Ok(win)
+                    }
                 }
             }
         },
@@ -4779,12 +4784,14 @@ pub fn putwin(handle: WINDOW, path: &path::Path) -> result!(()) {
         Some(path_str) => {
             let mode = "w";
 
-            match crate::shims::utils::fopen(unsafe { c_str_with_nul!(path_str) }, unsafe { c_str_with_nul!(mode) }) {
-                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
-                Some(fp) => {
-                    match unsafe { ncurses::putwin(handle, fp) } {
-                        OK => Ok(()),
-                        rc => Err(ncurses_function_error_with_rc!("putwin", rc))
+            unsafe {
+                match crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) {
+                    None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
+                    Some(fp) => {
+                        match ncurses::putwin(handle, fp) {
+                            OK => Ok(()),
+                            rc => Err(ncurses_function_error_with_rc!("putwin", rc))
+                        }
                     }
                 }
             }
@@ -4999,8 +5006,11 @@ pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
     }
 }
 
-pub fn slk_label(number: i32) -> String {
-    ncurses::slk_label(number)
+pub fn slk_label(number: i32) -> result!(String) {
+    match ncurses::slk_label(number) {
+        Some(label) => Ok(label),
+        None        => Err(ncurses_function_error!("slk_label"))
+    }
 }
 
 basic_ncurses_function!(slk_noutrefresh, "slk_noutrefresh");
@@ -5104,8 +5114,11 @@ pub fn typeahead(_fd: i32) -> i32 {
     unimplemented!();
 }
 
-pub fn unctrl(c: ChtypeChar) -> String {
-    ncurses::unctrl(ChtypeChar::into(c))
+pub fn unctrl(c: ChtypeChar) -> result!(String) {
+    match ncurses::unctrl(ChtypeChar::into(c)) {
+        Some(s) => Ok(s),
+        None    => Err(ncurses_function_error!("unctrl"))
+    }
 }
 
 pub fn unget_wch(ch: WideChar) -> result!(()) {

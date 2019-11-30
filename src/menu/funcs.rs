@@ -464,7 +464,7 @@ pub fn set_menu_spacing(menu: MENU, menu_spacing: MenuSpacing) -> menu_result!((
     }
 }
 
-pub fn set_menu_sub(menu: MENU, win: Option<WINDOW>) -> menu_result!(()) {
+pub fn set_menu_sub(menu: Option<MENU>, win: Option<WINDOW>) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_sub(menu, win) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_sub", rc))
@@ -484,7 +484,7 @@ pub fn set_menu_userptr(menu: MENU, userptr: MenuUserPtr) {
     };
 }
 
-pub fn set_menu_win(menu: MENU, win: Option<WINDOW>) -> menu_result!(()) {
+pub fn set_menu_win(menu: Option<MENU>, win: Option<WINDOW>) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_win(menu, win) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_win", rc))

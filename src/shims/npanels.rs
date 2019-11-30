@@ -41,9 +41,7 @@ static MODULE_PATH: &str = "ncursesw::shims::npanels::";
 pub unsafe fn new_panel(win: WINDOW) -> Option<PANEL> {
     assert!(!win.is_null(), "{}new_panel() : win.is_null()", MODULE_PATH);
 
-    let pan = bindings::new_panel(win);
-
-    return_optional_mut_ptr!(pan)
+    bindings::new_panel(win).as_mut().map(|ptr| ptr as PANEL)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
@@ -85,9 +83,7 @@ pub unsafe fn hide_panel(pan: PANEL) -> i32 {
 pub unsafe fn panel_window(pan: PANEL) -> Option<WINDOW> {
     assert!(!pan.is_null(), "{}panel_window() : pan.is_null()", MODULE_PATH);
 
-    let win = bindings::panel_window(pan);
-
-    return_optional_mut_ptr!(win)
+    bindings::panel_window(pan).as_mut().map(|ptr| ptr as WINDOW)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
@@ -118,16 +114,12 @@ pub unsafe fn panel_hidden(pan: PANEL) -> Option<bool> {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn panel_above(pan: Option<PANEL>) -> Option<PANEL> {
-    let ptr = bindings::panel_above(return_mut_ptr!(pan));
-
-    return_optional_mut_ptr!(ptr)
+    bindings::panel_above(return_mut_ptr!(pan)).as_mut().map(|ptr| ptr as PANEL)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn panel_below(pan: Option<PANEL>) -> Option<PANEL> {
-    let ptr = bindings::panel_below(return_mut_ptr!(pan));
-
-    return_optional_mut_ptr!(ptr)
+    bindings::panel_below(return_mut_ptr!(pan)).as_mut().map(|ptr| ptr as PANEL)
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
@@ -141,9 +133,7 @@ pub unsafe fn set_panel_userptr(pan: PANEL, ptr: Option<PANEL_USERPTR>) -> i32 {
 pub unsafe fn panel_userptr(pan: PANEL) -> Option<PANEL_USERPTR> {
     assert!(!pan.is_null(), "{}panel_userptr() : pan.is_null()", MODULE_PATH);
 
-    let ptr = bindings::panel_userptr(pan);
-
-    return_optional_mut_ptr!(ptr)
+    (bindings::panel_userptr(pan) as *mut libc::c_void).as_mut().map(|ptr| ptr as PANEL_USERPTR)
 }
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>

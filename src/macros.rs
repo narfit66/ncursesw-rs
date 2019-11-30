@@ -86,16 +86,6 @@ macro_rules! raw_with_nul_as_slice { ($name: ident) => { $name.clone().raw_with_
 
 macro_rules! ptr_to_string { ($ptr: ident) => { std::str::from_utf8_unchecked(CStr::from_ptr($ptr).to_bytes()).to_owned() } }
 
-macro_rules! return_optional_mut_ptr {
-    ($ptr: ident) => {
-        if $ptr.is_null() {
-            None
-        } else {
-            Some($ptr)
-        }
-    }
-}
-
 macro_rules! return_mut_ptr {
     ($ptr: ident) => {
         match $ptr {

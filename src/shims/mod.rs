@@ -26,6 +26,8 @@
 pub mod bindings;
 /// Defined constatnts.
 pub mod constants;
+/// utility functions thin API wrapper with assertions as appropriate.
+pub mod funcs;
 /// Main ncurses functions thin API wrapper with assertions as appropriate
 ///
 /// Most of the functions are `unsafe`.
@@ -42,5 +44,3 @@ pub mod nmouse;
 ///
 /// Most of the functions are `unsafe`.
 pub mod npanels;
-/// utility functions thin API wrapper with assertions as appropriate.
-pub mod utils;

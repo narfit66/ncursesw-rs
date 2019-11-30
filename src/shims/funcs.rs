@@ -1,5 +1,5 @@
 /*
-    src/shims/utils.rs
+    src/shims/funcs.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -25,16 +25,12 @@ use crate::cstring::*;
 
 type FILE = *mut bindings::FILE;
 
-pub fn fopen(path: &[i8], mode: &[i8]) -> Option<FILE> {
-    let fp = unsafe {
-        bindings::fopen(path.as_ptr(), mode.as_ptr())
-    };
-
-    return_optional_mut_ptr!(fp)
+pub unsafe fn fopen(path: &[i8], mode: &[i8]) -> Option<FILE> {
+    bindings::fopen(path.as_ptr(), mode.as_ptr()).as_mut().map(|ptr| ptr as FILE)
 }
 
-pub fn setlocale(lc: i32, locale: &[i8]) -> String {
+pub fn setlocale(lc: i32, locale: &[i8]) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::setlocale(lc, locale.as_ptr()))
+        (bindings::setlocale(lc, locale.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }

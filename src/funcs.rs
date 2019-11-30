@@ -27,6 +27,7 @@ use shims;
 use shims::bindings;
 use cstring::*;
 use ncurseswerror::NCurseswError;
+use constants::ERR;
 
 pub fn ncurses_version() -> Version {
     Version {
@@ -39,7 +40,8 @@ pub fn ncurses_version() -> Version {
 }
 
 pub fn setlocale(lc: LcCategory, locale: &str) -> result!(String) {
-    Ok(shims::utils::setlocale(match lc {
+    match shims::funcs::setlocale(
+        match lc {
             LcCategory::All      => bindings::LC_ALL,
             LcCategory::Collate  => bindings::LC_COLLATE,
             LcCategory::CType    => bindings::LC_CTYPE,
@@ -49,5 +51,8 @@ pub fn setlocale(lc: LcCategory, locale: &str) -> result!(String) {
             LcCategory::Messages => bindings::LC_MESSAGES
         } as i32,
         unsafe { c_str_with_nul!(locale) }
-    ))
+    ) {
+        Some(locale) => Ok(locale),
+        None         => Err(ncurses_function_error!("setlocale"))
+    }
 }

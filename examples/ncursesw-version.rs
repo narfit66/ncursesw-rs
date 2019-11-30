@@ -25,6 +25,6 @@ extern crate ncursesw;
 use ncursesw::*;
 
 fn main() {
-    println!("curses_version:  {}", curses_version());
+    println!("curses_version:  {}", curses_version().unwrap());
     println!("ncurses_version: {}", ncurses_version());
 }

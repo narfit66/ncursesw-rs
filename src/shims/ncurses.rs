@@ -445,9 +445,9 @@ pub fn curs_set(visibility: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_extend.3x.html>
-pub fn curses_version() -> String {
+pub fn curses_version() -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::curses_version())
+        (bindings::curses_version() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -509,9 +509,7 @@ pub unsafe fn delwin(win: WINDOW) -> i32 {
 pub unsafe fn derwin(orig: WINDOW, nlines: i32, ncols: i32, begin_y: i32, begin_x: i32) -> Option<WINDOW> {
     assert!(!orig.is_null(), "{}derwin() : orig.is_null()", MODULE_PATH);
 
-    let win = bindings::derwin(orig, nlines, ncols, begin_y, begin_x);
-
-    return_optional_mut_ptr!(win)
+    bindings::derwin(orig, nlines, ncols, begin_y, begin_x).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
@@ -525,9 +523,7 @@ pub fn doupdate() -> i32 {
 pub unsafe fn dupwin(win: WINDOW) -> Option<WINDOW> {
     assert!(!win.is_null(), "{}dupwin() : win.is_null()", MODULE_PATH);
 
-    let ptr = bindings::dupwin(win);
-
-    return_optional_mut_ptr!(ptr)
+    bindings::dupwin(win).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
@@ -777,9 +773,7 @@ pub unsafe fn getstr(str: *mut i8) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub unsafe fn getwin(filep: FILE) -> Option<WINDOW> {
-    let win = bindings::getwin(filep);
-
-    return_optional_mut_ptr!(win)
+    bindings::getwin(filep).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
@@ -924,9 +918,7 @@ pub fn init_pair(pair: short_t, f: short_t, b: short_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub unsafe fn initscr() -> Option<WINDOW> {
-    let win = bindings::initscr();
-
-    return_optional_mut_ptr!(win)
+    bindings::initscr().as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
@@ -1135,21 +1127,21 @@ pub fn key_defined(definition: &[i8]) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn key_name(w: wchar_t) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::key_name(w))
+        (bindings::key_name(w) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/keybound.3x.html>
 pub fn keybound(keycode: i32, count: i32) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::keybound(keycode, count))
+        (bindings::keybound(keycode, count) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn keyname(c: i32) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::keyname(c))
+        (bindings::keyname(c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -1191,7 +1183,7 @@ pub unsafe fn leaveok(win: WINDOW, bf: bool) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn longname() -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::longname())
+        (bindings::longname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -1790,30 +1782,24 @@ pub fn napms(ms: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>
 pub unsafe fn newpad(lines: i32, cols: i32) -> Option<WINDOW> {
-    let win = bindings::newpad(lines, cols);
-
-    return_optional_mut_ptr!(win)
+    bindings::newpad(lines, cols).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub unsafe fn newterm(ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
-    let ptr = bindings::newterm(
+    bindings::newterm(
         match ty {
             Some(s) => s.as_ptr(),
             None    => ptr::null()
         },
         outfd,
         infd
-    );
-
-    return_optional_mut_ptr!(ptr)
+    ).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
-    let win = bindings::newwin(lines, cols, y, x);
-
-    return_optional_mut_ptr!(win)
+    bindings::newwin(lines, cols, y, x).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
@@ -2113,9 +2099,7 @@ pub fn set_tabsize(size: i32) -> i32 {
 pub unsafe fn set_term(scr: SCREEN) -> Option<SCREEN> {
     assert!(!scr.is_null(), "{}set_term() : scr.is_null()", MODULE_PATH);
 
-    let ptr = bindings::set_term(scr);
-
-    return_optional_mut_ptr!(ptr)
+    bindings::set_term(scr).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getcchar.3x.html>
@@ -2198,9 +2182,9 @@ pub fn slk_init(fmt: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
-pub fn slk_label(n: i32) -> String {
+pub fn slk_label(n: i32) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::slk_label(n))
+        (bindings::slk_label(n) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -2271,18 +2255,14 @@ pub fn start_color() -> i32 {
 pub unsafe fn subpad(win: WINDOW, lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
     assert!(!win.is_null(), "{}subpad() : win.is_null()", MODULE_PATH);
 
-    let ptr = bindings::subpad(win, lines, cols, y, x);
-
-    return_optional_mut_ptr!(ptr)
+    bindings::subpad(win, lines, cols, y, x).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
 pub unsafe fn subwin(win: WINDOW, lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
     assert!(!win.is_null(), "{}subwin() : win.is_null()", MODULE_PATH);
 
-    let ptr = bindings::subwin(win, lines, cols, y, x);
-
-    return_optional_mut_ptr!(ptr)
+    bindings::subwin(win, lines, cols, y, x).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
@@ -2309,7 +2289,7 @@ pub fn termattrs() -> chtype {
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn termname() -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::termname())
+        (bindings::termname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -2328,9 +2308,9 @@ pub fn tigetnum(capname: &[i8]) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn tigetstr(capname: &[i8]) -> String {
+pub fn tigetstr(capname: &[i8]) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::tigetstr(capname.as_ptr()))
+        (bindings::tigetstr(capname.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -2356,9 +2336,9 @@ pub unsafe fn touchwin(win: WINDOW) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
-pub fn tparm(s: &[i8]) -> String {
+pub fn tparm(s: &[i8]) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::tparm(s.as_ptr()))
+        (bindings::tparm(s.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -2373,9 +2353,9 @@ pub fn typeahead(fd: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
-pub fn unctrl(c: chtype) -> String {
+pub fn unctrl(c: chtype) -> Option<String> {
     unsafe {
-        FromCStr::from_c_str(bindings::unctrl(c))
+        (bindings::unctrl(c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }
 
@@ -2780,9 +2760,7 @@ pub unsafe fn wgetnstr(win: WINDOW, str: *mut i8, n: i32) -> i32 {
 pub unsafe fn wgetparent(win: WINDOW) -> Option<WINDOW> {
     assert!(!win.is_null(), "{}wgetparent() : win.is_null()", MODULE_PATH);
 
-    let ptr = bindings::wgetparent(win);
-
-    return_optional_mut_ptr!(ptr)
+    bindings::wgetparent(win).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
