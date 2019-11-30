@@ -24,6 +24,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
+#![allow(clippy::unreadable_literal)]
 
 use std::os::raw::{c_short, c_int};
 

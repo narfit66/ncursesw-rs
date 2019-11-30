@@ -239,7 +239,7 @@ pub unsafe fn attr_off(attrs: attr_t, opts: *mut libc::c_void) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub unsafe fn attr_on(attrs: attr_t, opts: *mut libc::c_void) -> i32 {
-    assert!(opts.is_null(), "{}attr_on() : !opts.is_null()");
+    assert!(opts.is_null(), "{}attr_on() : !opts.is_null()", MODULE_PATH);
 
     bindings::attr_on(attrs, opts)
 }
@@ -575,7 +575,7 @@ pub fn erasechar() -> i8 {
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub unsafe fn erasewchar(ch: *mut wchar_t) -> i32 {
-    assert!(!ch.is_null(), "{}erasewchar() : ch.is_null()");
+    assert!(!ch.is_null(), "{}erasewchar() : ch.is_null()", MODULE_PATH);
 
     bindings::erasewchar(ch)
 }
