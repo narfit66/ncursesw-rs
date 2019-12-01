@@ -25,12 +25,10 @@
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
-use std::{mem, ptr, slice, ffi::{CStr, CString}};
+use std::{mem, slice, ffi::{CStr, CString}};
 
-use bindings;
-use bindings::{Menu_Hook, chtype};
-use cstring::*;
-use crate::shims::ncurses::WINDOW;
+use shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::WINDOW};
+use cstring::FromCStr;
 
 pub type MENU = *mut bindings::MENU;
 pub type ITEM = *mut bindings::ITEM;
@@ -348,46 +346,16 @@ pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
     assert!(!name.is_null(), "{}new_item() : name.is_null()", MODULE_PATH);
     assert!(!description.is_null(), "{}new_item() : description.is_null()", MODULE_PATH);
 
-    assert!(name != description, "{}new_item() : name == description", MODULE_PATH);
-
     bindings::new_item(name, description).as_mut().map(|ptr| ptr as ITEM)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
-pub unsafe fn new_menu(items: &mut Vec<ITEM>) -> Option<MENU> {
-    // Always make sure that the last pointer is a null. If this is the only `items`
-    // pointer then `new_menu()` should according to documentation return a null
-    // pointer and set `errno` to `E_NOT_CONNECTED`.
-    items.push(ptr::null_mut());
+pub unsafe fn new_menu(items: *mut ITEM) -> Option<MENU> {
+    assert!(!items.is_null(), "{}new_menu() : items.is_null()", MODULE_PATH);
 
-    items.shrink_to_fit();
+    //eprintln!("{}new_menu() items: {:p}", MODULE_PATH, items);
 
-    // TODO: This is still not working, trying to cast a double pointer is proving a
-    //       bit of a mare! The issue seems to be fat to 'thin' pointer conversion
-    //       as first item pointer is always invalid. In all the documentation i can
-    //       find `&Vec` should be a 'thin' pointer so just passing to `new_menu()`
-    //       an `.as_mut_ptr()` of `items` i thought should work!
-    //
-    //       The `items.shrink_to_fit()` seems to stop the first item pointer always
-    //       being null, would like to know why as i don't have a scooby to what's
-    //       going on here!!!  The only other example i can find that does the call
-    //       to `new_menu()` is in the 'ncurses-rs' crate and it works (without the
-    //       `shrink_to_fit()` and passing `items` using the `as_mut_ptr()`).
-    //
-    // It seems that all these are not fixing the issue...
-    //
-    // let menu = bindings::new_menu(items.as_mut_ptr());
-    // let menu = bindings::new_menu(items.as_mut_ptr() as *mut _ as *mut ITEM);
-    // let menu = bindings::new_menu(items.as_mut_ptr() as *mut usize as *mut ITEM);
-    // let menu = bindings::new_menu(*(&items.as_mut_ptr()));
-    // let menu = bindings::new_menu(*(&items.as_mut_ptr()) as *mut _ as *mut ITEM);
-    // let menu = bindings::new_menu(*(&items.as_mut_ptr()) as *mut usize as *mut ITEM);
-
-    let menu = bindings::new_menu(items.as_mut_ptr());
-
-    items.pop();
-
-    menu.as_mut().map(|ptr| ptr as MENU)
+    bindings::new_menu(items).as_mut().map(|ptr| ptr as MENU)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_cursor.3x.html>
@@ -494,17 +462,11 @@ pub unsafe fn set_menu_init(menu: MENU, hook: Menu_Hook) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
-pub unsafe fn set_menu_items(menu: MENU, items: &mut Vec<ITEM>) -> i32 {
+pub unsafe fn set_menu_items(menu: MENU, items: *mut ITEM) -> i32 {
     assert!(!menu.is_null(), "{}set_menu_items() : menu.is_null()", MODULE_PATH);
+    assert!(!items.is_null(), "{}set_menu_items() : items.is_null()", MODULE_PATH);
 
-    items.push(ptr::null_mut());
-    items.shrink_to_fit();
-
-    let rc = bindings::set_menu_items(menu, items.as_mut_ptr());
-
-    items.pop();
-
-    rc
+    bindings::set_menu_items(menu, items)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_mark.3x.html>

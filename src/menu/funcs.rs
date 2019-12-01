@@ -298,16 +298,20 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
     let name = CString::new(name)?;
     let description = CString::new(description)?;
 
-    assert!(name != description, "{}new_item() : name == description", MODULE_PATH);
-
     match unsafe { nmenu::new_item(name.into_raw(), description.into_raw()) } {
         Some(item) => Ok(item),
         None       => Err(menu_function_error_with_rc!("new_item", errno().into()))
     }
 }
 
-pub fn new_menu(items: Vec<ITEM>) -> menu_result!(MENU) {
-    match unsafe { nmenu::new_menu(&mut items.iter().copied().collect()) } {
+pub fn new_menu(items: &Vec<ITEM>) -> menu_result!(MENU) {
+    let item_handles: &mut Vec<ITEM> = &mut items.iter().copied().collect();
+
+    item_handles.push(std::ptr::null_mut());
+
+    //eprintln!("ncursesw::menu::new_menu() items: {:?}", items);
+
+    match unsafe { nmenu::new_menu(items.as_ptr() as *mut ITEM) } {
         Some(menu) => Ok(menu),
         None       => Err(menu_function_error_with_rc!("new_menu", errno().into()))
     }
@@ -413,8 +417,12 @@ pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     }
 }
 
-pub fn set_menu_items(menu: MENU, items: Vec<ITEM>) -> menu_result!(()) {
-    match unsafe { nmenu::set_menu_items(menu, &mut items.iter().copied().collect()) } {
+pub fn set_menu_items(menu: MENU, items: &Vec<ITEM>) -> menu_result!(()) {
+    let item_handles: &mut Vec<ITEM> = &mut items.iter().copied().collect();
+
+    item_handles.push(std::ptr::null_mut());
+
+    match unsafe { nmenu::set_menu_items(menu, item_handles.as_ptr() as *mut ITEM) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_items", rc))
     }
