@@ -11,7 +11,3 @@ curses_version:  ncurses 6.0.20160213
 ncurses_version: 6.1.20180127
 
 The command "cargo run --example ncursesw-version" exited with 0.
-
-## Menu module
-
-The menu module is just for reference at the moment and does not work correctly.

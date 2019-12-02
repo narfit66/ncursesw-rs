@@ -49,7 +49,7 @@ fn menu_test() -> Result<(), NCurseswError> {
     items.push(new_item("Exit", "Exit description")?);
 
     // Crate menu.
-    let my_menu = new_menu(&items)?;
+    let my_menu = new_menu(&mut items)?;
 
     let mut menu_opts = MenuOptions::default();
     menu_opts.set_show_description(true);

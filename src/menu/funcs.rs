@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::ffi::CString;
+use std::{ptr, ffi::CString};
 
 use errno::errno;
 
@@ -304,14 +304,17 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
     }
 }
 
-pub fn new_menu(items: &Vec<ITEM>) -> menu_result!(MENU) {
-    let item_handles: &mut Vec<ITEM> = &mut items.iter().copied().collect();
+pub fn new_menu(items: &mut Vec<ITEM>) -> menu_result!(MENU) {
+    items.push(ptr::null_mut());
+    items.shrink_to_fit();
 
-    item_handles.push(std::ptr::null_mut());
+    //eprintln!("ncursesw::menu::new_menu() items : {:?}", items);
 
-    //eprintln!("ncursesw::menu::new_menu() items: {:?}", items);
+    let menu = unsafe { nmenu::new_menu(items.as_ptr() as *mut ITEM) };
 
-    match unsafe { nmenu::new_menu(items.as_ptr() as *mut ITEM) } {
+    items.pop();
+
+    match menu {
         Some(menu) => Ok(menu),
         None       => Err(menu_function_error_with_rc!("new_menu", errno().into()))
     }
@@ -417,12 +420,15 @@ pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     }
 }
 
-pub fn set_menu_items(menu: MENU, items: &Vec<ITEM>) -> menu_result!(()) {
-    let item_handles: &mut Vec<ITEM> = &mut items.iter().copied().collect();
+pub fn set_menu_items(menu: MENU, items: &mut Vec<ITEM>) -> menu_result!(()) {
+    items.push(ptr::null_mut());
+    items.shrink_to_fit();
 
-    item_handles.push(std::ptr::null_mut());
+    let rc = unsafe { nmenu::set_menu_items(menu, items.as_ptr() as *mut ITEM) };
 
-    match unsafe { nmenu::set_menu_items(menu, item_handles.as_ptr() as *mut ITEM) } {
+    items.pop();
+
+    match rc {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_items", rc))
     }

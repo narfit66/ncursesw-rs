@@ -76,9 +76,9 @@ All features are supported as of ncurses ABI 6.1 including extended color pairs,
 
 Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate safely by not exposing any of the ncurses library raw pointers and by containing them in formalised structures.
 
-## [Documentation](https://narfit66.github.io/ncursesw-rs/ncursesw/index.html)
+## Documentation
 
-This at the moment is only *partial* but the end objective is to document the whole crate/library.
+Please use `cargo doc --open` for this crate for the time being!.
 
 ## License
 

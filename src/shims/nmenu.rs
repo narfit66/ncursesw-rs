@@ -231,11 +231,14 @@ pub unsafe fn menu_items(menu: MENU) -> Option<Vec<ITEM>> {
         if item_count <= 0 {
             None
         } else {
+            /*
             let items = slice::from_raw_parts(ptr, item_count as usize).to_vec();
+
             eprintln!("items: {:?}", items);
 
             Some(items)
-            //Some(slice::from_raw_parts(ptr, item_count as usize).to_vec())
+            */
+            Some(slice::from_raw_parts(ptr, item_count as usize).to_vec())
         }
     }
 }
