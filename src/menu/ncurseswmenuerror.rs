@@ -52,7 +52,7 @@ pub NCurseswMenuError
     NulError { source: ffi::NulError } = "{source}"
 }
 
-pub(in crate::menu) fn ncursesw_menu_error_from_rc(func: &str, err: i32) -> NCurseswMenuError {
+pub fn ncursesw_menu_error_from_rc(func: &str, err: i32) -> NCurseswMenuError {
     let func = func.to_string();
 
     match err {

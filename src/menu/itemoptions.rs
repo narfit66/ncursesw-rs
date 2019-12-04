@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, Into};
-use std::ops::{BitOr, BitXor};
+use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
 
 use menu::ItemOption;
 use shims::constants;

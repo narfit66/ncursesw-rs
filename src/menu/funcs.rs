@@ -28,11 +28,11 @@ use normal;
 
 use cstring::*;
 use shims::{nmenu, ncurses::WINDOW, constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND}};
-use menu::ncurseswmenuerror::{
-    NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
-};
 use menu::{
-    ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr
+    ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr,
+    ncurseswmenuerror::{
+        NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
+    }
 };
 
 pub type MENU = nmenu::MENU;
@@ -308,9 +308,7 @@ pub fn new_menu(items: &mut Vec<ITEM>) -> menu_result!(MENU) {
     items.push(ptr::null_mut());
     items.shrink_to_fit();
 
-    //eprintln!("ncursesw::menu::new_menu() items : {:?}", items);
-
-    let menu = unsafe { nmenu::new_menu(items.as_ptr() as *mut ITEM) };
+    let menu = unsafe { nmenu::new_menu(items.as_mut_ptr() as *mut ITEM) };
 
     items.pop();
 

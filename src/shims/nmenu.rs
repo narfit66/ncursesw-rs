@@ -226,18 +226,11 @@ pub unsafe fn menu_items(menu: MENU) -> Option<Vec<ITEM>> {
     if ptr.is_null() {
         None
     } else {
-        let item_count = item_count(menu);
+        let item_count = bindings::item_count(menu);
 
         if item_count <= 0 {
             None
         } else {
-            /*
-            let items = slice::from_raw_parts(ptr, item_count as usize).to_vec();
-
-            eprintln!("items: {:?}", items);
-
-            Some(items)
-            */
             Some(slice::from_raw_parts(ptr, item_count as usize).to_vec())
         }
     }
@@ -355,8 +348,6 @@ pub unsafe fn new_item(name: *mut i8, description: *mut i8) -> Option<ITEM> {
 /// <https://invisible-island.net/ncurses/man/menu_new.3x.html>
 pub unsafe fn new_menu(items: *mut ITEM) -> Option<MENU> {
     assert!(!items.is_null(), "{}new_menu() : items.is_null()", MODULE_PATH);
-
-    //eprintln!("{}new_menu() items: {:p}", MODULE_PATH, items);
 
     bindings::new_menu(items).as_mut().map(|ptr| ptr as MENU)
 }

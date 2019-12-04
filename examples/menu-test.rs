@@ -31,9 +31,9 @@ fn main() {
 }
 
 fn menu_test() -> Result<(), NCurseswError> {
-    // Initialize curses.
+    // initialize ncurses.
+
     initscr()?;
-    start_color()?;
     cbreak()?;
     noecho()?;
     curs_set(CursorType::Invisible)?;
@@ -69,8 +69,10 @@ fn menu_test() -> Result<(), NCurseswError> {
 
     // Print a border around the main window.
     r#box(my_menu_win, ChtypeChar::from(0), ChtypeChar::from(0))?;
-    mvaddstr(Origin { y: LINES() - 3, x: 0 }, "Press <Enter> to see the option selected")?;
-    mvaddstr(Origin { y: LINES() - 2, x: 0 }, "F1 to exit")?;
+    let mut origin = Origin { y: LINES() - 3, x: 0 };
+    mvaddstr(origin, "Press <Enter> to see the option selected")?;
+    origin.y += 1;
+    mvaddstr(origin, "F1 to exit")?;
     refresh()?;
 
     // Post the menu.
@@ -84,9 +86,11 @@ fn menu_test() -> Result<(), NCurseswError> {
             CharacterResult::Key(KeyBinding::UpArrow)   => menu_driver(my_menu, MenuRequest::UpItem)?,
             CharacterResult::Key(KeyBinding::DownArrow) => menu_driver(my_menu, MenuRequest::DownItem)?,
             CharacterResult::Character('\n')            => { //Enter
-                r#move(Origin { y: 20, x: 0 })?;
+                origin = Origin { y: 20, x: 0 };
+
+                r#move(origin)?;
                 clrtoeol()?;
-                mvaddstr(Origin { y: 20, x: 0 }, &format!("Item selected is : {}", item_name(current_item(my_menu)?)?))?;
+                mvaddstr(origin, &format!("Item selected is : {}", item_name(current_item(my_menu)?)?))?;
                 pos_menu_cursor(my_menu)?;
                 None
             },
@@ -108,8 +112,10 @@ fn menu_test() -> Result<(), NCurseswError> {
         free_item(*item)?;
     }
 
+    // free windows.
     delwin(my_menu_win_der_win)?;
     delwin(my_menu_win)?;
 
+    // end ncurses.
     endwin()
 }
