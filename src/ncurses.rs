@@ -74,23 +74,17 @@ type wint_t = ncurses::wint_t;
 
 /// Return the raw pointer to the current screen.
 pub fn curscr() -> WINDOW {
-    unsafe {
-        ncurses::curscr()
-    }
+    unsafe { ncurses::curscr() }
 }
 
 /// Return the raw pointer to the new screen.
 pub fn newscr() -> WINDOW {
-    unsafe {
-        ncurses::newscr()
-    }
+    unsafe { ncurses::newscr() }
 }
 
 /// Return the raw pointer to the standard screen.
 pub fn stdscr() -> WINDOW {
-    unsafe {
-        ncurses::stdscr()
-    }
+    unsafe { ncurses::stdscr() }
 }
 
 /// Return the number of colors available.
@@ -270,9 +264,7 @@ pub fn COLS() -> i32 {
 /// # }
 /// ```
 pub fn ESCDELAY() -> result!(time::Duration) {
-    let delay = time::Duration::from_millis(u64::try_from(ncurses::ESCDELAY())?);
-
-    Ok(delay)
+    Ok(time::Duration::from_millis(u64::try_from(ncurses::ESCDELAY())?))
 }
 
 /// Return the number of lines (y-axis) available on the terminal.
@@ -1527,10 +1519,7 @@ pub fn curs_set(cursor: CursorType) -> result!(CursorType) {
 }
 
 pub fn curses_version() -> result!(String) {
-    match ncurses::curses_version() {
-        Some(version) => Ok(version),
-        None          => Err(ncurses_function_error!("curses_version"))
-    }
+    ncurses::curses_version().ok_or(ncurses_function_error!("curses_version"))
 }
 
 basic_ncurses_function!(def_prog_mode, "def_prog_mode");
@@ -1570,19 +1559,13 @@ pub fn delscreen(sp: SCREEN) {
 basic_ncurses_function_with_window!(delwin, "delwin");
 
 pub fn derwin(orig: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
-    match unsafe { ncurses::derwin(orig, size.lines, size.columns, origin.y, origin.x) } {
-        None      => Err(ncurses_function_error!("derwin")),
-        Some(win) => Ok(win)
-    }
+    unsafe { ncurses::derwin(orig, size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("derwin"))
 }
 
 basic_ncurses_function!(doupdate, "doupdate");
 
 pub fn dupwin(handle: WINDOW) -> result!(WINDOW) {
-    match unsafe { ncurses::dupwin(handle) } {
-        None         => Err(ncurses_function_error!("dupwin")),
-        Some(handle) => Ok(handle)
-    }
+    unsafe { ncurses::dupwin(handle) }.ok_or(ncurses_function_error!("dupwin"))
 }
 
 basic_ncurses_function!(echo, "echo");
@@ -1695,9 +1678,7 @@ pub fn free_pair<P, T>(color_pair: P) -> result!(())
 }
 
 pub fn get_escdelay() -> result!(time::Duration) {
-    let delay = time::Duration::from_millis(u64::try_from(ncurses::get_escdelay())?);
-
-    Ok(delay)
+    Ok(time::Duration::from_millis(u64::try_from(ncurses::get_escdelay())?))
 }
 
 pub fn get_wch() -> result!(CharacterResult<WideChar>) {
@@ -2111,14 +2092,9 @@ pub fn getwin(path: &path::Path) -> result!(WINDOW) {
         Some(path_str) => {
             let mode = "r";
 
-            unsafe {
-                match crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) {
-                    None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
-                    Some(fp) => match ncurses::getwin(fp) {
-                        None      => Err(ncurses_function_error!("getwin")),
-                        Some(win) => Ok(win)
-                    }
-                }
+            match unsafe { crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) } {
+                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
+                Some(fp) => unsafe { ncurses::getwin(fp) }.ok_or(ncurses_function_error!("getwin"))
             }
         },
         None           => Err(ncurses_function_error!("getwin"))
@@ -2165,9 +2141,7 @@ pub fn hline_set(wch: ComplexChar, number: i32) -> result!(()) {
 }
 
 pub fn idcok(handle: WINDOW, bf: bool) {
-    unsafe {
-        ncurses::idcok(handle, bf)
-    }
+    unsafe { ncurses::idcok(handle, bf) }
 }
 
 pub fn idlok(handle: WINDOW, bf: bool) -> result!(()) {
@@ -2254,7 +2228,7 @@ pub fn inchstr() -> result!(ChtypeString) {
         Err(ncurses_function_error_with_rc!("inchstr", len))
     } else {
         assert!(!ptr.is_null(), "ncursesw::inchstr() : ptr.is_null()");
-        assert!(len> 0 && len <= LINE_MAX as i32, "ncursesw::inchstr() : len={}, LINE_MAX={}", len, LINE_MAX);
+        assert!(len > 0 && len <= LINE_MAX as i32, "ncursesw::inchstr() : len={}, LINE_MAX={}", len, LINE_MAX);
 
         Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
     }
@@ -2338,10 +2312,7 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
 /// also causes the first call to `refresh` to clear the screen. If errors occur, `initscr` writes an
 /// appropriate error message to standard error and exits; otherwise, a pointer is returned to `stdscr`.
 pub fn initscr() -> result!(WINDOW) {
-    match unsafe { ncurses::initscr() } {
-        None      => Err(ncurses_function_error!("initscr")),
-        Some(win) => Ok(win)
-    }
+    unsafe { ncurses::initscr() }.ok_or(ncurses_function_error!("initscr"))
 }
 
 pub fn innstr(number: i32) -> result!(String) {
@@ -2640,9 +2611,7 @@ simple_ncurses_function_with_window_returns_bool!(is_keypad);
 simple_ncurses_function_with_window_returns_bool!(is_leaveok);
 
 pub fn is_linetouched(handle: WINDOW, line: i32) -> bool {
-    unsafe {
-        ncurses::is_linetouched(handle, line)
-    }
+    unsafe { ncurses::is_linetouched(handle, line) }
 }
 
 simple_ncurses_function_with_window_returns_bool!(is_nodelay);
@@ -2676,24 +2645,15 @@ pub fn key_defined(definition: &str) -> result!(KeyBinding) {
 }
 
 pub fn key_name(w: KeyBinding) -> result!(String) {
-    match ncurses::key_name(KeyBinding::into(w)) {
-        None    => Err(ncurses_function_error!("key_name")),
-        Some(s) => Ok(s)
-    }
+    ncurses::key_name(KeyBinding::into(w)).ok_or(ncurses_function_error!("key_name"))
 }
 
 pub fn keybound(keycode: KeyBinding, count: i32) -> result!(String) {
-    match ncurses::keybound(KeyBinding::into(keycode), count) {
-        None    => Err(ncurses_function_error!("keybound")),
-        Some(s) => Ok(s)
-    }
+    ncurses::keybound(KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound"))
 }
 
 pub fn keyname(c: KeyBinding) -> result!(String) {
-    match ncurses::keyname(KeyBinding::into(c)) {
-        None    => Err(ncurses_function_error!("keyname")),
-        Some(s) => Ok(s)
-    }
+    ncurses::keyname(KeyBinding::into(c)).ok_or(ncurses_function_error!("keyname"))
 }
 
 pub fn keyok(keycode: KeyBinding, enable: bool) -> result!(()) {
@@ -2737,10 +2697,7 @@ pub fn leaveok(handle: WINDOW, bf: bool) -> result!(()) {
 }
 
 pub fn longname() -> result!(String) {
-    match ncurses::longname() {
-        None    => Err(ncurses_function_error!("longname")),
-        Some(s) => Ok(s)
-    }
+    ncurses::longname().ok_or(ncurses_function_error!("longname"))
 }
 
 pub fn mcprint(_data: *mut i8, _len: i32) -> i32 {
@@ -4677,21 +4634,20 @@ pub fn napms(ms: time::Duration) -> result!(()) {
 }
 
 pub fn newpad(size: Size) -> result!(WINDOW) {
-    match unsafe { ncurses::newpad(size.lines, size.columns) } {
-        None      => Err(ncurses_function_error!("newpad")),
-        Some(win) => Ok(win)
-    }
+    unsafe { ncurses::newpad(size.lines, size.columns) }.ok_or(ncurses_function_error!("newpad"))
 }
 
-pub fn newterm(_ty: Option<&str>, _outfd: crate::shims::bindings::FILE, _infd: crate::shims::bindings::FILE) -> Option<SCREEN> {
+pub fn newterm(
+    _ty: Option<&str>,
+    _outfd: crate::shims::bindings::FILE,
+    _infd: crate::shims::bindings::FILE
+) -> Option<SCREEN>
+{
     unimplemented!();
 }
 
 pub fn newwin(size: Size, origin: Origin) -> result!(WINDOW) {
-    match unsafe { ncurses::newwin(size.lines, size.columns, origin.y, origin.x) } {
-        None      => Err(ncurses_function_error!("newwin")),
-        Some(win) => Ok(win)
-    }
+    unsafe { ncurses::newwin(size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("newwin"))
 }
 
 basic_ncurses_function!(nl, "nl");
@@ -4784,14 +4740,12 @@ pub fn putwin(handle: WINDOW, path: &path::Path) -> result!(()) {
         Some(path_str) => {
             let mode = "w";
 
-            unsafe {
-                match crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) {
-                    None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
-                    Some(fp) => {
-                        match ncurses::putwin(handle, fp) {
-                            OK => Ok(()),
-                            rc => Err(ncurses_function_error_with_rc!("putwin", rc))
-                        }
+            match unsafe { crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) } {
+                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
+                Some(fp) => {
+                    match unsafe { ncurses::putwin(handle, fp) } {
+                        OK => Ok(()),
+                        rc => Err(ncurses_function_error_with_rc!("putwin", rc))
                     }
                 }
             }
@@ -4894,10 +4848,7 @@ pub fn set_tabsize(size: i32) -> result!(()) {
 }
 
 pub fn set_term(scr: SCREEN) -> result!(SCREEN) {
-    match unsafe { ncurses::set_term(scr) } {
-        None    => Err(ncurses_function_error!("set_term")),
-        Some(s) => Ok(s)
-    }
+    unsafe { ncurses::set_term(scr) }.ok_or(ncurses_function_error!("set_term"))
 }
 
 pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(ComplexChar)
@@ -5007,10 +4958,7 @@ pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
 }
 
 pub fn slk_label(number: i32) -> result!(String) {
-    match ncurses::slk_label(number) {
-        Some(label) => Ok(label),
-        None        => Err(ncurses_function_error!("slk_label"))
-    }
+    ncurses::slk_label(number).ok_or(ncurses_function_error!("slk_label"))
 }
 
 basic_ncurses_function!(slk_noutrefresh, "slk_noutrefresh");
@@ -5042,17 +4990,11 @@ basic_ncurses_function!(standout, "standout");
 basic_ncurses_function!(start_color, "start_color");
 
 pub fn subpad(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
-    match unsafe { ncurses::subpad(handle, size.lines, size.columns, origin.y, origin.x) } {
-        None      => Err(ncurses_function_error!("subpad")),
-        Some(win) => Ok(win)
-    }
+    unsafe { ncurses::subpad(handle, size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("subpad"))
 }
 
 pub fn subwin(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
-    match unsafe { ncurses::subwin(handle, size.lines, size.columns, origin.y, origin.x) } {
-        None         => Err(ncurses_function_error!("subwin")),
-        Some(handle) => Ok(handle)
-    }
+    unsafe { ncurses::subwin(handle, size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("subwin"))
 }
 
 pub fn syncok(handle: WINDOW, bf: bool) -> result!(()) {
@@ -5071,10 +5013,7 @@ pub fn termattrs() -> chtype {
 }
 
 pub fn termname() -> result!(String) {
-    match ncurses::termname() {
-        None    => Err(ncurses_function_error!("termname")),
-        Some(s) => Ok(s)
-    }
+    ncurses::termname().ok_or(ncurses_function_error!("termname"))
 }
 
 pub fn tigetflag(_capname: &str) -> i32 {
@@ -5115,10 +5054,7 @@ pub fn typeahead(_fd: i32) -> i32 {
 }
 
 pub fn unctrl(c: ChtypeChar) -> result!(String) {
-    match ncurses::unctrl(ChtypeChar::into(c)) {
-        Some(s) => Ok(s),
-        None    => Err(ncurses_function_error!("unctrl"))
-    }
+    ncurses::unctrl(ChtypeChar::into(c)).ok_or(ncurses_function_error!("unctrl"))
 }
 
 pub fn unget_wch(ch: WideChar) -> result!(()) {
@@ -6158,9 +6094,7 @@ pub fn wbkgd(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
 /// # }
 /// ```
 pub fn wbkgdset(handle: WINDOW, ch: ChtypeChar) {
-    unsafe {
-        ncurses::wbkgdset(handle, ChtypeChar::into(ch))
-    }
+    unsafe { ncurses::wbkgdset(handle, ChtypeChar::into(ch)) }
 }
 
 /// Set the background property on the given window and then apply this setting to every character position in that window.
@@ -6265,9 +6199,7 @@ pub fn wbkgrnd(handle: WINDOW, wch: ComplexChar) -> result!(()) {
 /// # }
 /// ```
 pub fn wbkgrndset(handle: WINDOW, wch: ComplexChar) {
-    unsafe {
-        ncurses::wbkgrndset(handle, &ComplexChar::into(wch))
-    }
+    unsafe { ncurses::wbkgrndset(handle, &ComplexChar::into(wch)) }
 }
 
 /// Draw a box around the edges of the given window.
@@ -6409,9 +6341,7 @@ pub fn wcolor_set<P, T>(handle: WINDOW, color_pair: P) -> result!(())
 }
 
 pub fn wcursyncup(handle: WINDOW) {
-    unsafe {
-        ncurses::wcursyncup(handle)
-    }
+    unsafe { ncurses::wcursyncup(handle) }
 }
 
 basic_ncurses_function_with_window!(wdelch, "wdelch");
@@ -6620,9 +6550,7 @@ pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
 }
 
 pub fn wgetparent(handle: WINDOW) -> Option<WINDOW> {
-    unsafe {
-        ncurses::wgetparent(handle)
-    }
+    unsafe { ncurses::wgetparent(handle) }
 }
 
 pub fn wgetscrreg(handle: WINDOW) -> result!(Region) {
@@ -7111,23 +7039,17 @@ basic_ncurses_function_with_window!(wstandend, "wstandend");
 basic_ncurses_function_with_window!(wstandout, "wstandout");
 
 pub fn wsyncdown(handle: WINDOW) {
-    unsafe {
-        ncurses::wsyncdown(handle)
-    }
+    unsafe { ncurses::wsyncdown(handle) }
 }
 
 pub fn wsyncup(handle: WINDOW) {
-    unsafe {
-        ncurses::wsyncup(handle)
-    }
+    unsafe { ncurses::wsyncup(handle) }
 }
 
 pub fn wtimeout(handle: WINDOW, ms: time::Duration) -> result!(()) {
     let ms = i32::try_from(ms.as_millis())?;
 
-    unsafe {
-        ncurses::wtimeout(handle, ms);
-    }
+    unsafe { ncurses::wtimeout(handle, ms); }
 
     Ok(())
 }

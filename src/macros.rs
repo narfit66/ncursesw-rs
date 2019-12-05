@@ -38,9 +38,7 @@ macro_rules! simple_ncurses_function {
 macro_rules! simple_ncurses_function_with_window_returns_bool {
     ($func: ident) => {
         pub fn $func(handle: WINDOW) -> bool {
-            unsafe {
-                ncurses::$func(handle)
-            }
+            unsafe { ncurses::$func(handle) }
         }
     }
 }

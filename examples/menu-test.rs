@@ -32,7 +32,6 @@ fn main() {
 
 fn menu_test() -> Result<(), NCurseswError> {
     // initialize ncurses.
-
     initscr()?;
     cbreak()?;
     noecho()?;
@@ -82,19 +81,30 @@ fn menu_test() -> Result<(), NCurseswError> {
     let mut ch = getch()?;
 
     while ch != CharacterResult::Key(KeyBinding::FunctionKey(1)) {
-        let _ = match ch {
-            CharacterResult::Key(KeyBinding::UpArrow)   => menu_driver(my_menu, MenuRequest::UpItem)?,
-            CharacterResult::Key(KeyBinding::DownArrow) => menu_driver(my_menu, MenuRequest::DownItem)?,
-            CharacterResult::Character('\n')            => { //Enter
+        match ch {
+            CharacterResult::Key(KeyBinding::UpArrow)   => {
+                if let Err(source) = menu_driver(my_menu, MenuRequest::UpItem) {
+                    if source != request_denied_error() {
+                        return Err(NCurseswError::from(source))
+                    }
+                }
+            },
+            CharacterResult::Key(KeyBinding::DownArrow) => {
+                if let Err(source) = menu_driver(my_menu, MenuRequest::DownItem) {
+                    if source != request_denied_error() {
+                        return Err(NCurseswError::from(source))
+                    }
+                }
+            },
+            CharacterResult::Character('\n')            => { // Enter
                 origin = Origin { y: 20, x: 0 };
 
                 r#move(origin)?;
                 clrtoeol()?;
                 mvaddstr(origin, &format!("Item selected is : {}", item_name(current_item(my_menu)?)?))?;
                 pos_menu_cursor(my_menu)?;
-                None
             },
-            _   => None
+            _   => { }
         };
 
         wrefresh(my_menu_win)?;
@@ -107,15 +117,19 @@ fn menu_test() -> Result<(), NCurseswError> {
     // Free menu.
     free_menu(my_menu)?;
 
+    // free windows.
+    delwin(my_menu_win_der_win)?;
+    delwin(my_menu_win)?;
+
     // free items.
     for item in items.iter().rev() {
         free_item(*item)?;
     }
 
-    // free windows.
-    delwin(my_menu_win_der_win)?;
-    delwin(my_menu_win)?;
-
     // end ncurses.
     endwin()
+}
+
+fn request_denied_error() -> NCurseswMenuError {
+    NCurseswMenuError::RequestDenied { func: "menu_driver".to_string() }
 }

@@ -32,10 +32,7 @@ pub type PANEL = npanels::PANEL;
 /// the top of the stack (causes it to be displayed above any other panel)
 /// and returns a pointer to the new panel.
 pub fn new_panel(window_handle: WINDOW) -> panels_result!(PANEL) {
-    match unsafe { npanels::new_panel(window_handle) } {
-        None         => Err(panels_function_error!("new_panel")),
-        Some(handle) => Ok(handle)
-    }
+    unsafe { npanels::new_panel(window_handle) }.ok_or(panels_function_error!("new_panel"))
 } 
 
 /// puts panel at the bottom of all panels.
@@ -82,10 +79,7 @@ pub fn hide_panel(handle: PANEL) -> panels_result!(()) {
 
 /// returns a pointer to the window of the given panel.
 pub fn panel_window(handle: PANEL) -> panels_result!(WINDOW) {
-    match unsafe { npanels::panel_window(handle) } {
-        None                => Err(panels_function_error!("panel_window")),
-        Some(window_handle) => Ok(window_handle)
-    }
+    unsafe { npanels::panel_window(handle) }.ok_or(panels_function_error!("panel_window"))
 } 
 
 /// replaces the current window of panel with window (useful, for example if you
@@ -111,28 +105,19 @@ pub fn move_panel(handle: PANEL, origin: Origin) -> panels_result!(()) {
 
 /// returns true if the panel is in the panel stack, false if it is not.
 pub fn panel_hidden(handle: PANEL) -> panels_result!(bool) {
-    match unsafe { npanels::panel_hidden(handle) } {
-        None    => Err(panels_function_error!("panel_hidden")),
-        Some(v) => Ok(v)
-    }
+    unsafe { npanels::panel_hidden(handle) }.ok_or(panels_function_error!("panel_hidden"))
 }
 
 /// returns a pointer to the panel above pan.
 /// If the panel argument is None, it returns a pointer to the bottom panel in the stack.
 pub fn panel_above(handle: Option<PANEL>) -> panels_result!(PANEL) {
-    match unsafe { npanels::panel_above(handle) } {
-        None    => Err(panels_function_error!("panel_above")),
-        Some(p) => Ok(p)
-    }
+    unsafe { npanels::panel_above(handle) }.ok_or(panels_function_error!("panel_above"))
 } 
 
 /// returns a pointer to the panel just below pan.
 /// If the panel argument is None, it returns a pointer to the top panel in the stack.
 pub fn panel_below(handle: Option<PANEL>) -> panels_result!(PANEL) {
-    match unsafe { npanels::panel_below(handle) } {
-        None    => Err(panels_function_error!("panel_below")),
-        Some(p) => Ok(p)
-    }
+    unsafe { npanels::panel_below(handle) }.ok_or(panels_function_error!("panel_below"))
 } 
 
 /// sets the panel's user pointer.
@@ -145,9 +130,7 @@ pub fn set_panel_userptr(handle: PANEL, ptr: PanelUserPtr) -> panels_result!(())
 
 /// returns the user pointer for a given panel.
 pub fn panel_userptr(handle: PANEL) -> PanelUserPtr {
-    unsafe {
-        npanels::panel_userptr(handle)
-    }
+    unsafe { npanels::panel_userptr(handle) }
 }
 
 /// removes the given panel from the stack and deallocates the PANEL structure

@@ -42,10 +42,7 @@ pub type Menu_Hook = crate::shims::bindings::Menu_Hook;
 static MODULE_PATH: &str = "ncursesw::menu::funcs::";
 
 pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
-    match unsafe { nmenu::current_item(menu) } {
-        Some(item) => Ok(item),
-        None       => Err(menu_function_error!("current_item"))
-    }
+    unsafe { nmenu::current_item(menu) }.ok_or(menu_function_error!("current_item"))
 }
 
 pub fn free_item(item: ITEM) -> menu_result!(()) {
@@ -73,10 +70,7 @@ pub fn item_count(menu: MENU) -> menu_result!(i32) {
 }
 
 pub fn item_description(item: ITEM) -> menu_result!(String) {
-    match unsafe { nmenu::item_description(item) } {
-        Some(description) => Ok(description),
-        None              => Err(menu_function_error!("item_description"))
-    }
+    unsafe { nmenu::item_description(item) }.ok_or(menu_function_error!("item_description"))
 }
 
 pub fn item_index(item: ITEM) -> menu_result!(i32) {
@@ -90,23 +84,15 @@ pub fn item_index(item: ITEM) -> menu_result!(i32) {
 } 
 
 pub fn item_init(menu: MENU) -> menu_result!(Menu_Hook) {
-    match unsafe { nmenu::item_init(menu) } {
-        Some(func) => Ok(func),
-        None       => Err(menu_function_error_with_rc!("item_init", errno().into()))
-    }
+    unsafe { nmenu::item_init(menu) }.ok_or(menu_function_error_with_rc!("item_init", errno().into()))
 }
 
 pub fn item_name(item: ITEM) -> menu_result!(String) {
-    match unsafe { nmenu::item_name(item) } {
-        Some(name) => Ok(name),
-        None       => Err(menu_function_error!("item_name"))
-    }
+    unsafe { nmenu::item_name(item) }.ok_or(menu_function_error!("item_name"))
 }
 
 pub fn item_opts(item: ITEM) -> ItemOptions {
-    unsafe {
-        ItemOptions::from(nmenu::item_opts(item))
-    }
+    unsafe { ItemOptions::from(nmenu::item_opts(item)) }
 }
 
 pub fn item_opts_off(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
@@ -124,34 +110,23 @@ pub fn item_opts_on(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
 }
 
 pub fn item_term(menu: MENU) -> menu_result!(Menu_Hook) {
-    match unsafe { nmenu::item_term(menu) } {
-        Some(func) => Ok(func),
-        None       => Err(menu_function_error_with_rc!("item_term", errno().into()))
-    }
+    unsafe { nmenu::item_term(menu) }.ok_or(menu_function_error_with_rc!("item_term", errno().into()))
 }
 
 pub fn item_userptr(item: ITEM) -> MenuUserPtr {
-    unsafe {
-        nmenu::item_userptr(item)
-    }
+    unsafe { nmenu::item_userptr(item) }
 }
 
 pub fn item_value(item: ITEM) -> bool {
-    unsafe {
-        nmenu::item_value(item)
-    }
+    unsafe { nmenu::item_value(item) }
 }
 
 pub fn item_visible(item: ITEM) -> bool {
-    unsafe {
-        nmenu::item_visible(item)
-    }
+    unsafe { nmenu::item_visible(item) }
 }
 
 pub fn menu_back(menu: MENU) -> normal::Attributes {
-    unsafe {
-        normal::Attributes::from(nmenu::menu_back(menu))
-    }
+    unsafe { normal::Attributes::from(nmenu::menu_back(menu)) }
 }
 
 pub fn menu_driver(menu: MENU, request: MenuRequest) -> menu_result!(Option<i32>) {
@@ -170,53 +145,36 @@ pub fn menu_driver(menu: MENU, request: MenuRequest) -> menu_result!(Option<i32>
 }
 
 pub fn menu_fore(menu: MENU) -> normal::Attributes {
-    unsafe {
-        normal::Attributes::from(nmenu::menu_fore(menu))
-    }
+    unsafe { normal::Attributes::from(nmenu::menu_fore(menu)) }
 }
 
 pub fn menu_format(menu: MENU) -> MenuSize {
     let mut rows: [i32; 1] = [0];
     let mut cols: [i32; 1] = [0];
 
-    unsafe {
-        nmenu::menu_format(menu, rows.as_mut_ptr(), cols.as_mut_ptr())
-    };
+    unsafe { nmenu::menu_format(menu, rows.as_mut_ptr(), cols.as_mut_ptr()) };
 
     MenuSize { rows: rows[0], columns: cols[0] }
 }
 
 pub fn menu_grey(menu: MENU) -> normal::Attributes {
-    unsafe {
-        normal::Attributes::from(nmenu::menu_grey(menu))
-    }
+    unsafe { normal::Attributes::from(nmenu::menu_grey(menu)) }
 }
 
 pub fn menu_init(menu: MENU) -> menu_result!(Menu_Hook) {
-    match unsafe { nmenu::menu_init(menu) } {
-        Some(func) => Ok(func),
-        None       => Err(menu_function_error_with_rc!("menu_init", errno().into()))
-    }
+    unsafe { nmenu::menu_init(menu) }.ok_or(menu_function_error_with_rc!("menu_init", errno().into()))
 }
 
 pub fn menu_items(menu: MENU) -> menu_result!(Vec<ITEM>) {
-    match unsafe { nmenu::menu_items(menu) } {
-        Some(items) => Ok(items),
-        None        => Err(menu_function_error!("menu_items"))
-    }
+    unsafe { nmenu::menu_items(menu) }.ok_or(menu_function_error!("menu_items"))
 }
 
 pub fn menu_mark(menu: MENU) -> menu_result!(String) {
-    match unsafe { nmenu::menu_mark(menu) } {
-        Some(mark) => Ok(mark),
-        None       => Err(menu_function_error!("menu_mark"))
-    }
+    unsafe { nmenu::menu_mark(menu) }.ok_or(menu_function_error!("menu_mark"))
 }
 
 pub fn menu_opts(menu: MENU) -> MenuOptions {
-    unsafe {
-        MenuOptions::from(nmenu::menu_opts(menu))
-    }
+    unsafe { MenuOptions::from(nmenu::menu_opts(menu)) }
 }
 
 pub fn menu_opts_off(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
@@ -234,16 +192,11 @@ pub fn menu_opts_on(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 }
 
 pub fn menu_pad(menu: MENU) -> char {
-    unsafe {
-        nmenu::menu_pad(menu) as u8 as char
-    }
+    unsafe { nmenu::menu_pad(menu) as u8 as char }
 }
 
 pub fn menu_pattern(menu: MENU) -> menu_result!(String) {
-    match unsafe { nmenu::menu_pattern(menu) } {
-        Some(pattern) => Ok(pattern),
-        None          => Err(menu_function_error!("menu_pattern"))
-    }
+    unsafe { nmenu::menu_pattern(menu) }.ok_or(menu_function_error!("menu_pattern"))
 }
 
 pub fn menu_request_by_name(name: &str) -> menu_result!(bool) {
@@ -255,10 +208,7 @@ pub fn menu_request_by_name(name: &str) -> menu_result!(bool) {
 }
 
 pub fn menu_request_name(request: i32) -> menu_result!(String) {
-    match unsafe { nmenu::menu_request_name(request) } {
-        Some(name) => Ok(name),
-        None       => Err(menu_function_error_with_rc!("menu_request_name", errno().into()))
-    }
+    unsafe { nmenu::menu_request_name(request) }.ok_or(menu_function_error_with_rc!("menu_request_name", errno().into()))
 }
 
 pub fn menu_spacing(menu: MENU) -> menu_result!(MenuSpacing) {
@@ -273,23 +223,19 @@ pub fn menu_spacing(menu: MENU) -> menu_result!(MenuSpacing) {
 }
 
 pub fn menu_sub(menu: MENU) -> menu_result!(WINDOW) {
-    match unsafe { nmenu::menu_sub(menu) } {
-        Some(win) => Ok(win),
-        None      => Err(menu_function_error!("menu_sub"))
-    }
+    unsafe { nmenu::menu_sub(menu) }.ok_or(menu_function_error!("menu_sub"))
 }
 
 pub fn menu_term(menu: MENU) -> menu_result!(Menu_Hook) {
-    match unsafe { nmenu::menu_term(menu) } {
-        Some(func) => Ok(func),
-        None       => Err(menu_function_error_with_rc!("menu_term", errno().into()))
-    }
+    unsafe { nmenu::menu_term(menu) }.ok_or(menu_function_error_with_rc!("menu_term", errno().into()))
 }
 
 pub fn menu_userptr(menu: MENU) -> MenuUserPtr {
-    unsafe {
-        nmenu::menu_userptr(menu)
-    }
+    unsafe { nmenu::menu_userptr(menu) }
+}
+
+pub fn menu_win(menu: MENU) -> menu_result!(WINDOW) {
+    unsafe { nmenu::menu_win(menu) }.ok_or(menu_function_error!("menu_win"))
 }
 
 pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
@@ -298,24 +244,18 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
     let name = CString::new(name)?;
     let description = CString::new(description)?;
 
-    match unsafe { nmenu::new_item(name.into_raw(), description.into_raw()) } {
-        Some(item) => Ok(item),
-        None       => Err(menu_function_error_with_rc!("new_item", errno().into()))
-    }
+    unsafe { nmenu::new_item(name.into_raw(), description.into_raw()) }.ok_or(menu_function_error_with_rc!("new_item", errno().into()))
 }
 
-pub fn new_menu(items: &mut Vec<ITEM>) -> menu_result!(MENU) {
-    items.push(ptr::null_mut());
-    items.shrink_to_fit();
+pub fn new_menu(item_handles: &mut Vec<ITEM>) -> menu_result!(MENU) {
+    item_handles.push(ptr::null_mut());
+    item_handles.shrink_to_fit();
 
-    let menu = unsafe { nmenu::new_menu(items.as_mut_ptr() as *mut ITEM) };
+    let menu = unsafe { nmenu::new_menu(item_handles.as_mut_ptr() as *mut ITEM) };
 
-    items.pop();
+    item_handles.pop();
 
-    match menu {
-        Some(menu) => Ok(menu),
-        None       => Err(menu_function_error_with_rc!("new_menu", errno().into()))
-    }
+    menu.ok_or(menu_function_error_with_rc!("new_menu", errno().into()))
 }
 
 pub fn pos_menu_cursor(menu: MENU) -> menu_result!(()) {
@@ -371,9 +311,7 @@ pub fn set_item_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 pub fn set_item_userptr(item: ITEM, userptr: MenuUserPtr) {
-    unsafe {
-        nmenu::set_item_userptr(item, userptr)
-    };
+    unsafe { nmenu::set_item_userptr(item, userptr) };
 }
 
 pub fn set_item_value(item: ITEM, value: bool) -> menu_result!(()) {
@@ -418,13 +356,13 @@ pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
     }
 }
 
-pub fn set_menu_items(menu: MENU, items: &mut Vec<ITEM>) -> menu_result!(()) {
-    items.push(ptr::null_mut());
-    items.shrink_to_fit();
+pub fn set_menu_items(menu: MENU, item_handles: &mut Vec<ITEM>) -> menu_result!(()) {
+    item_handles.push(ptr::null_mut());
+    item_handles.shrink_to_fit();
 
-    let rc = unsafe { nmenu::set_menu_items(menu, items.as_ptr() as *mut ITEM) };
+    let rc = unsafe { nmenu::set_menu_items(menu, item_handles.as_ptr() as *mut ITEM) };
 
-    items.pop();
+    item_handles.pop();
 
     match rc {
         E_OK => Ok(()),
@@ -491,9 +429,7 @@ pub fn set_menu_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 pub fn set_menu_userptr(menu: MENU, userptr: MenuUserPtr) {
-    unsafe {
-        nmenu::set_menu_userptr(menu, userptr)
-    };
+    unsafe { nmenu::set_menu_userptr(menu, userptr) };
 }
 
 pub fn set_menu_win(menu: Option<MENU>, win: Option<WINDOW>) -> menu_result!(()) {
@@ -513,9 +449,7 @@ pub fn set_top_row(menu: MENU, row: i32) -> menu_result!(()) {
 }
 
 pub fn top_row(menu: MENU) -> i32 {
-    unsafe {
-        nmenu::top_row(menu)
-    }
+    unsafe { nmenu::top_row(menu) }
 }
 
 pub fn unpost_menu(menu: MENU) -> menu_result!(()) {
