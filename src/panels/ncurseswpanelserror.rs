@@ -26,3 +26,12 @@ custom_error::custom_error! {
 pub NCurseswPanelsError
     LibraryError { func: String, rc: i32 } = "npanels::{func}() (#{rc})"
 }
+
+impl PartialEq for NCurseswPanelsError {
+    fn eq(&self, rhs: &Self) -> bool {
+        // TODO: must be a better way of doing this!!!
+        format!("{}", self) == format!("{}", rhs)
+    }
+}
+
+impl Eq for NCurseswPanelsError { }

@@ -52,6 +52,15 @@ pub NCurseswMenuError
     NulError { source: ffi::NulError } = "{source}"
 }
 
+impl PartialEq for NCurseswMenuError {
+    fn eq(&self, rhs: &Self) -> bool {
+        // TODO: must be a better way of doing this!!!
+        format!("{}", self) == format!("{}", rhs)
+    }
+}
+
+impl Eq for NCurseswMenuError { }
+
 pub fn ncursesw_menu_error_from_rc(func: &str, err: i32) -> NCurseswMenuError {
     let func = func.to_string();
 

@@ -49,3 +49,12 @@ pub NCurseswError
 
     FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
 }
+
+impl PartialEq for NCurseswError {
+    fn eq(&self, rhs: &Self) -> bool {
+        // TODO: must be a better way of doing this!!!
+        format!("{}", self) == format!("{}", rhs)
+    }
+}
+
+impl Eq for NCurseswError { }
