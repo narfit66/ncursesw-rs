@@ -28,18 +28,12 @@ pub trait FromCStr {
 
 impl FromCStr for String {
     unsafe fn from_c_str(ptr: *const libc::c_char) -> Self {
-        let bytes = ffi::CStr::from_ptr(ptr).to_bytes();
-
-        String::from_utf8_unchecked(bytes.to_vec())
+        String::from_utf8_unchecked(ffi::CStr::from_ptr(ptr).to_bytes().to_vec())
     }
 }
 
 impl FromCStr for Option<String> {
     unsafe fn from_c_str(ptr: *const libc::c_char) -> Self {
-        if ptr.is_null() {
-            None
-        } else {
-            Some(FromCStr::from_c_str(ptr))
-        }
+        (ptr as *mut libc::c_char).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
     }
 }

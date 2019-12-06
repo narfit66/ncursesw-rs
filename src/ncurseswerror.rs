@@ -28,6 +28,7 @@ use crate::{
 
 custom_error::custom_error! {
 /// NCursesw Errors/Events.
+#[derive(PartialEq, Eq)]
 pub NCurseswError
     LibraryError { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
     InterruptedCall = "interrupted system call (EINTR)",
@@ -49,12 +50,3 @@ pub NCurseswError
 
     FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
 }
-
-impl PartialEq for NCurseswError {
-    fn eq(&self, rhs: &Self) -> bool {
-        // TODO: must be a better way of doing this!!!
-        format!("{}", self) == format!("{}", rhs)
-    }
-}
-
-impl Eq for NCurseswError { }

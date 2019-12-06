@@ -24,16 +24,8 @@ use std::num;
 
 custom_error::custom_error! {
 /// NCursesw mouse errors.
+#[derive(PartialEq, Eq)]
 pub NCurseswMouseError
     LibraryError { func: String, rc: i32 } = "nmouse::{func}() (#{rc})",
     IntError { source: num::TryFromIntError } = "{source}"
 }
-
-impl PartialEq for NCurseswMouseError {
-    fn eq(&self, rhs: &Self) -> bool {
-        // TODO: must be a better way of doing this!!!
-        format!("{}", self) == format!("{}", rhs)
-    }
-}
-
-impl Eq for NCurseswMouseError { }
