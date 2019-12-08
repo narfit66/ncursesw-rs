@@ -25,7 +25,7 @@
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
-use std::{mem, slice, ffi::{CStr, CString}};
+use std::{mem, slice, ffi::CStr};
 
 use shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::WINDOW};
 use cstring::FromCStr;
@@ -46,20 +46,6 @@ pub unsafe fn current_item(menu: MENU) -> Option<ITEM> {
 /// <https://invisible-island.net/ncurses/man/mitem_new.3x.html>
 pub unsafe fn free_item(item: ITEM) -> i32 {
     assert!(!item.is_null(), "{}free_item() : item.is_null()", MODULE_PATH);
-
-    // if an item name has been defined (and it should be!) then unallocate it.
-    let name = bindings::item_name(item) as *mut i8;
-
-    if !name.is_null() {
-        let _ = CString::from_raw(name);
-    }
-
-    // if an item description has been defined (and it should be!) then unallocate it.
-    let desc = bindings::item_description(item) as *mut i8;
-
-    if !desc.is_null() {
-        let _ = CString::from_raw(desc);
-    }
 
     bindings::free_item(item)
 }

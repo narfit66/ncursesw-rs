@@ -27,7 +27,7 @@ use errno::errno;
 use normal;
 
 use cstring::*;
-use shims::{nmenu, ncurses::WINDOW, constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND}};
+use shims::{nmenu, bindings, ncurses::WINDOW, constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND}};
 use menu::{
     ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr,
     ncurseswmenuerror::{
@@ -46,12 +46,32 @@ pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
 }
 
 pub fn free_item(item: ITEM) -> menu_result!(()) {
+    assert!(!item.is_null(), "{}free_item() : item.is_null()", MODULE_PATH);
+
+    unsafe {
+        // if an item name has been defined (and it should be!) then unallocate it.
+        let name = bindings::item_name(item) as *mut i8;
+
+        if !name.is_null() {
+            let _ = CString::from_raw(name);
+        }
+
+        // if an item description has been defined (and it should be!) then unallocate it.
+        let desc = bindings::item_description(item) as *mut i8;
+
+        if !desc.is_null() {
+            let _ = CString::from_raw(desc);
+        }
+    }
+
     match unsafe { nmenu::free_item(item) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("free_item", rc))
     }
 }
 
+// make sure that free_menu() is called before free_item() otherwise the
+// item will still be connected to the menu.
 pub fn free_menu(menu: MENU) -> menu_result!(()) {
     match unsafe { nmenu::free_menu(menu) } {
         E_OK => Ok(()),
@@ -247,6 +267,14 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
     unsafe { nmenu::new_item(name, description) }.ok_or_else(|| menu_function_error_with_rc!("new_item", errno().into()))
 }
 
+// when new_menu() is called make sure that the memory for the item_handles
+// does not go out of scope until after free_menu() has been called otherwise
+// unpredicable results may occur.
+// See ncursesw-win-rs's Menu::new() <https://github.com/narfit66/ncursesw-win-rs/blob/master/src/menu/menu.rs>
+// as an example of how the extern "C" bindings::new_menu() function should
+// be called which bypasses this function and calls nmenu::new_menu() directly
+// (althought you could also call tis function directly as long as the underlying
+// memory does not go out of scope).
 pub fn new_menu(item_handles: &mut Vec<ITEM>) -> menu_result!(MENU) {
     item_handles.push(ptr::null_mut());
     item_handles.shrink_to_fit();
