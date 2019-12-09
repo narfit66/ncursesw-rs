@@ -49,14 +49,14 @@ pub fn free_item(item: ITEM) -> menu_result!(()) {
     assert!(!item.is_null(), "{}free_item() : item.is_null()", MODULE_PATH);
 
     unsafe {
-        // if an item name has been defined (and it should be!) then unallocate it.
+        // if an item name has been defined (and it should be!) then unallocate (consume) it.
         let name = bindings::item_name(item) as *mut i8;
 
         if !name.is_null() {
             let _ = CString::from_raw(name);
         }
 
-        // if an item description has been defined (and it should be!) then unallocate it.
+        // if an item description has been defined (and it should be!) then unallocate (consume) it.
         let desc = bindings::item_description(item) as *mut i8;
 
         if !desc.is_null() {
@@ -268,13 +268,15 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 }
 
 // when new_menu() is called make sure that the memory for the item_handles
-// does not go out of scope until after free_menu() has been called otherwise
-// unpredicable results may occur.
+// is contiguous and does not go out of scope until after free_menu() has
+// been called otherwise unpredicable results may occur, this is because the
+// underlying ncurses menu function use this memory directly.
 // See ncursesw-win-rs's Menu::new() <https://github.com/narfit66/ncursesw-win-rs/blob/master/src/menu/menu.rs>
-// as an example of how the extern "C" bindings::new_menu() function should
-// be called which bypasses this function and calls nmenu::new_menu() directly
-// (althought you could also call tis function directly as long as the underlying
-// memory does not go out of scope).
+// as an example of how the extern "C" bindings::new_menu() function can be
+// called by allocating and keeping the memory required but bypasses this
+// function and calling nmenu::new_menu() directly (although you could also
+// call this function directly as long as the underlying memory does not
+// go out of scope).
 pub fn new_menu(item_handles: &mut Vec<ITEM>) -> menu_result!(MENU) {
     item_handles.push(ptr::null_mut());
     item_handles.shrink_to_fit();

@@ -3,11 +3,11 @@ ncursesw [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=
 
 This is a *fat* wrapper around the ncurses TUI library, it's purpose is too make the ncurses functionally safe to use but please be aware that there are certian functions within the native ncurses library that are inheritenly unsafe and under certian circumstances can cause unpredictable results, these functions have been implemented and can be called but have been marked as *depreciated* as of version 0.1.2/0.1.3.
 
-This crate supports ncurses ABI 6 and above.
+This crate supports ncurses ABI 6.1 and above.
 
 There are actually three layers of ncurses functions exposed within this library, the raw `unsafe` functions that are generated with `bindgen` which are available in `ncursesw::shims::bindings`, a layer above this which again are mainly `unsafe` but protect the calling code to a certian degree with assetions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are in the whole left as per the bindgen version), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu}`. Last but not least there are the safe (within the limits of ncurses itself) functions in `ncursesw` and `ncursesw::{menu, mouse, panels}` which retain thier original ncurses names but have been rustified.
 
-ncurses modules implemented and rustified so far are the main ncurses library, mouse (version 2 only), panels and menu, but there are no plans at the moment to implement the forms module.
+ncurses modules implemented and rustified so far are the main ncurses library, mouse (version 2 only), panels and menu, the forms module will be implemented in the near future.
 
 There is a companion crate which acts as a wrapper around this crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which abstracts away the raw pointers that ncurses uses and functions in a more safe way, however a knowledge of how ncurses works is advised to use the true power of this library.
 
@@ -74,7 +74,7 @@ use ncursesw::menu::*;
 
 All features are supported as of ncurses ABI 6.1 including extended color pairs, soft labels, ripoff lines, panels, mouse and menus, i would suggest examining ncurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html) and [menu](https://invisible-island.net/ncurses/man/menu.3x.html) documentation, if you get the chance have a read of the book `Dan Gookin's Guide to Ncurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
 
-Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate safely by not exposing any of the ncurses library raw pointers and by containing them in formalised structures.
+Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate safely by not exposing any of the ncurses library raw pointers and by encapsulating them in formalised structures.
 
 ## Documentation
 
