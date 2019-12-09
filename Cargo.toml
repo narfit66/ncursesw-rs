@@ -16,7 +16,7 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 libc = "0.2"
-errno = "*"
+errno = "0.2"
 custom_error = "1.7"
 ascii = "1.0"
 semver = "0.9"
