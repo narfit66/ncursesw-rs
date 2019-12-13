@@ -60,7 +60,7 @@ impl Default for MenuOptions {
     }
 }
 
-/// Implement the | operator for adding Attributes to Attributes
+/// Implement the | operator for adding ItemOptions to ItemOptions
 impl BitOr for MenuOptions {
     type Output = Self;
 
@@ -69,7 +69,7 @@ impl BitOr for MenuOptions {
     }
 }
 
-/// Implement the ^ operator for removing Attributes from Attributes
+/// Implement the ^ operator for removing ItemOptions from ItemOptions
 impl BitXor for MenuOptions {
     type Output = Self;
 
@@ -78,7 +78,7 @@ impl BitXor for MenuOptions {
     }
 }
 
-/// Implement the | operator for adding an Attribute to Attributes
+/// Implement the | operator for adding an ItemOption to ItemOptions
 impl BitOr<MenuOption> for MenuOptions {
     type Output = Self;
 
@@ -97,7 +97,7 @@ impl BitOr<MenuOption> for MenuOptions {
     }
 }
 
-/// Implement the ^ operator for disabling an Attribute from Attributes
+/// Implement the ^ operator for disabling an ItemOption from ItemOptions
 impl BitXor<MenuOption> for MenuOptions {
     type Output = Self;
 

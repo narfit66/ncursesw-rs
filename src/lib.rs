@@ -36,6 +36,8 @@ mod macros;
 pub mod extend;
 /// Compiled in `ncursesw` features
 pub mod features;
+/// ncurses Form module
+pub mod form;
 /// Traits used by `ncursesw`
 mod gen;
 /// Normal color's, color pairs and attributes module

@@ -26,6 +26,7 @@ macro_rules! result { ($type: ty) => { Result<$type, NCurseswError> } }
 macro_rules! panels_result { ($type: ty) => { Result<$type, NCurseswPanelsError> } }
 macro_rules! mouse_result { ($type: ty) => { Result<$type, NCurseswMouseError> } }
 macro_rules! menu_result { ($type: ty) => { Result<$type, NCurseswMenuError> } }
+macro_rules! form_result { ($type: ty) => { Result<$type, NCurseswFormError> } }
 
 macro_rules! simple_ncurses_function {
     ($func: ident) => {
@@ -76,6 +77,9 @@ macro_rules! mouse_function_error_with_rc { ($func: expr, $rc: expr) => { NCurse
 
 macro_rules! menu_function_error { ($func: expr) => { ncursesw_menu_error_system_error($func) } }
 macro_rules! menu_function_error_with_rc { ($func: expr, $rc: expr) => { ncursesw_menu_error_from_rc($func, $rc) } }
+
+macro_rules! form_function_error { ($func: expr) => { ncursesw_form_error_system_error($func) } }
+macro_rules! form_function_error_with_rc { ($func: expr, $rc: expr) => { ncursesw_form_error_from_rc($func, $rc) } }
 
 macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type = bindings::$name as $type; } }
 

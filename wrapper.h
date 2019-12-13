@@ -28,6 +28,7 @@
 #include <ncurses.h>
 #include <panel.h>
 #include <menu.h>
+#include <form.h>
 
 // Workaround for rust-bindgen#753
 #define MARK_FIX_753(req_name, type) const type Fix753_##req_name = req_name;

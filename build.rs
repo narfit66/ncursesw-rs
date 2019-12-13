@@ -23,9 +23,9 @@
 extern crate bindgen;
 extern crate pkg_config;
 
+use std::{env, path::PathBuf};
+
 use pkg_config::Library;
-use std::env;
-use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Fix753 { }
@@ -48,19 +48,23 @@ fn find_library(name: &str) -> Option<Library> {
 fn main() {
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
 
-    find_library("menuw");
     find_library("panelw");
+    find_library("menuw");
+    find_library("formw");
     find_library("ncursesw");
 
     //
 
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")                    // 'c' header file
+        // NCurses core functions
         .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
+        // NCurses menu types.
         .blacklist_type("ITEM")                 // blacklisted to implement our own type
         .blacklist_type("MENU")                 // blacklisted to implement our own type
         .blacklist_type("Menu_Hook")            // blacklisted to implement our own type
+        // NCurses menu functions.
         .blacklist_function("item_init")        // blacklisted to implement our own function
         .blacklist_function("item_term")        // blacklisted to implement our own function
         .blacklist_function("menu_init")        // blacklisted to implement our own function
@@ -69,6 +73,9 @@ fn main() {
         .blacklist_function("set_item_term")    // blacklisted to implement our own function
         .blacklist_function("set_menu_init")    // blacklisted to implement our own function
         .blacklist_function("set_menu_term")    // blacklisted to implement our own function
+        // NCurses form types.
+        // NCurses form functions.
+        //
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding
         .expect("Unable to generate bindings");

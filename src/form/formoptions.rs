@@ -1,5 +1,5 @@
 /*
-    src/menu/itemoptions.rs
+    src/form/formoptions.rs
 
     Copyright (c) 2019 Stephen Whittle  All rights reserved.
 
@@ -22,28 +22,31 @@
 
 use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
 
-use menu::ItemOption;
+use form::FormOption;
 use shims::constants;
 
-/// Menu item options.
+/// Form options.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct ItemOptions {
+pub struct FormOptions {
     raw: i32
 }
 
-impl ItemOptions {
-    option_getter!(is_selectable, O_SELECTABLE);
-    option_setter!(set_selectable, O_SELECTABLE);
+impl FormOptions {
+    option_getter!(is_newline_overload, O_NL_OVERLOAD);
+    option_setter!(set_newline_overload, O_NL_OVERLOAD);
+
+    option_getter!(is_backspace_overload, O_BS_OVERLOAD);
+    option_setter!(set_backspace_overload, O_BS_OVERLOAD);
 }
 
-impl Default for ItemOptions {
+impl Default for FormOptions {
     fn default() -> Self {
         Self { raw: 0 }
     }
 }
 
-/// Implement the | operator for adding ItemOptions to ItemOptions
-impl BitOr for ItemOptions {
+/// Implement the | operator for adding FormOption to FormOptions
+impl BitOr for FormOptions {
     type Output = Self;
 
     fn bitor(self, rhs: Self) -> Self::Output {
@@ -51,8 +54,8 @@ impl BitOr for ItemOptions {
     }
 }
 
-/// Implement the ^ operator for removing ItemOptions from ItemOptions
-impl BitXor for ItemOptions {
+/// Implement the ^ operator for removing FormOption from FormOptions
+impl BitXor for FormOptions {
     type Output = Self;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
@@ -60,45 +63,47 @@ impl BitXor for ItemOptions {
     }
 }
 
-/// Implement the | operator for adding an ItemOption to ItemOptions
-impl BitOr<ItemOption> for ItemOptions {
+/// Implement the | operator for adding an FormOption to FormOptions
+impl BitOr<FormOption> for FormOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: ItemOption) -> Self::Output {
+    fn bitor(mut self, rhs: FormOption) -> Self::Output {
         match rhs {
-            ItemOption::Selectable => self.set_selectable(true)
+            FormOption::NewlineOverload => self.set_newline_overload(true),
+            FormOption::BackspaceOverload => self.set_backspace_overload(true)
         }
 
         self
     }
 }
 
-/// Implement the ^ operator for disabling an ItemOption from ItemOptions
-impl BitXor<ItemOption> for ItemOptions {
+/// Implement the ^ operator for disabling an FormOption from FormOptions
+impl BitXor<FormOption> for FormOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: ItemOption) -> Self::Output {
+    fn bitxor(mut self, rhs: FormOption) -> Self::Output {
         match rhs {
-            ItemOption::Selectable => self.set_selectable(false)
+            FormOption::NewlineOverload => self.set_newline_overload(false),
+            FormOption::BackspaceOverload => self.set_backspace_overload(false)
         }
 
         self
     }
 }
 
-impl From<ItemOption> for ItemOptions {
-    fn from(item_option: ItemOption) -> Self {
-        Self::default() | item_option
+impl From<FormOption> for FormOptions {
+    fn from(form_option: FormOption) -> Self {
+        Self::default() | form_option
     }
 }
 
-impl From<i32> for ItemOptions {
+impl From<i32> for FormOptions {
     fn from(raw: i32) -> Self {
         Self { raw }
     }
 }
 
-impl Into<i32> for ItemOptions {
+impl Into<i32> for FormOptions {
     fn into(self) -> i32 {
         self.raw
     }

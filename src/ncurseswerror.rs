@@ -23,7 +23,7 @@
 use std::{num, char, ffi};
 use crate::{
     COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
-    menu::NCurseswMenuError
+    menu::NCurseswMenuError, form::NCurseswFormError
 };
 
 custom_error::custom_error! {
@@ -47,6 +47,7 @@ pub NCurseswError
     PanelsError { source: NCurseswPanelsError } = "{source}",
     MouseError { source: NCurseswMouseError } = "{source}",
     MenuError { source: NCurseswMenuError } = "{source}",
+    FormError { source: NCurseswFormError } = "{source}",
 
     FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
 }

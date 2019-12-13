@@ -2,9 +2,14 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
+## [0.4.1] - ????.??.?? [BC]
+- NCurses form module implemented as `ncursesw::form`.
+- `ncursesw::menu::menu_request_name()` now takes a `MenuRequest` instead of `i32`. [BC]
+- `ncursesw::menu::set_menu_pad()` now takes a `char` instead of `i32`. [BC]
+
 ## [0.4.0] - 2019-12-09 [BC]
 - NCurses menu module implemented as `ncursesw::menu`.
-- Minor API changes [BC]
+- Minor API changes. [BC]
 - NCurses panels module functions are now correctly linked to.
 
 ## [0.3.2] - 2019-11-02

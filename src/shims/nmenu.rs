@@ -359,6 +359,9 @@ pub unsafe fn set_item_term(menu: MENU, hook: Menu_Hook) -> i32 {
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
 pub unsafe fn set_item_userptr(item: ITEM, userptr: Option<MENU_USERPTR>) -> i32 {
     assert!(!item.is_null(), "{}set_item_userptr() : item.is_null()", MODULE_PATH);
+    if let Some(userptr) = userptr {
+        assert!(!userptr.is_null(), "{}set_item_userptr() : userptr.is_null()", MODULE_PATH);
+    }
 
     bindings::set_item_userptr(item, return_mut_ptr!(userptr))
 }
@@ -477,6 +480,9 @@ pub unsafe fn set_menu_term(menu: MENU, hook: Menu_Hook) -> i32 {
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>
 pub unsafe fn set_menu_userptr(menu: MENU, userptr: Option<MENU_USERPTR>) -> i32 {
     assert!(!menu.is_null(), "{}set_menu_userptr() : menu.is_null()", MODULE_PATH);
+    if let Some(userptr) = userptr {
+        assert!(!userptr.is_null(), "{}set_menu_userptr() : userptr.is_null()", MODULE_PATH);
+    }
 
     bindings::set_menu_userptr(menu, return_mut_ptr!(userptr))
 }

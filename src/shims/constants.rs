@@ -242,7 +242,7 @@ wrap_const!(A_VERTICAL: attr_t);
 pub const A_ITALIC: attr_t = ((1 as attr_t) << 31);
 //wrap_const!(A_ITALIC: attr_t);
 
-// Menu Errors.
+// Menu/Form Errors.
 wrap_const!(E_BAD_ARGUMENT: i32);
 wrap_const!(E_BAD_STATE: i32);
 wrap_const!(E_CONNECTED: i32);
@@ -289,3 +289,96 @@ wrap_const!(REQ_PREV_MATCH: i32);
 
 wrap_const!(MIN_MENU_COMMAND: i32);
 wrap_const!(MAX_MENU_COMMAND: i32);
+
+
+// Form.
+
+/* field justification */
+wrap_const!(NO_JUSTIFICATION: i32);
+wrap_const!(JUSTIFY_LEFT: i32);
+wrap_const!(JUSTIFY_CENTER: i32);
+wrap_const!(JUSTIFY_RIGHT: i32);
+
+/* field options */
+wrap_const!(O_VISIBLE: i32);
+wrap_const!(O_ACTIVE: i32);
+wrap_const!(O_PUBLIC: i32);
+wrap_const!(O_EDIT: i32);
+wrap_const!(O_WRAP: i32);
+wrap_const!(O_BLANK: i32);
+wrap_const!(O_AUTOSKIP: i32);
+wrap_const!(O_NULLOK: i32);
+wrap_const!(O_PASSOK: i32);
+wrap_const!(O_STATIC: i32);
+wrap_const!(O_DYNAMIC_JUSTIFY: i32);
+wrap_const!(O_NO_LEFT_STRIP: i32);
+
+/* form options */
+wrap_const!(O_NL_OVERLOAD: i32);
+wrap_const!(O_BS_OVERLOAD: i32);
+
+/* form driver commands */
+wrap_const!(REQ_NEXT_PAGE: i32);	// move to next page
+wrap_const!(REQ_PREV_PAGE: i32);	// move to previous page
+wrap_const!(REQ_FIRST_PAGE: i32);	// move to first page
+wrap_const!(REQ_LAST_PAGE: i32);	// move to last page
+
+wrap_const!(REQ_NEXT_FIELD: i32);	// move to next field
+wrap_const!(REQ_PREV_FIELD: i32);	// move to previous field
+wrap_const!(REQ_FIRST_FIELD: i32);	// move to first field
+wrap_const!(REQ_LAST_FIELD: i32);	// move to last field
+wrap_const!(REQ_SNEXT_FIELD: i32);	// move to sorted next field
+wrap_const!(REQ_SPREV_FIELD: i32);	// move to sorted prev field
+wrap_const!(REQ_SFIRST_FIELD: i32); // move to sorted first field
+wrap_const!(REQ_SLAST_FIELD: i32);	// move to sorted last field
+wrap_const!(REQ_LEFT_FIELD: i32);	// move to left to field
+wrap_const!(REQ_RIGHT_FIELD: i32);  // move to right to field
+wrap_const!(REQ_UP_FIELD: i32);     // move to up to field
+wrap_const!(REQ_DOWN_FIELD: i32);   // move to down to field
+
+wrap_const!(REQ_NEXT_CHAR: i32);	// move to next char in field
+wrap_const!(REQ_PREV_CHAR: i32);	// move to prev char in field
+wrap_const!(REQ_NEXT_LINE: i32);	// move to next line in field
+wrap_const!(REQ_PREV_LINE: i32);	// move to prev line in field
+wrap_const!(REQ_NEXT_WORD: i32);	// move to next word in field
+wrap_const!(REQ_PREV_WORD: i32);	// move to prev word in field
+wrap_const!(REQ_BEG_FIELD: i32);	// move to first char in field
+wrap_const!(REQ_END_FIELD: i32);	// move after last char in field
+wrap_const!(REQ_BEG_LINE: i32);     // move to beginning of line
+wrap_const!(REQ_END_LINE: i32);     // move after last char in line
+wrap_const!(REQ_LEFT_CHAR: i32);	// move left in field
+wrap_const!(REQ_RIGHT_CHAR: i32);	// move right in field
+wrap_const!(REQ_UP_CHAR: i32);      // move up in field
+wrap_const!(REQ_DOWN_CHAR: i32);	// move down in field
+
+wrap_const!(REQ_NEW_LINE: i32);     // insert/overlay new line
+wrap_const!(REQ_INS_CHAR: i32);     // insert blank char at cursor
+wrap_const!(REQ_INS_LINE: i32);     // insert blank line at cursor
+wrap_const!(REQ_DEL_CHAR: i32);     // delete char at cursor
+wrap_const!(REQ_DEL_PREV: i32);     // delete char before cursor
+wrap_const!(REQ_DEL_LINE: i32);     // delete line at cursor
+wrap_const!(REQ_DEL_WORD: i32);     // delete word at cursor
+wrap_const!(REQ_CLR_EOL: i32);      // clear to end of line
+wrap_const!(REQ_CLR_EOF: i32);      // clear to end of field
+wrap_const!(REQ_CLR_FIELD: i32);	// clear entire field
+wrap_const!(REQ_OVL_MODE: i32);     // begin overlay mode
+wrap_const!(REQ_INS_MODE: i32);     // begin insert mode
+wrap_const!(REQ_SCR_FLINE: i32);	// scroll field forward a line
+wrap_const!(REQ_SCR_BLINE: i32);	// scroll field backward a line
+wrap_const!(REQ_SCR_FPAGE: i32);	// scroll field forward a page
+wrap_const!(REQ_SCR_BPAGE: i32);	// scroll field backward a page
+wrap_const!(REQ_SCR_FHPAGE: i32);	// scroll field forward	 half page
+wrap_const!(REQ_SCR_BHPAGE: i32);	// scroll field backward half page
+wrap_const!(REQ_SCR_FCHAR: i32);	// horizontal scroll char
+wrap_const!(REQ_SCR_BCHAR: i32);	// horizontal scroll char
+wrap_const!(REQ_SCR_HFLINE: i32);	// horizontal scroll line
+wrap_const!(REQ_SCR_HBLINE: i32);   // horizontal scroll line
+wrap_const!(REQ_SCR_HFHALF: i32);   // horizontal scroll half line
+wrap_const!(REQ_SCR_HBHALF: i32);   // horizontal scroll half line
+
+wrap_const!(REQ_VALIDATION: i32);	// validate field
+wrap_const!(REQ_NEXT_CHOICE: i32);	// display next field choice
+wrap_const!(REQ_PREV_CHOICE: i32);	// display prev field choice
+
+wrap_const!(MIN_FORM_COMMAND: i32);	// used by form_driver
+wrap_const!(MAX_FORM_COMMAND: i32);	// used by form_driver
