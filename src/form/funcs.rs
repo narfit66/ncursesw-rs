@@ -250,8 +250,8 @@ pub fn form_request_by_name(name: &str) -> form_result!(bool) {
     }
 }
 
-pub fn form_request_name(request: i32) -> form_result!(String) {
-    unsafe { nform::form_request_name(request) }.ok_or_else(|| form_function_error_with_rc!("form_request_name", errno().into()))
+pub fn form_request_name(request: FormRequest) -> form_result!(String) {
+    unsafe { nform::form_request_name(request.value()) }.ok_or_else(|| form_function_error_with_rc!("form_request_name", errno().into()))
 }
 
 pub fn form_sub(form: FORM) -> form_result!(WINDOW) {
