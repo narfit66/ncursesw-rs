@@ -28,9 +28,10 @@ use normal;
 
 use cstring::*;
 use shims::{
-    nform, nform::{Form_Hook, FieldType}, ncurses::{SCREEN, WINDOW}, bindings::va_list,
+    nform, nform::FieldType, ncurses::{SCREEN, WINDOW}, bindings::va_list,
     constants::{
-        E_OK, E_UNKNOWN_COMMAND, E_NO_MATCH, NO_JUSTIFICATION, JUSTIFY_LEFT, JUSTIFY_CENTER, JUSTIFY_RIGHT
+        E_OK, E_UNKNOWN_COMMAND, E_NO_MATCH, NO_JUSTIFICATION, JUSTIFY_LEFT,
+        JUSTIFY_CENTER, JUSTIFY_RIGHT
     }
 };
 use form::{
@@ -45,6 +46,7 @@ use crate::{Origin, Size};
 pub type FORM = nform::FORM;
 pub type FIELD = nform::FIELD;
 pub type FIELDTYPE = nform::FIELDTYPE;
+pub type Form_Hook = nform::Form_Hook;
 
 pub fn current_field(form: FORM) -> form_result!(FIELD) {
     unsafe { nform::current_field(form) }.ok_or_else(|| form_function_error!("current_field"))
