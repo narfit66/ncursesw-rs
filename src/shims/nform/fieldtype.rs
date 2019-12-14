@@ -20,16 +20,15 @@
     IN THE SOFTWARE.
 */
 
-use std::os::raw::{c_long, c_double};
 use bindings::{FIELDTYPE, va_list};
 
 pub enum FieldType {
     AlphaNumeric(i32),
     Alpha(i32),
-    Enum(Vec<String>, bool, bool),
-    Integer(i32, c_long, c_long),
-    Numeric(i32, c_double, c_double),
-    RegEx(String),
+    Enum(*const *const i8, bool, bool),
+    Integer(i32, i32, i32),
+    Numeric(i32, i32, i32),
+    RegExp(*const i8),
     Ipv4,
-    Custom(FIELDTYPE, va_list)
+    Custom(*mut FIELDTYPE, va_list)
 }

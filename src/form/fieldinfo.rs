@@ -29,7 +29,7 @@ pub struct FieldInfo {
 
 impl FieldInfo {
     pub fn new(size: Size, max: i32) -> Self {
-        FieldInfo { size, max }
+        Self { size, max }
     }
 
     pub fn size(&self) -> Size {

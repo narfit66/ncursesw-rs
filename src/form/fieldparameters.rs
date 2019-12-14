@@ -31,7 +31,7 @@ pub struct FieldParameters {
 
 impl FieldParameters {
     pub fn new(size: Size, origin: Origin, offscreen: i32, nbuffers: i32) -> Self {
-        FieldParameters { size, origin, offscreen, nbuffers }
+        Self { size, origin, offscreen, nbuffers }
     }
 
     pub fn size(&self) -> Size {

@@ -27,7 +27,7 @@ use std::{mem, slice, ptr};
 use crate::shims::{
     bindings,
     bindings::{
-        chtype, wchar_t, va_list, TYPE_ALNUM, TYPE_ALPHA, /*TYPE_ENUM,*/ TYPE_INTEGER, TYPE_NUMERIC, /*TYPE_REGEXP,*/ TYPE_IPV4
+        chtype, wchar_t, va_list, TYPE_ALNUM, TYPE_ALPHA, TYPE_ENUM, TYPE_INTEGER, TYPE_NUMERIC, TYPE_REGEXP, TYPE_IPV4
     },
     ncurses::{SCREEN, WINDOW}
 };
@@ -497,12 +497,26 @@ pub unsafe fn set_field_type(field: FIELD, fieldtype: FieldType) -> i32 {
     assert!(!field.is_null(), "{}set_field_type() : field.is_null()", MODULE_PATH);
 
     match fieldtype {
-        FieldType::AlphaNumeric(min_width)                  => bindings::set_field_type(field, TYPE_ALNUM, min_width),
-        FieldType::Alpha(min_width)                         => bindings::set_field_type(field, TYPE_ALPHA, min_width),
-        FieldType::Integer(precision, min_value, max_value) => bindings::set_field_type(field, TYPE_INTEGER, precision, min_value, max_value),
-        FieldType::Numeric(precision, min_value, max_value) => bindings::set_field_type(field, TYPE_NUMERIC, precision, min_value, max_value),
-        FieldType::Ipv4                                     => bindings::set_field_type(field, TYPE_IPV4),
-        _                                                   => -1
+        FieldType::AlphaNumeric(width)                        => bindings::set_field_type(field, TYPE_ALNUM, width),
+        FieldType::Alpha(width)                               => bindings::set_field_type(field, TYPE_ALPHA, width),
+        FieldType::Enum(value_list, check_case, check_unique) => {
+            assert!(!value_list.is_null(), "{}set_field_type() : value_list.is_null()", MODULE_PATH);
+
+            bindings::set_field_type(field, TYPE_ENUM, value_list, i32::from(check_case), i32::from(check_unique))
+        },
+        FieldType::Integer(padding, minimum, maximum)         => bindings::set_field_type(field, TYPE_INTEGER, padding, minimum, maximum),
+        FieldType::Numeric(padding, minimum, maximum)         => bindings::set_field_type(field, TYPE_NUMERIC, padding, minimum, maximum),
+        FieldType::RegExp(regexp)                             => {
+            assert!(!regexp.is_null(), "{}set_field_type() : regexp.is_null()", MODULE_PATH);
+
+            bindings::set_field_type(field, TYPE_REGEXP, regexp)
+        },
+        FieldType::Ipv4                                       => bindings::set_field_type(field, TYPE_IPV4),
+        FieldType::Custom(fieldtype, args)                    => {
+            assert!(!fieldtype.is_null(), "{}set_field_type() : fieldtype.is_null()", MODULE_PATH);
+
+            bindings::set_field_type(field, fieldtype, args)
+        }
     }
 }
 
