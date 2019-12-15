@@ -48,10 +48,23 @@ fn find_library(name: &str) -> Option<Library> {
 fn main() {
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
 
-    find_library("panelw");
-    find_library("menuw");
-    find_library("formw");
-    find_library("ncursesw");
+    find_library("panelw").expect("unable to find 'panelw' library");
+    find_library("menuw").expect("unable to find 'menuw' library");
+    find_library("formw").expect("unable to find 'formw' library");
+
+    let ncursesw_lib = pkg_config::Config::new()
+        .atleast_version("6.1")
+        .probe("ncursesw");
+
+    if let Ok(rustc_link_lib) =  env::var("NCURSESW_RUSTC_LINK_LIB") {
+        println!("cargo:rustc-link-lib={}", rustc_link_lib);
+    } else {
+        ncursesw_lib.expect("unable to find 'ncursesw' library");
+    }
+
+    if let Ok(rustc_flags) = env::var("NCURSESW_RUSTC_FLAGS") {
+        println!("cargo:rustc-flags={}", rustc_flags);
+    }
 
     //
 
@@ -73,8 +86,6 @@ fn main() {
         .blacklist_function("set_item_term")    // blacklisted to implement our own function
         .blacklist_function("set_menu_init")    // blacklisted to implement our own function
         .blacklist_function("set_menu_term")    // blacklisted to implement our own function
-        // NCurses form types.
-        // NCurses form functions.
         //
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding
