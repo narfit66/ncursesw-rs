@@ -31,25 +31,12 @@ use std::os::raw::{c_short, c_int};
 pub type ITEM = tagITEM;
 pub type MENU = tagMENU;
 
-pub type RipoffInit = extern "C" fn(*mut WINDOW, i32) -> i32;
-pub type Menu_Hook = extern "C" fn(*mut MENU);
+pub type RipoffInit = extern "C" fn(*mut WINDOW, c_int) -> c_int;
 
 // ncurses core functions.
 extern "C" {
     pub fn getcchar(_: *const cchar_t, _: *mut wchar_t, _: *mut attr_t, _: *mut c_short, _: *mut c_int) -> c_int;
     pub fn ripoffline(_: c_int, _: RipoffInit) -> c_int;
-}
-
-// ncurses menu functions.
-extern "C" {
-    pub fn item_init(_: *mut MENU) -> *const Menu_Hook;
-    pub fn item_term(_: *mut MENU) -> *const Menu_Hook;
-    pub fn menu_init(_: *mut MENU) -> *const Menu_Hook;
-    pub fn menu_term(_: *mut MENU) -> *const Menu_Hook;
-    pub fn set_item_init(_: *mut MENU, _: Menu_Hook) -> c_int;
-    pub fn set_item_term(_: *mut MENU, _: Menu_Hook) -> c_int;
-    pub fn set_menu_init(_: *mut MENU, _: Menu_Hook) -> c_int;
-    pub fn set_menu_term(_: *mut MENU, _: Menu_Hook) -> c_int;
 }
 
 // bingen output.

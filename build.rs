@@ -52,14 +52,13 @@ fn main() {
     find_library("menuw").expect("unable to find 'menuw' library");
     find_library("formw").expect("unable to find 'formw' library");
 
-    let ncursesw_lib = pkg_config::Config::new()
-        .atleast_version("6.1")
-        .probe("ncursesw");
-
     if let Ok(rustc_link_lib) =  env::var("NCURSESW_RUSTC_LINK_LIB") {
         println!("cargo:rustc-link-lib={}", rustc_link_lib);
     } else {
-        ncursesw_lib.expect("unable to find 'ncursesw' library");
+        pkg_config::Config::new()
+            .atleast_version("6.1")
+            .probe("ncursesw")
+            .expect("unable to find 'ncursesw' library");
     }
 
     if let Ok(rustc_flags) = env::var("NCURSESW_RUSTC_FLAGS") {
@@ -69,23 +68,13 @@ fn main() {
     //
 
     let bindings = bindgen::Builder::default()
-        .header("wrapper.h")                    // 'c' header file
+        .header("wrapper.h")                    // 'C' header file
         // NCurses core functions
         .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
         // NCurses menu types.
         .blacklist_type("ITEM")                 // blacklisted to implement our own type
         .blacklist_type("MENU")                 // blacklisted to implement our own type
-        .blacklist_type("Menu_Hook")            // blacklisted to implement our own type
-        // NCurses menu functions.
-        .blacklist_function("item_init")        // blacklisted to implement our own function
-        .blacklist_function("item_term")        // blacklisted to implement our own function
-        .blacklist_function("menu_init")        // blacklisted to implement our own function
-        .blacklist_function("menu_term")        // blacklisted to implement our own function
-        .blacklist_function("set_item_init")    // blacklisted to implement our own function
-        .blacklist_function("set_item_term")    // blacklisted to implement our own function
-        .blacklist_function("set_menu_init")    // blacklisted to implement our own function
-        .blacklist_function("set_menu_term")    // blacklisted to implement our own function
         //
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding

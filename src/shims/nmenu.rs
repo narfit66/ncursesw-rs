@@ -82,7 +82,7 @@ pub unsafe fn item_index(item: ITEM) -> i32 {
 pub unsafe fn item_init(menu: MENU) -> Option<Menu_Hook> {
     assert!(!menu.is_null(), "{}item_init() : menu.is_null()", MODULE_PATH);
 
-    (bindings::item_init(menu) as *mut Menu_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::item_init(menu).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_name.3x.html>
@@ -117,7 +117,7 @@ pub unsafe fn item_opts_on(item: ITEM, opts: i32) -> i32 {
 pub unsafe fn item_term(menu: MENU) -> Option<Menu_Hook> {
     assert!(!menu.is_null(), "{}item_term() : menu.is_null()", MODULE_PATH);
 
-    (bindings::item_term(menu) as *mut Menu_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::item_term(menu).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
@@ -182,7 +182,7 @@ pub unsafe fn menu_grey(menu: MENU) -> chtype {
 pub unsafe fn menu_init(menu: MENU) -> Option<Menu_Hook> {
     assert!(!menu.is_null(), "{}menu_init() : menu.is_null()", MODULE_PATH);
 
-    (bindings::menu_init(menu) as *mut Menu_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::menu_init(menu).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
@@ -272,7 +272,7 @@ pub unsafe fn menu_sub(menu: MENU) -> Option<WINDOW> {
 pub unsafe fn menu_term(menu: MENU) -> Option<Menu_Hook> {
     assert!(!menu.is_null(), "{}menu_term() : menu.is_null()", MODULE_PATH);
 
-    (bindings::menu_term(menu) as *mut Menu_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::menu_term(menu).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>

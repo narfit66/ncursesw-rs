@@ -39,6 +39,23 @@ The compiled library will be built in the `target` directory.
 cargo build
 ```
 
+## Custom Build
+
+Environment variables are used by `build.rs`:
+
+If set, `NCURSESW_RUSTC_LINK_LIB` will be used for `cargo:rustc-link-lib` setting.
+If set, `NCURSESW_RUSTC_FLAGS` will be used for `cargo:rustc-flags` setting.
+
+## Features
+
+By default this crate will be compiled so that the following NCurses functions `getch()`, `mvgetch()`, `mvwgetch()`, `wgetch()`, `get_wch()`, `mvget_wch()`, `mvwget_wch()` and `wget_ch()` will pass a `KEY_RESIZE` on event of the terminal being resized or a `KEY_EVENT` back to the client code as `KeyBinding::ResizeEvent` and `KeyBinding::Event` respectivly. The follwing setting in the client crates `Cargo.toml` will cause this crate to be compiled so that they will be passed back as `NCurseswError::KeyResize` and `NCurseswError::Event` error types instead.
+
+```
+[features]
+key_resize_as_error = ["ncursesw/key_resize_as_error"]
+key_event_as_error = ["ncursesw/key_event_as_error"]
+```
+
 ## How to Use
 
 ```
@@ -87,4 +104,4 @@ Please use `cargo doc --open` for this crate for the time being!.
 
 ## License
 
-Licensed under the MIT license, see [LICENSE](LICENSE)
+Licensed under the MIT license, see [LICENSE](https://github.com/narfit66/ncursesw-rs/blob/master/LICENSE)
