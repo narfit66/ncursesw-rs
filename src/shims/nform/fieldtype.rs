@@ -26,8 +26,8 @@ pub enum FieldType {
     AlphaNumeric(i32),
     Alpha(i32),
     Enum(*const *const i8, bool, bool),
-    Integer(i32, i32, i32),
-    Numeric(i32, i32, i32),
+    Integer(i32, libc::c_long, libc::c_long),
+    Numeric(i32, libc::c_double, libc::c_double),
     RegExp(*const i8),
     Ipv4,
     Custom(*mut FIELDTYPE, va_list)

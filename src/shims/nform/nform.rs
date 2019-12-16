@@ -27,7 +27,8 @@ use std::{mem, slice, ptr};
 use crate::shims::{
     bindings,
     bindings::{
-        chtype, wchar_t, va_list, TYPE_ALNUM, TYPE_ALPHA, TYPE_ENUM, TYPE_INTEGER, TYPE_NUMERIC, TYPE_REGEXP, TYPE_IPV4
+        chtype, wchar_t, va_list, TYPE_ALNUM, TYPE_ALPHA, TYPE_ENUM,
+        TYPE_INTEGER, TYPE_NUMERIC, TYPE_REGEXP, TYPE_IPV4
     },
     ncurses::{SCREEN, WINDOW}
 };
