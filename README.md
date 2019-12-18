@@ -31,7 +31,7 @@ ncursesw = { git = "https://github.com/narfit66/ncursesw-rs" }
 
 This crate has *only* been tested on Debian based x86_64 Linux (see above).
 
-You need to have the ncurses library (ABI 6 and above) installed on your system, included in the root directory of this project are two bin script which will download ncurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install ncurses into `/usr/lib` with wide character and extended color support.
+You need to have the ncurses library (ABI 6.1 and above) installed on your system, included in the root directory of this project are two bin script which will download ncurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install ncurses into `/usr/lib` with wide character and extended color support.
 
 The compiled library will be built in the `target` directory.
 
@@ -63,7 +63,7 @@ extern crate ncursesw;
 use ncursesw::*;
 ```
 
-This library follows the basic principles that are used when using ncurses with `C`, it supports the standard ascii functions (the add function seem to support unicode characters out of the box in ABI 6 if not earlier), ascii characters with attributes and/or color (`chtype`), wide characters (`wchar_t`/`wint_t`) and complex characters with attributes and color (`cchar_t`).
+This library follows the basic principles that are used when using ncurses with `C`, it supports the standard ascii functions (the add function seem to support unicode characters out of the box in ABI 6.1 if not earlier), ascii characters with attributes and/or color (`chtype`), wide characters (`wchar_t`/`wint_t`) and complex characters with attributes and color (`cchar_t`).
 
 Color pairs and attributes are dealt with in two modules. The `normal` module deals with the standard `ansi` color pairs defined internally within ncurses as `short_t/i16` and the `extend` module is for extended color pairs that are defined internally within ncurses as `i32`. Because the `normal` color pairs are actually an attribute within ncurses both modules also implement there own `attribute` and `attributes` types.
 
