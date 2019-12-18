@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::module_inception)]
+
 mod nform;
 mod fieldtype;
 

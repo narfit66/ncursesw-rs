@@ -432,7 +432,7 @@ pub fn set_field_opts(field: FIELD, opts: FieldOptions) -> form_result!(()) {
 }
 
 pub fn set_field_pad(field: FIELD, pad: char) -> form_result!(()) {
-    match unsafe { nform::set_field_pad(field, pad as u8 as i32) } {
+    match unsafe { nform::set_field_pad(field, i32::from(pad as u8)) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_pad", rc))
     }

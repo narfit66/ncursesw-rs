@@ -419,7 +419,7 @@ pub fn set_menu_opts(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 }
 
 pub fn set_menu_pad(menu: MENU, pad: char) -> menu_result!(()) {
-    match unsafe { nmenu::set_menu_pad(menu, pad as u8 as i32) } {
+    match unsafe { nmenu::set_menu_pad(menu, i32::from(pad as u8)) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_pad", rc))
     }
