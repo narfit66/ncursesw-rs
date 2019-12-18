@@ -21,6 +21,7 @@
 */
 
 #![allow(non_camel_case_types)]
+#![allow(clippy::missing_safety_doc)]
 
 use bindings;
 use shims;

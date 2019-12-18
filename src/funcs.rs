@@ -40,7 +40,7 @@ pub fn ncurses_version() -> Version {
 }
 
 pub fn setlocale(lc: LcCategory, locale: &str) -> result!(String) {
-    match shims::funcs::setlocale(
+    match unsafe { shims::funcs::setlocale(
         match lc {
             LcCategory::All      => bindings::LC_ALL,
             LcCategory::Collate  => bindings::LC_COLLATE,
@@ -50,8 +50,8 @@ pub fn setlocale(lc: LcCategory, locale: &str) -> result!(String) {
             LcCategory::Time     => bindings::LC_TIME,
             LcCategory::Messages => bindings::LC_MESSAGES
         } as i32,
-        unsafe { c_str_with_nul!(locale) }
-    ) {
+        c_str_with_nul!(locale)
+    )} {
         Some(locale) => Ok(locale),
         None         => Err(ncurses_function_error!("setlocale"))
     }

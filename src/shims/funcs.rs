@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::missing_safety_doc)]
+
 use bindings;
 use crate::cstring::*;
 
@@ -29,8 +31,6 @@ pub unsafe fn fopen(path: &[i8], mode: &[i8]) -> Option<FILE> {
     bindings::fopen(path.as_ptr(), mode.as_ptr()).as_mut().map(|ptr| ptr as FILE)
 }
 
-pub fn setlocale(lc: i32, locale: &[i8]) -> Option<String> {
-    unsafe {
-        (bindings::setlocale(lc, locale.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+pub unsafe fn setlocale(lc: i32, locale: &[i8]) -> Option<String> {
+    (bindings::setlocale(lc, locale.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
 }

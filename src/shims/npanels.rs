@@ -23,7 +23,8 @@
 #![allow(dead_code)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![warn(missing_debug_implementations)]
+#![allow(missing_debug_implementations)]
+#![allow(clippy::missing_safety_doc)]
 
 use bindings;
 use shims;
