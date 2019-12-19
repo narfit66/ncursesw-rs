@@ -68,9 +68,7 @@ pub unsafe fn show_panel(pan: PANEL) -> i32 {
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub fn update_panels() {
-    unsafe {
-        bindings::update_panels();
-    }
+    unsafe { bindings::update_panels() }
 } 
 
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>

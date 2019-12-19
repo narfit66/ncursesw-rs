@@ -286,13 +286,13 @@ pub unsafe fn form_page(form: FORM) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_requestname.3x.html>
-pub unsafe fn form_request_by_name(name: &[i8]) -> i32 {
-    bindings::form_request_by_name(name.as_ptr())
+pub fn form_request_by_name(name: &[i8]) -> i32 {
+    unsafe { bindings::form_request_by_name(name.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/form_requestname.3x.html>
-pub unsafe fn form_request_name(request: i32) -> Option<String> {
-    (bindings::form_request_name(request) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+pub fn form_request_name(request: i32) -> Option<String> {
+    unsafe { (bindings::form_request_name(request) as *mut i8).as_mut() }.map(|ptr| unsafe { FromCStr::from_c_str(ptr) })
 }
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>

@@ -238,13 +238,13 @@ pub unsafe fn menu_pattern(menu: MENU) -> Option<String> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_requestname.3x.html>
-pub unsafe fn menu_request_by_name(name: &[i8]) -> i32 {
-    bindings::menu_request_by_name(name.as_ptr())
+pub fn menu_request_by_name(name: &[i8]) -> i32 {
+    unsafe { bindings::menu_request_by_name(name.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_requestname.3x.html>
-pub unsafe fn menu_request_name(request: i32) -> Option<String> {
-    (bindings::menu_request_name(request) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+pub fn menu_request_name(request: i32) -> Option<String> {
+    unsafe { (bindings::menu_request_name(request) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_spacing.3x.html>

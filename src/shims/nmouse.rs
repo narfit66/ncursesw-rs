@@ -42,9 +42,7 @@ pub unsafe fn getmouse(event: MEVENT) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub fn has_mouse() -> bool {
-    unsafe {
-        bindings::has_mouse()
-    }
+    unsafe { bindings::has_mouse() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
@@ -57,9 +55,7 @@ pub unsafe fn mouse_trafo(py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub fn mouseinterval(erval: i32) -> i32 {
-    unsafe {
-        bindings::mouseinterval(erval)
-    }
+    unsafe { bindings::mouseinterval(erval) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>

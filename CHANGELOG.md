@@ -6,6 +6,7 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - NCurses form module implemented as `ncursesw::form`.
 - `ncursesw::menu::menu_request_name()` now takes a `MenuRequest` instead of `i32`. [BC]
 - `ncursesw::menu::set_menu_pad()` now takes a `char` instead of `i32`. [BC]
+- `bindgen` will now only create bindings against version 6.1 and above of the ncurses library.
 
 ## [0.4.0] - 2019-12-09 [BC]
 - NCurses menu module implemented as `ncursesw::menu`.

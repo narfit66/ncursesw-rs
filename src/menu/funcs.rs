@@ -220,7 +220,7 @@ pub fn menu_pattern(menu: MENU) -> menu_result!(String) {
 }
 
 pub fn menu_request_by_name(name: &str) -> menu_result!(bool) {
-    match unsafe { nmenu::menu_request_by_name(c_str_with_nul!(name)) } {
+    match nmenu::menu_request_by_name(unsafe { c_str_with_nul!(name) }) {
         E_OK       => Ok(true),
         E_NO_MATCH => Ok(false),
         rc         => Err(menu_function_error_with_rc!("menu_request_by_name", rc))
@@ -228,7 +228,7 @@ pub fn menu_request_by_name(name: &str) -> menu_result!(bool) {
 }
 
 pub fn menu_request_name(request: MenuRequest) -> menu_result!(String) {
-    unsafe { nmenu::menu_request_name(request.value()) }.ok_or_else(|| menu_function_error_with_rc!("menu_request_name", errno().into()))
+    nmenu::menu_request_name(request.value()).ok_or_else(|| menu_function_error_with_rc!("menu_request_name", errno().into()))
 }
 
 pub fn menu_spacing(menu: MENU) -> menu_result!(MenuSpacing) {

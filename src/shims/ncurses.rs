@@ -79,148 +79,106 @@ pub unsafe fn stdscr() -> WINDOW {
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn COLORS() -> i32 {
-    unsafe {
-        wrapped::COLORS
-    }
+    unsafe { wrapped::COLORS }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn COLOR_PAIR(n: i32) -> i32 {
-    unsafe {
-        bindings::COLOR_PAIR(n)
-    }
+    unsafe { bindings::COLOR_PAIR(n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn PAIR_NUMBER(attr: i32) -> i32 {
-    unsafe {
-        bindings::PAIR_NUMBER(attr)
-    }
+    unsafe { bindings::PAIR_NUMBER(attr) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn COLOR_PAIRS() -> i32 {
-    unsafe {
-        wrapped::COLOR_PAIRS
-    }
+    unsafe { wrapped::COLOR_PAIRS }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn COLS() -> i32 {
-    unsafe {
-        wrapped::COLS
-    }
+    unsafe { wrapped::COLS }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn ESCDELAY() -> i32 {
-    unsafe {
-        wrapped::ESCDELAY
-    }
+    unsafe { wrapped::ESCDELAY }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn LINES() -> i32 {
-    unsafe {
-        wrapped::LINES
-    }
+    unsafe { wrapped::LINES }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn TABSIZE() -> i32 {
-    unsafe {
-        wrapped::TABSIZE
-    }
+    unsafe { wrapped::TABSIZE }
 }
 
 pub fn acs_map() -> *const chtype {
-    unsafe {
-        &wrapped::acs_map as *const chtype
-    }
+    unsafe { &wrapped::acs_map as *const chtype }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub fn add_wch(wch: &cchar_t) -> i32 {
-    unsafe {
-        bindings::add_wch(wch)
-    }
+    unsafe { bindings::add_wch(wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub fn add_wchnstr(wchstr: &[cchar_t], n: i32) -> i32 {
-    unsafe {
-        bindings::add_wchnstr(wchstr.as_ptr(), n)
-    }
+    unsafe { bindings::add_wchnstr(wchstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub fn add_wchstr(wchstr: &[cchar_t]) -> i32 {
-    unsafe {
-        bindings::add_wchstr(wchstr.as_ptr())
-    }
+    unsafe { bindings::add_wchstr(wchstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addch.3x.html>
 pub fn addch(ch: chtype) -> i32 {
-    unsafe {
-        bindings::addch(ch)
-    }
+    unsafe { bindings::addch(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub fn addchnstr(chstr: &[chtype], n: i32) -> i32 {
-    unsafe {
-        bindings::addchnstr(chstr.as_ptr(), n)
-    }
+    unsafe { bindings::addchnstr(chstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub fn addchstr(chstr: &[chtype]) -> i32 {
-    unsafe {
-        bindings::addchstr(chstr.as_ptr())
-    }
+    unsafe { bindings::addchstr(chstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub fn addnstr(str: &[i8], n: i32) -> i32 {
-    unsafe {
-        bindings::addnstr(str.as_ptr(), n)
-    }
+    unsafe { bindings::addnstr(str.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub fn addnwstr(wstr: &[wchar_t], n: i32) -> i32 {
-    unsafe {
-        bindings::addnwstr(wstr.as_ptr(), n)
-    }
+    unsafe { bindings::addnwstr(wstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub fn addstr(str: &[i8]) -> i32 {
-    unsafe {
-        bindings::addstr(str.as_ptr())
-    }
+    unsafe { bindings::addstr(str.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub fn addwstr(wstr: &[wchar_t]) -> i32 {
-    unsafe {
-        bindings::addwstr(wstr.as_ptr())
-    }
+    unsafe { bindings::addwstr(wstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/new_pair.3x.html>
 pub fn alloc_pair(fg: i32, bg: i32) -> i32 {
-    unsafe {
-        bindings::alloc_pair(fg, bg)
-    }
+    unsafe { bindings::alloc_pair(fg, bg) }
 }
 
 /// <https://invisible-island.net/ncurses/man/default_colors.3x.html>
 pub fn assume_default_colors(fg: i32, bg: i32) -> i32 {
-    unsafe {
-        bindings::assume_default_colors(fg, bg)
-    }
+    unsafe { bindings::assume_default_colors(fg, bg) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
@@ -252,65 +210,47 @@ pub unsafe fn attr_set(attrs: attr_t, pair: short_t, opts: *mut libc::c_void) ->
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub fn attroff(attrs: i32) -> i32 {
-    unsafe {
-        bindings::attroff(attrs)
-    }
+    unsafe { bindings::attroff(attrs) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub fn attron(attrs: i32) -> i32 {
-    unsafe {
-        bindings::attron(attrs)
-    }
+    unsafe { bindings::attron(attrs) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub fn attrset(attrs: i32) -> i32 {
-    unsafe {
-        bindings::attrset(attrs)
-    }
+    unsafe { bindings::attrset(attrs) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn baudrate() -> i32 {
-    unsafe {
-        bindings::baudrate()
-    }
+    unsafe { bindings::baudrate() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_beep.3x.html>
 pub fn beep() -> i32 {
-    unsafe {
-        bindings::beep()
-    }
+    unsafe { bindings::beep() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgd.3x.html>
 pub fn bkgd(ch: chtype) -> i32 {
-    unsafe {
-        bindings::bkgd(ch)
-    }
+    unsafe { bindings::bkgd(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgd.3x.html>
 pub fn bkgdset(ch: chtype) {
-    unsafe {
-        bindings::bkgdset(ch)
-    }
+    unsafe { bindings::bkgdset(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgrnd.3x.html>
 pub fn bkgrnd(wch: &cchar_t) -> i32 {
-    unsafe {
-        bindings::bkgrnd(wch)
-    }
+    unsafe { bindings::bkgrnd(wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_bkgrnd.3x.html>
 pub fn bkgrndset(wch: &cchar_t) {
-    unsafe {
-        bindings::bkgrndset(wch)
-    }
+    unsafe { bindings::bkgrndset(wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
@@ -324,9 +264,7 @@ pub fn border(
     bl: chtype,
     br: chtype
 ) -> i32 {
-    unsafe {
-        bindings::border(ls, rs, ts, bs, tl, tr, bl, br)
-    }
+    unsafe { bindings::border(ls, rs, ts, bs, tl, tr, bl, br) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
@@ -340,9 +278,7 @@ pub fn border_set(
     bl: &cchar_t,
     br: &cchar_t
 ) -> i32 {
-    unsafe {
-        bindings::border_set(ls, rs, ts, bs, tl, tr, bl, br)
-    }
+    unsafe { bindings::border_set(ls, rs, ts, bs, tl, tr, bl, br) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
@@ -361,16 +297,12 @@ pub unsafe fn box_set(win: WINDOW, verch: &cchar_t, horch: &cchar_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn can_change_color() -> bool {
-    unsafe {
-        bindings::can_change_color()
-    }
+    unsafe { bindings::can_change_color() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn cbreak() -> i32 {
-    unsafe {
-        bindings::cbreak()
-    }
+    unsafe { bindings::cbreak() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
@@ -380,9 +312,7 @@ pub unsafe fn chgat(n: i32, attr: attr_t, pair: short_t, opts: *const libc::c_vo
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub fn clear() -> i32 {
-    unsafe {
-        bindings::clear()
-    }
+    unsafe { bindings::clear() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
@@ -394,16 +324,12 @@ pub unsafe fn clearok(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub fn clrtobot() -> i32 {
-    unsafe {
-        bindings::clrtobot()
-    }
+    unsafe { bindings::clrtobot() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub fn clrtoeol() -> i32 {
-    unsafe {
-        bindings::clrtoeol()
-    }
+    unsafe { bindings::clrtoeol() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
@@ -440,30 +366,22 @@ pub unsafe fn copywin(
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn curs_set(visibility: i32) -> i32 {
-    unsafe {
-        bindings::curs_set(visibility)
-    }
+    unsafe { bindings::curs_set(visibility) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_extend.3x.html>
 pub fn curses_version() -> Option<String> {
-    unsafe {
-        (bindings::curses_version() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::curses_version() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn def_prog_mode() -> i32 {
-    unsafe {
-        bindings::def_prog_mode()
-    }
+    unsafe { bindings::def_prog_mode() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn def_shell_mode() -> i32 {
-    unsafe {
-        bindings::def_shell_mode()
-    }
+    unsafe { bindings::def_shell_mode() }
 }
 
 /// <https://invisible-island.net/ncurses/man/define_key.3x.html>
@@ -473,23 +391,17 @@ pub unsafe fn define_key(definition: *mut i8, keycode: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn delay_output(ms: i32) -> i32 {
-    unsafe {
-        bindings::delay_output(ms)
-    }
+    unsafe { bindings::delay_output(ms) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_delch.3x.html>
 pub fn delch() -> i32 {
-    unsafe {
-        bindings::delch()
-    }
+    unsafe { bindings::delch() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_deleteln.3x.html>
 pub fn deleteln() -> i32 {
-    unsafe {
-        bindings::deleteln()
-    }
+    unsafe { bindings::deleteln() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
@@ -515,9 +427,7 @@ pub unsafe fn derwin(orig: WINDOW, nlines: i32, ncols: i32, begin_y: i32, begin_
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
 pub fn doupdate() -> i32 {
-    unsafe {
-        bindings::doupdate()
-    }
+    unsafe { bindings::doupdate() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
@@ -529,45 +439,33 @@ pub unsafe fn dupwin(win: WINDOW) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn echo() -> i32 {
-    unsafe {
-        bindings::echo()
-    }
+    unsafe { bindings::echo() }
 }
 
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub fn echo_wchar(wch: &cchar_t) -> i32 {
-    unsafe {
-        bindings::echo_wchar(wch)
-    }
+    unsafe { bindings::echo_wchar(wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addch.3x.html>
 pub fn echochar(ch: chtype) -> i32 {
-    unsafe {
-        bindings::echochar(ch)
-    }
+    unsafe { bindings::echochar(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub fn endwin() -> i32 {
-    unsafe {
-        bindings::endwin()
-    }
+    unsafe { bindings::endwin() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_clear.3x.html>
 pub fn erase() -> i32 {
-    unsafe {
-        bindings::erase()
-    }
+    unsafe { bindings::erase() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn erasechar() -> i8 {
-    unsafe {
-        bindings::erasechar()
-    }
+    unsafe { bindings::erasechar() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
@@ -596,51 +494,37 @@ pub unsafe fn extended_pair_content(pair: i32, fg: *mut i32, bg: *mut i32) -> i3
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn extended_slk_color(pair: i32) -> i32 {
-    unsafe {
-        bindings::extended_slk_color(pair)
-    }
+    unsafe { bindings::extended_slk_color(pair) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn filter() {
-    unsafe {
-        bindings::filter()
-    }
+    unsafe { bindings::filter() }
 }
 
 /// <https://invisible-island.net/ncurses/man/new_pair.3x.html>
 pub fn find_pair(fg: i32, bg: i32) -> i32 {
-    unsafe {
-        bindings::find_pair(fg, bg)
-    }
+    unsafe { bindings::find_pair(fg, bg) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_beep.3x.html>
 pub fn flash() -> i32 {
-    unsafe {
-        bindings::flash()
-    }
+    unsafe { bindings::flash() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn flushinp() -> i32 {
-    unsafe {
-        bindings::flushinp()
-    }
+    unsafe { bindings::flushinp() }
 }
 
 /// <https://invisible-island.net/ncurses/man/new_pair.3x.html>
 pub fn free_pair(pair: i32) -> i32 {
-    unsafe {
-        bindings::free_pair(pair)
-    }
+    unsafe { bindings::free_pair(pair) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_threads.3x.html>
 pub fn get_escdelay() -> i32 {
-    unsafe {
-        bindings::get_escdelay()
-    }
+    unsafe { bindings::get_escdelay() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wch.3x.html>
@@ -704,9 +588,7 @@ pub unsafe fn getcchar(wcval: &cchar_t, wch: *mut wchar_t, attrs: *mut attr_t, c
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub fn getch() -> i32 {
-    unsafe {
-        bindings::getch()
-    }
+    unsafe { bindings::getch() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_legacy.3x.html>
@@ -779,51 +661,37 @@ pub unsafe fn getwin(filep: FILE) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn halfdelay(tenths: i32) -> i32 {
-    unsafe {
-        bindings::halfdelay(tenths)
-    }
+    unsafe { bindings::halfdelay(tenths) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn has_colors() -> bool {
-    unsafe {
-        bindings::has_colors()
-    }
+    unsafe { bindings::has_colors() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn has_ic() -> bool {
-    unsafe {
-        bindings::has_ic()
-    }
+    unsafe { bindings::has_ic() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn has_il() -> bool {
-    unsafe {
-        bindings::has_il()
-    }
+    unsafe { bindings::has_il() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub fn has_key(ch: i32) -> i32 {
-    unsafe {
-        bindings::has_key(ch)
-    }
+    unsafe { bindings::has_key(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub fn hline(ch: chtype, n: i32) -> i32 {
-    unsafe {
-        bindings::hline(ch, n)
-    }
+    unsafe { bindings::hline(ch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub fn hline_set(wch: &cchar_t, n: i32) -> i32 {
-    unsafe {
-        bindings::hline_set(wch, n)
-    }
+    unsafe { bindings::hline_set(wch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
@@ -870,9 +738,7 @@ pub unsafe fn in_wchstr(wchstr: *mut cchar_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inch.3x.html>
 pub fn inch() -> chtype {
-    unsafe {
-        bindings::inch()
-    }
+    unsafe { bindings::inch() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
@@ -891,30 +757,22 @@ pub unsafe fn inchstr(chstr: *mut chtype) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn init_color(color: short_t, r: short_t, g: short_t, b: short_t) -> i32 {
-    unsafe {
-        bindings::init_color(color, r, g, b)
-    }
+    unsafe { bindings::init_color(color, r, g, b) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn init_extended_color(color: i32, r: i32, g: i32, b: i32) -> i32 {
-    unsafe {
-        bindings::init_extended_color(color, r, g, b)
-    }
+    unsafe { bindings::init_extended_color(color, r, g, b) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn init_extended_pair(color: i32, f: i32, b: i32) -> i32 {
-    unsafe {
-        bindings::init_extended_pair(color, f, b)
-    }
+    unsafe { bindings::init_extended_pair(color, f, b) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn init_pair(pair: short_t, f: short_t, b: short_t) -> i32 {
-    unsafe {
-        bindings::init_pair(pair, f, b)
-    }
+    unsafe { bindings::init_pair(pair, f, b) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
@@ -938,58 +796,42 @@ pub unsafe fn innwstr(wstr: *mut wchar_t, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub fn ins_nwstr(wstr: &[wchar_t], n: i32) -> i32 {
-    unsafe {
-        bindings::ins_nwstr(wstr.as_ptr(), n)
-    }
+    unsafe { bindings::ins_nwstr(wstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wch.3x.html>
 pub fn ins_wch(wch: &cchar_t) -> i32 {
-    unsafe {
-        bindings::ins_wch(wch)
-    }
+    unsafe { bindings::ins_wch(wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub fn ins_wstr(wstr: &[wchar_t]) -> i32 {
-    unsafe {
-        bindings::ins_wstr(wstr.as_ptr())
-    }
+    unsafe { bindings::ins_wstr(wstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insch.3x.html>
 pub fn insch(ch: chtype) -> i32 {
-    unsafe {
-        bindings::insch(ch)
-    }
+    unsafe { bindings::insch(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_deleteln.3x.html>
 pub fn insdelln(n: i32) -> i32 {
-    unsafe {
-        bindings::insdelln(n)
-    }
+    unsafe { bindings::insdelln(n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_deleteln.3x.html>
 pub fn insertln() -> i32 {
-    unsafe {
-        bindings::insertln()
-    }
+    unsafe { bindings::insertln() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub fn insnstr(str: &[i8], n: i32) -> i32 {
-    unsafe {
-        bindings::insnstr(str.as_ptr(), n)
-    }
+    unsafe { bindings::insnstr(str.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub fn insstr(str: &[i8]) -> i32 {
-    unsafe {
-        bindings::insstr(str.as_ptr())
-    }
+    unsafe { bindings::insstr(str.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
@@ -1099,9 +941,7 @@ pub unsafe fn is_syncok(win: WINDOW) -> bool {
 
 /// <https://invisible-island.net/ncurses/man/resizeterm.3x.html>
 pub fn is_term_resized(lines: i32, cols: i32) -> bool {
-    unsafe {
-        bindings::is_term_resized(lines, cols)
-    }
+    unsafe { bindings::is_term_resized(lines, cols) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
@@ -1113,44 +953,32 @@ pub unsafe fn is_wintouched(win: WINDOW) -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub fn isendwin() -> bool {
-    unsafe {
-        bindings::isendwin()
-    }
+    unsafe { bindings::isendwin() }
 }
 
 /// <https://invisible-island.net/ncurses/man/key_defined.3x.html>
 pub fn key_defined(definition: &[i8]) -> i32 {
-    unsafe {
-        bindings::key_defined(definition.as_ptr())
-    }
+    unsafe { bindings::key_defined(definition.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn key_name(w: wchar_t) -> Option<String> {
-    unsafe {
-        (bindings::key_name(w) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::key_name(w) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/keybound.3x.html>
 pub fn keybound(keycode: i32, count: i32) -> Option<String> {
-    unsafe {
-        (bindings::keybound(keycode, count) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::keybound(keycode, count) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn keyname(c: i32) -> Option<String> {
-    unsafe {
-        (bindings::keyname(c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::keyname(c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/keyok.3x.html>
 pub fn keyok(keycode: i32, enable: bool) -> i32 {
-    unsafe {
-        bindings::keyok(keycode, enable)
-    }
+    unsafe { bindings::keyok(keycode, enable) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
@@ -1162,9 +990,7 @@ pub unsafe fn keypad(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn killchar() -> i8 {
-    unsafe {
-        bindings::killchar()
-    }
+    unsafe { bindings::killchar() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
@@ -1183,9 +1009,7 @@ pub unsafe fn leaveok(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn longname() -> Option<String> {
-    unsafe {
-        (bindings::longname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::longname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_print.3x.html>
@@ -1204,79 +1028,57 @@ pub unsafe fn meta(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_move.3x.html>
 pub fn r#move(y: i32, x: i32) -> i32 {
-    unsafe {
-        bindings::move_(y, x)
-    }
+    unsafe { bindings::move_(y, x) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub fn mvadd_wch(y: i32, x: i32, wch: &cchar_t) -> i32 {
-    unsafe {
-        bindings::mvadd_wch(y, x, wch)
-    }
+    unsafe { bindings::mvadd_wch(y, x, wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub fn mvadd_wchnstr(y: i32, x: i32, wchstr: &[cchar_t], n: i32) -> i32 {
-    unsafe {
-        bindings::mvadd_wchnstr(y, x, wchstr.as_ptr(), n)
-    }
+    unsafe { bindings::mvadd_wchnstr(y, x, wchstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wchstr.3x.html>
 pub fn mvadd_wchstr(y: i32, x: i32, wchstr: &[cchar_t]) -> i32 {
-    unsafe {
-        bindings::mvadd_wchstr(y, x, wchstr.as_ptr())
-    }
+    unsafe { bindings::mvadd_wchstr(y, x, wchstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addch.3x.html>
 pub fn mvaddch(y: i32, x: i32, ch: chtype) -> i32 {
-    unsafe {
-        bindings::mvaddch(y, x, ch)
-    }
+    unsafe { bindings::mvaddch(y, x, ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub fn mvaddchnstr(y: i32, x: i32, chstr: &[chtype], n: i32) -> i32 {
-    unsafe {
-        bindings::mvaddchnstr(y, x, chstr.as_ptr(), n)
-    }
+    unsafe { bindings::mvaddchnstr(y, x, chstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addchstr.3x.html>
 pub fn mvaddchstr(y: i32, x: i32, chstr: &[chtype]) -> i32 {
-    unsafe {
-        bindings::mvaddchstr(y, x, chstr.as_ptr())
-    }
+    unsafe { bindings::mvaddchstr(y, x, chstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub fn mvaddnstr(y: i32, x: i32, str: &[i8], n: i32) -> i32 {
-    unsafe {
-        bindings::mvaddnstr(y, x, str.as_ptr(), n)
-    }
+    unsafe { bindings::mvaddnstr(y, x, str.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub fn mvaddnwstr(y: i32, x: i32, wstr: &[wchar_t], n: i32) -> i32 {
-    unsafe {
-        bindings::mvaddnwstr(y, x, wstr.as_ptr(), n)
-    }
+    unsafe { bindings::mvaddnwstr(y, x, wstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addstr.3x.html>
 pub fn mvaddstr(y: i32, x: i32, str: &[i8]) -> i32 {
-    unsafe {
-        bindings::mvaddstr(y, x, str.as_ptr())
-    }
+    unsafe { bindings::mvaddstr(y, x, str.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_addwstr.3x.html>
 pub fn mvaddwstr(y: i32, x: i32, wstr: &[wchar_t]) -> i32 {
-    unsafe {
-        bindings::mvaddwstr(y, x, wstr.as_ptr())
-    }
+    unsafe { bindings::mvaddwstr(y, x, wstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
@@ -1286,16 +1088,12 @@ pub unsafe fn mvchgat(y: i32, x: i32, n: i32, attr: attr_t, color: short_t, opts
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn mvcur(oldrow: i32, oldcol: i32, newrow: i32, newcol: i32) -> i32 {
-    unsafe {
-        bindings::mvcur(oldrow, oldcol, newrow, newcol)
-    }
+    unsafe { bindings::mvcur(oldrow, oldcol, newrow, newcol) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_delch.3x.html>
 pub fn mvdelch(y: i32, x: i32) -> i32 {
-    unsafe {
-        bindings::mvdelch(y, x)
-    }
+    unsafe { bindings::mvdelch(y, x) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
@@ -1321,9 +1119,7 @@ pub unsafe fn mvget_wstr(y: i32, x: i32, wstr: *mut wint_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub fn mvgetch(y: i32, x: i32) -> i32 {
-    unsafe {
-        bindings::mvgetch(y, x)
-    }
+    unsafe { bindings::mvgetch(y, x) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wstr.3x.html>
@@ -1349,16 +1145,12 @@ pub unsafe fn mvgetstr(y: i32, x: i32, str: *mut i8) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub fn mvhline(y: i32, x: i32, ch: chtype, n: i32) -> i32 {
-    unsafe {
-        bindings::mvhline(y, x, ch, n)
-    }
+    unsafe { bindings::mvhline(y, x, ch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub fn mvhline_set(y: i32, x: i32, wch: &cchar_t, n: i32) -> i32 {
-    unsafe {
-        bindings::mvhline_set(y, x, wch, n)
-    }
+    unsafe { bindings::mvhline_set(y, x, wch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_in_wch.3x.html>
@@ -1384,9 +1176,7 @@ pub unsafe fn mvin_wchstr(y: i32, x: i32, wchstr: *mut cchar_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inch.3x.html>
 pub fn mvinch(y: i32, x: i32) -> chtype {
-    unsafe {
-        bindings::mvinch(y, x)
-    }
+    unsafe { bindings::mvinch(y, x) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inchstr.3x.html>
@@ -1419,44 +1209,32 @@ pub unsafe fn mvinnwstr(y: i32, x: i32, wstr: *mut wchar_t, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub fn mvins_nwstr(y: i32, x: i32, wstr: &[wchar_t], n: i32) -> i32 {
-    unsafe {
-        bindings::mvins_nwstr(y, x, wstr.as_ptr(), n)
-    }
+    unsafe { bindings::mvins_nwstr(y, x, wstr.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wch.3x.html>
 pub fn mvins_wch(y: i32, x: i32, wch: &cchar_t) -> i32 {
-    unsafe {
-        bindings::mvins_wch(y, x, wch)
-    }
+    unsafe { bindings::mvins_wch(y, x, wch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_ins_wstr.3x.html>
 pub fn mvins_wstr(y: i32, x: i32, wstr: &[wchar_t]) -> i32 {
-    unsafe {
-        bindings::mvins_wstr(y, x, wstr.as_ptr())
-    }
+    unsafe { bindings::mvins_wstr(y, x, wstr.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insch.3x.html>
 pub fn mvinsch(y: i32, x: i32, ch: chtype) -> i32 {
-    unsafe {
-        bindings::mvinsch(y, x, ch)
-    }
+    unsafe { bindings::mvinsch(y, x, ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub fn mvinsnstr(y: i32, x: i32, str: &[i8], n: i32) -> i32 {
-    unsafe {
-        bindings::mvinsnstr(y, x, str.as_ptr(), n)
-    }
+    unsafe { bindings::mvinsnstr(y, x, str.as_ptr(), n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_insstr.3x.html>
 pub fn mvinsstr(y: i32, x: i32, str: &[i8]) -> i32 {
-    unsafe {
-        bindings::mvinsstr(y, x, str.as_ptr())
-    }
+    unsafe { bindings::mvinsstr(y, x, str.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_instr.3x.html>
@@ -1475,16 +1253,12 @@ pub unsafe fn mvinwstr(y: i32, x: i32, wstr: *mut wchar_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub fn mvvline(y: i32, x: i32, ch: chtype, n: i32) -> i32 {
-    unsafe {
-        bindings::mvvline(y, x, ch, n)
-    }
+    unsafe { bindings::mvvline(y, x, ch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub fn mvvline_set(y: i32, x: i32, wch: &cchar_t, n: i32) -> i32 {
-    unsafe {
-        bindings::mvvline_set(y, x, wch, n)
-    }
+    unsafe { bindings::mvvline_set(y, x, wch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
@@ -1776,9 +1550,7 @@ pub unsafe fn mvwvline_set(win: WINDOW, y: i32, x: i32, wch: &cchar_t, n: i32) -
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn napms(ms: i32) -> i32 {
-    unsafe {
-        bindings::napms(ms)
-    }
+    unsafe { bindings::napms(ms) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>
@@ -1805,16 +1577,12 @@ pub unsafe fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub fn nl() -> i32 {
-    unsafe {
-        bindings::nl()
-    }
+    unsafe { bindings::nl() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn nocbreak() -> i32 {
-    unsafe {
-        bindings::nocbreak()
-    }
+    unsafe { bindings::nocbreak() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
@@ -1826,37 +1594,27 @@ pub unsafe fn nodelay(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn noecho() -> i32 {
-    unsafe {
-        bindings::noecho()
-    }
+    unsafe { bindings::noecho() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn nofilter() {
-    unsafe {
-        bindings::nofilter()
-    }
+    unsafe { bindings::nofilter() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub fn nonl() -> i32 {
-    unsafe {
-        bindings::nonl()
-    }
+    unsafe { bindings::nonl() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn noqiflush() {
-    unsafe {
-        bindings::noqiflush()
-    }
+    unsafe { bindings::noqiflush() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn noraw() -> i32 {
-    unsafe {
-        bindings::noraw()
-    }
+    unsafe { bindings::noraw() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
@@ -1936,9 +1694,7 @@ pub unsafe fn prefresh(
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn putp(str: &[i8]) -> i32 {
-    unsafe {
-        bindings::putp(str.as_ptr())
-    }
+    unsafe { bindings::putp(str.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
@@ -1951,16 +1707,12 @@ pub unsafe fn putwin(win: WINDOW, filep: FILE) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn qiflush() {
-    unsafe {
-        bindings::qiflush()
-    }
+    unsafe { bindings::qiflush() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn raw() -> i32 {
-    unsafe {
-        bindings::raw()
-    }
+    unsafe { bindings::raw() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
@@ -1972,100 +1724,72 @@ pub unsafe fn redrawwin(win: WINDOW) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_refresh.3x.html>
 pub fn refresh() -> i32 {
-    unsafe {
-        bindings::refresh()
-    }
+    unsafe { bindings::refresh() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn reset_color_pairs() {
-    unsafe {
-        bindings::reset_color_pairs()
-    }
+    unsafe { bindings::reset_color_pairs() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn reset_prog_mode() -> i32 {
-    unsafe {
-        bindings::reset_prog_mode()
-    }
+    unsafe { bindings::reset_prog_mode() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn reset_shell_mode() -> i32 {
-    unsafe {
-        bindings::reset_shell_mode()
-    }
+    unsafe { bindings::reset_shell_mode() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn resetty() -> i32 {
-    unsafe {
-        bindings::resetty()
-    }
+    unsafe { bindings::resetty() }
 }
 
 /// <https://invisible-island.net/ncurses/man/resizeterm.3x.html>
 pub fn resize_term(lines: i32, cols: i32) -> i32 {
-    unsafe {
-        bindings::resize_term(lines, cols)
-    }
+    unsafe { bindings::resize_term(lines, cols) }
 }
 
 /// <https://invisible-island.net/ncurses/man/resizeterm.3x.html>
 pub fn resizeterm(lines: i32, cols: i32) -> i32 {
-    unsafe {
-        bindings::resizeterm(lines, cols)
-    }
+    unsafe { bindings::resizeterm(lines, cols) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn ripoffline(line: i32, init: bindings::RipoffInit) -> i32 {
-    unsafe {
-        bindings::ripoffline(line, init)
-    }
+    unsafe { bindings::ripoffline(line, init) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn savetty() -> i32 {
-    unsafe {
-        bindings::savetty()
-    }
+    unsafe { bindings::savetty() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
 pub fn scr_dump(filename: &[i8]) -> i32 {
-    unsafe {
-        bindings::scr_dump(filename.as_ptr())
-    }
+    unsafe { bindings::scr_dump(filename.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
 pub fn scr_init(filename: &[i8]) -> i32 {
-    unsafe {
-        bindings::scr_init(filename.as_ptr())
-    }
+    unsafe { bindings::scr_init(filename.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
 pub fn scr_restore(filename: &[i8]) -> i32 {
-    unsafe {
-        bindings::scr_restore(filename.as_ptr())
-    }
+    unsafe { bindings::scr_restore(filename.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scr_dump.3x.html>
 pub fn scr_set(filename: &[i8]) -> i32 {
-    unsafe {
-        bindings::scr_set(filename.as_ptr())
-    }
+    unsafe { bindings::scr_set(filename.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scroll.3x.html>
 pub fn scrl(n: i32) -> i32 {
-    unsafe {
-        bindings::scrl(n)
-    }
+    unsafe { bindings::scrl(n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_scroll.3x.html>
@@ -2084,16 +1808,12 @@ pub unsafe fn scrollok(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_threads.3x.html>
 pub fn set_escdelay(size: i32) -> i32 {
-    unsafe {
-        bindings::set_escdelay(size)
-    }
+    unsafe { bindings::set_escdelay(size) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_threads.3x.html>
 pub fn set_tabsize(size: i32) -> i32 {
-    unsafe {
-        bindings::set_tabsize(size)
-    }
+    unsafe { bindings::set_tabsize(size) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
@@ -2113,16 +1833,12 @@ pub unsafe fn setcchar(wcval: *mut cchar_t, wch: *const wchar_t, attrs: attr_t, 
 
 /// <https://invisible-island.net/ncurses/man/curs_outopts.3x.html>
 pub fn setscrreg(top: i32, bot: i32) -> i32 {
-    unsafe {
-        bindings::setscrreg(top, bot)
-    }
+    unsafe { bindings::setscrreg(top, bot) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_attr() -> attr_t {
-    unsafe {
-        bindings::slk_attr()
-    }
+    unsafe { bindings::slk_attr() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
@@ -2142,114 +1858,82 @@ pub unsafe fn slk_attr_set(attrs: attr_t, pair: short_t, opts: *mut libc::c_void
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_attroff(ch: chtype) -> i32 {
-    unsafe {
-        bindings::slk_attroff(ch)
-    }
+    unsafe { bindings::slk_attroff(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_attron(ch: chtype) -> i32 {
-    unsafe {
-        bindings::slk_attron(ch)
-    }
+    unsafe { bindings::slk_attron(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_attrset(ch: chtype) -> i32 {
-    unsafe {
-        bindings::slk_attrset(ch)
-    }
+    unsafe { bindings::slk_attrset(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_clear() -> i32 {
-    unsafe {
-        bindings::slk_clear()
-    }
+    unsafe { bindings::slk_clear() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_color(pair: short_t) -> i32 {
-    unsafe {
-        bindings::slk_color(pair)
-    }
+    unsafe { bindings::slk_color(pair) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_init(fmt: i32) -> i32 {
-    unsafe {
-        bindings::slk_init(fmt)
-    }
+    unsafe { bindings::slk_init(fmt) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_label(n: i32) -> Option<String> {
-    unsafe {
-        (bindings::slk_label(n) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::slk_label(n) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_noutrefresh() -> i32 {
-    unsafe {
-        bindings::slk_noutrefresh()
-    }
+    unsafe { bindings::slk_noutrefresh() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_refresh() -> i32 {
-    unsafe {
-        bindings::slk_refresh()
-    }
+    unsafe { bindings::slk_refresh() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_restore() -> i32 {
-    unsafe {
-        bindings::slk_restore()
-    }
+    unsafe { bindings::slk_restore() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_set(n: i32, label: &[i8], fmt: i32) -> i32 {
-    unsafe {
-        bindings::slk_set(n, label.as_ptr(), fmt)
-    }
+    unsafe { bindings::slk_set(n, label.as_ptr(), fmt) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_touch() -> i32 {
-    unsafe {
-        bindings::slk_touch()
-    }
+    unsafe { bindings::slk_touch() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_wset(n: i32, label: &[wchar_t], fmt: i32) -> i32 {
-    unsafe {
-        bindings::slk_wset(n, label.as_ptr(), fmt)
-    }
+    unsafe { bindings::slk_wset(n, label.as_ptr(), fmt) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub fn standend() -> i32 {
-    unsafe {
-        bindings::standend()
-    }
+    unsafe { bindings::standend() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>
 pub fn standout() -> i32 {
-    unsafe {
-        bindings::standout()
-    }
+    unsafe { bindings::standout() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn start_color() -> i32 {
-    unsafe {
-        bindings::start_color()
-    }
+    unsafe { bindings::start_color() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_pad.3x.html>
@@ -2275,51 +1959,37 @@ pub unsafe fn syncok(win: WINDOW, bf: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn term_attrs() -> attr_t {
-    unsafe {
-        bindings::term_attrs()
-    }
+    unsafe { bindings::term_attrs() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn termattrs() -> chtype {
-    unsafe {
-        bindings::termattrs()
-    }
+    unsafe { bindings::termattrs() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_termattrs.3x.html>
 pub fn termname() -> Option<String> {
-    unsafe {
-        (bindings::termname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::termname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn tigetflag(capname: &[i8]) -> i32 {
-    unsafe {
-        bindings::tigetflag(capname.as_ptr())
-    }
+    unsafe { bindings::tigetflag(capname.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn tigetnum(capname: &[i8]) -> i32 {
-    unsafe {
-        bindings::tigetnum(capname.as_ptr())
-    }
+    unsafe { bindings::tigetnum(capname.as_ptr()) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn tigetstr(capname: &[i8]) -> Option<String> {
-    unsafe {
-        (bindings::tigetstr(capname.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::tigetstr(capname.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn timeout(delay: i32) {
-    unsafe {
-        bindings::timeout(delay)
-    }
+    unsafe { bindings::timeout(delay) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
@@ -2338,9 +2008,7 @@ pub unsafe fn touchwin(win: WINDOW) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn tparm(s: &[i8]) -> Option<String> {
-    unsafe {
-        (bindings::tparm(s.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::tparm(s.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 // <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
@@ -2348,30 +2016,22 @@ pub fn tparm(s: &[i8]) -> Option<String> {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn typeahead(fd: i32) -> i32 {
-    unsafe {
-        bindings::typeahead(fd)
-    }
+    unsafe { bindings::typeahead(fd) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn unctrl(c: chtype) -> Option<String> {
-    unsafe {
-        (bindings::unctrl(c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
-    }
+    unsafe { (bindings::unctrl(c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_get_wch.3x.html>
 pub fn unget_wch(ch: wchar_t) -> i32 {
-    unsafe {
-        bindings::unget_wch(ch)
-    }
+    unsafe { bindings::unget_wch(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub fn ungetch(ch: i32) -> i32 {
-    unsafe {
-        bindings::ungetch(ch)
-    }
+    unsafe { bindings::ungetch(ch) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_touch.3x.html>
@@ -2383,69 +2043,51 @@ pub unsafe fn untouchwin(win: WINDOW) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/default_colors.3x.html>
 pub fn use_default_colors() -> i32 {
-    unsafe {
-        bindings::use_default_colors()
-    }
+    unsafe { bindings::use_default_colors() }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn use_env(f: bool) {
-    unsafe {
-        bindings::use_env(f)
-    }
+    unsafe { bindings::use_env(f) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_extend.3x.html>
 pub fn use_extended_names(enable: bool) -> i32 {
-    unsafe {
-        bindings::use_extended_names(enable)
-    }
+    unsafe { bindings::use_extended_names(enable) }
 }
 
 /// <https://invisible-island.net/ncurses/man/legacy_coding.3x.html>
 pub fn use_legacy_coding(level: i32) -> i32 {
-    unsafe {
-        bindings::use_legacy_coding(level)
-    }
+    unsafe { bindings::use_legacy_coding(level) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub fn use_tioctl(f: bool) {
-    unsafe {
-        bindings::use_tioctl(f)
-    }
+    unsafe { bindings::use_tioctl(f) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn vid_attr(attrs: attr_t, pair: short_t) -> i32 {
-    unsafe {
-        bindings::vid_attr(attrs, pair, ptr::null_mut())
-    }
+    unsafe { bindings::vid_attr(attrs, pair, ptr::null_mut()) }
 }
 
 //int vid_puts(attr_t attrs, short pair, void *opts, int (*putc)(int));
 
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn vidattr(attrs: chtype) -> i32 {
-    unsafe {
-        bindings::vidattr(attrs)
-    }
+    unsafe { bindings::vidattr(attrs) }
 }
 
 //int vidputs(chtype attrs, int (*putc)(int));
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
 pub fn vline(ch: chtype, n: i32) -> i32 {
-    unsafe {
-        bindings::vline(ch, n)
-    }
+    unsafe { bindings::vline(ch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border_set.3x.html>
 pub fn vline_set(wch: &cchar_t, n: i32) -> i32 {
-    unsafe {
-        bindings::vline_set(wch, n)
-    }
+    unsafe { bindings::vline_set(wch, n) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
