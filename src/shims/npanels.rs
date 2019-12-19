@@ -96,6 +96,8 @@ pub unsafe fn replace_panel(pan: PANEL, win: WINDOW) -> i32 {
 /// <https://invisible-island.net/ncurses//man/panel.3x.html>
 pub unsafe fn move_panel(pan: PANEL, starty: i32, startx: i32) -> i32 {
     assert!(!pan.is_null(), "{}move_panel() : pan.is_null()", MODULE_PATH);
+    assert!(starty >= 0, "{}move_panel() : starty = {}", MODULE_PATH, starty);
+    assert!(startx >= 0, "{}move_panel() : startx = {}", MODULE_PATH, startx);
 
     bindings::move_panel(pan, starty, startx)
 } 

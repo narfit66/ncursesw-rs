@@ -73,6 +73,8 @@ pub unsafe fn ungetmouse(event: MEVENT) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn wenclose(win: WINDOW, y: i32, x: i32) -> bool {
     assert!(!win.is_null(), "{}wenclose() : win.is_null()", MODULE_PATH);
+    assert!(y >= 0, "{}wenclose() : y = {}", MODULE_PATH, y);
+    assert!(x >= 0, "{}wenclose() : x = {}", MODULE_PATH, x);
 
     bindings::wenclose(win, y, x)
 }

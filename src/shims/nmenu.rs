@@ -393,6 +393,8 @@ pub unsafe fn set_menu_format(menu: Option<MENU>, rows: i32, cols: i32) -> i32 {
     if let Some(ptr) = menu {
         assert!(!ptr.is_null(), "{}set_menu_format() : menu.is_null()", MODULE_PATH);
     }
+    assert!(rows >= 0, "{}set_menu_format() : rows = {}", MODULE_PATH, rows);
+    assert!(cols >= 0, "{}set_menu_format() : cols = {}", MODULE_PATH, cols);
 
     bindings::set_menu_format(return_mut_ptr!(menu), rows, cols)
 }
@@ -455,6 +457,9 @@ pub unsafe fn set_menu_spacing(
     spc_columns:     i32
 ) -> i32 {
     assert!(!menu.is_null(), "{}set_menu_spacing() : menu.is_null()", MODULE_PATH);
+    assert!(spc_description >= 0, "{}set_menu_spacing() : spc_description = {}", MODULE_PATH, spc_description);
+    assert!(spc_rows >= 0, "{}set_menu_spacing() : spc_rows = {}", MODULE_PATH, spc_rows);
+    assert!(spc_columns >= 0, "{}set_menu_spacing() : spc_columns = {}", MODULE_PATH, spc_columns);
 
     bindings::set_menu_spacing(menu, spc_description, spc_rows, spc_columns)
 }
@@ -503,6 +508,7 @@ pub unsafe fn set_menu_win(menu: Option<MENU>, win: Option<WINDOW>) -> i32 {
 /// <https://invisible-island.net/ncurses/man/mitem_current.3x.html>
 pub unsafe fn set_top_row(menu: MENU, row: i32) -> i32 {
     assert!(!menu.is_null(), "{}set_top_row() : menu.is_null()", MODULE_PATH);
+    assert!(row >= 0, "{}set_top_row() : row = {}", MODULE_PATH, row);
 
     bindings::set_top_row(menu, row)
 }

@@ -69,6 +69,8 @@ pub unsafe fn data_behind(form: FORM) -> bool {
 /// <https://invisible-island.net/ncurses/man/form_field_new.3x.html>
 pub unsafe fn dup_field(field: FIELD, toprow: i32, leftcol: i32) -> Option<FIELD> {
     assert!(!field.is_null(), "{}dup_field() : field.is_null()", MODULE_PATH);
+    assert!(toprow >= 0, "{}dup_field() : top_row: {}", MODULE_PATH, toprow);
+    assert!(leftcol >= 0, "{}dup_field() : leftcol: {}", MODULE_PATH, leftcol);
 
     bindings::dup_field(field, toprow, leftcol).as_mut().map(|ptr| ptr as FIELD)
 }
@@ -100,6 +102,7 @@ pub unsafe fn field_back(field: FIELD) -> chtype {
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
 pub unsafe fn field_buffer(field: FIELD, buf: i32) -> Option<Vec<i8>> {
     assert!(!field.is_null(), "{}field_buffer() : field.is_null()", MODULE_PATH);
+    assert!(buf >= 0, "{}field_buffer() : buf = {}", MODULE_PATH, buf);
 
     let ptr = bindings::field_buffer(field, buf);
 
@@ -347,6 +350,8 @@ pub unsafe fn free_form(form: FORM) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_field_new.3x.html>
 pub unsafe fn link_field(field: FIELD, toprow: i32, leftcol: i32) -> Option<FIELD> {
     assert!(!field.is_null(), "{}link_field() : field.is_null()", MODULE_PATH);
+    assert!(toprow >= 0, "{}link_field() : toprow = {}", MODULE_PATH, toprow);
+    assert!(leftcol >= 0, "{}link_field() : leftcol = {}", MODULE_PATH, leftcol);
 
     bindings::link_field(field, toprow, leftcol).as_mut().map(|ptr| ptr as FIELD)
 }
@@ -362,12 +367,21 @@ pub unsafe fn link_fieldtype(type1: FIELDTYPE, type2: FIELDTYPE) -> Option<FIELD
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
 pub unsafe fn move_field(field: FIELD, frow: i32, fcol: i32) -> i32 {
     assert!(!field.is_null(), "{}move_field() : field.is_null()", MODULE_PATH);
+    assert!(frow >= 0, "{}move_field() : frow = {}", MODULE_PATH, frow);
+    assert!(fcol >= 0, "{}move_field() : fcol = {}", MODULE_PATH, fcol);
 
     bindings::move_field(field, frow, fcol)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_new.3x.html>
 pub unsafe fn new_field(height: i32, width: i32, toprow: i32, leftcol: i32, offscreen: i32, nbuffers: i32) -> Option<FIELD> {
+    assert!(height >= 0, "{}new_field() : height = {}", MODULE_PATH, height);
+    assert!(width >= 0, "{}new_field() : width = {}", MODULE_PATH, width);
+    assert!(toprow >= 0, "{}new_field() : toprow = {}", MODULE_PATH, toprow);
+    assert!(leftcol >= 0, "{}new_field() : leftcol = {}", MODULE_PATH, leftcol);
+    assert!(offscreen >= 0, "{}new_field() : offscreen = {}", MODULE_PATH, offscreen);
+    assert!(nbuffers >= 0, "{}new_field() : nbuffers = {}", MODULE_PATH, nbuffers);
+
     bindings::new_field(height, width, toprow, leftcol, offscreen, nbuffers).as_mut().map(|ptr| ptr as FIELD)
 }
 
@@ -442,6 +456,7 @@ pub unsafe fn set_field_back(field: FIELD, attr: chtype) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
 pub unsafe fn set_field_buffer(field: FIELD, buf: i32, value: &[i8]) -> i32 {
     assert!(!field.is_null(), "{}set_field_buffer() : field.is_null()", MODULE_PATH);
+    assert!(buf >= 0, "{}set_field_buffer() : buf = {}", MODULE_PATH, buf);
 
     bindings::set_field_buffer(field, buf, value.as_ptr())
 }
@@ -463,6 +478,7 @@ pub unsafe fn set_field_init(form: FORM, func: Form_Hook) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_field_just.3x.html>
 pub unsafe fn set_field_just(field: FIELD, justification: i32) -> i32 {
     assert!(!field.is_null(), "{}set_field_just() : field.is_null()", MODULE_PATH);
+    assert!(justification >= 0, "{}set_field_just() : justification = {}", MODULE_PATH, justification);
 
     bindings::set_field_just(field, justification)
 }
@@ -583,6 +599,7 @@ pub unsafe fn set_form_opts(form: FORM, opts: i32) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_page.3x.html>
 pub unsafe fn set_form_page(form: FORM, n: i32) -> i32 {
     assert!(!form.is_null(), "{}set_form_page() : form.is_null()", MODULE_PATH);
+    assert!(n >= 0, "{}set_form_page() : n = {}", MODULE_PATH, n);
 
     bindings::set_form_page(form, n)
 }
@@ -631,6 +648,7 @@ pub unsafe fn set_form_win(form: Option<FORM>, win: Option<WINDOW>) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
 pub unsafe fn set_max_field(field: FIELD, max: i32) -> i32 {
     assert!(!field.is_null(), "{}set_max_field() : field.is_null()", MODULE_PATH);
+    assert!(max >= 0, "{}set_max_field() : max = {}", MODULE_PATH, max);
 
     bindings::set_max_field(field, max)
 }
