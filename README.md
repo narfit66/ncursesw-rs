@@ -1,4 +1,4 @@
-ncursesw [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw)
+ncursesw [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw) ![Lines of Code](https://tokei.rs/b1/github/narfit66/ncursesw-rs?category=code)
 ========
 
 This is a *fat* wrapper around the ncurses TUI library, it's purpose is too make the ncurses functionally safe to use but please be aware that there are certian functions within the native ncurses library that are inheritenly unsafe and under certian circumstances can cause unpredictable results, these functions have been implemented and can be called but have been marked as *depreciated* as of version 0.1.2/0.1.3.

@@ -115,9 +115,9 @@ pub unsafe fn field_buffer(field: FIELD, buf: i32) -> Option<Vec<i8>> {
         while byte != 0 {
             buffer.push(byte);
 
-            byte = ptr::read(ptr.offset(offset));
-
             offset += 1;
+
+            byte = ptr::read(ptr.offset(offset));
         }
 
         Some(buffer)
@@ -295,7 +295,7 @@ pub fn form_request_by_name(name: &[i8]) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/form_requestname.3x.html>
 pub fn form_request_name(request: i32) -> Option<String> {
-    unsafe { (bindings::form_request_name(request) as *mut i8).as_mut() }.map(|ptr| unsafe { FromCStr::from_c_str(ptr) })
+    unsafe { (bindings::form_request_name(request) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>
