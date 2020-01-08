@@ -20,7 +20,10 @@
     IN THE SOFTWARE.
 */
 
+use std::convert::TryFrom;
+
 use shims::constants;
+use menu::NCurseswMenuError;
 
 /// Menu request.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -47,8 +50,32 @@ pub enum MenuRequest {
 }
 
 impl MenuRequest {
-    pub(in crate::menu) fn value(self) -> i32 {
-        match self {
+    pub(in crate::menu) fn new(request: i32) -> Self {
+        match request {
+            constants::REQ_LEFT_ITEM     => MenuRequest::LeftItem,
+            constants::REQ_RIGHT_ITEM    => MenuRequest::RightItem,
+            constants::REQ_UP_ITEM       => MenuRequest::UpItem,
+            constants::REQ_DOWN_ITEM     => MenuRequest::DownItem,
+            constants::REQ_SCR_ULINE     => MenuRequest::ScrollUpLine,
+            constants::REQ_SCR_DLINE     => MenuRequest::ScrollDownLine,
+            constants::REQ_SCR_UPAGE     => MenuRequest::ScrollUpPage,
+            constants::REQ_SCR_DPAGE     => MenuRequest::ScrollDownPage,
+            constants::REQ_FIRST_ITEM    => MenuRequest::FirstItem,
+            constants::REQ_LAST_ITEM     => MenuRequest::LastItem,
+            constants::REQ_NEXT_ITEM     => MenuRequest::NextItem,
+            constants::REQ_PREV_ITEM     => MenuRequest::PreviousItem,
+            constants::REQ_TOGGLE_ITEM   => MenuRequest::ToggleItem,
+            constants::REQ_CLEAR_PATTERN => MenuRequest::ClearPattern,
+            constants::REQ_BACK_PATTERN  => MenuRequest::BackPattern,
+            constants::REQ_NEXT_MATCH    => MenuRequest::NextMatch,
+            constants::REQ_PREV_MATCH    => MenuRequest::PreviousMatch,
+            constants::KEY_MOUSE         => MenuRequest::Mouse,
+            _                            => panic!("MenuRequest::new({}) out of bounds!!!", request)
+        }
+    }
+
+    pub(in crate::menu) fn value(self) -> menu_result!(i32) {
+        Ok(match self {
             MenuRequest::LeftItem       => constants::REQ_LEFT_ITEM,
             MenuRequest::RightItem      => constants::REQ_RIGHT_ITEM,
             MenuRequest::UpItem         => constants::REQ_UP_ITEM,
@@ -66,8 +93,8 @@ impl MenuRequest {
             MenuRequest::BackPattern    => constants::REQ_BACK_PATTERN,
             MenuRequest::NextMatch      => constants::REQ_NEXT_MATCH,
             MenuRequest::PreviousMatch  => constants::REQ_PREV_MATCH,
-            MenuRequest::Navigate(key)  => key as i32,
+            MenuRequest::Navigate(key)  => i32::try_from(u32::try_from(key)?)?,
             MenuRequest::Mouse          => constants::KEY_MOUSE
-        }
+        })
     }
 }

@@ -20,7 +20,10 @@
     IN THE SOFTWARE.
 */
 
+use std::convert::TryFrom;
+
 use shims::constants;
+use form::NCurseswFormError;
 
 /// Form request.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -87,8 +90,72 @@ pub enum FormRequest {
 }
 
 impl FormRequest {
-    pub(in crate::form) fn value(self) -> i32 {
-        match self {
+    pub(in crate::form) fn new(request: i32) -> Self {
+        match request {
+            constants::REQ_NEXT_PAGE    => FormRequest::NextPage,
+            constants::REQ_PREV_PAGE    => FormRequest::PreviousPage,
+            constants::REQ_FIRST_PAGE   => FormRequest::FirstPage,
+            constants::REQ_LAST_PAGE    => FormRequest::LastPage,
+            constants::REQ_NEXT_FIELD   => FormRequest::NextField,
+            constants::REQ_PREV_FIELD   => FormRequest::PreviousField,
+            constants::REQ_FIRST_FIELD  => FormRequest::FirstField,
+            constants::REQ_LAST_FIELD   => FormRequest::LastField,
+            constants::REQ_SNEXT_FIELD  => FormRequest::SortedNextField,
+            constants::REQ_SPREV_FIELD  => FormRequest::SortedPreviousField,
+            constants::REQ_SFIRST_FIELD => FormRequest::SortedFirstField,
+            constants::REQ_SLAST_FIELD  => FormRequest::SortedLastField,
+            constants::REQ_LEFT_FIELD   => FormRequest::LeftField,
+            constants::REQ_RIGHT_FIELD  => FormRequest::RightField,
+            constants::REQ_UP_FIELD     => FormRequest::UpField,
+            constants::REQ_DOWN_FIELD   => FormRequest::DownField,
+            constants::REQ_NEXT_CHAR    => FormRequest::NextCharacter,
+            constants::REQ_PREV_CHAR    => FormRequest::PreviousCharacter,
+            constants::REQ_NEXT_LINE    => FormRequest::NextLine,
+            constants::REQ_PREV_LINE    => FormRequest::PreviousLine,
+            constants::REQ_NEXT_WORD    => FormRequest::NextWord,
+            constants::REQ_PREV_WORD    => FormRequest::PreviousWord,
+            constants::REQ_BEG_FIELD    => FormRequest::BeginField,
+            constants::REQ_END_FIELD    => FormRequest::EndField,
+            constants::REQ_BEG_LINE     => FormRequest::BeginLine,
+            constants::REQ_END_LINE     => FormRequest::EndLine,
+            constants::REQ_LEFT_CHAR    => FormRequest::LeftCharacter,
+            constants::REQ_RIGHT_CHAR   => FormRequest::RightCharacter,
+            constants::REQ_UP_CHAR      => FormRequest::UpCharacter,
+            constants::REQ_DOWN_CHAR    => FormRequest::DownCharacter,
+            constants::REQ_NEW_LINE     => FormRequest::Newline,
+            constants::REQ_INS_CHAR     => FormRequest::InsertCharacter,
+            constants::REQ_INS_LINE     => FormRequest::InsertLine,
+            constants::REQ_DEL_CHAR     => FormRequest::DeleteCharacter,
+            constants::REQ_DEL_PREV     => FormRequest::DeletePreviousCharacter,
+            constants::REQ_DEL_LINE     => FormRequest::DeleteLine,
+            constants::REQ_DEL_WORD     => FormRequest::DeleteWord,
+            constants::REQ_CLR_EOL      => FormRequest::ClearToEndOfLine,
+            constants::REQ_CLR_EOF      => FormRequest::ClearToEndOfField,
+            constants::REQ_CLR_FIELD    => FormRequest::ClearField,
+            constants::REQ_OVL_MODE     => FormRequest::OverlayMode,
+            constants::REQ_INS_MODE     => FormRequest::InsertMode,
+            constants::REQ_SCR_FLINE    => FormRequest::ScrollForwardLine,
+            constants::REQ_SCR_BLINE    => FormRequest::ScrollBackwardLine,
+            constants::REQ_SCR_FPAGE    => FormRequest::ScrollForwardPage,
+            constants::REQ_SCR_BPAGE    => FormRequest::ScrollBackwardPage,
+            constants::REQ_SCR_FHPAGE   => FormRequest::ScrollForwardHalfPage,
+            constants::REQ_SCR_BHPAGE   => FormRequest::ScrollBackwardHalfPage,
+            constants::REQ_SCR_FCHAR    => FormRequest::ScrollForwardCharacter,
+            constants::REQ_SCR_BCHAR    => FormRequest::ScrollBackwardCharacter,
+            constants::REQ_SCR_HFLINE   => FormRequest::ScrollForwardHorizontalLine,
+            constants::REQ_SCR_HBLINE   => FormRequest::ScrollBackwardHorizontalLine,
+            constants::REQ_SCR_HFHALF   => FormRequest::ScrollForwardHalfHorizontalLine,
+            constants::REQ_SCR_HBHALF   => FormRequest::ScrollBackwardHalfHorizontalLine,
+            constants::REQ_VALIDATION   => FormRequest::Validate,
+            constants::REQ_NEXT_CHOICE  => FormRequest::DisplayNextField,
+            constants::REQ_PREV_CHOICE  => FormRequest::DisplayPreviousField,
+            constants::KEY_MOUSE        => FormRequest::Mouse,
+            _                           => panic!("FormRequest::new({}) out of bounds!!!", request)
+        }
+    }
+
+    pub(in crate::form) fn value(self) -> form_result!(i32) {
+        Ok(match self {
             FormRequest::NextPage                         => constants::REQ_NEXT_PAGE,
             FormRequest::PreviousPage                     => constants::REQ_PREV_PAGE,
             FormRequest::FirstPage                        => constants::REQ_FIRST_PAGE,
@@ -146,8 +213,8 @@ impl FormRequest {
             FormRequest::Validate                         => constants::REQ_VALIDATION,
             FormRequest::DisplayNextField                 => constants::REQ_NEXT_CHOICE,
             FormRequest::DisplayPreviousField             => constants::REQ_PREV_CHOICE,
-            FormRequest::Navigate(key)                    => key as i32,
+            FormRequest::Navigate(key)                    => i32::try_from(u32::try_from(key)?)?,
             FormRequest::Mouse                            => constants::KEY_MOUSE
-        }
+        })
     }
 }

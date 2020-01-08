@@ -178,14 +178,14 @@ pub fn field_userptr(field: FIELD) -> form_result!(*mut libc::c_void) {
     unsafe { nform::field_userptr(field) }.ok_or_else(|| form_function_error!("field_userptr"))
 }
 
-pub fn form_driver(form: FORM, request: FormRequest) -> form_result!(Option<i32>) {
-    match unsafe { nform::form_driver(form, request.value()) } {
+pub fn form_driver(form: FORM, request: FormRequest) -> form_result!(Option<FormRequest>) {
+    match unsafe { nform::form_driver(form, request.value()?) } {
         E_OK => Ok(None),
         rc   => if request == FormRequest::Mouse {
             if rc == E_UNKNOWN_COMMAND {
                 Ok(None)
             } else {
-                Ok(Some(rc))
+                Ok(Some(FormRequest::new(rc)))
             }
         } else {
             Err(form_function_error_with_rc!("form_driver", rc))
@@ -193,14 +193,14 @@ pub fn form_driver(form: FORM, request: FormRequest) -> form_result!(Option<i32>
     }
 }
 
-pub fn form_driver_w(form: FORM, request: FormRequest, wch: WideChar) -> form_result!(Option<i32>) {
-    match unsafe { nform::form_driver_w(form, request.value(), wch.into()) } {
+pub fn form_driver_w(form: FORM, request: FormRequest, wch: WideChar) -> form_result!(Option<FormRequest>) {
+    match unsafe { nform::form_driver_w(form, request.value()?, wch.into()) } {
         E_OK => Ok(None),
         rc   => if request == FormRequest::Mouse {
             if rc == E_UNKNOWN_COMMAND {
                 Ok(None)
             } else {
-                Ok(Some(rc))
+                Ok(Some(FormRequest::new(rc)))
             }
         } else {
             Err(form_function_error_with_rc!("form_driver_w", rc))
@@ -253,7 +253,7 @@ pub fn form_request_by_name(name: &str) -> form_result!(bool) {
 }
 
 pub fn form_request_name(request: FormRequest) -> form_result!(String) {
-    nform::form_request_name(request.value()).ok_or_else(|| form_function_error_with_rc!("form_request_name", errno().into()))
+    nform::form_request_name(request.value()?).ok_or_else(|| form_function_error_with_rc!("form_request_name", errno().into()))
 }
 
 pub fn form_sub(form: FORM) -> form_result!(WINDOW) {

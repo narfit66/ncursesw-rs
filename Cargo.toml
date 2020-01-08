@@ -1,11 +1,12 @@
 [package]
 name = "ncursesw"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["Steve Whittle <narfit66@googlemail.com>"]
 description = "A fat wrapper around the ncurses TUI library"
 repository = "https://github.com/narfit66/ncursesw-rs"
 readme = "README.md"
 keywords = ["ncurses", "TUI"]
+categories = ["api-bindings", "external-ffi-bindings", "command-line-interface"]
 license = "MIT"
 build = "build.rs"
 

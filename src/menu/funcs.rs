@@ -149,14 +149,14 @@ pub fn menu_back(menu: MENU) -> normal::Attributes {
     unsafe { normal::Attributes::from(nmenu::menu_back(menu)) }
 }
 
-pub fn menu_driver(menu: MENU, request: MenuRequest) -> menu_result!(Option<i32>) {
-    match unsafe { nmenu::menu_driver(menu, request.value()) } {
+pub fn menu_driver(menu: MENU, request: MenuRequest) -> menu_result!(Option<MenuRequest>) {
+    match unsafe { nmenu::menu_driver(menu, request.value()?) } {
         E_OK => Ok(None),
         rc   => if request == MenuRequest::Mouse {
             if rc == E_UNKNOWN_COMMAND {
                 Ok(None)
             } else {
-                Ok(Some(rc))
+                Ok(Some(MenuRequest::new(rc)))
             }
         } else {
             Err(menu_function_error_with_rc!("menu_driver", rc))
@@ -228,7 +228,7 @@ pub fn menu_request_by_name(name: &str) -> menu_result!(bool) {
 }
 
 pub fn menu_request_name(request: MenuRequest) -> menu_result!(String) {
-    nmenu::menu_request_name(request.value()).ok_or_else(|| menu_function_error_with_rc!("menu_request_name", errno().into()))
+    nmenu::menu_request_name(request.value()?).ok_or_else(|| menu_function_error_with_rc!("menu_request_name", errno().into()))
 }
 
 pub fn menu_spacing(menu: MENU) -> menu_result!(MenuSpacing) {
