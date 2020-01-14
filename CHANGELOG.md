@@ -7,7 +7,7 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - `ncursesw::menu::menu_request_name()` now takes a `MenuRequest` instead of `i32`. [BC]
 - `ncursesw::menu::set_menu_pad()` now takes a `char` instead of `i32`. [BC]
 - `ncursesw::menu::menu_driver()` now returns a `Result<Option<MenuRequest>, NCurseswMenuError>` instead of `Result<Option<i32>, NCurseswMenuError>`. [BC]
-- `bindgen` will now only create bindings against version 6.1 and above of the ncurses library.
+- `bindgen` will now only create bindings against version 6.1 and above of the NCurses library.
 
 ## [0.4.0] - 2019-12-09 [BC]
 - NCurses menu module implemented as `ncursesw::menu`.

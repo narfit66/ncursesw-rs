@@ -1,12 +1,13 @@
 [package]
 name = "ncursesw"
 version = "0.5.0"
-authors = ["Steve Whittle <narfit66@googlemail.com>"]
-description = "A fat wrapper around the ncurses TUI library"
+authors = [ "Steve Whittle <narfit66@googlemail.com>" ]
+description = "A fat wrapper around the NCurses TUI library"
 repository = "https://github.com/narfit66/ncursesw-rs"
+documentation = "https://docs.rs/ncursesw"
 readme = "README.md"
-keywords = ["ncurses", "TUI"]
-categories = ["api-bindings", "external-ffi-bindings", "command-line-interface"]
+keywords = [ "ncurses", "TUI" ]
+categories = [ "api-bindings", "external-ffi-bindings", "command-line-interface" ]
 license = "MIT"
 build = "build.rs"
 
@@ -35,6 +36,10 @@ key_resize_as_error = []
 # conditional compulation of KEY_EVENT to return as a NCurseswError::KeyEvent (the default) for getch(), mvgetch(),
 # mvwgetch(), wgetch(), get_wch(), mvget_wch(), mvwget_wch() and wget_ch().
 key_event_as_error = []
+docs-rs = []
+
+[package.metadata.docs.rs]
+features = [ "docs-rs" ] # This feature will be enabled during the docs.rs build.
 
 [lib]
 name = "ncursesw"

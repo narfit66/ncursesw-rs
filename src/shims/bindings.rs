@@ -41,4 +41,8 @@ extern "C" {
 }
 
 // bingen output.
+#[cfg(feature = "docs-rs")]
+include!(concat!(env!("CARGO_MANIFEST_DIR"), "/build/bindings.rs"));
+
+#[cfg(not(feature = "docs-rs"))]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));

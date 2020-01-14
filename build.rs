@@ -20,6 +20,9 @@
     IN THE SOFTWARE.
 */
 
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
 extern crate bindgen;
 extern crate pkg_config;
 
@@ -37,28 +40,32 @@ impl bindgen::callbacks::ParseCallbacks for Fix753 {
     }
 }
 
-fn find_library(name: &str) -> Option<Library> {
-    if let Ok(lib) = pkg_config::probe_library(name) {
-        return Some(lib);
+fn find_library(lib: &str) -> Library {
+    if let Ok(lib_config) = pkg_config::probe_library(lib) {
+        return lib_config;
     }
 
-    None
+    panic!("Unable to find '{}' library!!!", lib);
 }
 
+#[cfg(feature = "docs-rs")]
+fn main() { } // Skip the build script when the doc is building.
+
+#[cfg(not(feature = "docs-rs"))]
 fn main() {
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
 
-    find_library("panelw").expect("unable to find 'panelw' library");
-    find_library("menuw").expect("unable to find 'menuw' library");
-    find_library("formw").expect("unable to find 'formw' library");
+    find_library("panelw");
+    find_library("menuw");
+    find_library("formw");
 
-    if let Ok(rustc_link_lib) =  env::var("NCURSESW_RUSTC_LINK_LIB") {
+    if let Ok(rustc_link_lib) = env::var("NCURSESW_RUSTC_LINK_LIB") {
         println!("cargo:rustc-link-lib={}", rustc_link_lib);
     } else {
         pkg_config::Config::new()
             .atleast_version("6.1")
             .probe("ncursesw")
-            .expect("unable to find 'ncursesw' library");
+            .expect("Unable to find 'ncursesw' library");
     }
 
     if let Ok(rustc_flags) = env::var("NCURSESW_RUSTC_FLAGS") {
@@ -80,7 +87,8 @@ fn main() {
         .generate()                             // generate the binding
         .expect("Unable to generate bindings");
 
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let out_path = PathBuf::from(env::var("OUT_DIR")
+        .expect("Environment variable 'OUT_DIR' is undefined."));
 
     bindings
         .write_to_file(out_path.join("bindings.rs"))

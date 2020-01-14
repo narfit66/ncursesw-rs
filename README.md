@@ -1,7 +1,7 @@
-ncursesw [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw) ![Lines of Code](https://tokei.rs/b1/github/narfit66/ncursesw-rs?category=code)
+ncursesw [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw) [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://crates.io/crates/ncursesw-win/LICENSE) ![Lines of Code](https://tokei.rs/b1/github/narfit66/ncursesw-rs?category=code)
 ========
 
-This is a *fat* wrapper around the NCurses TUI library, it's purpose is too make the library functionally safe to use but please be aware that there are certian functions within the native library that are inheritenly unsafe and under certian circumstances can cause unpredictable results, these functions have been implemented and can be called but have been marked as *depreciated*.
+This is a *fat* wrapper around the NCurses TUI library, it's purpose is too make the library functionally safe to use but please be aware that there are certian functions within the native library that are inheritenly unsafe and under certian circumstances can cause undefined behaviour, these functions have been implemented and can be called but have been marked as *depreciated*.
 
 This crate supports NCurses ABI 6.1 and above.
 
