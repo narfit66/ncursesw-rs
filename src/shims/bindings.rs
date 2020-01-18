@@ -38,6 +38,7 @@ pub type RipoffInit = extern "C" fn(*mut WINDOW, c_int) -> c_int;
 extern "C" {
     pub fn getcchar(_: *const cchar_t, _: *mut wchar_t, _: *mut attr_t, _: *mut c_short, _: *mut c_int) -> c_int;
     pub fn ripoffline(_: c_int, _: RipoffInit) -> c_int;
+    pub fn ripoffline_sp(_: *mut SCREEN, _: c_int, _: RipoffInit) -> c_int;
 }
 
 // bingen output.

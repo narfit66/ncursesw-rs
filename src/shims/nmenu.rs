@@ -28,7 +28,7 @@
 
 use std::{mem, slice, ffi::CStr};
 
-use shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::WINDOW};
+use shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::{SCREEN, WINDOW}};
 use cstring::FromCStr;
 
 pub type MENU = *mut bindings::MENU;
@@ -525,4 +525,12 @@ pub unsafe fn unpost_menu(menu: MENU) -> i32 {
     assert!(!menu.is_null(), "{}unpost_menu() : menu.is_null()", MODULE_PATH);
 
     bindings::unpost_menu(menu)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn new_menu_sp(sp: SCREEN, item_handles: *mut ITEM) -> Option<MENU> {
+    assert!(!sp.is_null(), "{}new_menu_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!item_handles.is_null(), "{}new_menu_sp() : item_handles.is_null()", MODULE_PATH);
+
+    bindings::new_menu_sp(sp, item_handles).as_mut().map(|ptr| ptr as MENU)
 }

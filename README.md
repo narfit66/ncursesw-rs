@@ -104,7 +104,7 @@ Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/nc
 
 ## Documentation
 
-Please use `cargo doc --open` for this crate for the time being!.
+Documentation for this crate can be found [here](https://docs.rs/ncursesw).
 
 ## License
 

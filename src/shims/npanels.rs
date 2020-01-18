@@ -27,14 +27,15 @@
 #![allow(clippy::missing_safety_doc)]
 
 use bindings;
-use shims;
+use shims::ncurses;
 
 use constants::{TRUE, FALSE};
 
 pub type PANEL = *mut bindings::panel;
 pub type PANEL_USERPTR = *const libc::c_void;
 
-type WINDOW = shims::ncurses::WINDOW;
+type WINDOW = ncurses::WINDOW;
+type SCREEN = ncurses::SCREEN;
 
 static MODULE_PATH: &str = "ncursesw::shims::npanels::";
 
@@ -143,3 +144,24 @@ pub unsafe fn del_panel(pan: PANEL) -> i32 {
 
     bindings::del_panel(pan)
 } 
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn ceiling_panel(sp: SCREEN) -> Option<PANEL> {
+    assert!(!sp.is_null(), "{}ceiling_panel() : sp.is_null()", MODULE_PATH);
+
+    bindings::ceiling_panel(sp).as_mut().map(|ptr| ptr as PANEL)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn ground_panel(sp: SCREEN) -> Option<PANEL> {
+    assert!(!sp.is_null(), "{}ground_panel() : sp.is_null()", MODULE_PATH);
+
+    bindings::ground_panel(sp).as_mut().map(|ptr| ptr as PANEL)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn update_panels_sp(sp: SCREEN) {
+    assert!(!sp.is_null(), "{}update_panels_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::update_panels_sp(sp)
+}

@@ -26,13 +26,14 @@ use panels::{NCurseswPanelsError, PanelUserPtr};
 
 type WINDOW = ncurses::WINDOW;
 
+type SCREEN = *mut crate::shims::bindings::SCREEN;
 pub type PANEL = npanels::PANEL;
 
 /// allocates a PANEL structure, associates it with win, places the panel on
 /// the top of the stack (causes it to be displayed above any other panel)
 /// and returns a pointer to the new panel.
 pub fn new_panel(window_handle: WINDOW) -> panels_result!(PANEL) {
-    unsafe { npanels::new_panel(window_handle) }.ok_or(panels_function_error!("new_panel"))
+    unsafe { npanels::new_panel(window_handle).ok_or(panels_function_error!("new_panel")) }
 } 
 
 /// puts panel at the bottom of all panels.
@@ -79,7 +80,7 @@ pub fn hide_panel(handle: PANEL) -> panels_result!(()) {
 
 /// returns a pointer to the window of the given panel.
 pub fn panel_window(handle: PANEL) -> panels_result!(WINDOW) {
-    unsafe { npanels::panel_window(handle) }.ok_or(panels_function_error!("panel_window"))
+    unsafe { npanels::panel_window(handle).ok_or(panels_function_error!("panel_window")) }
 } 
 
 /// replaces the current window of panel with window (useful, for example if you
@@ -105,19 +106,19 @@ pub fn move_panel(handle: PANEL, origin: Origin) -> panels_result!(()) {
 
 /// returns true if the panel is in the panel stack, false if it is not.
 pub fn panel_hidden(handle: PANEL) -> panels_result!(bool) {
-    unsafe { npanels::panel_hidden(handle) }.ok_or(panels_function_error!("panel_hidden"))
+    unsafe { npanels::panel_hidden(handle).ok_or(panels_function_error!("panel_hidden")) }
 }
 
 /// returns a pointer to the panel above pan.
 /// If the panel argument is None, it returns a pointer to the bottom panel in the stack.
 pub fn panel_above(handle: Option<PANEL>) -> panels_result!(PANEL) {
-    unsafe { npanels::panel_above(handle) }.ok_or(panels_function_error!("panel_above"))
+    unsafe { npanels::panel_above(handle).ok_or(panels_function_error!("panel_above")) }
 } 
 
 /// returns a pointer to the panel just below pan.
 /// If the panel argument is None, it returns a pointer to the top panel in the stack.
 pub fn panel_below(handle: Option<PANEL>) -> panels_result!(PANEL) {
-    unsafe { npanels::panel_below(handle) }.ok_or(panels_function_error!("panel_below"))
+    unsafe { npanels::panel_below(handle).ok_or(panels_function_error!("panel_below")) }
 } 
 
 /// sets the panel's user pointer.
@@ -141,3 +142,15 @@ pub fn del_panel(handle: PANEL) -> panels_result!(()) {
         rc => Err(panels_function_error_with_rc!("del_panel", rc))
     }
 }
+
+pub fn ceiling_panel(screen: SCREEN) -> panels_result!(PANEL) {
+    unsafe { npanels::ceiling_panel(screen).ok_or(panels_function_error!("ceiling_panel")) }
+}
+
+pub fn ground_panel(screen: SCREEN) -> panels_result!(PANEL) {
+    unsafe { npanels::ground_panel(screen).ok_or(panels_function_error!("ground_panel")) }
+}
+
+pub fn update_panels_sp(screen: SCREEN) {
+    unsafe { npanels::update_panels_sp(screen) }
+} 

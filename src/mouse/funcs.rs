@@ -31,6 +31,7 @@ use shims::{ncurses, nmouse, bindings};
 use shims::constants::{OK, ERR};
 
 type WINDOW = ncurses::WINDOW;
+type SCREEN = ncurses::SCREEN;
 pub type MEVENT = bindings::MEVENT;
 pub type mmask_t = nmouse::mmask_t;
 
@@ -109,4 +110,51 @@ pub fn mouse_version() -> i32 {
 
 pub fn has_mouse_interface() -> bool {
     mouse_version() > 0
+}
+
+pub fn getmouse_sp(screen: SCREEN, event: nmouse::MEVENT) -> mouse_result!(()) {
+    match unsafe { nmouse::getmouse_sp(screen, event) } {
+        OK => Ok(()),
+        rc => Err(mouse_function_error_with_rc!("getmouse_sp", rc))
+    }
+}
+
+pub fn has_mouse_sp(screen: SCREEN) -> bool {
+    unsafe { bindings::has_mouse_sp(screen) }
+}
+
+pub fn mouseinterval_sp(screen: SCREEN) -> mouse_result!(time::Duration) {
+    let rc = unsafe { nmouse::mouseinterval_sp(screen, -1) };
+
+    if rc < 0 {
+        Err(mouse_function_error_with_rc!("mouseinterval_sp", rc))
+    } else {
+        Ok(time::Duration::from_millis(u64::try_from(rc)?))
+    }
+}
+
+pub fn set_mouseinterval_sp(screen: SCREEN, delay: time::Duration) -> mouse_result!(()) {
+    let ms = i32::try_from(delay.as_millis())?;
+
+    match unsafe { nmouse::mouseinterval_sp(screen, ms) } {
+        OK => Ok(()),
+        rc => Err(mouse_function_error_with_rc!("set_mouseinterval_sp", rc))
+    }
+}
+
+pub fn mousemask_sp(screen: SCREEN, newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mouse_result!(mmask_t) {
+    let mask = unsafe { nmouse::mousemask_sp(screen, newmask, oldmask) };
+
+    if mask == 0 {
+        Err(mouse_function_error!("mousemask_sp"))
+    } else {
+        Ok(mask)
+    }
+}
+
+pub fn ungetmouse_sp(screen: SCREEN, event: nmouse::MEVENT) -> mouse_result!(()) {
+    match unsafe { nmouse::ungetmouse_sp(screen, event) } {
+        OK => Ok(()),
+        rc => Err(mouse_function_error_with_rc!("ungetmouse_sp", rc))
+    }
 }

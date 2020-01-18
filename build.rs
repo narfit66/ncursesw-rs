@@ -79,6 +79,7 @@ fn main() {
         // NCurses core functions
         .blacklist_function("getcchar")         // blacklisted to implement our own function
         .blacklist_function("ripoffline")       // blacklisted to implement our own function
+        .blacklist_function("ripoffline_sp")    // blacklisted to implement our own function
         // NCurses menu types.
         .blacklist_type("ITEM")                 // blacklisted to implement our own type
         .blacklist_type("MENU")                 // blacklisted to implement our own type

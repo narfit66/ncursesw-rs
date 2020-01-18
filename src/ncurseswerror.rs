@@ -21,6 +21,7 @@
 */
 
 use std::{num, char, ffi};
+use errno::Errno;
 use crate::{
     COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
     menu::NCurseswMenuError, form::NCurseswFormError
@@ -49,5 +50,6 @@ pub NCurseswError
     MenuError { source: NCurseswMenuError } = "{source}",
     FormError { source: NCurseswFormError } = "{source}",
 
+    OSError { func: String, errno: Errno} = @{ format!("{}() : {} (#{})", func, errno, errno.0) },
     FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
 }

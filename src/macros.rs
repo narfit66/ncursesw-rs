@@ -36,6 +36,14 @@ macro_rules! simple_ncurses_function {
     }
 }
 
+macro_rules! simple_ncurses_sp_function {
+    ($func: ident) => {
+        pub fn $func(screen: SCREEN) {
+            unsafe { ncurses::$func(screen) }
+        }
+    }
+}
+
 macro_rules! simple_ncurses_function_with_window_returns_bool {
     ($func: ident) => {
         pub fn $func(handle: WINDOW) -> bool {
@@ -48,6 +56,17 @@ macro_rules! basic_ncurses_function {
     ($func: ident, $rc: expr) => {
         pub fn $func() -> result!(()) {
             match ncurses::$func() {
+                OK => Ok(()),
+                rc => Err(ncurses_function_error_with_rc!($rc, rc))
+            }
+        }
+    }
+}
+
+macro_rules! basic_ncurses_sp_function {
+    ($func: ident, $rc: expr) => {
+        pub fn $func(screen: SCREEN) -> result!(()) {
+            match unsafe { ncurses::$func(screen) } {
                 OK => Ok(()),
                 rc => Err(ncurses_function_error_with_rc!($rc, rc))
             }

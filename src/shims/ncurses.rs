@@ -65,19 +65,22 @@ mod wrapped {
     }
 }
 
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub unsafe fn curscr() -> WINDOW {
     wrapped::curscr
 }
 
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub unsafe fn newscr() -> WINDOW {
     wrapped::newscr
 }
 
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub unsafe fn stdscr() -> WINDOW {
     wrapped::stdscr
 }
 
-/// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn COLORS() -> i32 {
     unsafe { wrapped::COLORS }
 }
@@ -92,27 +95,27 @@ pub fn PAIR_NUMBER(attr: i32) -> i32 {
     unsafe { bindings::PAIR_NUMBER(attr) }
 }
 
-/// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn COLOR_PAIRS() -> i32 {
     unsafe { wrapped::COLOR_PAIRS }
 }
 
-/// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn COLS() -> i32 {
     unsafe { wrapped::COLS }
 }
 
-/// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn ESCDELAY() -> i32 {
     unsafe { wrapped::ESCDELAY }
 }
 
-/// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn LINES() -> i32 {
     unsafe { wrapped::LINES }
 }
 
-/// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
+/// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn TABSIZE() -> i32 {
     unsafe { wrapped::TABSIZE }
 }
@@ -462,7 +465,6 @@ pub fn echo() -> i32 {
     unsafe { bindings::echo() }
 }
 
-
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
 pub fn echo_wchar(wch: &cchar_t) -> i32 {
     unsafe { bindings::echo_wchar(wch) }
@@ -678,6 +680,8 @@ pub unsafe fn getstr(str: *mut i8) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
 pub unsafe fn getwin(filep: FILE) -> Option<WINDOW> {
+    assert!(!filep.is_null(), "{}getwin() : filep.is_null()", MODULE_PATH);
+
     bindings::getwin(filep).as_mut().map(|ptr| ptr as WINDOW)
 }
 
@@ -1824,14 +1828,15 @@ pub unsafe fn newpad(lines: i32, cols: i32) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub unsafe fn newterm(ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
-    bindings::newterm(
-        match ty {
-            Some(s) => s.as_ptr(),
-            None    => ptr::null()
-        },
-        outfd,
-        infd
-    ).as_mut().map(|ptr| ptr as SCREEN)
+    assert!(!outfd.is_null(), "{}newterm() : outfd.is_null()", MODULE_PATH);
+    assert!(!infd.is_null(), "{}newterm() : infd.is_null()", MODULE_PATH);
+
+    let term_type = match ty {
+        Some(term) => term.as_ptr(),
+        None       => ptr::null()
+    };
+
+    bindings::newterm(term_type, outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
@@ -2108,10 +2113,10 @@ pub fn set_tabsize(size: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
-pub unsafe fn set_term(scr: SCREEN) -> Option<SCREEN> {
-    assert!(!scr.is_null(), "{}set_term() : scr.is_null()", MODULE_PATH);
+pub unsafe fn set_term(new: SCREEN) -> Option<SCREEN> {
+    assert!(!new.is_null(), "{}set_term() : new.is_null()", MODULE_PATH);
 
-    bindings::set_term(scr).as_mut().map(|ptr| ptr as SCREEN)
+    bindings::set_term(new).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_getcchar.3x.html>
@@ -2387,12 +2392,12 @@ pub fn vid_attr(attrs: attr_t, pair: short_t) -> i32 {
     unsafe { bindings::vid_attr(attrs, pair, ptr::null_mut()) }
 }
 
-//int vid_puts(attr_t attrs, short pair, void *opts, int (*putc)(int));
-
 /// <https://invisible-island.net/ncurses/man/curs_terminfo.3x.html>
 pub fn vidattr(attrs: chtype) -> i32 {
     unsafe { bindings::vidattr(attrs) }
 }
+
+//int vid_puts(attr_t attrs, short pair, void *opts, int (*putc)(int));
 
 //int vidputs(chtype attrs, int (*putc)(int));
 
@@ -3006,10 +3011,10 @@ pub unsafe fn wtouchln(win: WINDOW, y: i32, n: i32, changed: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_util.3x.html>
-pub unsafe fn wunctrl(ch: *mut cchar_t) -> *mut wchar_t {
+pub unsafe fn wunctrl(ch: *mut cchar_t) -> Option<*mut wchar_t> {
     assert!(!ch.is_null(), "{}wunctrl() : ch.is_null()", MODULE_PATH);
 
-    bindings::wunctrl(ch)
+    bindings::wunctrl(ch).as_mut().map(|ptr| ptr as *mut wchar_t)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_border.3x.html>
@@ -3090,3 +3095,775 @@ pub fn ACS_BSSS() -> chtype { ACS_TTEE() }
 pub fn ACS_BSBS() -> chtype { ACS_HLINE() }
 pub fn ACS_SBSB() -> chtype { ACS_VLINE() }
 pub fn ACS_SSSS() -> chtype { ACS_PLUS() }
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn alloc_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32 {
+    assert!(!sp.is_null(), "{}alloc_pair_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::alloc_pair_sp(sp, fg, bg)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn assume_default_colors_sp(sp: SCREEN, fg: i32, bg: i32) -> i32 {
+    assert!(!sp.is_null(), "{}assume_default_colors_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::assume_default_colors_sp(sp, fg, bg)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn baudrate_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}baudrate_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::baudrate_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn beep_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}beep_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::beep_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn can_change_color_sp(sp: SCREEN) -> bool {
+    assert!(!sp.is_null(), "{}can_change_color_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::can_change_color_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn cbreak_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}cbreak_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::cbreak_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn color_content_sp(sp: SCREEN, color: short_t, r: *mut short_t, g: *mut short_t, b: *mut short_t) -> i32 {
+    assert!(!sp.is_null(), "{}color_content_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!r.is_null(), "{}color_content_sp() : r.is_null()", MODULE_PATH);
+    assert!(!g.is_null(), "{}color_content_sp() : g.is_null()", MODULE_PATH);
+    assert!(!b.is_null(), "{}color_content_sp() : b.is_null()", MODULE_PATH);
+
+    bindings::color_content_sp(sp, color, r, g, b)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn curs_set_sp(sp: SCREEN, visibility: i32) -> i32 {
+    assert!(!sp.is_null(), "{}curs_set_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::curs_set_sp(sp, visibility)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn define_key_sp(sp: SCREEN, definition: *mut i8, keycode: i32) -> i32 {
+    assert!(!sp.is_null(), "{}define_key_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::define_key_sp(sp, definition, keycode)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn def_prog_mode_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}def_prog_mode_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::def_prog_mode_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn def_shell_mode_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}def_shell_mode_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::def_shell_mode_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn delay_output_sp(sp: SCREEN, ms: i32) -> i32 {
+    assert!(!sp.is_null(), "{}delay_output_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::delay_output_sp(sp, ms)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn doupdate_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}doupdate_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::doupdate_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn echo_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}echo_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::echo_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn endwin_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}endwin_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::endwin_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn erasechar_sp(sp: SCREEN) -> i8 {
+    assert!(!sp.is_null(), "{}erasechar_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::erasechar_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn extended_color_content_sp(sp: SCREEN, color: i32, r: *mut i32, g: *mut i32, b: *mut i32) -> i32 {
+    assert!(!sp.is_null(), "{}extended_color_content_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!r.is_null(), "{}extended_color_content_sp() : r.is_null()", MODULE_PATH);
+    assert!(!g.is_null(), "{}extended_color_content_sp() : g.is_null()", MODULE_PATH);
+    assert!(!b.is_null(), "{}extended_color_content_sp() : b.is_null()", MODULE_PATH);
+
+    bindings::extended_color_content_sp(sp, color, r, g, b)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn extended_pair_content_sp(sp: SCREEN, pair: i32, fg: *mut i32, bg: *mut i32) -> i32 {
+    assert!(!sp.is_null(), "{}extended_pair_content_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!fg.is_null(), "{}extended_pair_content_sp() : fg.is_null()", MODULE_PATH);
+    assert!(!bg.is_null(), "{}extended_pair_content_sp() : bg.is_null()", MODULE_PATH);
+
+    bindings::extended_pair_content_sp(sp, pair, fg, bg)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn extended_slk_color_sp(sp: SCREEN, pair: i32) -> i32 {
+    assert!(!sp.is_null(), "{}extended_slk_color_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::extended_slk_color_sp(sp, pair)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn filter_sp(sp: SCREEN) {
+    assert!(!sp.is_null(), "{}filter_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::filter_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn find_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32 {
+    assert!(!sp.is_null(), "{}find_pair_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::find_pair_sp(sp, fg, bg)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn free_pair_sp(sp: SCREEN, pair: i32) -> i32 {
+    assert!(!sp.is_null(), "{}free_pair_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::free_pair_sp(sp, pair)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn flash_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}flash_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::flash_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn flushinp_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}flushinp_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::flushinp_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn get_escdelay_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}get_escdelay_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::get_escdelay_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn getwin_sp(sp: SCREEN, filep: FILE) -> Option<WINDOW> {
+    assert!(!sp.is_null(), "{}getwin_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!filep.is_null(), "{}getwin_sp() : filep.is_null()", MODULE_PATH);
+
+    bindings::getwin_sp(sp, filep).as_mut().map(|ptr| ptr as WINDOW)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn halfdelay_sp(sp: SCREEN, tenths: i32) -> i32 {
+    assert!(!sp.is_null(), "{}halfdelay_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::halfdelay_sp(sp, tenths)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn has_colors_sp(sp: SCREEN) -> bool {
+    assert!(!sp.is_null(), "{}has_colors_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::has_colors_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn has_ic_sp(sp: SCREEN) -> bool {
+    assert!(!sp.is_null(), "{}has_ic_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::has_ic_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn has_il_sp(sp: SCREEN) -> bool {
+    assert!(!sp.is_null(), "{}has_il_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::has_il_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn has_key_sp(sp: SCREEN, ch: i32) -> i32 {
+    assert!(!sp.is_null(), "{}has_key_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::has_key_sp(sp, ch)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn init_color_sp(sp: SCREEN, color: short_t, r: short_t, g: short_t, b: short_t) -> i32 {
+    assert!(!sp.is_null(), "{}init_color_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::init_color_sp(sp, color, r, g, b)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn init_extended_color_sp(sp: SCREEN, color: i32, r: i32, g: i32, b: i32) -> i32 {
+    assert!(!sp.is_null(), "{}init_extended_color_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::init_extended_color_sp(sp, color, r, g, b)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn init_extended_pair_sp(sp: SCREEN, color: i32, f: i32, b: i32) -> i32 {
+    assert!(!sp.is_null(), "{}init_extended_pair_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::init_extended_pair_sp(sp, color, f, b)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn init_pair_sp(sp: SCREEN, pair: short_t, f: short_t, b: short_t) -> i32 {
+    assert!(!sp.is_null(), "{}init_pair_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::init_pair_sp(sp, pair, f, b)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn intrflush_sp(sp: SCREEN, win: WINDOW, bf: bool) -> i32 {
+    assert!(!sp.is_null(), "{}intrflush_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!win.is_null(), "{}intrflush_sp() : win.is_null()", MODULE_PATH);
+
+    bindings::intrflush_sp(sp, win, bf)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn isendwin_sp(sp: SCREEN) -> bool {
+    assert!(!sp.is_null(), "{}isendwin_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::isendwin_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn is_term_resized_sp(sp: SCREEN, lines: i32, cols: i32) -> bool {
+    assert!(!sp.is_null(), "{}is_term_resized_sp() : sp.is_null()", MODULE_PATH);
+    assert!(lines >= 0, "{}is_term_resized_sp() : lines = {}", MODULE_PATH, lines);
+    assert!(cols >= 0, "{}is_term_resized_sp() : cols = {}", MODULE_PATH, cols);
+
+    bindings::is_term_resized_sp(sp, lines, cols)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn keybound_sp(sp: SCREEN, keycode: i32, count: i32) -> Option<String> {
+    assert!(!sp.is_null(), "{}keybound_sp() : sp.is_null()", MODULE_PATH);
+
+    (bindings::keybound_sp(sp, keycode, count) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn key_defined_sp(sp: SCREEN, definition: &[i8]) -> i32 {
+    assert!(!sp.is_null(), "{}key_defined_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::key_defined_sp(sp, definition.as_ptr())
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn keyname_sp(sp: SCREEN, c: i32) -> Option<String> {
+    assert!(!sp.is_null(), "{}keyname_sp() : sp.is_null()", MODULE_PATH);
+
+    (bindings::keyname_sp(sp, c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn keyok_sp(sp: SCREEN, keycode: i32, enable: bool) -> i32 {
+    assert!(!sp.is_null(), "{}keyok_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::keyok_sp(sp, keycode, enable)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn killchar_sp(sp: SCREEN) -> i8 {
+    assert!(!sp.is_null(), "{}keychar_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::killchar_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn longname_sp(sp: SCREEN) -> Option<String> {
+    assert!(!sp.is_null(), "{}longname_sp() : sp.is_null()", MODULE_PATH);
+
+    (bindings::longname_sp(sp) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn mcprint_sp(sp: SCREEN, data: *mut i8, len: i32) -> i32 {
+    assert!(!sp.is_null(), "{}mcprint_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!data.is_null(), "{}mcprint_sp() : data.is_null()", MODULE_PATH);
+    assert!(len > 0, "{}mcprint_sp() : n = {}", MODULE_PATH, len);
+
+    bindings::mcprint_sp(sp, data, len)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn mvcur_sp(sp: SCREEN, oldrow: i32, oldcol: i32, newrow: i32, newcol: i32) -> i32 {
+    assert!(!sp.is_null(), "{}mvcur_sp() : sp.is_null()", MODULE_PATH);
+    assert!(oldrow >= 0, "{}mvcur_sp() : oldrow = {}", MODULE_PATH, oldrow);
+    assert!(oldcol >= 0, "{}mvcur_sp() : oldcol = {}", MODULE_PATH, oldcol);
+    assert!(newrow >= 0, "{}mvcur_sp() : newrow = {}", MODULE_PATH, newrow);
+    assert!(newcol >= 0, "{}mvcur_sp() : newcol = {}", MODULE_PATH, newcol);
+
+    bindings::mvcur_sp(sp, oldrow, oldcol, newrow, newcol)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn napms_sp(sp: SCREEN, ms: i32) -> i32 {
+    assert!(!sp.is_null(), "{}napms_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::napms_sp(sp, ms)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn newpad_sp(sp: SCREEN, lines: i32, cols: i32) -> Option<WINDOW> {
+    assert!(!sp.is_null(), "{}newpad_sp() : sp.is_null()", MODULE_PATH);
+    assert!(lines >= 0, "{}newpad() : lines = {}", MODULE_PATH, lines);
+    assert!(cols >= 0, "{}newpad() : cols = {}", MODULE_PATH, cols);
+
+    bindings::newpad_sp(sp, lines, cols).as_mut().map(|ptr| ptr as WINDOW)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn new_prescr() -> Option<SCREEN> {
+    bindings::new_prescr().as_mut().map(|ptr| ptr as SCREEN)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn newterm_sp(sp: SCREEN, ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
+    assert!(!sp.is_null(), "{}newterm_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!outfd.is_null(), "{}newterm_sp() : outfd.is_null()", MODULE_PATH);
+    assert!(!infd.is_null(), "{}newterm_sp() : infd.is_null()", MODULE_PATH);
+
+    let term_type = match ty {
+        Some(term) => term.as_ptr(),
+        None       => ptr::null()
+    };
+
+    bindings::newterm_sp(sp, term_type, outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn newwin_sp(sp: SCREEN, lines: i32, cols: i32, y: i32, x: i32) -> Option<WINDOW> {
+    assert!(!sp.is_null(), "{}newwin_sp() : sp.is_null()", MODULE_PATH);
+    assert!(lines >= 0, "{}newwin_sp() : lines = {}", MODULE_PATH, lines);
+    assert!(cols >= 0, "{}newwin_sp() : cols = {}", MODULE_PATH, cols);
+    assert!(y >= 0, "{}newwin_sp() : y = {}", MODULE_PATH, y);
+    assert!(x >= 0, "{}newwin_sp() : x = {}", MODULE_PATH, x);
+
+    bindings::newwin_sp(sp, lines, cols, y, x).as_mut().map(|ptr| ptr as WINDOW)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn nl_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}nl_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::nl_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn nocbreak_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}nocbreak_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::nocbreak_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn noecho_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}noecho_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::noecho_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn nofilter_sp(sp: SCREEN) {
+    assert!(!sp.is_null(), "{}nofilter_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::nofilter_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn nonl_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}nonl_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::nonl_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn noqiflush_sp(sp: SCREEN) {
+    assert!(!sp.is_null(), "{}noqiflush_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::noqiflush_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn noraw_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}noraw_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::noraw_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn pair_content_sp(sp: SCREEN, pair: short_t, fg: *mut short_t, bg: *mut short_t) -> i32 {
+    assert!(!sp.is_null(), "{}pair_content_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!fg.is_null(), "{}pair_content_sp() : fg.is_null()", MODULE_PATH);
+    assert!(!bg.is_null(), "{}pair_content_sp() : bg.is_null()", MODULE_PATH);
+
+    bindings::pair_content_sp(sp, pair, fg, bg)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn qiflush_sp(sp: SCREEN) {
+    assert!(!sp.is_null(), "{}qiflush_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::qiflush_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn raw_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}raw_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::raw_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn reset_color_pairs_sp(sp: SCREEN) {
+    assert!(!sp.is_null(), "{}reset_color_pairs_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::reset_color_pairs_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn reset_prog_mode_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}reset_prog_mode_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::reset_prog_mode_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn reset_shell_mode_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}reset_shell_mode_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::reset_shell_mode_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn resetty_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}resetty_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::resetty_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn resize_term_sp(sp: SCREEN, lines: i32, cols: i32) -> i32 {
+    assert!(!sp.is_null(), "{}resize_term_sp() : sp.is_null()", MODULE_PATH);
+    assert!(lines >= 0, "{}resize_term_sp() : lines = {}", MODULE_PATH, lines);
+    assert!(cols >= 0, "{}resize_term_sp() : cols = {}", MODULE_PATH, cols);
+
+    bindings::resize_term_sp(sp, lines, cols)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn resizeterm_sp(sp: SCREEN, lines: i32, cols: i32) -> i32 {
+    assert!(!sp.is_null(), "{}resizeterm_sp() : sp.is_null()", MODULE_PATH);
+    assert!(lines >= 0, "{}resizeterm_sp() : lines = {}", MODULE_PATH, lines);
+    assert!(cols >= 0, "{}resizeterm_sp() : cols = {}", MODULE_PATH, cols);
+
+    bindings::resizeterm_sp(sp, lines, cols)
+}
+
+// int restartterm_sp(SCREEN*, NCURSES_CONST char*, int, int *);
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn ripoffline_sp(sp: SCREEN, line: i32, init: bindings::RipoffInit) -> i32 {
+    assert!(!sp.is_null(), "{}ripoffline_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::ripoffline_sp(sp, line, init)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn savetty_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}savetty_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::savetty_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn scr_init_sp(sp: SCREEN, filename: &[i8]) -> i32 {
+    assert!(!sp.is_null(), "{}scr_init_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::scr_init_sp(sp, filename.as_ptr())
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn scr_restore_sp(sp: SCREEN, filename: &[i8]) -> i32 {
+    assert!(!sp.is_null(), "{}scr_restore_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::scr_restore_sp(sp, filename.as_ptr())
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn scr_set_sp(sp: SCREEN, filename: &[i8]) -> i32 {
+    assert!(!sp.is_null(), "{}scr_set_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::scr_set_sp(sp, filename.as_ptr())
+}
+
+// TERMINAL* set_curterm_sp(SCREEN*, TERMINAL*);
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn set_escdelay_sp(sp: SCREEN, delay: i32) -> i32 {
+    assert!(!sp.is_null(), "{}set_escdelay_sp() : sp.is_null()", MODULE_PATH);
+    assert!(delay >= 0, "{}set_escdelay_sp() : delay = {}", MODULE_PATH, delay);
+
+    bindings::set_escdelay_sp(sp, delay)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn set_tabsize_sp(sp: SCREEN, size: i32) -> i32 {
+    assert!(!sp.is_null(), "{}set_tabsize_sp() : sp.is_null()", MODULE_PATH);
+    assert!(size >= 0, "{}set_tabsize_sp() : size = {}", MODULE_PATH, size);
+
+    bindings::set_tabsize_sp(sp, size)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_attroff_sp(sp: SCREEN, ch: chtype) -> i32 {
+    assert!(!sp.is_null(), "{}slk_attroff_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_attroff_sp(sp, ch)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_attron_sp(sp: SCREEN, ch: chtype) -> i32 {
+    assert!(!sp.is_null(), "{}slk_attron_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_attron_sp(sp, ch)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_attr_set_sp(sp: SCREEN, attrs: attr_t, pair: short_t, opts: *mut libc::c_void) -> i32 {
+    assert!(!sp.is_null(), "{}slk_attr_set_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_attr_set_sp(sp, attrs, pair, opts)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_attrset_sp(sp: SCREEN, ch: chtype) -> i32 {
+    assert!(!sp.is_null(), "{}slk_attrset_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_attrset_sp(sp, ch)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_attr_sp(sp: SCREEN) -> attr_t {
+    assert!(!sp.is_null(), "{}slk_attr_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_attr_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_clear_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}slk_clear_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_clear_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_color_sp(sp: SCREEN, pair: short_t) -> i32 {
+    assert!(!sp.is_null(), "{}slk_color_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_color_sp(sp, pair)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_init_sp(sp: SCREEN, fmt: i32) -> i32 {
+    assert!(!sp.is_null(), "{}slk_init_sp() : sp.is_null()", MODULE_PATH);
+    assert!(fmt >= 0, "{}slk_init_sp() : fmt = {}", MODULE_PATH, fmt);
+
+    bindings::slk_init_sp(sp, fmt)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_label_sp(sp: SCREEN, n: i32) -> Option<String> {
+    assert!(!sp.is_null(), "{}slk_label_sp() : sp.is_null()", MODULE_PATH);
+    assert!(n > 0, "{}slk_label_sp() : n = {}", MODULE_PATH, n);
+
+    (bindings::slk_label_sp(sp, n) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_noutrefresh_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}slk_noutrefresh_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_noutrefresh_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_refresh_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}slk_refresh_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_refresh_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_restore_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}slk_restore_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_restore_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_set_sp(sp: SCREEN, n: i32, label: &[i8], fmt: i32) -> i32 {
+    assert!(!sp.is_null(), "{}slk_set_sp() : sp.is_null()", MODULE_PATH);
+    assert!(n > 0, "{}slk_set_sp() : n = {}", MODULE_PATH, n);
+    assert!(fmt >= 0, "{}slk_set_sp() : fmt = {}", MODULE_PATH, fmt);
+
+    bindings::slk_set_sp(sp, n, label.as_ptr(), fmt)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn slk_touch_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}slk_touch_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::slk_touch_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn start_color_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}start_color_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::start_color_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn term_attrs_sp(sp: SCREEN) -> attr_t {
+    assert!(!sp.is_null(), "{}term_attrs_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::term_attrs_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn termattrs_sp(sp: SCREEN) -> chtype {
+    assert!(!sp.is_null(), "{}termattrs_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::termattrs_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn termname_sp(sp: SCREEN) -> Option<String> {
+    assert!(!sp.is_null(), "{}termname_sp() : sp.is_null()", MODULE_PATH);
+
+    (bindings::termname() as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn typeahead_sp(sp: SCREEN, fd: i32) -> i32 {
+    assert!(!sp.is_null(), "{}typeahead_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::typeahead_sp(sp, fd)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn unctrl_sp(sp: SCREEN, c: chtype) -> Option<String> {
+    assert!(!sp.is_null(), "{}unctrl_sp() : sp.is_null()", MODULE_PATH);
+
+    (bindings::unctrl_sp(sp, c) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn ungetch_sp(sp: SCREEN, ch: i32) -> i32 {
+    assert!(!sp.is_null(), "{}ungetch_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::ungetch_sp(sp, ch)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn unget_wch_sp(sp: SCREEN, ch: wchar_t) -> i32 {
+    assert!(!sp.is_null(), "{}unget_wch_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::unget_wch_sp(sp, ch)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn use_default_colors_sp(sp: SCREEN) -> i32 {
+    assert!(!sp.is_null(), "{}use_default_colors_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::use_default_colors_sp(sp)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn use_env_sp(sp: SCREEN, f: bool) {
+    assert!(!sp.is_null(), "{}use_env_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::use_env_sp(sp, f)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn use_tioctl_sp(sp: SCREEN, f: bool) {
+    assert!(!sp.is_null(), "{}use_tioctl_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::use_tioctl_sp(sp, f)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn use_legacy_coding_sp(sp: SCREEN, level: i32) -> i32 {
+    assert!(!sp.is_null(), "{}use_legacy_coding_sp() : sp.is_null()", MODULE_PATH);
+    assert!(level >= 0, "{}use_legacy_coding_sp() : level = {}", MODULE_PATH, level);
+
+    bindings::use_legacy_coding_sp(sp, level)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn vid_attr_sp(sp: SCREEN, attrs: attr_t, pair: short_t) -> i32 {
+    assert!(!sp.is_null(), "{}vid_attr_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::vid_attr_sp(sp, attrs, pair, ptr::null_mut())
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn vidattr_sp(sp: SCREEN, attrs: chtype) -> i32 {
+    assert!(!sp.is_null(), "{}vidattr_sp() : sp.is_null()", MODULE_PATH);
+
+    bindings::vidattr_sp(sp, attrs)
+}
+
+// int vid_puts_sp(SCREEN*, attr_t, short, void *, NCURSES_SP_OUTC);
+
+// int vidputs_sp(SCREEN*, chtype, NCURSES_SP_OUTC);
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn wunctrl_sp(sp: SCREEN, ch: *mut cchar_t) -> Option<*mut wchar_t> {
+    assert!(!sp.is_null(), "{}wunctrl_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!ch.is_null(), "{}wunctrl_sp() : ch.is_null()", MODULE_PATH);
+
+    bindings::wunctrl_sp(sp, ch).as_mut().map(|ptr| ptr as *mut wchar_t)
+}

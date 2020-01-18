@@ -25,7 +25,11 @@
 #![allow(clippy::too_many_arguments)]
 
 use libc::{c_void, EINTR};
-use std::{convert::{From, TryFrom}, path, char, ptr, slice, time, mem};
+use std::{
+    convert::{From, TryFrom},
+    char, ptr, slice, time, mem, os::unix::io::AsRawFd,
+    io::{Write, Read}, ffi::CString
+};
 
 use constants::{
     ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
@@ -52,7 +56,7 @@ use ncurseswerror::*;
 use region::*;
 use size::*;
 use softlabeltype::*;
-use shims::{ncurses, bindings::CCHARW_MAX};
+use shims::{ncurses, bindings};
 
 static MODULE_PATH: &str = "ncursesw::ncurses::";
 
@@ -119,7 +123,7 @@ pub fn COLORS() -> i32 {
     ncurses::COLORS()
 }
 
-#[deprecated(since = "0.3.3", note = "no publicly exposed equivalent.")]
+#[deprecated(since = "0.4.0", note = "no publicly exposed equivalent.")]
 /// Return the attribute value of a given `normal` color pair.
 ///
 /// ## Example
@@ -155,7 +159,7 @@ pub fn COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t {
     ncurses::COLOR_PAIR(normal::ColorPair::into(color_pair)) as attr_t
 }
 
-#[deprecated(since = "0.3.3", note = "use normal::Attributes::color_pair() instead")]
+#[deprecated(since = "0.4.0", note = "use normal::Attributes::color_pair() instead")]
 /// Return the color pair from  given `normal` attributes value.
 ///
 /// ## Example
@@ -635,6 +639,9 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
         rc => Err(ncurses_function_error_with_rc!("addwstr", rc))
     }
 }
+
+// see src/include/colorpair.rs
+//pub fn alloc_pair(fg: i32, bg: i32) -> i32 { }
 
 /// Assign the colors given as the default foreground and background colors of color pair 0
 ///
@@ -1467,7 +1474,7 @@ basic_ncurses_function!(clrtobot, "clrtobot");
 
 basic_ncurses_function!(clrtoeol, "clrtoeol");
 
-#[deprecated(since = "0.3.3", note = "Use normal::Color::rgb() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() instead")]
 pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
@@ -1554,20 +1561,20 @@ basic_ncurses_function!(delch, "delch");
 
 basic_ncurses_function!(deleteln, "deleteln");
 
-pub fn delscreen(sp: SCREEN) {
-    unsafe { ncurses::delscreen(sp) }
+pub fn delscreen(screen: SCREEN) {
+    unsafe { ncurses::delscreen(screen) }
 }
 
 basic_ncurses_function_with_window!(delwin, "delwin");
 
 pub fn derwin(orig: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
-    unsafe { ncurses::derwin(orig, size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("derwin"))
+    unsafe { ncurses::derwin(orig, size.lines, size.columns, origin.y, origin.x).ok_or(ncurses_function_error!("derwin")) }
 }
 
 basic_ncurses_function!(doupdate, "doupdate");
 
 pub fn dupwin(handle: WINDOW) -> result!(WINDOW) {
-    unsafe { ncurses::dupwin(handle) }.ok_or(ncurses_function_error!("dupwin"))
+    unsafe { ncurses::dupwin(handle).ok_or(ncurses_function_error!("dupwin")) }
 }
 
 basic_ncurses_function!(echo, "echo");
@@ -1609,7 +1616,7 @@ pub fn erasewchar() -> result!(WideChar) {
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use extend::Color::rgb() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() instead")]
 pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
@@ -1621,7 +1628,7 @@ pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use extend::ColorPair::colors() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() instead")]
 pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
@@ -1640,6 +1647,9 @@ pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
 }
 
 simple_ncurses_function!(filter);
+
+// see src/include/colorpair.rs
+//pub fn find_pair(fg: i32, bg: i32) -> i32 { }
 
 /// Flashes the screen (visible bell), and if that is not possible, audible alarm on the terminal.
 ///
@@ -1857,7 +1867,7 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
 }
 
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    let mut wch: [wchar_t; CCHARW_MAX as usize] = [0; CCHARW_MAX as usize];
+    let mut wch: [wchar_t; bindings::CCHARW_MAX as usize] = [0; bindings::CCHARW_MAX as usize];
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
     let opts: *mut i32 = ptr::null_mut();
@@ -2089,18 +2099,18 @@ pub fn getstr() -> result!(String) {
     }
 }
 
-pub fn getwin(path: &path::Path) -> result!(WINDOW) {
-    match path.to_str() {
-        Some(path_str) => {
-            let mode = "r";
+pub fn getwin<I: AsRawFd + Read>(file: I) -> result!(WINDOW) {
+    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
 
-            match unsafe { crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) } {
-                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode: mode.to_string() }),
-                Some(fp) => unsafe { ncurses::getwin(fp) }.ok_or(ncurses_function_error!("getwin"))
-            }
-        },
-        None           => Err(ncurses_function_error!("getwin"))
+        if !fs.is_null() {
+            Ok(fs)
+        } else {
+            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
+        }
     }
+
+    unsafe { ncurses::getwin(fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin")) }
 }
 
 pub fn halfdelay(tenths: time::Duration) -> result!(()) {
@@ -2108,7 +2118,7 @@ pub fn halfdelay(tenths: time::Duration) -> result!(()) {
 
     match ncurses::halfdelay(delay) {
         OK => Ok(()),
-        rc => Err(ncurses_function_error_with_rc!("delay_output", rc))
+        rc => Err(ncurses_function_error_with_rc!("halfdelay", rc))
     }
 }
 
@@ -2236,7 +2246,7 @@ pub fn inchstr() -> result!(ChtypeString) {
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use normal::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::Color::new() instead")]
 pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -2252,7 +2262,7 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use extend::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::new() instead")]
 pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -2268,7 +2278,7 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(exten
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use extend::ColorPair::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() instead")]
 pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
     if pair_number >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -2286,7 +2296,7 @@ pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(e
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use normal::ColorPair::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() instead")]
 pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
     if i32::from(pair_number) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -2314,7 +2324,7 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
 /// also causes the first call to `refresh` to clear the screen. If errors occur, `initscr` writes an
 /// appropriate error message to standard error and exits; otherwise, a pointer is returned to `stdscr`.
 pub fn initscr() -> result!(WINDOW) {
-    unsafe { ncurses::initscr() }.ok_or(ncurses_function_error!("initscr"))
+    unsafe { ncurses::initscr().ok_or(ncurses_function_error!("initscr")) }
 }
 
 pub fn innstr(number: i32) -> result!(String) {
@@ -4636,20 +4646,33 @@ pub fn napms(ms: time::Duration) -> result!(()) {
 }
 
 pub fn newpad(size: Size) -> result!(WINDOW) {
-    unsafe { ncurses::newpad(size.lines, size.columns) }.ok_or(ncurses_function_error!("newpad"))
+    unsafe { ncurses::newpad(size.lines, size.columns).ok_or(ncurses_function_error!("newpad")) }
 }
 
-pub fn newterm(
-    _ty: Option<&str>,
-    _outfd: crate::shims::bindings::FILE,
-    _infd: crate::shims::bindings::FILE
-) -> Option<SCREEN>
+pub fn newterm<O, I>(term_type: Option<&str>, output: O, input: I) -> result!(SCREEN)
+    where O: AsRawFd + Write,
+          I: AsRawFd + Read
 {
-    unimplemented!();
+    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
+
+        if !fs.is_null() {
+            Ok(fs)
+        } else {
+            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
+        }
+    }
+
+    let term = match term_type {
+        Some(ty) => Some(unsafe { c_str_with_nul!(ty) }),
+        None     => None
+    };
+
+    unsafe { ncurses::newterm(term, fdopen(output, "wb+")?, fdopen(input, "rb+")?).ok_or(ncurses_function_error!("newterm")) }
 }
 
 pub fn newwin(size: Size, origin: Origin) -> result!(WINDOW) {
-    unsafe { ncurses::newwin(size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("newwin"))
+    unsafe { ncurses::newwin(size.lines, size.columns, origin.y, origin.x).ok_or(ncurses_function_error!("newwin")) }
 }
 
 basic_ncurses_function!(nl, "nl");
@@ -4694,7 +4717,7 @@ pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.3.3", note = "Use normal::ColorPair::colors() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() instead")]
 pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
@@ -4737,22 +4760,20 @@ pub fn putp(_str: &str) -> i32 {
     unimplemented!();
 }
 
-pub fn putwin(handle: WINDOW, path: &path::Path) -> result!(()) {
-    match path.to_str() {
-        Some(path_str) => {
-            let mode = "w";
+pub fn putwin<O: AsRawFd + Write>(handle: WINDOW, file: O) -> result!(()) {
+    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
 
-            match unsafe { crate::shims::funcs::fopen(c_str_with_nul!(path_str), c_str_with_nul!(mode)) } {
-                None     => Err(NCurseswError::FOpen { fname: path.display().to_string(), mode:  mode.to_string() }),
-                Some(fp) => {
-                    match unsafe { ncurses::putwin(handle, fp) } {
-                        OK => Ok(()),
-                        rc => Err(ncurses_function_error_with_rc!("putwin", rc))
-                    }
-                }
-            }
-        },
-        None => Err(ncurses_function_error!("putwin"))
+        if !fs.is_null() {
+            Ok(fs)
+        } else {
+            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
+        }
+    }
+
+    match unsafe { ncurses::putwin(handle, fdopen(file, "wb+")?) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("putwin", rc))
     }
 }
 
@@ -4801,19 +4822,19 @@ pub fn ripoffline(line: Orientation, init: RipoffInit) -> result!(()) {
 
 basic_ncurses_function!(savetty, "savetty");
 
-pub fn scr_dump(_filename: &str) -> i32 {
+pub fn scr_dump(_filename: &str) -> result!(()) {
     unimplemented!();
 }
 
-pub fn scr_init(_filename: &str) -> i32 {
+pub fn scr_init(_filename: &str) -> result!(()) {
     unimplemented!();
 }
 
-pub fn scr_restore(_filename: &str) -> i32 {
+pub fn scr_restore(_filename: &str) -> result!(()) {
     unimplemented!();
 }
 
-pub fn scr_set(_filename: &str) -> i32 {
+pub fn scr_set(_filename: &str) -> result!(()) {
     unimplemented!();
 }
 
@@ -4849,8 +4870,8 @@ pub fn set_tabsize(size: i32) -> result!(()) {
     }
 }
 
-pub fn set_term(scr: SCREEN) -> result!(SCREEN) {
-    unsafe { ncurses::set_term(scr) }.ok_or(ncurses_function_error!("set_term"))
+pub fn set_term(screen: SCREEN) -> result!(SCREEN) {
+    unsafe { ncurses::set_term(screen) }.ok_or(ncurses_function_error!("set_term"))
 }
 
 pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(ComplexChar)
@@ -4992,11 +5013,11 @@ basic_ncurses_function!(standout, "standout");
 basic_ncurses_function!(start_color, "start_color");
 
 pub fn subpad(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
-    unsafe { ncurses::subpad(handle, size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("subpad"))
+    unsafe { ncurses::subpad(handle, size.lines, size.columns, origin.y, origin.x).ok_or(ncurses_function_error!("subpad")) }
 }
 
 pub fn subwin(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
-    unsafe { ncurses::subwin(handle, size.lines, size.columns, origin.y, origin.x) }.ok_or(ncurses_function_error!("subwin"))
+    unsafe { ncurses::subwin(handle, size.lines, size.columns, origin.y, origin.x).ok_or(ncurses_function_error!("subwin")) }
 }
 
 pub fn syncok(handle: WINDOW, bf: bool) -> result!(()) {
@@ -7069,14 +7090,9 @@ pub fn wtouchln(handle: WINDOW, line: i32, n: i32, changed: Changed) -> result!(
 pub fn wunctrl(ch: ComplexChar) -> result!(WideChar) {
     let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
 
-    let ptr = unsafe { ncurses::wunctrl(wch.as_mut_ptr()) };
-
-    if ptr.is_null() {
-        Err(ncurses_function_error!("wunctrl"))
-    } else {
-        let wc = WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] as wchar_t });
-
-        Ok(wc)
+    match unsafe { ncurses::wunctrl(wch.as_mut_ptr()) } {
+        Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] as wchar_t })),
+        None      => Err(ncurses_function_error!("wunctrl"))
     }
 }
 
@@ -7091,5 +7107,638 @@ pub fn wvline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) 
     match unsafe { ncurses::wvline_set(handle, &ComplexChar::into(wch), number) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("wvline_set", rc))
+    }
+}
+
+// `_sp` functions.
+
+//pub unsafe fn alloc_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32
+
+pub fn assume_default_colors_sp<S, C, T>(screen: SCREEN, colors: S) -> result!(())
+    where S: ColorsType<C, T>,
+          C: ColorType<T>,
+          T: ColorAttributeTypes
+{
+    match unsafe { ncurses::assume_default_colors_sp(screen, colors.foreground().number(), colors.background().number()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("assume_default_colors_sp", rc))
+    }
+}
+
+pub fn baudrate_sp(screen: SCREEN) -> i32 {
+    unsafe { ncurses::baudrate_sp(screen) }
+}
+
+pub fn beep_sp(screen: SCREEN) -> result!(()) {
+    match unsafe { ncurses::beep_sp(screen) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("beep_sp", rc))
+    }
+}
+
+pub fn can_change_color_sp(screen: SCREEN) -> bool {
+    unsafe { ncurses::can_change_color_sp(screen) }
+}
+
+basic_ncurses_sp_function!(cbreak_sp, "cbreak_sp");
+
+//#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() instead")]
+pub fn color_content_sp(screen: SCREEN, color: normal::Color) -> result!(normal::RGB) {
+    let mut r: [short_t; 1] = [0];
+    let mut g: [short_t; 1] = [0];
+    let mut b: [short_t; 1] = [0];
+
+    match unsafe { ncurses::color_content_sp(screen, normal::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+        OK => Ok(normal::RGB::new(r[0], g[0], b[0])),
+        rc => Err(ncurses_function_error_with_rc!("color_content_sp", rc))
+    }
+}
+
+pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
+    match unsafe { ncurses::curs_set_sp(screen, match cursor {
+        CursorType::Invisible   => 0,
+        CursorType::Visible     => 1,
+        CursorType::VeryVisible => 2
+    }) } {
+        0  => Ok(CursorType::Invisible),
+        1  => Ok(CursorType::Visible),
+        2  => Ok(CursorType::VeryVisible),
+        rc => Err(ncurses_function_error_with_rc!("curs_set_sp", rc))
+    }
+}
+
+pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
+    match unsafe { ncurses::define_key_sp(
+        screen,
+        match definition {
+            None    => ptr::null_mut(),
+            Some(s) => s.to_c_str()?.as_ptr() as *mut i8
+        },
+        KeyBinding::into(keycode)
+    )} {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
+    }
+}
+
+basic_ncurses_sp_function!(def_prog_mode_sp, "def_prog_mode_sp");
+
+basic_ncurses_sp_function!(def_shell_mode_sp, "def_shell_mode_sp");
+
+pub fn delay_output_sp(screen: SCREEN, ms: time::Duration) -> result!(()) {
+    let ms = i32::try_from(ms.as_millis())?;
+
+    match unsafe { ncurses::delay_output_sp(screen, ms) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("delay_output_sp", rc))
+    }
+}
+
+basic_ncurses_sp_function!(doupdate_sp, "doupdate_sp");
+
+basic_ncurses_sp_function!(echo_sp, "echo_sp");
+
+basic_ncurses_sp_function!(endwin_sp, "endwin_sp");
+
+pub fn erasechar_sp(screen: SCREEN) -> result!(char) {
+    let rc = unsafe { ncurses::erasechar_sp(screen) };
+
+    if rc < 0 {
+        Err(ncurses_function_error_with_rc!("erasechar_sp", i32::from(rc)))
+    } else {
+        Ok(char::from(rc as u8))
+    }
+}
+
+//#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() instead")]
+pub fn extended_color_content_sp(screen: SCREEN, color: extend::Color) -> result!(extend::RGB) {
+    let mut r: [i32; 1] = [0];
+    let mut g: [i32; 1] = [0];
+    let mut b: [i32; 1] = [0];
+
+    match unsafe { ncurses::extended_color_content_sp(screen, extend::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+        OK => Ok(extend::RGB::new(r[0], g[0], b[0])),
+        rc => Err(ncurses_function_error_with_rc!("extended_color_content_sp", rc))
+    }
+}
+
+//#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() instead")]
+pub fn extended_pair_content_sp(screen: SCREEN, color_pair: extend::ColorPair) -> result!(extend::Colors) {
+    let mut fg: [i32; 1] = [0];
+    let mut bg: [i32; 1] = [0];
+
+    match unsafe { ncurses::extended_pair_content_sp(screen, extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0]))),
+        rc => Err(ncurses_function_error_with_rc!("extended_pair_content_sp", rc))
+    }
+}
+
+pub fn extended_slk_color_sp(screen: SCREEN, color_pair: extend::ColorPair) -> result!(()) {
+    match unsafe { ncurses::extended_slk_color_sp(screen, color_pair.number()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("extended_slk_color_sp", rc))
+    }
+}
+
+simple_ncurses_sp_function!(filter_sp);
+
+//pub unsafe fn find_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32
+
+#[deprecated(since = "0.5.0", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
+pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
+    where P:   ColorPairType<T>,
+          i32: From<P>,
+          T:   ColorAttributeTypes
+{
+    match unsafe { ncurses::free_pair_sp(screen, color_pair.into()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("free_pair_sp", rc))
+    }
+}
+
+pub fn flash_sp(screen: SCREEN) -> result!(()) {
+    match unsafe { ncurses::flash_sp(screen) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("flash_sp", rc))
+    }
+}
+
+basic_ncurses_sp_function!(flushinp_sp, "flushinp_sp");
+
+pub fn get_escdelay_sp(screen: SCREEN) -> result!(time::Duration) {
+    Ok(time::Duration::from_millis(u64::try_from(unsafe { ncurses::get_escdelay_sp(screen) })?))
+}
+
+pub fn getwin_sp<I: AsRawFd + Read>(screen: SCREEN, file: I) -> result!(WINDOW) {
+    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
+
+        if !fs.is_null() {
+            Ok(fs)
+        } else {
+            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
+        }
+    }
+
+    unsafe { ncurses::getwin_sp(screen, fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin_sp")) }
+}
+
+pub fn halfdelay_sp(screen: SCREEN, tenths: time::Duration) -> result!(()) {
+    let delay = i32::try_from(tenths.as_secs())? / 10;
+
+    match unsafe { ncurses::halfdelay_sp(screen, delay) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("halfdelay_sp", rc))
+    }
+}
+
+pub fn has_colors_sp(screen: SCREEN) -> bool {
+    unsafe { ncurses::has_colors_sp(screen) }
+}
+
+pub fn has_ic_sp(screen: SCREEN) -> bool {
+    unsafe { ncurses::has_ic_sp(screen) }
+}
+
+pub fn has_il_sp(screen: SCREEN) -> bool {
+    unsafe { ncurses::has_il_sp(screen) }
+}
+
+pub fn has_key_sp(screen: SCREEN, ch: KeyBinding) -> bool {
+    unsafe { ncurses::has_key_sp(screen, KeyBinding::into(ch)) == TRUE }
+}
+
+//#[deprecated(since = "0.4.0", note = "Use normal::Color::new() instead")]
+pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
+    if i32::from(color_number) >= COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match unsafe { ncurses::init_color_sp(screen, color_number, rgb.red(), rgb.green(), rgb.blue()) } {
+            OK => {
+                set_ncurses_colortype(NCursesColorType::Normal);
+
+                Ok(normal::Color::from(color_number))
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_color_sp", rc))
+        }
+    }
+}
+
+//#[deprecated(since = "0.4.0", note = "Use extend::Color::new() instead")]
+pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
+    if color_number >= COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match unsafe { ncurses::init_extended_color_sp(screen, color_number, rgb.red(), rgb.green(), rgb.blue()) } {
+            OK => {
+                set_ncurses_colortype(NCursesColorType::Extended);
+
+                Ok(extend::Color::from(color_number))
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_extended_color_sp", rc))
+        }
+    }
+}
+
+//#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() instead")]
+pub fn init_extended_pair_sp(screen: SCREEN, pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
+    if pair_number >= COLOR_PAIRS() {
+        Err(NCurseswError::ColorPairLimit)
+    } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match unsafe { ncurses::init_extended_pair_sp(screen, pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) } {
+            OK => {
+                set_ncurses_colortype(NCursesColorType::Extended);
+
+                Ok(extend::ColorPair::from(pair_number))
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_extended_pair_sp", rc))
+        }
+    }
+}
+
+//#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() instead")]
+pub fn init_pair_sp(screen: SCREEN, pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
+    if i32::from(pair_number) >= COLOR_PAIRS() {
+        Err(NCurseswError::ColorPairLimit)
+    } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
+        Err(NCurseswError::ColorLimit)
+    } else {
+        match unsafe { ncurses::init_pair_sp(screen, pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) } {
+            OK => {
+                set_ncurses_colortype(NCursesColorType::Normal);
+
+                Ok(normal::ColorPair::from(pair_number))
+            },
+            rc => Err(ncurses_function_error_with_rc!("init_pair_sp", rc))
+        }
+    }
+}
+
+pub fn intrflush_sp(screen: SCREEN, window: WINDOW, bf: bool) -> result!(()) {
+    match unsafe { ncurses::intrflush_sp(screen, window, bf) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("intrflush_sp", rc))
+    }
+}
+
+pub fn isendwin_sp(screen: SCREEN) -> bool {
+    unsafe { ncurses::isendwin_sp(screen) }
+}
+
+pub fn is_term_resized_sp(screen: SCREEN, size: Size) -> bool {
+    unsafe { ncurses::is_term_resized_sp(screen, size.lines, size.columns) }
+}
+
+pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> result!(String) {
+    unsafe { ncurses::keybound_sp(screen, KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound_sp")) }
+}
+
+pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(KeyBinding) {
+    let c = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
+
+    if c < 0 {
+        Err(ncurses_function_error_with_rc!("key_defined_sp", c))
+    } else {
+        Ok(KeyBinding::from(c))
+    }
+}
+
+pub fn keyname_sp(screen: SCREEN, c: KeyBinding) -> result!(String) {
+    unsafe { ncurses::keyname_sp(screen, KeyBinding::into(c)).ok_or(ncurses_function_error!("keyname_sp")) }
+}
+
+pub fn keyok_sp(screen: SCREEN, keycode: KeyBinding, enable: bool) -> result!(()) {
+    match unsafe { ncurses::keyok_sp(screen, KeyBinding::into(keycode), enable) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("keyok_sp", rc))
+    }
+}
+
+pub fn killchar_sp(screen: SCREEN) -> result!(char) {
+    let rc = unsafe { ncurses::killchar_sp(screen) };
+
+    if rc < 0 {
+        Err(ncurses_function_error_with_rc!("killchar_sp", i32::from(rc)))
+    } else {
+        Ok(char::from(rc as u8))
+    }
+}
+
+pub fn longname_sp(screen: SCREEN) -> result!(String) {
+    unsafe { ncurses::longname_sp(screen).ok_or(ncurses_function_error!("longname_sp")) }
+}
+
+pub fn mcprint_sp(_screen: SCREEN, _data: *mut i8, _len: i32) -> i32 {
+    unimplemented!();
+}
+
+pub fn mvcur_sp(screen: SCREEN, old: Origin, new: Origin) -> result!(()) {
+    match unsafe { ncurses::mvcur_sp(screen, old.y, old.x, new.y, new.x) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("mvcur_sp", rc))
+    }
+}
+
+#[deprecated(since = "0.5.0", note = "ncurses library call superseeded by native rust call. Use std::thread::sleep(dur: std::time::Duration) instead")]
+pub fn napms_sp(screen: SCREEN, ms: time::Duration) -> result!(()) {
+    let ms = i32::try_from(ms.as_millis())?;
+
+    match unsafe { ncurses::napms_sp(screen, ms) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("napms_sp", rc))
+    }
+}
+
+pub fn newpad_sp(screen: SCREEN, size: Size) -> result!(WINDOW) {
+    unsafe { ncurses::newpad_sp(screen, size.lines, size.columns).ok_or(ncurses_function_error!("newpad_sp")) }
+}
+
+pub fn new_prescr() -> result!(SCREEN) {
+    unsafe { ncurses::new_prescr().ok_or(ncurses_function_error!("new_prescr")) }
+}
+
+pub fn newterm_sp<O, I>(screen: SCREEN, term_type: Option<&str>, output: O, input: I) -> result!(SCREEN)
+    where O: AsRawFd + Write,
+          I: AsRawFd + Read
+{
+    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
+
+        if !fs.is_null() {
+            Ok(fs)
+        } else {
+            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
+        }
+    }
+
+    let term = match term_type {
+        Some(ty) => Some(unsafe { c_str_with_nul!(ty) }),
+        None     => None
+    };
+
+    unsafe { ncurses::newterm_sp(screen, term, fdopen(output, "wb+")?, fdopen(input, "rb+")?).ok_or(ncurses_function_error!("newterm_sp")) }
+}
+
+pub fn newwin_sp(screen: SCREEN, size: Size, origin: Origin) -> result!(WINDOW) {
+    unsafe { ncurses::newwin_sp(screen, size.lines, size.columns, origin.y, origin.x).ok_or(ncurses_function_error!("newwin_sp")) }
+}
+
+basic_ncurses_sp_function!(nl_sp, "nl_sp");
+
+basic_ncurses_sp_function!(nocbreak_sp, "nocbreak_sp");
+
+basic_ncurses_sp_function!(noecho_sp, "noecho_sp");
+
+simple_ncurses_sp_function!(nofilter_sp);
+
+basic_ncurses_sp_function!(nonl_sp, "nonl_sp");
+
+simple_ncurses_sp_function!(noqiflush_sp);
+
+basic_ncurses_sp_function!(noraw_sp, "noraw_sp");
+
+//#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() instead")]
+pub fn pair_content_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(normal::Colors) {
+    let mut fg: [short_t; 1] = [0];
+    let mut bg: [short_t; 1] = [0];
+
+    match unsafe { ncurses::pair_content_sp(screen, normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0]))),
+        rc => Err(ncurses_function_error_with_rc!("pair_content_sp", rc))
+    }
+}
+
+simple_ncurses_sp_function!(qiflush_sp);
+
+basic_ncurses_sp_function!(raw_sp, "raw_sp");
+
+simple_ncurses_sp_function!(reset_color_pairs_sp);
+
+basic_ncurses_sp_function!(reset_prog_mode_sp, "reset_prog_mode_sp");
+
+basic_ncurses_sp_function!(reset_shell_mode_sp, "reset_shell_mode_sp");
+
+basic_ncurses_sp_function!(resetty_sp, "resetty_sp");
+
+pub fn resize_term_sp(screen: SCREEN, size: Size) -> result!(()) {
+    match unsafe { ncurses::resize_term_sp(screen, size.lines, size.columns) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("resize_term_sp", rc))
+    }
+}
+
+pub fn resizeterm_sp(screen: SCREEN, size: Size) -> result!(()) {
+    match unsafe { ncurses::resizeterm_sp(screen, size.lines, size.columns) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("resizeterm_sp", rc))
+    }
+}
+
+// int restartterm_sp(SCREEN*, NCURSES_CONST char*, int, int *);
+
+pub fn ripoffline_sp(screen: SCREEN, line: Orientation, init: RipoffInit) -> result!(()) {
+    match unsafe { ncurses::ripoffline_sp(
+        screen,
+        match line {
+            Orientation::Top    => 1,
+            Orientation::Bottom => -1
+        },
+        init
+    ) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ripoffline_sp", rc))
+    }
+}
+
+basic_ncurses_sp_function!(savetty_sp, "savetty_sp");
+
+pub fn scr_dump_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
+    unimplemented!();
+}
+
+pub fn scr_init_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
+    unimplemented!();
+}
+
+pub fn scr_restore_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
+    unimplemented!();
+}
+
+pub fn scr_set_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
+    unimplemented!();
+}
+
+// TERMINAL* set_curterm_sp(SCREEN*, TERMINAL*);
+
+pub fn set_escdelay_sp(screen: SCREEN, size: time::Duration) -> result!(()) {
+    let ms = i32::try_from(size.as_millis())?;
+
+    match unsafe { ncurses::set_escdelay_sp(screen, ms) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("set_escdelay_sp", rc))
+    }
+}
+
+pub fn set_tabsize_sp(screen: SCREEN, size: i32) -> result!(()) {
+    match unsafe { ncurses::set_tabsize_sp(screen, size) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("set_tabsize_sp", rc))
+    }
+}
+
+pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    match unsafe { ncurses::slk_attroff_sp(screen, normal::Attributes::into(attrs)) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attroff_sp", rc))
+    }
+}
+
+pub fn slk_attron_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    match unsafe { ncurses::slk_attron_sp(screen, normal::Attributes::into(attrs)) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attron_sp", rc))
+    }
+}
+
+pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> result!(())
+    where A: AttributesType<T>,
+          P: ColorPairType<T>,
+          T: ColorAttributeTypes
+{
+    match unsafe { ncurses::slk_attr_set_sp(screen, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attr_set_sp", rc))
+    }
+}
+
+pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    match unsafe { ncurses::slk_attrset_sp(screen, normal::Attributes::into(attrs)) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_attrset_sp", rc))
+    }
+}
+
+pub fn slk_attr_sp(screen: SCREEN) -> attr_t {
+    unsafe { ncurses::slk_attr_sp(screen) }
+}
+
+basic_ncurses_sp_function!(slk_clear_sp, "slk_clear_sp");
+
+pub fn slk_color_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(()) {
+    match unsafe { ncurses::slk_color_sp(screen, color_pair.number()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_color_sp", rc))
+    }
+}
+
+pub fn slk_init_sp(screen: SCREEN, fmt: SoftLabelType) -> result!(()) {
+    match unsafe { ncurses::slk_init_sp(screen, match fmt {
+        SoftLabelType::ThreeTwoThree => 0,
+        SoftLabelType::FourFour      => 1,
+        SoftLabelType::FourFourIndex => 2
+    }) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_init_sp", rc))
+    }
+}
+
+pub fn slk_label_sp(screen: SCREEN, number: i32) -> result!(String) {
+    unsafe { ncurses::slk_label_sp(screen, number).ok_or(ncurses_function_error!("slk_label_sp")) }
+}
+
+basic_ncurses_sp_function!(slk_noutrefresh_sp, "slk_noutrefresh_sp");
+
+basic_ncurses_sp_function!(slk_refresh_sp, "slk_refresh_sp");
+
+basic_ncurses_sp_function!(slk_restore_sp, "slk_restore_sp");
+
+pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: &str, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_set_sp(screen, label_number, c_str_with_nul!(label), fmt.value()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("slk_set_sp", rc))
+    }
+}
+
+basic_ncurses_sp_function!(slk_touch_sp, "slk_touch_sp");
+
+basic_ncurses_sp_function!(start_color_sp, "start_color_sp");
+
+pub fn term_attrs_sp(_screen: SCREEN) -> attr_t {
+    unimplemented!();
+}
+
+pub fn termattrs_sp(_screen: SCREEN) -> chtype {
+    unimplemented!();
+}
+
+pub fn termname_sp(screen: SCREEN) -> result!(String) {
+    unsafe { ncurses::termname_sp(screen).ok_or(ncurses_function_error!("termname_sp")) }
+}
+
+pub fn typeahead_sp(_screen: SCREEN, _fd: i32) -> i32 {
+    unimplemented!();
+}
+
+pub fn unctrl_sp(screen: SCREEN, c: ChtypeChar) -> result!(String) {
+    unsafe { ncurses::unctrl_sp(screen, ChtypeChar::into(c)).ok_or(ncurses_function_error!("unctrl_sp")) }
+}
+
+pub fn ungetch_sp(screen: SCREEN, ch: char) -> result!(()) {
+    match unsafe { ncurses::ungetch_sp(screen, i32::from(ch as u8)) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("ungetch_sp", rc))
+    }
+}
+
+pub fn unget_wch_sp(screen: SCREEN, ch: WideChar) -> result!(()) {
+    match unsafe { ncurses::unget_wch_sp(screen, WideChar::into(ch)) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("unget_wch_sp", rc))
+    }
+}
+
+basic_ncurses_sp_function!(use_default_colors_sp, "use_default_colors_sp");
+
+pub fn use_env_sp(screen: SCREEN, f: bool) {
+    unsafe { ncurses::use_env_sp(screen, f) }
+}
+
+pub fn use_tioctl_sp(screen: SCREEN, f: bool) {
+    unsafe { ncurses::use_tioctl_sp(screen, f) }
+}
+
+pub fn use_legacy_coding_sp(screen: SCREEN, level: Legacy) -> result!(Legacy) {
+    match unsafe { ncurses::use_legacy_coding_sp(screen, match level {
+        Legacy::Level0 => 0,
+        Legacy::Level1 => 1,
+        Legacy::Level2 => 2
+    }) } {
+        0  => Ok(Legacy::Level0),
+        1  => Ok(Legacy::Level1),
+        2  => Ok(Legacy::Level2),
+        rc => Err(ncurses_function_error_with_rc!("use_legacy_coding_sp", rc))
+    }
+}
+
+pub fn vid_attr_sp(_screen: SCREEN, _attrs: attr_t, _pair: short_t) -> i32 {
+    unimplemented!();
+}
+
+pub fn vidattr_sp(_screen: SCREEN, _attrs: chtype) -> i32 {
+    unimplemented!();
+}
+
+// int vid_puts_sp(SCREEN*, attr_t, short, void *, NCURSES_SP_OUTC);
+
+// int vidputs_sp(SCREEN*, chtype, NCURSES_SP_OUTC);
+
+pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
+    let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
+
+    match unsafe { ncurses::wunctrl_sp(screen, wch.as_mut_ptr()) } {
+        Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] as wchar_t })),
+        None      => Err(ncurses_function_error!("wunctrl_sp"))
     }
 }

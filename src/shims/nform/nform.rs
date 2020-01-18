@@ -394,18 +394,11 @@ pub unsafe fn new_fieldtype(
     bindings::new_fieldtype(Some(field_check), Some(char_check)).as_mut().map(|ptr| ptr as FIELDTYPE)
 }
 
-/// <https://invisible-island.net/ncurses/man/form_fieldtype.3x.html>
+/// <https://invisible-island.net/ncurses/man/new_form.3x.html>
 pub unsafe fn new_form(fields: *mut FIELD) -> Option<FORM> {
     assert!(!fields.is_null(), "{}new_form() : fields.is_null()", MODULE_PATH);
 
     bindings::new_form(fields).as_mut().map(|ptr| ptr as FORM)
-}
-
-pub unsafe fn new_form_sp(screen: SCREEN, fields: *mut FIELD) -> Option<FORM> {
-    assert!(!screen.is_null(), "{}new_form_sp() : fields.is_null()", MODULE_PATH);
-    assert!(!fields.is_null(), "{}new_form_sp() : fields.is_null()", MODULE_PATH);
-
-    bindings::new_form_sp(screen, fields).as_mut().map(|ptr| ptr as FORM)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_new_page.3x.html>
@@ -672,4 +665,12 @@ pub unsafe fn unpost_form(form: FORM) -> i32 {
     assert!(!form.is_null(), "{}unpost_form() : form.is_null()", MODULE_PATH);
 
     bindings::unpost_form(form)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn new_form_sp(sp: SCREEN, fields: *mut FIELD) -> Option<FORM> {
+    assert!(!sp.is_null(), "{}new_form_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!fields.is_null(), "{}new_form_sp() : fields.is_null()", MODULE_PATH);
+
+    bindings::new_form_sp(sp, fields).as_mut().map(|ptr| ptr as FORM)
 }

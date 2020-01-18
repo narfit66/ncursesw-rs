@@ -49,7 +49,7 @@ pub type FIELDTYPE = nform::FIELDTYPE;
 pub type Form_Hook = nform::Form_Hook;
 
 pub fn current_field(form: FORM) -> form_result!(FIELD) {
-    unsafe { nform::current_field(form) }.ok_or_else(|| form_function_error!("current_field"))
+    unsafe { nform::current_field(form).ok_or_else(|| form_function_error!("current_field")) }
 }
 
 pub fn data_ahead(form: FORM) -> bool {
@@ -61,7 +61,7 @@ pub fn data_behind(form: FORM) -> bool {
 }
 
 pub fn dup_field(field: FIELD, origin: Origin) -> form_result!(FIELD) {
-    unsafe { nform::dup_field(field, origin.y, origin.x) }.ok_or_else(|| form_function_error!("dup_field"))
+    unsafe { nform::dup_field(field, origin.y, origin.x).ok_or_else(|| form_function_error!("dup_field")) }
 }
 
 pub fn dynamic_field_info(field: FIELD) -> form_result!(FieldInfo) {
@@ -76,7 +76,7 @@ pub fn dynamic_field_info(field: FIELD) -> form_result!(FieldInfo) {
 }
 
 pub fn field_arg(field: FIELD) -> form_result!(*mut libc::c_void) {
-    unsafe { nform::field_arg(field) }.ok_or_else(|| form_function_error!("field_arg"))
+    unsafe { nform::field_arg(field).ok_or_else(|| form_function_error!("field_arg")) }
 }
 
 pub fn field_back(field: FIELD) -> normal::Attributes {
@@ -84,7 +84,7 @@ pub fn field_back(field: FIELD) -> normal::Attributes {
 }
 
 pub fn field_buffer(field: FIELD, buffer_number: i32) -> form_result!(Vec<i8>) {
-    unsafe { nform::field_buffer(field, buffer_number) }.ok_or_else(|| form_function_error!("field_buffer"))
+    unsafe { nform::field_buffer(field, buffer_number).ok_or_else(|| form_function_error!("field_buffer")) }
 }
 
 pub fn field_count(form: FORM) -> form_result!(i32) {
@@ -127,7 +127,7 @@ pub fn field_info(field: FIELD) -> form_result!(FieldParameters) {
 }
 
 pub fn field_init(form: FORM) -> form_result!(Form_Hook) {
-    unsafe { nform::field_init(form) }.ok_or_else(|| form_function_error_with_rc!("field_init", errno().into()))
+    unsafe { nform::field_init(form).ok_or_else(|| form_function_error_with_rc!("field_init", errno().into())) }
 }
 
 pub fn field_just(field: FIELD) -> form_result!(FieldJustification) {
@@ -167,15 +167,15 @@ pub fn field_status(field: FIELD) -> bool {
 }
 
 pub fn field_term(form: FORM) -> form_result!(Form_Hook) {
-    unsafe { nform::field_term(form) }.ok_or_else(|| form_function_error_with_rc!("field_term", errno().into()))
+    unsafe { nform::field_term(form).ok_or_else(|| form_function_error_with_rc!("field_term", errno().into())) }
 }
 
 pub fn field_type(field: FIELD) -> form_result!(FIELDTYPE) {
-    unsafe { nform::field_type(field) }.ok_or_else(|| form_function_error_with_rc!("field_type", errno().into()))
+    unsafe { nform::field_type(field).ok_or_else(|| form_function_error_with_rc!("field_type", errno().into())) }
 }
 
 pub fn field_userptr(field: FIELD) -> form_result!(*mut libc::c_void) {
-    unsafe { nform::field_userptr(field) }.ok_or_else(|| form_function_error!("field_userptr"))
+    unsafe { nform::field_userptr(field).ok_or_else(|| form_function_error!("field_userptr")) }
 }
 
 pub fn form_driver(form: FORM, request: FormRequest) -> form_result!(Option<FormRequest>) {
@@ -209,11 +209,11 @@ pub fn form_driver_w(form: FORM, request: FormRequest, wch: WideChar) -> form_re
 }
 
 pub fn form_fields(form: FORM) -> form_result!(Vec<FIELD>) {
-    unsafe { nform::form_fields(form) }.ok_or_else(|| form_function_error!("menu_fields"))
+    unsafe { nform::form_fields(form).ok_or_else(|| form_function_error!("menu_fields")) }
 }
 
 pub fn form_init(form: FORM) -> form_result!(Form_Hook) {
-    unsafe { nform::form_init(form) }.ok_or_else(|| form_function_error_with_rc!("form_init", errno().into()))
+    unsafe { nform::form_init(form).ok_or_else(|| form_function_error_with_rc!("form_init", errno().into())) }
 }
 
 pub fn form_opts(form: FORM) -> FormOptions {
@@ -261,15 +261,15 @@ pub fn form_sub(form: FORM) -> form_result!(WINDOW) {
 }
 
 pub fn form_term(form: FORM) -> form_result!(Form_Hook) {
-    unsafe { nform::form_term(form) }.ok_or_else(|| form_function_error_with_rc!("form_term", errno().into()))
+    unsafe { nform::form_term(form).ok_or_else(|| form_function_error_with_rc!("form_term", errno().into())) }
 }
 
 pub fn form_userptr(form: FORM) -> form_result!(*mut libc::c_void) {
-    unsafe { nform::form_userptr(form) }.ok_or_else(|| form_function_error!("form_userptr"))
+    unsafe { nform::form_userptr(form).ok_or_else(|| form_function_error!("form_userptr")) }
 }
 
 pub fn form_win(form: FORM) -> form_result!(WINDOW) {
-    unsafe { nform::form_win(form) }.ok_or_else(|| form_function_error!("form_win"))
+    unsafe { nform::form_win(form).ok_or_else(|| form_function_error!("form_win")) }
 }
 
 pub fn free_field(field: FIELD) -> form_result!(()) {
@@ -294,11 +294,11 @@ pub fn free_form(form: FORM) -> form_result!(()) {
 }
 
 pub fn link_field(field: FIELD, origin: Origin) -> form_result!(FIELD) {
-    unsafe { nform::link_field(field, origin.y, origin.x) }.ok_or_else(|| form_function_error!("link_field"))
+    unsafe { nform::link_field(field, origin.y, origin.x).ok_or_else(|| form_function_error!("link_field")) }
 }
 
 pub fn link_fieldtype(type1: FIELDTYPE, type2: FIELDTYPE) -> form_result!(FIELDTYPE) {
-    unsafe { nform::link_fieldtype(type1, type2) }.ok_or_else(|| form_function_error!("link_fieldtype"))
+    unsafe { nform::link_fieldtype(type1, type2).ok_or_else(|| form_function_error!("link_fieldtype")) }
 }
 
 pub fn move_field(field: FIELD, origin: Origin) -> form_result!(()) {
@@ -316,7 +316,7 @@ pub fn new_field(parameters: FieldParameters) -> form_result!(FIELD) {
         parameters.origin().x,
         parameters.offscreen(),
         parameters.nbuffers()
-    ) }.ok_or_else(|| form_function_error!("new_field"))
+    ).ok_or_else(|| form_function_error!("new_field")) }
 }
 
 pub fn new_fieldtype(
@@ -324,7 +324,7 @@ pub fn new_fieldtype(
     char_check:  unsafe extern "C" fn(_: i32, _: *const libc::c_void) -> bool
 ) -> form_result!(FIELDTYPE)
 {
-    unsafe { nform::new_fieldtype(field_check, char_check) }.ok_or_else(|| form_function_error!("new_fieldtype"))
+    unsafe { nform::new_fieldtype(field_check, char_check).ok_or_else(|| form_function_error!("new_fieldtype")) }
 }
 
 pub fn new_form(fields: &mut Vec<FIELD>) -> form_result!(FORM) {
@@ -336,17 +336,6 @@ pub fn new_form(fields: &mut Vec<FIELD>) -> form_result!(FORM) {
     fields.pop();
 
     form.ok_or_else(|| form_function_error_with_rc!("new_form", errno().into()))
-}
-
-pub fn new_form_sp(screen: SCREEN, fields: &mut Vec<FIELD>) -> form_result!(FORM) {
-    fields.push(ptr::null_mut());
-    fields.shrink_to_fit();
-
-    let form = unsafe { nform::new_form_sp(screen, fields.as_mut_ptr() as *mut FIELD) };
-
-    fields.pop();
-
-    form.ok_or_else(|| form_function_error_with_rc!("new_form_sp", errno().into()))
 }
 
 pub fn new_page(field: FIELD) -> bool {
@@ -580,4 +569,15 @@ pub fn unpost_form(form: FORM) -> form_result!(()) {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("unpost_form", rc))
     }
+}
+
+pub fn new_form_sp(screen: SCREEN, fields: &mut Vec<FIELD>) -> form_result!(FORM) {
+    fields.push(ptr::null_mut());
+    fields.shrink_to_fit();
+
+    let form = unsafe { nform::new_form_sp(screen, fields.as_mut_ptr() as *mut FIELD) };
+
+    fields.pop();
+
+    form.ok_or_else(|| form_function_error_with_rc!("new_form_sp", errno().into()))
 }
