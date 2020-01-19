@@ -1,7 +1,7 @@
 /*
     src/softlabeltype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -29,4 +29,14 @@ pub enum SoftLabelType {
     FourFour,
     /// A four-four layout with an index
     FourFourIndex
+}
+
+impl SoftLabelType {
+    pub(in crate) fn value(self) -> i32 {
+        match self {
+            SoftLabelType::ThreeTwoThree => 0,
+            SoftLabelType::FourFour      => 1,
+            SoftLabelType::FourFourIndex => 2
+        }
+    }
 }

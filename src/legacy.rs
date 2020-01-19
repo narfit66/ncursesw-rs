@@ -1,7 +1,7 @@
 /*
     src/legacy.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -25,4 +25,23 @@ pub enum Legacy {
     Level0,
     Level1,
     Level2
+}
+
+impl Legacy {
+    pub(in crate) fn new(level: i32) -> Option<Self> {
+        match level {
+            0 => Some(Legacy::Level0),
+            1 => Some(Legacy::Level1),
+            2 => Some(Legacy::Level2),
+            _ => None
+        }
+    }
+
+    pub(in crate) fn value(self) -> i32 {
+        match self {
+            Legacy::Level0 => 0,
+            Legacy::Level1 => 1,
+            Legacy::Level2 => 2
+        }
+    }
 }

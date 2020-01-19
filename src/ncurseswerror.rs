@@ -1,7 +1,7 @@
 /*
     src/ncurseswerror.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -50,6 +50,5 @@ pub NCurseswError
     MenuError { source: NCurseswMenuError } = "{source}",
     FormError { source: NCurseswFormError } = "{source}",
 
-    OSError { func: String, errno: Errno} = @{ format!("{}() : {} (#{})", func, errno, errno.0) },
-    FOpen { fname: String, mode: String } = "bindings::fopen({fname}, {mode})"
+    OSError { func: String, errno: Errno} = @{ format!("{}() : {} (#{})", func, errno, errno.0) }
 }

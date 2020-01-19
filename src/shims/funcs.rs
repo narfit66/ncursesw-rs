@@ -1,7 +1,7 @@
 /*
     src/shims/funcs.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,15 +22,15 @@
 
 #![allow(clippy::missing_safety_doc)]
 
-use bindings;
-use crate::cstring::*;
+use std::os::unix::io::AsRawFd;
 
-type FILE = *mut bindings::FILE;
+use shims::{ncurses::FILE, bindings};
+use cstring::*;
 
-pub unsafe fn fopen(path: &[i8], mode: &[i8]) -> Option<FILE> {
-    bindings::fopen(path.as_ptr(), mode.as_ptr()).as_mut().map(|ptr| ptr as FILE)
+pub(in crate) unsafe fn fdopen<FD: AsRawFd>(file: FD, mode: &[i8]) -> Option<FILE> {
+    bindings::fdopen(file.as_raw_fd(), mode.as_ptr()).as_mut().map(|ptr| ptr as FILE)
 }
 
 pub fn setlocale(lc: i32, locale: &[i8]) -> Option<String> {
-    unsafe { (bindings::setlocale(lc, locale.as_ptr()) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
+    unsafe { (bindings::setlocale(lc, locale.as_ptr())).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }

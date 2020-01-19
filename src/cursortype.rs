@@ -1,7 +1,7 @@
 /*
     src/cursortype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -29,6 +29,25 @@ pub enum CursorType {
     Visible,
     /// Makes the cursor "highly" visible in some way. Not supported on all terminals.
     VeryVisible
+}
+
+impl CursorType {
+    pub(in crate) fn new(cursor: i32) -> Option<Self> {
+        match cursor {
+            0 => Some(CursorType::Invisible),
+            1 => Some(CursorType::Visible),
+            2 => Some(CursorType::VeryVisible),
+            _ => None
+        }
+    }
+
+    pub(in crate) fn value(self) -> i32 {
+        match self {
+            CursorType::Invisible   => 0,
+            CursorType::Visible     => 1,
+            CursorType::VeryVisible => 2
+        }
+    }
 }
 
 impl Default for CursorType {

@@ -1,7 +1,7 @@
 /*
     src/ncurses.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -26,9 +26,8 @@
 
 use libc::{c_void, EINTR};
 use std::{
-    convert::{From, TryFrom},
-    char, ptr, slice, time, mem, os::unix::io::AsRawFd,
-    io::{Write, Read}, ffi::CString
+    convert::{From, TryFrom}, char, ptr, slice, time, mem,
+    os::unix::io::AsRawFd, io::{Write, Read}
 };
 
 use constants::{
@@ -56,7 +55,7 @@ use ncurseswerror::*;
 use region::*;
 use size::*;
 use softlabeltype::*;
-use shims::{ncurses, bindings};
+use shims::{funcs, ncurses, bindings};
 
 static MODULE_PATH: &str = "ncursesw::ncurses::";
 
@@ -639,9 +638,6 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
         rc => Err(ncurses_function_error_with_rc!("addwstr", rc))
     }
 }
-
-// see src/include/colorpair.rs
-//pub fn alloc_pair(fg: i32, bg: i32) -> i32 { }
 
 /// Assign the colors given as the default foreground and background colors of color pair 0
 ///
@@ -1504,27 +1500,22 @@ pub fn copywin(
     dmax:       Origin,
     overlay:    bool) -> result!(())
 {
-    match unsafe { ncurses::copywin(src_handle, dst_handle, smin.y, smin.x, dmin.y, dmin.x, dmax.y, dmax.x, if overlay {
+    let olay = if overlay {
         TRUE
     } else {
         FALSE
-    }) } {
+    };
+
+    match unsafe { ncurses::copywin(src_handle, dst_handle, smin.y, smin.x, dmin.y, dmin.x, dmax.y, dmax.x, olay) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("copywin", rc))
     }
 }
 
 pub fn curs_set(cursor: CursorType) -> result!(CursorType) {
-    match ncurses::curs_set(match cursor {
-        CursorType::Invisible   => 0,
-        CursorType::Visible     => 1,
-        CursorType::VeryVisible => 2
-    }) {
-        0  => Ok(CursorType::Invisible),
-        1  => Ok(CursorType::Visible),
-        2  => Ok(CursorType::VeryVisible),
-        rc => Err(ncurses_function_error_with_rc!("curs_set", rc))
-    }
+    let rc = ncurses::curs_set(cursor.value());
+
+    CursorType::new(rc).ok_or(ncurses_function_error_with_rc!("curs_set", rc))
 }
 
 pub fn curses_version() -> result!(String) {
@@ -1536,22 +1527,19 @@ basic_ncurses_function!(def_prog_mode, "def_prog_mode");
 basic_ncurses_function!(def_shell_mode, "def_shell_mode");
 
 pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key(
-        match definition {
-            None    => ptr::null_mut(),
-            Some(s) => s.to_c_str()?.as_ptr() as *mut i8
-        },
-        KeyBinding::into(keycode)
-    )} {
+    let def = match definition {
+        None    => ptr::null_mut(),
+        Some(s) => unsafe { c_str_with_nul!(s).as_ptr() as *mut i8 }
+    };
+
+    match unsafe { ncurses::define_key(def, KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key", rc))
     }
 }
 
 pub fn delay_output(ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    match ncurses::delay_output(ms) {
+    match ncurses::delay_output(i32::try_from(ms.as_millis())?) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("delay_output", rc))
     }
@@ -1647,9 +1635,6 @@ pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
 }
 
 simple_ncurses_function!(filter);
-
-// see src/include/colorpair.rs
-//pub fn find_pair(fg: i32, bg: i32) -> i32 { }
 
 /// Flashes the screen (visible bell), and if that is not possible, audible alarm on the terminal.
 ///
@@ -2100,23 +2085,11 @@ pub fn getstr() -> result!(String) {
 }
 
 pub fn getwin<I: AsRawFd + Read>(file: I) -> result!(WINDOW) {
-    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
-        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
-
-        if !fs.is_null() {
-            Ok(fs)
-        } else {
-            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
-        }
-    }
-
     unsafe { ncurses::getwin(fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin")) }
 }
 
 pub fn halfdelay(tenths: time::Duration) -> result!(()) {
-    let delay = i32::try_from(tenths.as_secs())? / 10;
-
-    match ncurses::halfdelay(delay) {
+    match ncurses::halfdelay(i32::try_from(tenths.as_secs())? / 10) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("halfdelay", rc))
     }
@@ -4653,16 +4626,6 @@ pub fn newterm<O, I>(term_type: Option<&str>, output: O, input: I) -> result!(SC
     where O: AsRawFd + Write,
           I: AsRawFd + Read
 {
-    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
-        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
-
-        if !fs.is_null() {
-            Ok(fs)
-        } else {
-            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
-        }
-    }
-
     let term = match term_type {
         Some(ty) => Some(unsafe { c_str_with_nul!(ty) }),
         None     => None
@@ -4761,16 +4724,6 @@ pub fn putp(_str: &str) -> i32 {
 }
 
 pub fn putwin<O: AsRawFd + Write>(handle: WINDOW, file: O) -> result!(()) {
-    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
-        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
-
-        if !fs.is_null() {
-            Ok(fs)
-        } else {
-            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
-        }
-    }
-
     match unsafe { ncurses::putwin(handle, fdopen(file, "wb+")?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("putwin", rc))
@@ -4808,13 +4761,7 @@ pub fn resizeterm(size: Size) -> result!(()) {
 }
 
 pub fn ripoffline(line: Orientation, init: RipoffInit) -> result!(()) {
-    match ncurses::ripoffline(
-        match line {
-            Orientation::Top    => 1,
-            Orientation::Bottom => -1
-        },
-        init
-    ) {
+    match ncurses::ripoffline(line.value(), init) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("ripoffline", rc))
     }
@@ -4970,11 +4917,7 @@ pub fn slk_color(color_pair: normal::ColorPair) -> result!(()) {
 }
 
 pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
-    match ncurses::slk_init(match fmt {
-        SoftLabelType::ThreeTwoThree => 0,
-        SoftLabelType::FourFour      => 1,
-        SoftLabelType::FourFourIndex => 2
-    }) {
+    match ncurses::slk_init(fmt.value()) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_init", rc))
     }
@@ -5072,8 +5015,16 @@ pub fn tparm(_s: &str) -> String {
     unimplemented!();
 }
 
-pub fn typeahead(_fd: i32) -> i32 {
-    unimplemented!();
+pub fn typeahead<FD: AsRawFd + Read>(file: Option<FD>) -> result!(()) {
+    let fd = match file {
+        Some(f) => f.as_raw_fd(),
+        None    => -1
+    };
+
+    match ncurses::typeahead(fd) {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("typeahead", rc))
+    }
 }
 
 pub fn unctrl(c: ChtypeChar) -> result!(String) {
@@ -5107,16 +5058,9 @@ pub fn use_extended_names(enable: bool) -> bool {
 }
 
 pub fn use_legacy_coding(level: Legacy) -> result!(Legacy) {
-    match ncurses::use_legacy_coding(match level {
-        Legacy::Level0 => 0,
-        Legacy::Level1 => 1,
-        Legacy::Level2 => 2
-    }) {
-        0  => Ok(Legacy::Level0),
-        1  => Ok(Legacy::Level1),
-        2  => Ok(Legacy::Level2),
-        rc => Err(ncurses_function_error_with_rc!("use_legacy_coding", rc))
-    }
+    let rc = ncurses::use_legacy_coding(level.value());
+
+    Legacy::new(rc).ok_or(ncurses_function_error_with_rc!("use_legacy_coding", rc))
 }
 
 pub fn use_tioctl(f: bool) {
@@ -7078,10 +7022,12 @@ pub fn wtimeout(handle: WINDOW, ms: time::Duration) -> result!(()) {
 }
 
 pub fn wtouchln(handle: WINDOW, line: i32, n: i32, changed: Changed) -> result!(()) {
-    match unsafe { ncurses::wtouchln(handle, line, n, match changed {
+    let change = match changed {
         Changed::True  => 1,
         Changed::False => 0
-    }) } {
+    };
+
+    match unsafe { ncurses::wtouchln(handle, line, n, change) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("wtouchln", rc))
     }
@@ -7111,8 +7057,6 @@ pub fn wvline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) 
 }
 
 // `_sp` functions.
-
-//pub unsafe fn alloc_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32
 
 pub fn assume_default_colors_sp<S, C, T>(screen: SCREEN, colors: S) -> result!(())
     where S: ColorsType<C, T>,
@@ -7155,27 +7099,18 @@ pub fn color_content_sp(screen: SCREEN, color: normal::Color) -> result!(normal:
 }
 
 pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
-    match unsafe { ncurses::curs_set_sp(screen, match cursor {
-        CursorType::Invisible   => 0,
-        CursorType::Visible     => 1,
-        CursorType::VeryVisible => 2
-    }) } {
-        0  => Ok(CursorType::Invisible),
-        1  => Ok(CursorType::Visible),
-        2  => Ok(CursorType::VeryVisible),
-        rc => Err(ncurses_function_error_with_rc!("curs_set_sp", rc))
-    }
+    let rc = unsafe { ncurses::curs_set_sp(screen, cursor.value()) };
+
+    CursorType::new(rc).ok_or(ncurses_function_error_with_rc!("curs_set_sp", rc))
 }
 
 pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key_sp(
-        screen,
-        match definition {
-            None    => ptr::null_mut(),
-            Some(s) => s.to_c_str()?.as_ptr() as *mut i8
-        },
-        KeyBinding::into(keycode)
-    )} {
+    let def = match definition {
+        None    => ptr::null_mut(),
+        Some(s) => unsafe { c_str_with_nul!(s).as_ptr() as *mut i8 }
+    };
+
+    match unsafe { ncurses::define_key_sp(screen, def, KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
     }
@@ -7186,9 +7121,7 @@ basic_ncurses_sp_function!(def_prog_mode_sp, "def_prog_mode_sp");
 basic_ncurses_sp_function!(def_shell_mode_sp, "def_shell_mode_sp");
 
 pub fn delay_output_sp(screen: SCREEN, ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    match unsafe { ncurses::delay_output_sp(screen, ms) } {
+    match unsafe { ncurses::delay_output_sp(screen, i32::try_from(ms.as_millis())?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("delay_output_sp", rc))
     }
@@ -7242,8 +7175,6 @@ pub fn extended_slk_color_sp(screen: SCREEN, color_pair: extend::ColorPair) -> r
 
 simple_ncurses_sp_function!(filter_sp);
 
-//pub unsafe fn find_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32
-
 #[deprecated(since = "0.5.0", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
 pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
     where P:   ColorPairType<T>,
@@ -7270,23 +7201,11 @@ pub fn get_escdelay_sp(screen: SCREEN) -> result!(time::Duration) {
 }
 
 pub fn getwin_sp<I: AsRawFd + Read>(screen: SCREEN, file: I) -> result!(WINDOW) {
-    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
-        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
-
-        if !fs.is_null() {
-            Ok(fs)
-        } else {
-            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
-        }
-    }
-
     unsafe { ncurses::getwin_sp(screen, fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin_sp")) }
 }
 
 pub fn halfdelay_sp(screen: SCREEN, tenths: time::Duration) -> result!(()) {
-    let delay = i32::try_from(tenths.as_secs())? / 10;
-
-    match unsafe { ncurses::halfdelay_sp(screen, delay) } {
+    match unsafe { ncurses::halfdelay_sp(screen, i32::try_from(tenths.as_secs())? / 10) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("halfdelay_sp", rc))
     }
@@ -7463,16 +7382,6 @@ pub fn newterm_sp<O, I>(screen: SCREEN, term_type: Option<&str>, output: O, inpu
     where O: AsRawFd + Write,
           I: AsRawFd + Read
 {
-    fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
-        let fs = unsafe { bindings::fdopen(file.as_raw_fd(), CString::new(mode)?.as_ptr()) };
-
-        if !fs.is_null() {
-            Ok(fs)
-        } else {
-            Err(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() })
-        }
-    }
-
     let term = match term_type {
         Some(ty) => Some(unsafe { c_str_with_nul!(ty) }),
         None     => None
@@ -7539,14 +7448,7 @@ pub fn resizeterm_sp(screen: SCREEN, size: Size) -> result!(()) {
 // int restartterm_sp(SCREEN*, NCURSES_CONST char*, int, int *);
 
 pub fn ripoffline_sp(screen: SCREEN, line: Orientation, init: RipoffInit) -> result!(()) {
-    match unsafe { ncurses::ripoffline_sp(
-        screen,
-        match line {
-            Orientation::Top    => 1,
-            Orientation::Bottom => -1
-        },
-        init
-    ) } {
+    match unsafe { ncurses::ripoffline_sp(screen, line.value(), init) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("ripoffline_sp", rc))
     }
@@ -7634,11 +7536,7 @@ pub fn slk_color_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(()
 }
 
 pub fn slk_init_sp(screen: SCREEN, fmt: SoftLabelType) -> result!(()) {
-    match unsafe { ncurses::slk_init_sp(screen, match fmt {
-        SoftLabelType::ThreeTwoThree => 0,
-        SoftLabelType::FourFour      => 1,
-        SoftLabelType::FourFourIndex => 2
-    }) } {
+    match unsafe { ncurses::slk_init_sp(screen, fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_init_sp", rc))
     }
@@ -7677,8 +7575,16 @@ pub fn termname_sp(screen: SCREEN) -> result!(String) {
     unsafe { ncurses::termname_sp(screen).ok_or(ncurses_function_error!("termname_sp")) }
 }
 
-pub fn typeahead_sp(_screen: SCREEN, _fd: i32) -> i32 {
-    unimplemented!();
+pub fn typeahead_sp<FD: AsRawFd + Read>(screen: SCREEN, file: Option<FD>) -> result!(()) {
+    let fd = match file {
+        Some(f) => f.as_raw_fd(),
+        None    => -1
+    };
+
+    match unsafe { ncurses::typeahead_sp(screen, fd) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("typeahead_sp", rc))
+    }
 }
 
 pub fn unctrl_sp(screen: SCREEN, c: ChtypeChar) -> result!(String) {
@@ -7710,16 +7616,9 @@ pub fn use_tioctl_sp(screen: SCREEN, f: bool) {
 }
 
 pub fn use_legacy_coding_sp(screen: SCREEN, level: Legacy) -> result!(Legacy) {
-    match unsafe { ncurses::use_legacy_coding_sp(screen, match level {
-        Legacy::Level0 => 0,
-        Legacy::Level1 => 1,
-        Legacy::Level2 => 2
-    }) } {
-        0  => Ok(Legacy::Level0),
-        1  => Ok(Legacy::Level1),
-        2  => Ok(Legacy::Level2),
-        rc => Err(ncurses_function_error_with_rc!("use_legacy_coding_sp", rc))
-    }
+    let rc = unsafe { ncurses::use_legacy_coding_sp(screen, level.value()) };
+
+    Legacy::new(rc).ok_or(ncurses_function_error_with_rc!("use_legacy_coding_sp", rc))
 }
 
 pub fn vid_attr_sp(_screen: SCREEN, _attrs: attr_t, _pair: short_t) -> i32 {
@@ -7741,4 +7640,10 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
         Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] as wchar_t })),
         None      => Err(ncurses_function_error!("wunctrl_sp"))
     }
+}
+
+// private functions.
+
+fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+    unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() }) }
 }

@@ -1,7 +1,7 @@
 /*
     src/include/colorpair.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -48,6 +48,30 @@ macro_rules! extend_colorpair {
 
         pub fn find_pair(colors: Colors) -> Option<ColorPair> {
             let pair = ncurses::find_pair(colors.foreground().number(), colors.background().number());
+
+            if pair < 0 {
+                None
+            } else {
+                set_ncurses_colortype($extend);
+
+                Some(ColorPair::from(pair))
+            }
+        }
+
+        pub fn alloc_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(ColorPair) {
+            let pair = unsafe { ncurses::alloc_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
+
+            if pair < 0 {
+                Err(ncurses_function_error_with_rc!("alloc_pair_sp", pair))
+            } else {
+                set_ncurses_colortype($extend);
+
+                Ok(ColorPair::from(pair))
+            }
+        }
+
+        pub fn find_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> Option<ColorPair> {
+            let pair = unsafe { ncurses::find_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
 
             if pair < 0 {
                 None
