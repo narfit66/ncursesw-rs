@@ -27,7 +27,7 @@
 use libc::{c_void, EINTR};
 use std::{
     convert::{From, TryFrom}, char, ptr, slice, time, mem,
-    os::unix::io::AsRawFd, io::{Write, Read}
+    path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
 
 use constants::{
@@ -2685,8 +2685,11 @@ pub fn longname() -> result!(String) {
     ncurses::longname().ok_or(ncurses_function_error!("longname"))
 }
 
-pub fn mcprint(_data: *mut i8, _len: i32) -> i32 {
-    unimplemented!();
+pub fn mcprint(data: &[i8], len: i32) -> result!(i32) {
+    match unsafe { ncurses::mcprint(data.as_ptr() as *mut i8, len) } {
+        ERR => Err(NCurseswError::OSError { func: String::from("mcprint"), errno: errno::errno() }),
+        rc  => Ok(rc)
+    }
 }
 
 pub fn meta(handle: WINDOW, bf: bool) -> result!(()) {
@@ -4769,20 +4772,32 @@ pub fn ripoffline(line: Orientation, init: RipoffInit) -> result!(()) {
 
 basic_ncurses_function!(savetty, "savetty");
 
-pub fn scr_dump(_filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_dump(filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_dump(path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_dump", rc))
+    }
 }
 
-pub fn scr_init(_filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_init(filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_init(path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_init", rc))
+    }
 }
 
-pub fn scr_restore(_filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_restore(filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_restore(path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_restore", rc))
+    }
 }
 
-pub fn scr_set(_filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_set(filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_set(path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_set", rc))
+    }
 }
 
 pub fn scrl(n: i32) -> result!(()) {
@@ -4801,10 +4816,8 @@ pub fn scrollok(handle: WINDOW, bf: bool) -> result!(()) {
     }
 }
 
-pub fn set_escdelay(size: time::Duration) -> result!(()) {
-    let ms = i32::try_from(size.as_millis())?;
-
-    match ncurses::set_escdelay(ms) {
+pub fn set_escdelay(ms: time::Duration) -> result!(()) {
+    match ncurses::set_escdelay(i32::try_from(ms.as_millis())?) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("set_escdelay", rc))
     }
@@ -7349,8 +7362,11 @@ pub fn longname_sp(screen: SCREEN) -> result!(String) {
     unsafe { ncurses::longname_sp(screen).ok_or(ncurses_function_error!("longname_sp")) }
 }
 
-pub fn mcprint_sp(_screen: SCREEN, _data: *mut i8, _len: i32) -> i32 {
-    unimplemented!();
+pub fn mcprint_sp(screen: SCREEN, data: &[i8], len: i32) -> result!(i32) {
+    match unsafe { ncurses::mcprint_sp(screen, data.as_ptr() as *mut i8, len) } {
+        ERR => Err(NCurseswError::OSError { func: String::from("mcprint_sp"), errno: errno::errno() }),
+        rc  => Ok(rc)
+    }
 }
 
 pub fn mvcur_sp(screen: SCREEN, old: Origin, new: Origin) -> result!(()) {
@@ -7456,28 +7472,31 @@ pub fn ripoffline_sp(screen: SCREEN, line: Orientation, init: RipoffInit) -> res
 
 basic_ncurses_sp_function!(savetty_sp, "savetty_sp");
 
-pub fn scr_dump_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_init_sp(screen: SCREEN, filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_init_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_init_sp", rc))
+    }
 }
 
-pub fn scr_init_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_restore_sp(screen: SCREEN, filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_restore_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_restore_sp", rc))
+    }
 }
 
-pub fn scr_restore_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
-    unimplemented!();
-}
-
-pub fn scr_set_sp(_screen: SCREEN, _filename: &str) -> result!(()) {
-    unimplemented!();
+pub fn scr_set_sp(screen: SCREEN, filename: &Path) -> result!(()) {
+    match unsafe { bindings::scr_set_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+        OK => Ok(()),
+        rc => Err(ncurses_function_error_with_rc!("scr_set_sp", rc))
+    }
 }
 
 // TERMINAL* set_curterm_sp(SCREEN*, TERMINAL*);
 
-pub fn set_escdelay_sp(screen: SCREEN, size: time::Duration) -> result!(()) {
-    let ms = i32::try_from(size.as_millis())?;
-
-    match unsafe { ncurses::set_escdelay_sp(screen, ms) } {
+pub fn set_escdelay_sp(screen: SCREEN, ms: time::Duration) -> result!(()) {
+    match unsafe { ncurses::set_escdelay_sp(screen, i32::try_from(ms.as_millis())?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("set_escdelay_sp", rc))
     }
@@ -7646,4 +7665,11 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
 
 fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
     unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() }) }
+}
+
+fn path_as_slice(path: &Path) -> result!(&[i8]) {
+    let fqname = format!("{}", path.display());
+    let s = fqname.as_str();
+
+    Ok(unsafe { c_str_with_nul!(s) })
 }
