@@ -13,6 +13,13 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - `ncursesw::putwin()` now takes `O: std::os::unix::io::AsRawFd + std::io::Write` instead of `&std::path::Path`. [BC]
 - `ncursesw::shims::ncurses::wunctrl()` now returns `Option<*mut wchar_t>` instead of `*mut wchar_t`. [BC]
 - Added missing NCurses `_sp` (screen) functions.
+- `ncursesw::normal::alloc_pair()` now returns a `Result<normal::ColorPair, NCurseswError>` instead of `normal::ColorPair`. [BC]
+- `ncursesw::normal::find_pair()` now returns a `Result<Option<normal::ColorPair>, NCurseswError>` instead of `Option<normal::ColorPair>`. [BC]
+- `ncursesw::free_pair()` signature now takes  `i32: From<T>` instead of `i32: From<P>`. [BC]
+- Added `ncursesw::{normal,extend}::Attribute::Default` trait which returns `Attribute::Normal`.
+- Added `ncursesw::{normal,extend}::Color::Default` trait which returns `Color::TerminalDefault`.
+- Added `ncursesw::{normal,extend}::Colors::Default` trait which returns `Colors { foreground: Color::TerminalDefault, background: Color::TerminalDefault }`.
+- Added `ncursesw::{normal,extend}::AttributesColorPair::Default` trait which returns `AttributesColorPair { attributes: Attributes::Normal, color_pair: ColorPair::default() }`.
 
 ## [0.4.0] - 2019-12-09 [BC]
 - NCurses menu module implemented as `ncursesw::menu`.

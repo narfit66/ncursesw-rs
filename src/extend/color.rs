@@ -1,7 +1,7 @@
 /*
     src/extend/color.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -28,9 +28,13 @@ use std::convert::{From, Into};
 use basecolor::BaseColor;
 use gen::ColorType;
 use ncurseswerror::NCurseswError;
+use ncursescolortype::*;
 use extend::rgb::RGB;
 use shims::constants::COLOR_WHITE;
-use crate::{init_extended_color, extended_color_content};
+use crate::{
+    SCREEN, init_extended_color, extended_color_content,
+    init_extended_color_sp, extended_color_content_sp
+};
 
 const EXT_COLOR_WHITE: i32 = COLOR_WHITE as i32;
 const LIGHT_COLOR_OFFSET: i32 = EXT_COLOR_WHITE + 1;
@@ -48,11 +52,27 @@ pub enum Color {
 
 impl Color {
     pub fn new(number: i32, rgb: RGB) -> result!(Self) {
-        init_extended_color(number, rgb)
+        let color = init_extended_color(number, rgb)?;
+
+        set_ncurses_colortype(NCursesColorType::Extended);
+
+        Ok(color)
+    }
+
+    pub fn new_sp(screen: SCREEN, number: i32, rgb: RGB) -> result!(Self) {
+        let color = init_extended_color_sp(screen, number, rgb)?;
+
+        set_ncurses_colortype(NCursesColorType::Extended);
+
+        Ok(color)
     }
 
     pub fn rgb(&self) -> result!(RGB) {
         extended_color_content(*self)
+    }
+
+    pub fn rgb_sp(&self, screen: SCREEN) -> result!(RGB) {
+        extended_color_content_sp(screen, *self)
     }
 }
 
@@ -65,7 +85,7 @@ impl ColorType<i32> for Color {
 impl From<i32> for Color {
     fn from(color: i32) -> Self {
         if color == -1 {
-            Color::TerminalDefault
+            Color::default()
         } else if color <= EXT_COLOR_WHITE {
             Color::Dark(BaseColor::from_i32(color))
         } else if color <= EXT_COLOR_WHITE + LIGHT_COLOR_OFFSET {
@@ -84,5 +104,13 @@ impl Into<i32> for Color {
             Color::Light(color)    => i32::from(color.light()),
             Color::Custom(n)       => n
         }
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        set_ncurses_colortype(NCursesColorType::Extended);
+
+        Color::TerminalDefault
     }
 }

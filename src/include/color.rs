@@ -1,7 +1,7 @@
 /*
     src/include/color.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -55,7 +55,7 @@ impl FromStr for Color {
     /// ```
     fn from_str(color: &str) -> Result<Self, Self::Err> {
         match color {
-            "default"       => Ok(Color::TerminalDefault),
+            "default"       => Ok(Color::default()),
             "black"         => Ok(Color::Dark(BaseColor::Black)),
             "red"           => Ok(Color::Dark(BaseColor::Red)),
             "green"         => Ok(Color::Dark(BaseColor::Green)),

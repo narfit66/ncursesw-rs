@@ -1,7 +1,7 @@
 /*
     src/extend/colorpair.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,127 +23,66 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::convert::{From, Into};
+use std::convert::Into;
 
+use shims::ncurses;
 use extend::{Colors, Color};
 use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
-use ncursescolortype::NCursesColorType;
+use gen::{ColorType, ColorsType};
+use ncursescolortype::*;
 use ncurseswerror::NCurseswError;
-use crate::{init_extended_pair, extended_pair_content};
-
-include!("../include/colorpair.rs");
-
-extend_colorpair!(NCursesColorType::Extended);
+use crate::{
+    SCREEN,
+    init_extended_pair, extended_pair_content,
+    init_extended_pair_sp, extended_pair_content_sp
+};
 
 /// A extended color pair.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ColorPair {
-    raw: i32
+    screen: Option<SCREEN>,
+    number: i32
 }
 
 impl ColorPair {
-    /// Create a new extended color pair.
-    ///
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::normal::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    ///
-    /// let colors = color_pair1.colors()?;
-    ///
-    /// assert!(colors.foreground() == blue && colors.background() == yellow);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
+    pub(in crate) fn _from(screen: Option<SCREEN>, number: i32) -> Self {
+        set_ncurses_colortype(NCursesColorType::Extended);
+
+        Self { screen, number }
+    }
+}
+
+impl ColorPair {
     pub fn new(pair: i32, colors: Colors) -> result!(Self) {
         init_extended_pair(pair, colors)
     }
-}
 
-/// Return the colors (foreground and background) of the color pair.
-impl ColorPairColors<Colors, Color, i32> for ColorPair {
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::extend::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    ///
-    /// let colors = color_pair1.colors()?;
-    ///
-    /// assert!(colors.foreground() == blue && colors.background() == yellow);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
-    fn colors(&self) -> result!(Colors) {
-        extended_pair_content(*self)
+    pub fn new_sp(screen: SCREEN, pair: i32, colors: Colors) -> result!(Self) {
+        init_extended_pair_sp(screen, pair, colors)
+    }
+
+    pub fn screen(&self) -> Option<SCREEN> {
+        self.screen
+    }
+
+    pub fn default_sp(screen: SCREEN) -> Self {
+        Self::_from(Some(screen), 0)
     }
 }
 
-/// Return the number of the color pair.
+impl ColorPairColors<Colors, Color, i32> for ColorPair {
+    fn colors(&self) -> result!(Colors) {
+        if let Some(sp) = self.screen {
+            extended_pair_content_sp(sp, *self)
+        } else {
+            extended_pair_content(*self)
+        }
+    }
+}
+
 impl ColorPairType<i32> for ColorPair {
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::extend::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    ///
-    /// let colors = color_pair1.colors()?;
-    ///
-    /// assert!(color_pair1.number() == 1);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
     fn number(&self) -> i32 {
-        self.raw
+        self.number
     }
 }
 
@@ -163,14 +102,48 @@ impl ColorPairGeneric<i32> for ColorPair {
     }
 }
 
-impl From<i32> for ColorPair {
-    fn from(raw: i32) -> Self {
-        Self { raw }
+impl Into<i32> for ColorPair {
+    fn into(self) -> i32 {
+        self.number
     }
 }
 
-impl Into<i32> for ColorPair {
-    fn into(self) -> i32 {
-        self.raw
+pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
+    let number = ncurses::alloc_pair(colors.foreground().number(), colors.background().number());
+
+    if number.is_negative() {
+        Err(ncurses_function_error_with_rc!("alloc_pair", number))
+    } else {
+        Ok(ColorPair::_from(None, number))
+    }
+}
+
+pub fn find_pair(colors: Colors) -> Option<ColorPair> {
+    let number = ncurses::find_pair(colors.foreground().number(), colors.background().number());
+
+    if number.is_negative() {
+        None
+    } else {
+        Some(ColorPair::_from(None, number))
+    }
+}
+
+pub fn alloc_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(ColorPair) {
+    let number = unsafe { ncurses::alloc_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
+
+    if number.is_negative() {
+        Err(ncurses_function_error_with_rc!("alloc_pair_sp", number))
+    } else {
+        Ok(ColorPair::_from(Some(screen), number))
+    }
+}
+
+pub fn find_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> Option<ColorPair> {
+    let number = unsafe { ncurses::find_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
+
+    if number.is_negative() {
+        None
+    } else {
+        Some(ColorPair::_from(Some(screen), number))
     }
 }

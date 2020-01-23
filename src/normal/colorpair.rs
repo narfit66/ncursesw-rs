@@ -1,7 +1,7 @@
 /*
     src/normal/colorpair.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,132 +23,72 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::{convert::{From, Into}, ops::BitOr};
+use std::{convert::{TryFrom, From, Into}, ops::BitOr};
 
-use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
+use gen::{ColorType, ColorsType, ColorPairType, ColorPairGeneric, ColorPairColors};
 use normal::{Attribute, Attributes, Colors, Color};
-use ncursescolortype::NCursesColorType;
+use ncursescolortype::*;
 use ncurseswerror::NCurseswError;
-use shims::ncurses::{attr_t, short_t};
-use crate::{COLOR_PAIR, PAIR_NUMBER, init_pair, pair_content};
+use shims::{ncurses, ncurses::{attr_t, short_t}};
+use crate::{
+    SCREEN, COLOR_PAIR, PAIR_NUMBER,
+    init_pair, pair_content,
+    init_pair_sp, pair_content_sp
+};
 
-include!("../include/colorpair.rs");
-
-extend_colorpair!(NCursesColorType::Normal);
-
-/// A `normal` color pair.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ColorPair {
-    raw: short_t
+    screen: Option<SCREEN>,
+    number: short_t
 }
 
 impl ColorPair {
-    /// Create a new `normal` color pair.
-    ///
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::normal::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    ///
-    /// let colors = color_pair1.colors()?;
-    ///
-    /// assert!(colors.foreground() == blue && colors.background() == yellow);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
+    pub(in crate) fn _from(screen: Option<SCREEN>, number: short_t) -> Self {
+        set_ncurses_colortype(NCursesColorType::Normal);
+
+        Self { screen, number }
+    }
+}
+
+impl ColorPair {
     pub fn new(pair: short_t, colors: Colors) -> result!(Self) {
         init_pair(pair, colors)
     }
 
-    pub(crate) fn as_attr_t(&self) -> attr_t {
+    pub fn new_sp(screen: SCREEN, pair: short_t, colors: Colors) -> result!(Self) {
+        init_pair_sp(screen, pair, colors)
+    }
+
+    pub fn screen(&self) -> Option<SCREEN> {
+        self.screen
+    }
+
+    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+        self.screen = screen
+    }
+
+    pub(in crate) fn as_attr_t(&self) -> attr_t {
         COLOR_PAIR(*self)
     }
-}
 
-/// Return the colors (foreground and background) of the color pair.
-impl ColorPairColors<Colors, Color, short_t> for ColorPair {
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::normal::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    ///
-    /// let colors = color_pair1.colors()?;
-    ///
-    /// assert!(colors.foreground() == blue && colors.background() == yellow);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
-    fn colors(&self) -> result!(Colors) {
-        pair_content(*self)
+    pub fn default_sp(screen: SCREEN) -> Self {
+        Self::_from(Some(screen), 0)
     }
 }
 
-/// Return the number of the color pair.
+impl ColorPairColors<Colors, Color, short_t> for ColorPair {
+    fn colors(&self) -> result!(Colors) {
+        if let Some(sp) = self.screen {
+            pair_content_sp(sp, *self)
+        } else {
+            pair_content(*self)
+        }
+    }
+}
+
 impl ColorPairType<short_t> for ColorPair {
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::normal::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    ///
-    /// let colors = color_pair1.colors()?;
-    ///
-    /// assert!(color_pair1.number() == 1);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
     fn number(&self) -> short_t {
-        self.raw
+        self.number
     }
 }
 
@@ -158,51 +98,17 @@ impl ColorPairGeneric<short_t> for ColorPair {
     }
 }
 
-/// Implement the | operator for combining a `ColorPair` and a `Attribute` to produce `Attributes`
 impl BitOr<Attribute> for ColorPair {
     type Output = Attributes;
 
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use ncursesw::*;
-    /// use ncursesw::normal::*;
-    ///
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// #     let h = initscr()?;
-    /// #     if has_colors() {
-    /// start_color()?;
-    ///
-    /// let blue = Color::Dark(BaseColor::Blue);
-    /// let yellow = Color::Dark(BaseColor::Yellow);
-    ///
-    /// let color_pair1 = ColorPair::new(1, Colors::new(blue, yellow))?;
-    /// let attrs = Attribute::Dim | color_pair1;
-    ///
-    /// assert!(attrs.color_pair() == color_pair1);
-    /// #     }
-    /// #
-    /// #     delwin(h)?;
-    /// #     // endwin()?;
-    /// #     Ok(())
-    /// # }
-    /// ```
     fn bitor(self, rhs: Attribute) -> Self::Output {
         Attributes::default() | self | rhs
     }
 }
 
-impl From<short_t> for ColorPair {
-    fn from(raw: short_t) -> Self {
-        Self { raw }
-    }
-}
-
 impl Into<short_t> for ColorPair {
     fn into(self) -> short_t {
-        self.raw
+        self.number
     }
 }
 
@@ -212,14 +118,48 @@ impl From<Attributes> for ColorPair {
     }
 }
 
-impl From<i32> for ColorPair {
-    fn from(raw: i32) -> Self {
-        Self { raw: raw as short_t }
+impl Into<i32> for ColorPair {
+    fn into(self) -> i32 {
+        i32::from(self.number)
     }
 }
 
-impl Into<i32> for ColorPair {
-    fn into(self) -> i32 {
-        i32::from(self.raw)
+pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
+    let number = ncurses::alloc_pair(colors.foreground().number(), colors.background().number());
+
+    if number.is_negative() {
+        Err(ncurses_function_error_with_rc!("alloc_pair", number))
+    } else {
+        Ok(ColorPair::_from(None, short_t::try_from(number)?))
     }
+}
+
+pub fn find_pair(colors: Colors) -> result!(Option<ColorPair>) {
+    let number = ncurses::find_pair(colors.foreground().number(), colors.background().number());
+
+    Ok(if number.is_negative() {
+        None
+    } else {
+        Some(ColorPair::_from(None, short_t::try_from(number)?))
+    })
+}
+
+pub fn alloc_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(ColorPair) {
+    let number = unsafe { ncurses::alloc_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
+
+    if number.is_negative() {
+        Err(ncurses_function_error_with_rc!("alloc_pair_sp", number))
+    } else {
+        Ok(ColorPair::_from(Some(screen), short_t::try_from(number)?))
+    }
+}
+
+pub fn find_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(Option<ColorPair>) {
+    let number = unsafe { ncurses::find_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
+
+    Ok(if number.is_negative() {
+        None
+    } else {
+        Some(ColorPair::_from(Some(screen), short_t::try_from(number)?))
+    })
 }

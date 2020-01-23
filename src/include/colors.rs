@@ -1,7 +1,7 @@
 /*
     src/include/colors.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -25,7 +25,7 @@ macro_rules! define_colors {
         use ncursescolortype::set_ncurses_colortype;
 
         /// Foreground and background colors.
-        #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+        #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
         pub struct Colors {
             foreground: Color,
             background: Color

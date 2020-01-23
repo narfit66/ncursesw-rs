@@ -1,7 +1,7 @@
 /*
     src/normal/color.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -28,10 +28,12 @@ use std::convert::{From, Into};
 use basecolor::BaseColor;
 use gen::ColorType;
 use ncurseswerror::NCurseswError;
+use ncursescolortype::*;
 use normal::rgb::RGB;
-use shims::ncurses::short_t;
-use shims::constants::COLOR_WHITE;
-use crate::{init_color, color_content};
+use shims::{ncurses::short_t, constants::COLOR_WHITE};
+use crate::{
+    SCREEN, init_color, color_content, init_color_sp, color_content_sp
+};
 
 const LIGHT_COLOR_OFFSET: i16 = COLOR_WHITE + 1;
 
@@ -48,11 +50,27 @@ pub enum Color {
 
 impl Color {
     pub fn new(number: short_t, rgb: RGB) -> result!(Self) {
-        init_color(number, rgb)
+        let color = init_color(number, rgb)?;
+
+        set_ncurses_colortype(NCursesColorType::Normal);
+
+        Ok(color)
+    }
+
+    pub fn new_sp(screen: SCREEN, number: short_t, rgb: RGB) -> result!(Self) {
+        let color = init_color_sp(screen, number, rgb)?;
+
+        set_ncurses_colortype(NCursesColorType::Normal);
+
+        Ok(color)
     }
 
     pub fn rgb(&self) -> result!(RGB) {
         color_content(*self)
+    }
+
+    pub fn rgb_sp(&self, screen: SCREEN) -> result!(RGB) {
+        color_content_sp(screen, *self)
     }
 }
 
@@ -67,7 +85,7 @@ impl ColorType<short_t> for Color {
 impl From<short_t> for Color {
     fn from(color: short_t) -> Self {
         if color == -1 {
-            Color::TerminalDefault
+            Color::default()
         } else if color <= COLOR_WHITE {
             Color::Dark(BaseColor::from_short_t(color))
         } else if color <= COLOR_WHITE + LIGHT_COLOR_OFFSET {
@@ -86,5 +104,13 @@ impl Into<short_t> for Color {
             Color::Light(color)    => color.light(),
             Color::Custom(n)       => n
         }
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        set_ncurses_colortype(NCursesColorType::Normal);
+
+        Color::TerminalDefault
     }
 }

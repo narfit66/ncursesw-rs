@@ -190,7 +190,7 @@ pub fn COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t {
 /// # }
 /// ```
 pub fn PAIR_NUMBER(attrs: normal::Attributes) -> normal::ColorPair {
-    normal::ColorPair::from(ncurses::PAIR_NUMBER(normal::Attributes::into(attrs)))
+    normal::ColorPair::_from(None, ncurses::PAIR_NUMBER(normal::Attributes::into(attrs)) as short_t)
 }
 
 /// Return the number of color pairs available.
@@ -738,6 +738,14 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
 /// # }
 /// ```
 pub fn attr_get() -> result!(AttributesColorPairSet) {
+    _attr_get(None, "attr_get")
+}
+
+pub fn attr_get_sp(screen: SCREEN) -> result!(AttributesColorPairSet) {
+    _attr_get(Some(screen), "attr_get_sp")
+}
+
+fn _attr_get(screen: Option<SCREEN>, func: &str) -> result!(AttributesColorPairSet) {
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
     let mut opts: [i32; 1] = [0];
@@ -748,7 +756,7 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
                 AttributesColorPairSet::Normal(
                     normal::AttributesColorPair::new(
                         normal::Attributes::from(attrs[0]),
-                        normal::ColorPair::from(color_pair[0])
+                        normal::ColorPair::_from(screen, color_pair[0])
                     )
                 )
             },
@@ -756,12 +764,12 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
                 AttributesColorPairSet::Extended(
                     extend::AttributesColorPair::new(
                         extend::Attributes::from(attrs[0]),
-                        extend::ColorPair::from(opts[0])
+                        extend::ColorPair::_from(screen, opts[0])
                     )
                 )
             }
         }),
-        rc => Err(ncurses_function_error_with_rc!("attr_get", rc))
+        rc => Err(ncurses_function_error_with_rc!(func, rc))
     }
 }
 
@@ -1665,10 +1673,10 @@ basic_ncurses_function!(flushinp, "flushinp");
 #[deprecated(since = "0.1.3", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
 pub fn free_pair<P, T>(color_pair: P) -> result!(())
     where P:   ColorPairType<T>,
-          i32: From<P>,
+          i32: From<T>,
           T:   ColorAttributeTypes
 {
-    match ncurses::free_pair(color_pair.into()) {
+    match ncurses::free_pair(i32::from(color_pair.number())) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("free_pair", rc))
     }
@@ -1852,6 +1860,14 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
 }
 
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
+    _getcchar(None, "getcchar", wcval)
+}
+
+pub fn getcchar_sp(screen: SCREEN, wcval: ComplexChar) -> result!(WideCharAndAttributes) {
+    _getcchar(Some(screen), "getcchar_sp", wcval)
+}
+
+fn _getcchar(screen: Option<SCREEN>, func: &str, wcval: ComplexChar) -> result!(WideCharAndAttributes) {
     let mut wch: [wchar_t; bindings::CCHARW_MAX as usize] = [0; bindings::CCHARW_MAX as usize];
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
@@ -1863,7 +1879,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
                 AttributesColorPairSet::Normal(
                     normal::AttributesColorPair::new(
                         normal::Attributes::from(attrs),
-                        normal::ColorPair::from(color_pair)
+                        normal::ColorPair::_from(screen, color_pair)
                     )
                 )
             },
@@ -1871,7 +1887,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
                 AttributesColorPairSet::Extended(
                     extend::AttributesColorPair::new(
                         extend::Attributes::from(attrs),
-                        extend::ColorPair::from(ext_color_pair)
+                        extend::ColorPair::_from(screen, ext_color_pair)
                     )
                 )
             }
@@ -1889,7 +1905,7 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
 
             Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
         },
-        rc => Err(ncurses_function_error_with_rc!("getcchar", rc))
+        rc => Err(ncurses_function_error_with_rc!(func, rc))
     }
 }
 
@@ -2262,7 +2278,7 @@ pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(e
             OK => {
                 set_ncurses_colortype(NCursesColorType::Extended);
 
-                Ok(extend::ColorPair::from(pair_number))
+                Ok(extend::ColorPair::_from(None, pair_number))
             },
             rc => Err(ncurses_function_error_with_rc!("init_extended_pair", rc))
         }
@@ -2280,7 +2296,7 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
             OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
-                Ok(normal::ColorPair::from(pair_number))
+                Ok(normal::ColorPair::_from(None, pair_number))
             },
             rc => Err(ncurses_function_error_with_rc!("init_pair", rc))
         }
@@ -5553,6 +5569,14 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
 /// # }
 /// ```
 pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
+    _wattr_get(None, "wattr_get", handle)
+}
+
+pub fn wattr_get_sp(screen: SCREEN, handle: WINDOW) -> result!(AttributesColorPairSet) {
+    _wattr_get(Some(screen), "wattr_get_sp", handle)
+}
+
+fn _wattr_get(screen: Option<SCREEN>, func: &str, handle: WINDOW) -> result!(AttributesColorPairSet) {
     let mut attrs: [attr_t; 1] = [0];
     let mut color_pair: [short_t; 1] = [0];
     let mut opts: [i32; 1] = [0];
@@ -5563,7 +5587,7 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
                          AttributesColorPairSet::Normal(
                              normal::AttributesColorPair::new(
                                  normal::Attributes::from(attrs[0]),
-                                 normal::ColorPair::from(color_pair[0])
+                                 normal::ColorPair::_from(screen, color_pair[0])
                              )
                          )
                      },
@@ -5571,12 +5595,12 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
                          AttributesColorPairSet::Extended(
                              extend::AttributesColorPair::new(
                                  extend::Attributes::from(attrs[0]),
-                                 extend::ColorPair::from(opts[0])
+                                 extend::ColorPair::_from(screen, opts[0])
                              )
                          )
                      }
               }),
-        rc => Err(ncurses_function_error_with_rc!("wattr_get", rc))
+        rc => Err(ncurses_function_error_with_rc!(func, rc))
     }
 }
 
@@ -7191,10 +7215,10 @@ simple_ncurses_sp_function!(filter_sp);
 #[deprecated(since = "0.5.0", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
 pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
     where P:   ColorPairType<T>,
-          i32: From<P>,
+          i32: From<T>,
           T:   ColorAttributeTypes
 {
-    match unsafe { ncurses::free_pair_sp(screen, color_pair.into()) } {
+    match unsafe { ncurses::free_pair_sp(screen, i32::from(color_pair.number())) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("free_pair_sp", rc))
     }
@@ -7283,7 +7307,7 @@ pub fn init_extended_pair_sp(screen: SCREEN, pair_number: i32, colors: extend::C
             OK => {
                 set_ncurses_colortype(NCursesColorType::Extended);
 
-                Ok(extend::ColorPair::from(pair_number))
+                Ok(extend::ColorPair::_from(Some(screen), pair_number))
             },
             rc => Err(ncurses_function_error_with_rc!("init_extended_pair_sp", rc))
         }
@@ -7301,7 +7325,7 @@ pub fn init_pair_sp(screen: SCREEN, pair_number: short_t, colors: normal::Colors
             OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
-                Ok(normal::ColorPair::from(pair_number))
+                Ok(normal::ColorPair::_from(Some(screen), pair_number))
             },
             rc => Err(ncurses_function_error_with_rc!("init_pair_sp", rc))
         }
