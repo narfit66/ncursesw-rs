@@ -45,14 +45,14 @@ pub type SCREEN = *mut bindings::screen;
 static MODULE_PATH: &str = "ncursesw::shims::ncurses::";
 
 mod wrapped {
-    use libc::c_int;
-    use bindings::chtype;
-    use bindings::WINDOW;
+    use libc::{c_int, c_char};
+    use bindings::{chtype, WINDOW};
 
     extern "C" {
         pub static curscr: *mut WINDOW;
         pub static newscr: *mut WINDOW;
         pub static stdscr: *mut WINDOW;
+        pub static ttytype: *mut c_char;
         pub static COLORS: c_int;
         pub static COLOR_PAIRS: c_int;
         pub static COLS: c_int;
@@ -60,7 +60,7 @@ mod wrapped {
         pub static LINES: c_int;
         pub static TABSIZE: c_int;
 
-        /* Line graphics */
+        // Line graphics
         pub static mut acs_map: [chtype; 0];
     }
 }
@@ -78,6 +78,10 @@ pub unsafe fn newscr() -> WINDOW {
 /// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub unsafe fn stdscr() -> WINDOW {
     wrapped::stdscr
+}
+
+pub unsafe fn ttytype() -> Option<String> {
+    wrapped::ttytype.as_mut().map(|ptr| FromCStr::from_c_str(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
@@ -118,10 +122,6 @@ pub fn LINES() -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
 pub fn TABSIZE() -> i32 {
     unsafe { wrapped::TABSIZE }
-}
-
-pub fn acs_map() -> *const chtype {
-    unsafe { &wrapped::acs_map as *const chtype }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_add_wch.3x.html>
@@ -3033,57 +3033,61 @@ pub unsafe fn wvline_set(win: WINDOW, wch: &cchar_t, n: i32) -> i32 {
     bindings::wvline_set(win, wch, n)
 }
 
-/* Line graphics */
-pub fn NCURSES_ACS(c: char) -> chtype { unsafe { *acs_map().offset((c as libc::c_uchar) as isize) as chtype } }
+// Line graphics
 
-/* VT100 symbols begin here */
-pub fn ACS_ULCORNER() -> chtype { NCURSES_ACS('l') } /* upper left corner */
-pub fn ACS_LLCORNER() -> chtype { NCURSES_ACS('m') } /* lower left corner */
-pub fn ACS_URCORNER() -> chtype { NCURSES_ACS('k') } /* upper right corner */
-pub fn ACS_LRCORNER() -> chtype { NCURSES_ACS('j') } /* lower right corner */
-pub fn ACS_LTEE() -> chtype { NCURSES_ACS('t') } /* tee pointing right */
-pub fn ACS_RTEE() -> chtype { NCURSES_ACS('u') } /* tee pointing left */
-pub fn ACS_BTEE() -> chtype { NCURSES_ACS('v') } /* tee pointing up */
-pub fn ACS_TTEE() -> chtype { NCURSES_ACS('w') } /* tee pointing down */
-pub fn ACS_HLINE() -> chtype { NCURSES_ACS('q') } /* horizontal line */
-pub fn ACS_VLINE() -> chtype { NCURSES_ACS('x') } /* vertical line */
-pub fn ACS_PLUS() -> chtype { NCURSES_ACS('n') } /* large plus or crossover */
-pub fn ACS_S1() -> chtype { NCURSES_ACS('o') } /* scan line 1 */
-pub fn ACS_S9() -> chtype { NCURSES_ACS('s') } /* scan line 9 */
-pub fn ACS_DIAMOND() -> chtype { NCURSES_ACS('`') } /* diamond */
-pub fn ACS_CKBOARD() -> chtype { NCURSES_ACS('a') } /* checker board(stipple) */
-pub fn ACS_DEGREE() -> chtype { NCURSES_ACS('f') } /* degree symbol */
-pub fn ACS_PLMINUS() -> chtype { NCURSES_ACS('g') } /* plus/minus */
-pub fn ACS_BULLET() -> chtype { NCURSES_ACS('~') } /* bullet */
+fn acs_map() -> *const chtype {
+    unsafe { &wrapped::acs_map as *const chtype }
+}
 
-/* Teletype 5410v1 symbols begin here */
-pub fn ACS_LARROW() -> chtype { NCURSES_ACS(',') } /* arrow pointing left */
-pub fn ACS_RARROW() -> chtype { NCURSES_ACS('+') } /* arrow pointing right */
-pub fn ACS_DARROW() -> chtype { NCURSES_ACS('.') } /* arrow pointing down */
-pub fn ACS_UARROW() -> chtype { NCURSES_ACS('-') } /* arrow pointing up */
-pub fn ACS_BOARD() -> chtype { NCURSES_ACS('h') } /* board of squares */
-pub fn ACS_LANTERN() -> chtype { NCURSES_ACS('i') } /* lantern symbol */
-pub fn ACS_BLOCK() -> chtype { NCURSES_ACS('0') } /* solid square block */
+pub fn NCURSES_ACS(c: char) -> chtype {
+    unsafe { *acs_map().offset((c as libc::c_uchar) as isize) as chtype }
+}
 
-/*
- * These aren't documented, but a lot of System Vs have them anyway
- * (you can spot pprryyzz{{||}} in a lot of AT&T terminfo strings).
- * The ACS_names may not match AT&T's, our source didn't know them.
- */
-pub fn ACS_S3() -> chtype { NCURSES_ACS('p') } /* scan line 3 */
-pub fn ACS_S7() -> chtype { NCURSES_ACS('r') } /* scan line 7 */
-pub fn ACS_LEQUAL() -> chtype { NCURSES_ACS('y') } /* less/equal */
-pub fn ACS_GEQUAL() -> chtype { NCURSES_ACS('z') } /* greater/equal */
-pub fn ACS_PI() -> chtype { NCURSES_ACS('{') } /* Pi */
-pub fn ACS_NEQUAL() -> chtype { NCURSES_ACS('|') } /* not equal */
-pub fn ACS_STERLING() -> chtype { NCURSES_ACS('}') } /* UK pound sign */
+// VT100 symbols begin here
 
-/*
- * Line drawing ACS names are of the form ACS_trbl, where t is the top, r
- * is the right, b is the bottom, and l is the left. t, r, b, and l might
- * be B(blank), S(single), D(double), or T(thick). The subset defined
- * here only uses B and S.
- */
+pub fn ACS_ULCORNER() -> chtype { NCURSES_ACS('l') } // upper left corner
+pub fn ACS_LLCORNER() -> chtype { NCURSES_ACS('m') } // lower left corner
+pub fn ACS_URCORNER() -> chtype { NCURSES_ACS('k') } // upper right corner
+pub fn ACS_LRCORNER() -> chtype { NCURSES_ACS('j') } // lower right corner
+pub fn ACS_LTEE() -> chtype { NCURSES_ACS('t') }     // tee pointing right
+pub fn ACS_RTEE() -> chtype { NCURSES_ACS('u') }     // tee pointing left
+pub fn ACS_BTEE() -> chtype { NCURSES_ACS('v') }     // tee pointing up
+pub fn ACS_TTEE() -> chtype { NCURSES_ACS('w') }     // tee pointing down
+pub fn ACS_HLINE() -> chtype { NCURSES_ACS('q') }    // horizontal line
+pub fn ACS_VLINE() -> chtype { NCURSES_ACS('x') }    // vertical line
+pub fn ACS_PLUS() -> chtype { NCURSES_ACS('n') }     // large plus or crossover
+pub fn ACS_S1() -> chtype { NCURSES_ACS('o') }       // scan line 1
+pub fn ACS_S9() -> chtype { NCURSES_ACS('s') }       // scan line 9
+pub fn ACS_DIAMOND() -> chtype { NCURSES_ACS('`') }  // diamond
+pub fn ACS_CKBOARD() -> chtype { NCURSES_ACS('a') }  // checker board(stipple)
+pub fn ACS_DEGREE() -> chtype { NCURSES_ACS('f') }   // degree symbol
+pub fn ACS_PLMINUS() -> chtype { NCURSES_ACS('g') }  // plus/minus
+pub fn ACS_BULLET() -> chtype { NCURSES_ACS('~') }   // bullet
+
+// Teletype 5410v1 symbols begin here
+pub fn ACS_LARROW() -> chtype { NCURSES_ACS(',') }   // arrow pointing left
+pub fn ACS_RARROW() -> chtype { NCURSES_ACS('+') }   // arrow pointing right
+pub fn ACS_DARROW() -> chtype { NCURSES_ACS('.') }   // arrow pointing down
+pub fn ACS_UARROW() -> chtype { NCURSES_ACS('-') }   // arrow pointing up
+pub fn ACS_BOARD() -> chtype { NCURSES_ACS('h') }    // board of squares
+pub fn ACS_LANTERN() -> chtype { NCURSES_ACS('i') }  // lantern symbol
+pub fn ACS_BLOCK() -> chtype { NCURSES_ACS('0') }    // solid square block
+
+// These aren't documented, but a lot of System Vs have them anyway
+// (you can spot pprryyzz{{||}} in a lot of AT&T terminfo strings).
+// The ACS_names may not match AT&T's, our source didn't know them.
+pub fn ACS_S3() -> chtype { NCURSES_ACS('p') }       // scan line 3
+pub fn ACS_S7() -> chtype { NCURSES_ACS('r') }       // scan line 7
+pub fn ACS_LEQUAL() -> chtype { NCURSES_ACS('y') }   // less/equal
+pub fn ACS_GEQUAL() -> chtype { NCURSES_ACS('z') }   // greater/equal
+pub fn ACS_PI() -> chtype { NCURSES_ACS('{') }       // Pi
+pub fn ACS_NEQUAL() -> chtype { NCURSES_ACS('|') }   // not equal
+pub fn ACS_STERLING() -> chtype { NCURSES_ACS('}') } // UK pound sign
+
+// Line drawing ACS names are of the form ACS_trbl, where t is the top, r
+// is the right, b is the bottom, and l is the left. t, r, b, and l might
+// be B(blank), S(single), D(double), or T(thick). The subset defined
+// here only uses B and S.
 pub fn ACS_BSSB() -> chtype { ACS_ULCORNER() }
 pub fn ACS_SSBB() -> chtype { ACS_LLCORNER() }
 pub fn ACS_BBSS() -> chtype { ACS_URCORNER() }
@@ -3095,6 +3099,8 @@ pub fn ACS_BSSS() -> chtype { ACS_TTEE() }
 pub fn ACS_BSBS() -> chtype { ACS_HLINE() }
 pub fn ACS_SBSB() -> chtype { ACS_VLINE() }
 pub fn ACS_SSSS() -> chtype { ACS_PLUS() }
+
+// screen type functions.
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn alloc_pair_sp(sp: SCREEN, fg: i32, bg: i32) -> i32 {

@@ -92,6 +92,10 @@ pub fn stdscr() -> WINDOW {
     unsafe { ncurses::stdscr() }
 }
 
+pub fn ttytype() -> result!(String) {
+    unsafe { ncurses::ttytype().ok_or(ncurses_function_error!("ttytype")) }
+}
+
 /// Return the number of colors available.
 ///
 /// This is initialized by `start_color` to the maximum number of colors the terminal can support.
@@ -140,13 +144,37 @@ pub fn COLORS() -> i32 {
 /// start_color()?;
 ///
 /// let yellow = Color::from_str("yellow")?;
-/// let blue = Color::from_str("blue")?;
-/// 
-/// let color_pair0 = ColorPair::default();
-/// let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+/// let blue   = Color::from_str("blue")?;
+/// let green  = Color::from_str("blue")?;
+/// let red    = Color::from_str("red")?;
 ///
-/// assert!(COLOR_PAIR(color_pair0) == 0b0000000000);
-/// assert!(COLOR_PAIR(color_pair1) == 0b0100000000);
+/// let color_pair0  = ColorPair::default();
+/// let color_pair1  = ColorPair::new(1,  Colors::new(yellow, blue))?;
+/// let color_pair2  = ColorPair::new(2,  Colors::new(yellow, green))?;
+/// let color_pair3  = ColorPair::new(3,  Colors::new(yellow, red))?;
+/// let color_pair4  = ColorPair::new(4,  Colors::new(blue, yellow))?;
+/// let color_pair5  = ColorPair::new(5,  Colors::new(blue, green))?;
+/// let color_pair6  = ColorPair::new(6,  Colors::new(blue, red))?;
+/// let color_pair7  = ColorPair::new(7,  Colors::new(green, yellow))?;
+/// let color_pair8  = ColorPair::new(8,  Colors::new(green, blue))?;
+/// let color_pair9  = ColorPair::new(9,  Colors::new(green, red))?;
+/// let color_pair10 = ColorPair::new(10, Colors::new(red, yellow))?;
+/// let color_pair11 = ColorPair::new(11, Colors::new(red, blue))?;
+/// let color_pair12 = ColorPair::new(12, Colors::new(red, green))?;
+///
+/// assert!(COLOR_PAIR(color_pair0)  == 0b0000000000000000);
+/// assert!(COLOR_PAIR(color_pair1)  == 0b0000000100000000);
+/// assert!(COLOR_PAIR(color_pair2)  == 0b0000001000000000);
+/// assert!(COLOR_PAIR(color_pair3)  == 0b0000001100000000);
+/// assert!(COLOR_PAIR(color_pair4)  == 0b0000010000000000);
+/// assert!(COLOR_PAIR(color_pair5)  == 0b0000010100000000);
+/// assert!(COLOR_PAIR(color_pair6)  == 0b0000011000000000);
+/// assert!(COLOR_PAIR(color_pair7)  == 0b0000011100000000);
+/// assert!(COLOR_PAIR(color_pair8)  == 0b0000100000000000);
+/// assert!(COLOR_PAIR(color_pair9)  == 0b0000100100000000);
+/// assert!(COLOR_PAIR(color_pair10) == 0b0000101000000000);
+/// assert!(COLOR_PAIR(color_pair11) == 0b0000101100000000);
+/// assert!(COLOR_PAIR(color_pair12) == 0b0000110000000000);
 /// #     }
 /// #
 /// #     delwin(h)?;
@@ -7123,7 +7151,7 @@ pub fn can_change_color_sp(screen: SCREEN) -> bool {
 
 basic_ncurses_sp_function!(cbreak_sp, "cbreak_sp");
 
-//#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::Color::rgb_sp() instead")]
 pub fn color_content_sp(screen: SCREEN, color: normal::Color) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
@@ -7180,7 +7208,7 @@ pub fn erasechar_sp(screen: SCREEN) -> result!(char) {
     }
 }
 
-//#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::Color::rgb_sp() instead")]
 pub fn extended_color_content_sp(screen: SCREEN, color: extend::Color) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
@@ -7192,7 +7220,7 @@ pub fn extended_color_content_sp(screen: SCREEN, color: extend::Color) -> result
     }
 }
 
-//#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::colors() instead")]
 pub fn extended_pair_content_sp(screen: SCREEN, color_pair: extend::ColorPair) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
@@ -7264,7 +7292,7 @@ pub fn has_key_sp(screen: SCREEN, ch: KeyBinding) -> bool {
     unsafe { ncurses::has_key_sp(screen, KeyBinding::into(ch)) == TRUE }
 }
 
-//#[deprecated(since = "0.4.0", note = "Use normal::Color::new() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::Color::new_sp() instead")]
 pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -7280,7 +7308,7 @@ pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) ->
     }
 }
 
-//#[deprecated(since = "0.4.0", note = "Use extend::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::new_sp() instead")]
 pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -7296,7 +7324,7 @@ pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RG
     }
 }
 
-//#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::new_sp() instead")]
 pub fn init_extended_pair_sp(screen: SCREEN, pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
     if pair_number >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -7314,7 +7342,7 @@ pub fn init_extended_pair_sp(screen: SCREEN, pair_number: i32, colors: extend::C
     }
 }
 
-//#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::new_sp() instead")]
 pub fn init_pair_sp(screen: SCREEN, pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
     if i32::from(pair_number) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -7448,7 +7476,7 @@ simple_ncurses_sp_function!(noqiflush_sp);
 
 basic_ncurses_sp_function!(noraw_sp, "noraw_sp");
 
-//#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::colors() instead")]
 pub fn pair_content_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
