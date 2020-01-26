@@ -7,7 +7,7 @@ This crate supports NCurses ABI 6.1 and above.
 
 There are actually three layers of NCurses functions exposed within this library, the raw `unsafe` functions that are generated with `bindgen` which are available in `ncursesw::shims::bindings`, a layer above this which again are mainly `unsafe` but protect the calling code to a certian degree with assetions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are in the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}`. Last but not least there are the safe (within the limits of NCurses itself) functions in `ncursesw` and `ncursesw::{panels, mouse, menu, form}` which retain thier original ncurses names but have been rustified.
 
-There is a companion crate which acts as a wrapper around this crate [ncursesw-win](https://crates.io/crates/ncursesw-win) and encapsulates the raw pointers that NCurses uses and functions in an entirly safe way.
+There is a companion crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which acts as a wrapper around this crate and encapsulates the raw pointers that NCurses uses and functions in an entirly safe way.
 
 ## Requirements
 
@@ -52,7 +52,7 @@ If set, `NCURSESW_RUSTC_LINK_LIB` will be used for the `cargo:rustc-link-lib` se
 
 ## Features
 
-By default this crate will be compiled so that the following NCurses functions `getch()`, `mvgetch()`, `mvwgetch()`, `wgetch()`, `get_wch()`, `mvget_wch()`, `mvwget_wch()` and `wget_ch()` will pass a `KEY_RESIZE` on event of the terminal being resized or a `KEY_EVENT` back to the client code as `KeyBinding::ResizeEvent` and `KeyBinding::Event` respectivly. The follwing setting in the client crates `Cargo.toml` will cause this crate to be compiled so that they will be passed back as `NCurseswError::KeyResize` and `NCurseswError::Event` error types instead.
+By default this crate will be compiled so that the following NCurses functions `getch()`, `mvgetch()`, `mvwgetch()`, `wgetch()`, `get_wch()`, `mvget_wch()`, `mvwget_wch()` and `wget_ch()` will pass a `KEY_RESIZE` on event of the terminal being resized or a `KEY_EVENT` back to the client code as `KeyBinding::ResizeEvent` and `KeyBinding::Event` respectivly. The follwing setting in the client code crates `Cargo.toml` will cause this crate to be compiled so that they will be passed back as `NCurseswError::KeyResize` and `NCurseswError::Event` error types instead.
 
 ```
 [features]
@@ -68,9 +68,9 @@ extern crate ncursesw;
 use ncursesw::*;
 ```
 
-This library follows the basic principles that are used when using NCurses with `C`, it supports the standard ascii functions (the `add` type functions seem to support unicode characters out of the box in ABI 6.1 if not earlier), ascii characters with attributes and/or color (`chtype`), wide characters (`wchar_t`/`wint_t`) and complex characters with attributes and color (`cchar_t`).
+This library follows the basic principles that are used when using NCurses with `C`, it supports the standard ascii functions (the `add` type functions seem to support unicode characters out of the box in NCurses ABI 6.1 if not earlier), ascii characters with attributes and/or color (`chtype`), wide characters (`wchar_t`/`wint_t`) and complex characters with attributes and color (`cchar_t`).
 
-Color pairs and attributes are dealt with in two modules. The `normal` module deals with the standard `ansi` color pairs defined internally within ncurses as `short_t/i16` and the `extend` module is for extended color pairs that are defined internally within ncurses as `i32`. Because the `normal` color pairs are actually an attribute within ncurses both modules also implement there own `attribute` and `attributes` types.
+Color pairs and attributes are dealt with in two modules. The `normal` module deals with the standard `ansi` color pairs defined internally within ncurses as `short_t/i16` and the `extend` module is for extended color pairs that are defined internally within ncurses as `i32`. Because the `normal` color pairs are actually an attribute within NCurses both modules also implement there own `attribute` and `attributes` types.
 
 To use attributes and color pairs
 ```

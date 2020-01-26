@@ -29,14 +29,14 @@ type WINDOW = ncurses::WINDOW;
 type SCREEN = *mut crate::shims::bindings::SCREEN;
 pub type PANEL = npanels::PANEL;
 
-/// allocates a PANEL structure, associates it with win, places the panel on
+/// Allocates a PANEL structure, associates it with win, places the panel on
 /// the top of the stack (causes it to be displayed above any other panel)
 /// and returns a pointer to the new panel.
 pub fn new_panel(window_handle: WINDOW) -> panels_result!(PANEL) {
     unsafe { npanels::new_panel(window_handle).ok_or(panels_function_error!("new_panel")) }
 } 
 
-/// puts panel at the bottom of all panels.
+/// Puts panel at the bottom of all panels.
 pub fn bottom_panel(handle: PANEL) -> panels_result!(()) {
     match unsafe { npanels::bottom_panel(handle) } {
         OK => Ok(()),
@@ -44,7 +44,7 @@ pub fn bottom_panel(handle: PANEL) -> panels_result!(()) {
     }
 }
 
-/// puts the given visible panel on top of all panels in the stack.
+/// Puts the given visible panel on top of all panels in the stack.
 pub fn top_panel(handle: PANEL) -> panels_result!(()) {
     match unsafe { npanels::top_panel(handle) } {
         OK => Ok(()),
@@ -52,7 +52,7 @@ pub fn top_panel(handle: PANEL) -> panels_result!(()) {
     }
 }
 
-/// makes a hidden panel visible by placing it on top of the panels in the panel stack.
+/// Makes a hidden panel visible by placing it on top of the panels in the panel stack.
 pub fn show_panel(handle: PANEL) -> panels_result!(()) {
     match unsafe { npanels::show_panel(handle) } {
         OK => Ok(()),
@@ -60,7 +60,7 @@ pub fn show_panel(handle: PANEL) -> panels_result!(()) {
     }
 }
 
-/// refreshes the virtual screen to reflect the relations between the panels in the stack.
+/// Refreshes the virtual screen to reflect the relations between the panels in the stack.
 ///
 /// Does not call doupdate() to refresh the physical screen. Use this function and not wrefresh() or wnoutrefresh().
 /// update_panels() may be called more than once before a call to doupdate(), but doupdate() is the function
@@ -69,7 +69,7 @@ pub fn update_panels() {
     npanels::update_panels();
 } 
 
-/// removes the given panel from the panel stack and thus hides it from view.
+/// Removes the given panel from the panel stack and thus hides it from view.
 /// The PANEL structure is not lost, merely removed from the stack.
 pub fn hide_panel(handle: PANEL) -> panels_result!(()) {
     match unsafe { npanels::hide_panel(handle) } {
@@ -78,12 +78,12 @@ pub fn hide_panel(handle: PANEL) -> panels_result!(()) {
     }
 }
 
-/// returns a pointer to the window of the given panel.
+/// Returns a pointer to the window of the given panel.
 pub fn panel_window(handle: PANEL) -> panels_result!(WINDOW) {
     unsafe { npanels::panel_window(handle).ok_or(panels_function_error!("panel_window")) }
 } 
 
-/// replaces the current window of panel with window (useful, for example if you
+/// Replaces the current window of panel with window (useful, for example if you
 /// want to resize a panel; if you're using ncurses, you can call replace_panel()
 /// on the output of wresize(3x)). It does not change the position of the panel
 /// in the stack.
@@ -94,7 +94,7 @@ pub fn replace_panel(handle: PANEL, window_handle: WINDOW) -> panels_result!(())
     }
 } 
 
-/// moves the given panel window so that its upper-left corner is at origin.y, origin.x.
+/// Moves the given panel window so that its upper-left corner is at origin.y, origin.x.
 /// It does not change the position of the panel in the stack. Be sure to use this
 /// function, not mvwin(), to move a panel window.
 pub fn move_panel(handle: PANEL, origin: Origin) -> panels_result!(()) {
@@ -104,24 +104,24 @@ pub fn move_panel(handle: PANEL, origin: Origin) -> panels_result!(()) {
     }
 } 
 
-/// returns true if the panel is in the panel stack, false if it is not.
+/// Returns true if the panel is in the panel stack, false if it is not.
 pub fn panel_hidden(handle: PANEL) -> panels_result!(bool) {
     unsafe { npanels::panel_hidden(handle).ok_or(panels_function_error!("panel_hidden")) }
 }
 
-/// returns a pointer to the panel above pan.
+/// Returns a pointer to the panel above pan.
 /// If the panel argument is None, it returns a pointer to the bottom panel in the stack.
 pub fn panel_above(handle: Option<PANEL>) -> panels_result!(PANEL) {
     unsafe { npanels::panel_above(handle).ok_or(panels_function_error!("panel_above")) }
 } 
 
-/// returns a pointer to the panel just below pan.
+/// Returns a pointer to the panel just below pan.
 /// If the panel argument is None, it returns a pointer to the top panel in the stack.
 pub fn panel_below(handle: Option<PANEL>) -> panels_result!(PANEL) {
     unsafe { npanels::panel_below(handle).ok_or(panels_function_error!("panel_below")) }
 } 
 
-/// sets the panel's user pointer.
+/// Sets the panel's user pointer.
 pub fn set_panel_userptr(handle: PANEL, ptr: PanelUserPtr) -> panels_result!(()) {
     match unsafe { npanels::set_panel_userptr(handle, ptr) } {
         OK => Ok(()),
@@ -129,12 +129,12 @@ pub fn set_panel_userptr(handle: PANEL, ptr: PanelUserPtr) -> panels_result!(())
     }
 }
 
-/// returns the user pointer for a given panel.
+/// Returns the user pointer for a given panel.
 pub fn panel_userptr(handle: PANEL) -> PanelUserPtr {
     unsafe { npanels::panel_userptr(handle) }
 }
 
-/// removes the given panel from the stack and deallocates the PANEL structure
+/// Removes the given panel from the stack and deallocates the PANEL structure
 /// (but not its associated window).
 pub fn del_panel(handle: PANEL) -> panels_result!(()) {
     match unsafe { npanels::del_panel(handle) } {
@@ -143,14 +143,19 @@ pub fn del_panel(handle: PANEL) -> panels_result!(()) {
     }
 }
 
+// screen `_sp` functions.
+
+/// Screen function equivalent of `panel_below(None)`.
 pub fn ceiling_panel(screen: SCREEN) -> panels_result!(PANEL) {
     unsafe { npanels::ceiling_panel(screen).ok_or(panels_function_error!("ceiling_panel")) }
 }
 
+/// Screen function equivalent of `panel_above(None)`.
 pub fn ground_panel(screen: SCREEN) -> panels_result!(PANEL) {
     unsafe { npanels::ground_panel(screen).ok_or(panels_function_error!("ground_panel")) }
 }
 
+/// Screen function of `update_panels()`.
 pub fn update_panels_sp(screen: SCREEN) {
     unsafe { npanels::update_panels_sp(screen) }
 } 

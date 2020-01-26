@@ -20,10 +20,17 @@
     IN THE SOFTWARE.
 */
 
+/// Override locale-encoding checks.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Legacy {
+    /// The NCurses library functions normally, rendering nonprinting characters
+    /// as described in `unctrl()`.
     Level0,
+    /// The NCurses library ignores `isprintf()` for codes in the range 160-255.
     Level1,
+    /// The NCurses library ignores `isprintf()` for codes in the range 128-255.
+    /// It also modifies the output of `unctrl()`, showing codes in the
+    /// range 128-159 as is.
     Level2
 }
 

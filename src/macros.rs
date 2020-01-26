@@ -28,63 +28,6 @@ macro_rules! mouse_result { ($type: ty) => { Result<$type, NCurseswMouseError> }
 macro_rules! menu_result { ($type: ty) => { Result<$type, NCurseswMenuError> } }
 macro_rules! form_result { ($type: ty) => { Result<$type, NCurseswFormError> } }
 
-macro_rules! simple_ncurses_function {
-    ($func: ident) => {
-        pub fn $func() {
-            ncurses::$func()
-        }
-    }
-}
-
-macro_rules! simple_ncurses_sp_function {
-    ($func: ident) => {
-        pub fn $func(screen: SCREEN) {
-            unsafe { ncurses::$func(screen) }
-        }
-    }
-}
-
-macro_rules! simple_ncurses_function_with_window_returns_bool {
-    ($func: ident) => {
-        pub fn $func(handle: WINDOW) -> bool {
-            unsafe { ncurses::$func(handle) }
-        }
-    }
-}
-
-macro_rules! basic_ncurses_function {
-    ($func: ident, $rc: expr) => {
-        pub fn $func() -> result!(()) {
-            match ncurses::$func() {
-                OK => Ok(()),
-                rc => Err(ncurses_function_error_with_rc!($rc, rc))
-            }
-        }
-    }
-}
-
-macro_rules! basic_ncurses_sp_function {
-    ($func: ident, $rc: expr) => {
-        pub fn $func(screen: SCREEN) -> result!(()) {
-            match unsafe { ncurses::$func(screen) } {
-                OK => Ok(()),
-                rc => Err(ncurses_function_error_with_rc!($rc, rc))
-            }
-        }
-    }
-}
-
-macro_rules! basic_ncurses_function_with_window {
-    ($func: ident, $rc: expr) => {
-        pub fn $func(handle: WINDOW) -> result!(()) {
-            match unsafe { ncurses::$func(handle) } {
-                OK => Ok(()),
-                rc => Err(ncurses_function_error_with_rc!($rc, rc))
-            }
-        }
-    }
-}
-
 macro_rules! ncurses_function_error { ($func: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: ERR } } }
 macro_rules! ncurses_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: $rc } } }
 

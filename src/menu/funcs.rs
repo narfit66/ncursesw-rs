@@ -489,6 +489,9 @@ pub fn unpost_menu(menu: MENU) -> menu_result!(()) {
     }
 }
 
+// screen `_sp` functions.
+
+/// Screen function of `new_menu()`.
 pub fn new_menu_sp(screen: SCREEN, item_handles: &mut Vec<ITEM>) -> menu_result!(MENU) {
     item_handles.push(ptr::null_mut());
     item_handles.shrink_to_fit();

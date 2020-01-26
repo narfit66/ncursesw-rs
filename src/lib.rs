@@ -1,7 +1,7 @@
 /*
     src/lib.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -36,19 +36,19 @@ mod macros;
 pub mod extend;
 /// Compiled in `ncursesw` features
 pub mod features;
-/// ncurses Form module
+/// NCurses Form module
 pub mod form;
 /// Traits used by `ncursesw`
 mod gen;
 /// Normal color's, color pairs and attributes module
 pub mod normal;
-/// ncurses Menu module
+/// NCurses Menu module
 pub mod menu;
-/// ncurses Mouse module
+/// NCurses Mouse module
 pub mod mouse;
-/// ncurses Panels module
+/// NCurses Panels module
 pub mod panels;
-/// ncurses API shims module
+/// NCurses API shims module
 pub mod shims;
 
 mod chtypet;

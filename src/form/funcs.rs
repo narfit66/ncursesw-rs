@@ -571,6 +571,9 @@ pub fn unpost_form(form: FORM) -> form_result!(()) {
     }
 }
 
+// screen `_sp` functions.
+
+/// Screen function of `new_form()`.
 pub fn new_form_sp(screen: SCREEN, fields: &mut Vec<FIELD>) -> form_result!(FORM) {
     fields.push(ptr::null_mut());
     fields.shrink_to_fit();

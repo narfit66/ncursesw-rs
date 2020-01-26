@@ -112,6 +112,9 @@ pub fn has_mouse_interface() -> bool {
     mouse_version() > 0
 }
 
+// screen `_sp` functions.
+
+/// Screen function of `getmouse()`.
 pub fn getmouse_sp(screen: SCREEN, event: nmouse::MEVENT) -> mouse_result!(()) {
     match unsafe { nmouse::getmouse_sp(screen, event) } {
         OK => Ok(()),
@@ -119,10 +122,12 @@ pub fn getmouse_sp(screen: SCREEN, event: nmouse::MEVENT) -> mouse_result!(()) {
     }
 }
 
+/// Screen function of `has_mouse()`.
 pub fn has_mouse_sp(screen: SCREEN) -> bool {
     unsafe { bindings::has_mouse_sp(screen) }
 }
 
+/// Screen function of `mouseinterval()`.
 pub fn mouseinterval_sp(screen: SCREEN) -> mouse_result!(time::Duration) {
     let rc = unsafe { nmouse::mouseinterval_sp(screen, -1) };
 
@@ -133,6 +138,7 @@ pub fn mouseinterval_sp(screen: SCREEN) -> mouse_result!(time::Duration) {
     }
 }
 
+/// Screen function of `set_mouseinterval()`.
 pub fn set_mouseinterval_sp(screen: SCREEN, delay: time::Duration) -> mouse_result!(()) {
     let ms = i32::try_from(delay.as_millis())?;
 
@@ -142,6 +148,7 @@ pub fn set_mouseinterval_sp(screen: SCREEN, delay: time::Duration) -> mouse_resu
     }
 }
 
+/// Screen function of `mousemask()`.
 pub fn mousemask_sp(screen: SCREEN, newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mouse_result!(mmask_t) {
     let mask = unsafe { nmouse::mousemask_sp(screen, newmask, oldmask) };
 
@@ -152,6 +159,7 @@ pub fn mousemask_sp(screen: SCREEN, newmask: mmask_t, oldmask: Option<*mut mmask
     }
 }
 
+/// Screen function of `ungetmouse()`.
 pub fn ungetmouse_sp(screen: SCREEN, event: nmouse::MEVENT) -> mouse_result!(()) {
     match unsafe { nmouse::ungetmouse_sp(screen, event) } {
         OK => Ok(()),
