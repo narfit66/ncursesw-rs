@@ -1,7 +1,7 @@
 /*
     src/form/fieldinfo.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,20 +22,24 @@
 
 use crate::Size;
 
+/// Form field details.
 pub struct FieldInfo {
     size: Size,
     max:  i32
 }
 
 impl FieldInfo {
+    /// Create a new instance.
     pub fn new(size: Size, max: i32) -> Self {
         Self { size, max }
     }
 
+    /// Returns the size.
     pub fn size(&self) -> Size {
         self.size
     }
 
+    /// Returns the maximum.
     pub fn max(&self) -> i32 {
         self.max
     }

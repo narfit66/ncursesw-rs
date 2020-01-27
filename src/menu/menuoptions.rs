@@ -1,7 +1,7 @@
 /*
     src/menu/menuoptions.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@ use menu::MenuOption;
 use shims::constants;
 
 /// Menu options.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct MenuOptions {
     raw: i32
 }
@@ -52,12 +52,6 @@ impl MenuOptions {
 
     option_getter!(is_mouse_menu, O_MOUSE_MENU);
     option_setter!(set_mouse_menu, O_MOUSE_MENU);
-}
-
-impl Default for MenuOptions {
-    fn default() -> Self {
-        Self { raw: 0 }
-    }
 }
 
 /// Implement the | operator for adding ItemOptions to ItemOptions

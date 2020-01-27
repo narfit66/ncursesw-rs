@@ -1,7 +1,7 @@
 /*
     src/form/ncurseswformerror.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -26,13 +26,13 @@ use errno::{Errno, errno};
 use shims::constants;
 
 custom_error::custom_error! {
-/// NCursesw menu errors.
+/// NCursesw form errors.
 #[derive(PartialEq, Eq)]
 pub NCurseswFormError
     /// Routine detected an incorrect or out-of-range argument.
     BadArgument { func: String } = "nform::{func}() : bad argument",
     BadState { func: String } = "nform::{func}() : bad state",
-    /// Item is connected to a menu.
+    /// Field is connected to a form.
     Connected { func: String } = "nform::{func}() : connected",
     Current { func: String } = "nform::{func}() : current",
     InvalidField { func: String } = "nform::{func}() : invalid field",

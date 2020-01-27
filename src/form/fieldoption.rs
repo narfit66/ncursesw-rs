@@ -1,7 +1,7 @@
 /*
     src/form/fieldoption.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,17 +20,32 @@
     IN THE SOFTWARE.
 */
 
+/// Field option.
 pub enum FieldOption {
+    /// The field is displayed. If this option is off, display of the field is suppressed.
     Visible,
+    /// The field is visited during processing. If this option is off, the field will not
+    /// be reachable by navigation keys. Please notice that an invisible field appears to
+    /// be inactive also.
     Active,
+    /// The field contents are displayed as data is entered.
     Public,
+    /// The field can be edited.
     Edit,
+    /// Words that do not fit on a line are wrapped to the next line. Words are blank-separated.
     Wrap,
+    /// The field is cleared whenever a character is entered at the first position.
     Blank,
+    /// Skip to the next field when this one fills.
     AutoSkip,
+    /// Allow a blank field.
     NullOk,
+    /// Validate field only if modified by user.
     PassOk,
+    /// Field buffers are fixed to field's original size. Turn this option off to create a dynamic field.
     Static,
+    /// Permit dynamic fields to be justified, like static fields.
     DynamicJustify,
+    /// Preserve leading whitespace in the field buffer, which is normally discarded.
     NoLeftStrip
 }

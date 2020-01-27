@@ -1,7 +1,7 @@
 /*
     src/menu/itemoptions.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@ use menu::ItemOption;
 use shims::constants;
 
 /// Menu item options.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ItemOptions {
     raw: i32
 }
@@ -34,12 +34,6 @@ pub struct ItemOptions {
 impl ItemOptions {
     option_getter!(is_selectable, O_SELECTABLE);
     option_setter!(set_selectable, O_SELECTABLE);
-}
-
-impl Default for ItemOptions {
-    fn default() -> Self {
-        Self { raw: 0 }
-    }
 }
 
 /// Implement the | operator for adding ItemOptions to ItemOptions

@@ -37,16 +37,50 @@ pub mod extend;
 /// Compiled in `ncursesw` features
 pub mod features;
 /// NCurses Form module
+///
+/// The form library provides terminal-independent facilities for composing
+/// form screens on character-cell terminals. The library includes: field
+/// routines, which create and modify form fields; and form routines, which
+/// group fields into forms, display forms on the screen, and handle
+/// interaction with the user.
+///
+/// Your program should set up the locale, e.g.,
+///
+///         ncursesw::setlocale(LcCategory::All, "")?;
+///
+/// so that input/output processing will work.
 pub mod form;
 /// Traits used by `ncursesw`
 mod gen;
 /// Normal color's, color pairs and attributes module
 pub mod normal;
 /// NCurses Menu module
+///
+/// The menu library provides terminal-independent facilities for composing
+/// menu systems on character-cell terminals. The library includes: item routines,
+/// which create and modify menu items; and menu routines, which group items into
+/// menus, display menus on the screen, and handle interaction with the user.
 pub mod menu;
 /// NCurses Mouse module
+///
+/// These functions provide an interface to mouse events from NCurses. Mouse events
+/// are represented by `KeyBinding::KeyMouse` pseudo-key values in the `wgetch()`
+/// input stream.
 pub mod mouse;
 /// NCurses Panels module
+///
+/// Panels are NCurses windows with the added feature of depth. Panel functions allow
+/// the use of stacked windows and ensure the proper portions of each window and the
+/// NCurses `stdscr()` window are hidden or displayed when panels are added, moved,
+/// modified or removed. The set of currently visible panels is the stack of panels.
+/// The `stdscr()` window is beneath all panels, and is not considered part of the stack.
+///
+/// A window is associated with every panel. The panel routines enable you to create,
+/// move, hide, and show panels, as well as position a panel at any desired location
+/// in the stack.
+///
+/// Panel routines are a functional layer added to NCurses, make only high-level
+/// NCurses calls, and work anywhere terminfo NCurses does.
 pub mod panels;
 /// NCurses API shims module
 pub mod shims;

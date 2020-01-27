@@ -4668,6 +4668,12 @@ pub fn newpad_sp(screen: SCREEN, size: Size) -> result!(WINDOW) {
     unsafe { ncurses::newpad_sp(screen, size.lines, size.columns).ok_or(ncurses_function_error!("newpad_sp")) }
 }
 
+/// When creating a new screen, the library uses static variables which have
+/// been preset, e.g. by `use_env()`, `filter()` etc. With the screen-pointer
+/// extension, there are situations where it must create a current screen
+/// before the unextended library does. The `new_prescr()` function is used
+/// internally to handle these cases. It is also provided as an entrypoint
+/// to allow applications to customize the library initialization.
 pub fn new_prescr() -> result!(SCREEN) {
     unsafe { ncurses::new_prescr().ok_or(ncurses_function_error!("new_prescr")) }
 }

@@ -1,7 +1,7 @@
 /*
     src/menu/menurequest.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -50,27 +50,27 @@ pub enum MenuRequest {
 }
 
 impl MenuRequest {
-    pub(in crate::menu) fn new(request: i32) -> Self {
+    pub(in crate::menu) fn new(request: i32) -> Option<Self> {
         match request {
-            constants::REQ_LEFT_ITEM     => MenuRequest::LeftItem,
-            constants::REQ_RIGHT_ITEM    => MenuRequest::RightItem,
-            constants::REQ_UP_ITEM       => MenuRequest::UpItem,
-            constants::REQ_DOWN_ITEM     => MenuRequest::DownItem,
-            constants::REQ_SCR_ULINE     => MenuRequest::ScrollUpLine,
-            constants::REQ_SCR_DLINE     => MenuRequest::ScrollDownLine,
-            constants::REQ_SCR_UPAGE     => MenuRequest::ScrollUpPage,
-            constants::REQ_SCR_DPAGE     => MenuRequest::ScrollDownPage,
-            constants::REQ_FIRST_ITEM    => MenuRequest::FirstItem,
-            constants::REQ_LAST_ITEM     => MenuRequest::LastItem,
-            constants::REQ_NEXT_ITEM     => MenuRequest::NextItem,
-            constants::REQ_PREV_ITEM     => MenuRequest::PreviousItem,
-            constants::REQ_TOGGLE_ITEM   => MenuRequest::ToggleItem,
-            constants::REQ_CLEAR_PATTERN => MenuRequest::ClearPattern,
-            constants::REQ_BACK_PATTERN  => MenuRequest::BackPattern,
-            constants::REQ_NEXT_MATCH    => MenuRequest::NextMatch,
-            constants::REQ_PREV_MATCH    => MenuRequest::PreviousMatch,
-            constants::KEY_MOUSE         => MenuRequest::Mouse,
-            _                            => panic!("MenuRequest::new({}) out of bounds!!!", request)
+            constants::REQ_LEFT_ITEM     => Some(MenuRequest::LeftItem),
+            constants::REQ_RIGHT_ITEM    => Some(MenuRequest::RightItem),
+            constants::REQ_UP_ITEM       => Some(MenuRequest::UpItem),
+            constants::REQ_DOWN_ITEM     => Some(MenuRequest::DownItem),
+            constants::REQ_SCR_ULINE     => Some(MenuRequest::ScrollUpLine),
+            constants::REQ_SCR_DLINE     => Some(MenuRequest::ScrollDownLine),
+            constants::REQ_SCR_UPAGE     => Some(MenuRequest::ScrollUpPage),
+            constants::REQ_SCR_DPAGE     => Some(MenuRequest::ScrollDownPage),
+            constants::REQ_FIRST_ITEM    => Some(MenuRequest::FirstItem),
+            constants::REQ_LAST_ITEM     => Some(MenuRequest::LastItem),
+            constants::REQ_NEXT_ITEM     => Some(MenuRequest::NextItem),
+            constants::REQ_PREV_ITEM     => Some(MenuRequest::PreviousItem),
+            constants::REQ_TOGGLE_ITEM   => Some(MenuRequest::ToggleItem),
+            constants::REQ_CLEAR_PATTERN => Some(MenuRequest::ClearPattern),
+            constants::REQ_BACK_PATTERN  => Some(MenuRequest::BackPattern),
+            constants::REQ_NEXT_MATCH    => Some(MenuRequest::NextMatch),
+            constants::REQ_PREV_MATCH    => Some(MenuRequest::PreviousMatch),
+            constants::KEY_MOUSE         => Some(MenuRequest::Mouse),
+            _                            => None
         }
     }
 

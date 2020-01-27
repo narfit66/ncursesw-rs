@@ -1,7 +1,7 @@
 /*
     src/form/fieldparameters.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,6 +22,7 @@
 
 use crate::{Size, Origin};
 
+/// Field parameters when defining a new form field.
 pub struct FieldParameters {
     size:      Size,
     origin:    Origin,
@@ -30,22 +31,27 @@ pub struct FieldParameters {
 }
 
 impl FieldParameters {
+    /// Create a new instance.
     pub fn new(size: Size, origin: Origin, offscreen: i32, nbuffers: i32) -> Self {
         Self { size, origin, offscreen, nbuffers }
     }
 
+    /// The height and width of the field.
     pub fn size(&self) -> Size {
         self.size
     }
 
+    /// The origin of the field.
     pub fn origin(&self) -> Origin {
         self.origin
     }
 
+    /// The number of off screen rows.
     pub fn offscreen(&self) -> i32 {
         self.offscreen
     }
 
+    /// The number of additional working buffers.
     pub fn nbuffers(&self) -> i32 {
         self.nbuffers
     }

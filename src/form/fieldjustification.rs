@@ -1,7 +1,7 @@
 /*
     src/form/fieldjustification.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,11 +22,16 @@
 
 use std::fmt::{Display, Formatter, Result};
 
+/// Field justification.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum FieldJustification {
+    /// No justification.
     None,
+    /// Left justification.
     Left,
+    /// Centred.
     Centered,
+    /// Right justification.
     Right
 }
 
