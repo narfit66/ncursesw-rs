@@ -4851,18 +4851,6 @@ extern "C" {
     pub fn resetty_sp(arg1: *mut SCREEN) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn ripoffline_sp(
-        arg1: *mut SCREEN,
-        arg2: ::std::os::raw::c_int,
-        arg3: ::std::option::Option<
-            unsafe extern "C" fn(
-                arg1: *mut WINDOW,
-                arg2: ::std::os::raw::c_int,
-            ) -> ::std::os::raw::c_int,
-        >,
-    ) -> ::std::os::raw::c_int;
-}
-extern "C" {
     pub fn savetty_sp(arg1: *mut SCREEN) -> ::std::os::raw::c_int;
 }
 extern "C" {
