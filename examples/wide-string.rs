@@ -20,10 +20,13 @@
     IN THE SOFTWARE.
 */
 
+extern crate gettextrs;
 extern crate ncursesw;
 
+use gettextrs::*;
+
 use ncursesw::{
-    initscr, endwin, setlocale, addwstr, WideString, refresh, getch, LcCategory, NCurseswError
+    initscr, endwin, addwstr, refresh, getch, WideString, NCurseswError
 };
 
 pub fn main() {
@@ -34,7 +37,7 @@ pub fn main() {
 }
 
 pub fn main_routine() -> Result<(), NCurseswError> {
-    setlocale(LcCategory::All, "")?;
+    setlocale(LocaleCategory::LcAll, "");
 
     initscr()?;
 

@@ -882,7 +882,8 @@ pub unsafe fn instr(str: *mut i8) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub unsafe fn intrflush(win: WINDOW, bf: bool) -> i32 {
-    assert!(!win.is_null(), "{}intrflush() : win.is_null()", MODULE_PATH);
+    // no asset needed as according to the documentation the win parameter is ignored!.
+    //assert!(!win.is_null(), "{}intrflush() : win.is_null()", MODULE_PATH);
 
     bindings::intrflush(win, bf)
 }
@@ -969,6 +970,13 @@ pub unsafe fn is_scrollok(win: WINDOW) -> bool {
     assert!(!win.is_null(), "{}is_scrollok() : win.is_null()", MODULE_PATH);
 
     bindings::is_scrollok(win)
+}
+
+/// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
+pub unsafe fn is_subwin(win: WINDOW) -> bool {
+    assert!(!win.is_null(), "{}is_subwin() : win.is_null()", MODULE_PATH);
+
+    bindings::is_subwin(win)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_opaque.3x.html>
@@ -1722,7 +1730,6 @@ pub unsafe fn mvwins_nwstr(win: WINDOW, y: i32, x: i32, wstr: &[wchar_t], n: i32
     assert!(!win.is_null(), "{}mvwins_nwstr() : win.is_null()", MODULE_PATH);
     assert!(y >= 0, "{}mvwins_nwstr() : y = {}", MODULE_PATH, y);
     assert!(x >= 0, "{}mvwins_nwstr() : x = {}", MODULE_PATH, x);
-    assert!(n > 0, "{}mvwins_nwstr() : n = {}", MODULE_PATH, n);
 
     bindings::mvwins_nwstr(win, y, x, wstr.as_ptr(), n)
 }
@@ -1759,7 +1766,6 @@ pub unsafe fn mvwinsnstr(win: WINDOW, y: i32, x: i32, str: &[i8], n: i32) -> i32
     assert!(!win.is_null(), "{}mvwinsnstr() : win.is_null()", MODULE_PATH);
     assert!(y >= 0, "{}mvwinsnstr() : y = {}", MODULE_PATH, y);
     assert!(x >= 0, "{}mvwinsnstr() : x = {}", MODULE_PATH, x);
-    assert!(n > 0, "{}mvwinsnstr() : n = {}", MODULE_PATH, n);
 
     bindings::mvwinsnstr(win, y, x, str.as_ptr(), n)
 }

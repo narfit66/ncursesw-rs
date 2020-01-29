@@ -25,12 +25,7 @@
 use std::os::unix::io::AsRawFd;
 
 use shims::{ncurses::FILE, bindings};
-use cstring::*;
 
 pub(in crate) unsafe fn fdopen<FD: AsRawFd>(file: FD, mode: &[i8]) -> Option<FILE> {
     bindings::fdopen(file.as_raw_fd(), mode.as_ptr()).as_mut().map(|ptr| ptr as FILE)
-}
-
-pub fn setlocale(lc: i32, locale: &[i8]) -> Option<String> {
-    unsafe { (bindings::setlocale(lc, locale.as_ptr())).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }

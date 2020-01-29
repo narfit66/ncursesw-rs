@@ -1,7 +1,7 @@
 /*
     src/gen/colorpaircolors.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,9 +20,9 @@
     IN THE SOFTWARE.
 */
 
-use ncurseswerror::NCurseswError;
-use gen::{ColorsType, ColorType, ColorAttributeTypes};
+use crate::{NCurseswError, ColorsType, ColorType, ColorAttributeTypes};
 
+/// Color pair's colors.
 pub trait ColorPairColors<S, C, T>
     where S: ColorsType<C, T>,
           C: ColorType<T>,

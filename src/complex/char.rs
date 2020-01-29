@@ -1,7 +1,7 @@
 /*
     src/complex/char.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -28,6 +28,7 @@ use shims::bindings::cchar_t;
 use wide::WideChar;
 use crate::{setcchar, wunctrl};
 
+/// Complex character (wide character and rendition).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ComplexChar {
     raw: cchar_t

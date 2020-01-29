@@ -27,6 +27,7 @@ use ncurseswerror::NCurseswError;
 use shims::bindings::WEOF;
 use shims::ncurses::{wint_t, wchar_t};
 
+/// Wide character (UTF-8 character).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct WideChar {
     raw: wint_t

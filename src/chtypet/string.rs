@@ -1,7 +1,7 @@
 /*
     src/chtypet/string.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -29,6 +29,7 @@ use chtypet::ChtypeChar;
 use shims::ncurses::{chtype, attr_t};
 use normal::{Attribute, Attributes};
 
+/// Ascii string and rendition.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ChtypeString {
     raw: Vec<chtype>

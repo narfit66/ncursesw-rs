@@ -45,9 +45,9 @@ pub mod features;
 /// interaction with the user.
 ///
 /// Your program should set up the locale, e.g.,
-///
-///         ncursesw::setlocale(LcCategory::All, "")?;
-///
+/// ```text
+/// ncursesw::setlocale(LcCategory::All, "")?;
+/// ```
 /// so that input/output processing will work.
 pub mod form;
 /// Traits used by `ncursesw`
@@ -98,7 +98,6 @@ mod cursortype;
 mod funcs;
 mod justification;
 mod keybinding;
-mod lccategory;
 mod legacy;
 mod ncurses;
 mod ncursescolortype;
@@ -122,7 +121,6 @@ pub use funcs::*;
 pub use gen::*;
 pub use justification::*;
 pub use keybinding::*;
-pub use lccategory::*;
 pub use legacy::*;
 pub use ncurses::*;
 pub use ncursescolortype::*;

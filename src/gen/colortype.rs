@@ -1,7 +1,7 @@
 /*
     src/gen/colortype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,8 +22,10 @@
 
 use gen::ColorAttributeTypes;
 
+/// Color.
 pub trait ColorType<T>
     where T: ColorAttributeTypes
 {
+    /// Color number.
     fn number(&self) -> i32;
 }

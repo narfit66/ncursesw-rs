@@ -84,13 +84,13 @@ pub fn ungetmouse(event: nmouse::MEVENT) -> mouse_result!(()) {
 ///
 /// As a side effect, setting a zero mousemask may turn off the mouse pointer;
 /// setting a nonzero mask may turn it on. Whether this happens is device-dependent.
-pub fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mouse_result!(mmask_t) {
-    let mask = unsafe { nmouse::mousemask(newmask, oldmask) };
+pub fn mousemask(newmask: mmask_t) -> mouse_result!(mmask_t) {
+    let mut oldmask: [mmask_t; 1] = [0];
 
-    if mask == 0 {
+    if unsafe { nmouse::mousemask(newmask, Some(oldmask.as_mut_ptr())) } == 0 {
         Err(mouse_function_error!("mousemask"))
     } else {
-        Ok(mask)
+        Ok(oldmask[0])
     }
 }
 
@@ -201,13 +201,13 @@ pub fn mouseinterval_sp(screen: SCREEN, delay: Option<time::Duration>) -> mouse_
 }
 
 /// Screen function of `mousemask()`.
-pub fn mousemask_sp(screen: SCREEN, newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mouse_result!(mmask_t) {
-    let mask = unsafe { nmouse::mousemask_sp(screen, newmask, oldmask) };
+pub fn mousemask_sp(screen: SCREEN, newmask: mmask_t) -> mouse_result!(mmask_t) {
+    let mut oldmask: [mmask_t; 1] = [0];
 
-    if mask == 0 {
+    if unsafe { nmouse::mousemask_sp(screen, newmask, Some(oldmask.as_mut_ptr())) } == 0 {
         Err(mouse_function_error!("mousemask_sp"))
     } else {
-        Ok(mask)
+        Ok(oldmask[0])
     }
 }
 

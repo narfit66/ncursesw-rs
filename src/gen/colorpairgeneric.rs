@@ -1,7 +1,7 @@
 /*
     src/gen/colorpairgeneric.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,9 +22,10 @@
 
 use std::ptr;
 
-use gen::ColorAttributeTypes;
+use crate::ColorAttributeTypes;
 use shims::ncurses::short_t;
 
+/// Color pair generic methods.
 pub trait ColorPairGeneric<T: ColorAttributeTypes> {
     fn as_short_t(&self) -> short_t {
         0

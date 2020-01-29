@@ -1,7 +1,7 @@
 /*
     src/gen/getcharactertype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,9 +20,9 @@
     IN THE SOFTWARE.
 */
 
-use crate::wide::WideChar;
+use crate::WideChar;
 
-/// NCursesw get function type.
+/// `ncursesw` get function type.
 pub trait GetCharacterType { }
 
 impl GetCharacterType for char { }

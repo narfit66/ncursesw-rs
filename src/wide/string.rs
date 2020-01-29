@@ -28,6 +28,7 @@ use gen::*;
 use shims::ncurses::wchar_t;
 use wide::WideChar;
 
+/// Wide character string (UTF-8).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct WideString {
     raw: Vec<wchar_t>

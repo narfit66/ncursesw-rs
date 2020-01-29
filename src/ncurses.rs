@@ -138,6 +138,7 @@ pub fn TABSIZE() -> i32 {
     ncurses::TABSIZE()
 }
 
+/// Equivalent of `wadd_wch()` using `stdscr()` as window `handle`.
 pub fn add_wch(wch: ComplexChar) -> result!(()) {
     match ncurses::add_wch(&ComplexChar::into(wch)) {
         OK => Ok(()),
@@ -145,6 +146,7 @@ pub fn add_wch(wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `wadd_wchnstr()` using `stdscr()` as window `handle`.
 pub fn add_wchnstr(wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::add_wchnstr(raw_with_nul_as_slice!(wchstr), number) {
         OK => Ok(()),
@@ -152,6 +154,7 @@ pub fn add_wchnstr(wchstr: &ComplexString, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `wadd_wchstr()` using `stdscr()` as window `handle`.
 pub fn add_wchstr(wchstr: &ComplexString) -> result!(()) {
     match ncurses::add_wchstr(raw_with_nul_as_slice!(wchstr)) {
         OK => Ok(()),
@@ -159,6 +162,7 @@ pub fn add_wchstr(wchstr: &ComplexString) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddch()` using `stdscr()` as window `handle`.
 pub fn addch(ch: ChtypeChar) -> result!(()) {
     match ncurses::addch(ChtypeChar::into(ch)) {
         OK => Ok(()),
@@ -166,6 +170,7 @@ pub fn addch(ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddchnstr()` using `stdscr()` as window `handle`.
 pub fn addchnstr(chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::addchnstr(raw_with_nul_as_slice!(chstr), number) {
         OK => Ok(()),
@@ -173,6 +178,7 @@ pub fn addchnstr(chstr: &ChtypeString, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddchstr()` using `stdscr()` as window `handle`.
 pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
     match ncurses::addchstr(raw_with_nul_as_slice!(chstr)) {
         OK => Ok(()),
@@ -180,6 +186,7 @@ pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddnstr()` using `stdscr()` as window `handle`.
 pub fn addnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::addnstr(unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
@@ -187,6 +194,7 @@ pub fn addnstr(str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddnwstr()` using `stdscr()` as window `handle`.
 pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::addnwstr(raw_with_nul_as_slice!(wstr), number) {
         OK => Ok(()),
@@ -194,6 +202,7 @@ pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddstr()` using `stdscr()` as window `handle`.
 pub fn addstr(str: &str) -> result!(()) {
     match ncurses::addstr(unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
@@ -201,6 +210,7 @@ pub fn addstr(str: &str) -> result!(()) {
     }
 }
 
+/// Equivalent of `waddwstr()` using `stdscr()` as window `handle`.
 pub fn addwstr(wstr: &WideString) -> result!(()) {
     match ncurses::addwstr(raw_with_nul_as_slice!(wstr)) {
         OK => Ok(()),
@@ -208,6 +218,15 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
     }
 }
 
+/// This defines which colors to paint for color pair 0. This function
+/// recognizes a special color `Color::TerminalDefault`, which denotes
+/// the default terminal color.
+///
+/// The following are equivalent:
+/// ```text
+/// use_default_colors()?;
+/// assume_default_colors(Colors::new(Color::TerminalDefault, Color::TerminalDefault));
+/// ```
 pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
     where S: ColorsType<C, T>,
           C: ColorType<T>,
@@ -219,10 +238,12 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
     }
 }
 
+/// Equivalent of `wattr_get()` using `stdscr()` as window `handle`.
 pub fn attr_get() -> result!(AttributesColorPairSet) {
     _attr_get(None)
 }
 
+/// Equivalent of `wattr_off()` using `stdscr()` as window `handle`.
 pub fn attr_off<A, T>(attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -233,6 +254,7 @@ pub fn attr_off<A, T>(attrs: A) -> result!(())
     }
 }
 
+/// Equivalent of `wattr_on()` using `stdscr()` as window `handle`.
 pub fn attr_on<A, T>(attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -243,6 +265,7 @@ pub fn attr_on<A, T>(attrs: A) -> result!(())
     }
 }
 
+/// Equivalent of `wattr_set()` using `stdscr()` as window `handle`.
 pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -254,8 +277,7 @@ pub fn attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
     }
 }
 
-/// Remove attribute attr from the “background” set applied to all writes
-/// to the current window.
+/// Equivalent of `wattroff()` using `stdscr()` as window `handle`.
 pub fn attroff(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attroff(normal::Attributes::into(attrs)) {
         OK => Ok(()),
@@ -263,8 +285,7 @@ pub fn attroff(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
-/// Add attribute attr from the “background” set applied to all writes to
-/// the current window.
+/// Equivalent of `wattron()` using `stdscr()` as window `handle`.
 pub fn attron(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attron(normal::Attributes::into(attrs)) {
         OK => Ok(()),
@@ -272,8 +293,7 @@ pub fn attron(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
-/// Set the “background” set of attributes to attr. This set is initially
-/// no attributes.
+/// Equivalent of `wattron()` using `stdscr()` as window `handle`.
 pub fn attrset(attrs: normal::Attributes) -> result!(()) {
     match ncurses::attrset(normal::Attributes::into(attrs)) {
         OK => Ok(()),
@@ -321,11 +341,7 @@ pub fn bkgdset(ch: ChtypeChar) {
     ncurses::bkgdset(ChtypeChar::into(ch))
 }
 
-/// Set the background property of the window to the complex character `wch`.
-/// The change is then applied to every character position in that window:
-///
-/// - The attribute of every character in the window is changed to the new background attribute.
-/// - Wherever the former background character appears, it is changed to the new background character.
+/// Equivalent of `wbkgrnd()` using `stdscr()` as window `handle`.
 pub fn bkgrnd(wch: ComplexChar) -> result!(()) {
     match ncurses::bkgrnd(&ComplexChar::into(wch)) {
         OK => Ok(()),
@@ -333,30 +349,12 @@ pub fn bkgrnd(wch: ComplexChar) -> result!(()) {
     }
 }
 
-/// Set the window’s background. A window’s background consists of a character
-/// and it's combination of attributes as a complex character. The attribute
-/// part of the background is combined (OR’ed) with all non-blank characters
-/// that are written into the window. Both the character and attribute parts
-/// of the background are combined with the blank characters. The background
-/// becomes a property of the character and moves with the character through
-/// any scrolling and insert/delete line/character operations.
+/// Equivalent of `wbkgrndset()` using `stdscr()` as window `handle`.
 pub fn bkgrndset(wch: ComplexChar) {
     ncurses::bkgrndset(&ComplexChar::into(wch))
 }
 
-/// Draw a border around the edges of the window. Each parameter specifies the
-/// character to use for a specific part of the border.
-///
-/// See the table below for more details.
-///
-/// ls : Left side
-/// rs : Right side
-/// ts : Top
-/// bs : Bottom
-/// tl : Upper-left corner
-/// tr : Upper-right corner
-/// bl : Bottom-left corner
-/// br : Bottom-right corner
+/// Equivalent of `wborder()` using `stdscr()` as window `handle`.
 pub fn border(
     ls: ChtypeChar,
     rs: ChtypeChar,
@@ -382,19 +380,7 @@ pub fn border(
     }
 }
 
-/// Draw a border around the edges of the window. Each parameter specifies the
-/// character to use for a specific part of the border.
-///
-/// See the table below for more details.
-///
-/// ls : Left side
-/// rs : Right side
-/// ts : Top
-/// bs : Bottom
-/// tl : Upper-left corner
-/// tr : Upper-right corner
-/// bl : Bottom-left corner
-/// br : Bottom-right corner
+/// Equivalent of `wborder_set()` using `stdscr()` as window `handle`.
 pub fn border_set(
     ls: ComplexChar,
     rs: ComplexChar,
@@ -457,7 +443,7 @@ pub fn cbreak() -> result!(()) {
     }
 }
 
-/// Set the attributes and color pair of number characters at the current cursor position
+/// Equivalent of `wchgat()` using `stdscr()` as window `handle`.
 pub fn chgat<A, P, T>(number: i32, attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -469,8 +455,7 @@ pub fn chgat<A, P, T>(number: i32, attrs: A, color_pair: P) -> result!(())
     }
 }
 
-/// Like `erase()`, but also cause the whole window to be repainted upon
-/// next call to `refresh()`.
+/// Equivalent of `wclear()` using `stdscr()` as window `handle`.
 pub fn clear() -> result!(()) {
     match ncurses::clear() {
         OK => Ok(()),
@@ -486,8 +471,7 @@ pub fn clearok(handle: WINDOW, flag: bool) -> result!(()) {
     }
 }
 
-/// Erase from cursor to the end of the window: all lines below the cursor
-/// are deleted, and then the equivalent of `clrtoeol()` is performed.
+/// Equivalent of `wclrtobot()` using `stdscr()` as window `handle`.
 pub fn clrtobot() -> result!(()) {
     match ncurses::clrtobot() {
         OK => Ok(()),
@@ -495,7 +479,7 @@ pub fn clrtobot() -> result!(()) {
     }
 }
 
-/// Erase from cursor to the end of the line.
+/// Equivalent of `wclrtoeol()` using `stdscr()` as window `handle`.
 pub fn clrtoeol() -> result!(()) {
     match ncurses::clrtoeol() {
         OK => Ok(()),
@@ -519,6 +503,7 @@ pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
     }
 }
 
+/// Equivalent of `wcolor_set()` using `stdscr()` as window `handle`.
 pub fn color_set<P, T>(color_pair: P) -> result!(())
     where P: ColorPairType<T>,
           T: ColorAttributeTypes
@@ -529,6 +514,12 @@ pub fn color_set<P, T>(color_pair: P) -> result!(())
     }
 }
 
+/// The `copywin()` routine provides a finer granularity of control over
+/// the `overlay()` and `overwrite()` routines. As in the `prefresh()`
+/// routine, a rectangle is specified in the destination  window, (`dmin`)
+/// and (`dmax`), and the upper-left-corner coordinates of the source window,
+/// (`smin`). If the argument `overlay` is `true`, then copying is
+/// non-destructive, as in `overlay()`.
 pub fn copywin(
     src_handle: WINDOW,
     dst_handle: WINDOW,
@@ -560,10 +551,12 @@ pub fn curs_set(cursor: CursorType) -> result!(CursorType) {
     CursorType::new(rc).ok_or(ncurses_function_error_with_rc!("curs_set", rc))
 }
 
+/// Return the version number, including patch level of the underlying
+/// library, e.g., 6.1.20180127.
 pub fn curses_version() -> result!(String) {
     ncurses::curses_version().ok_or(ncurses_function_error!("curses_version"))
 }
- 
+
 /// Save the current terminal mode as the “program” mode, the mode when
 /// the running program is using NCurses. (Its counterpart is the “shell”
 /// mode, for when the program is not in NCurses.) Subsequent calls to
@@ -586,6 +579,14 @@ pub fn def_shell_mode() -> result!(()) {
     }
 }
 
+/// Permits an application to define keycodes with their corresponding
+/// control strings, so that the NCurses library will interpret them
+/// just as it would the predefined codes in the terminfo database.
+///
+/// If the given `definition` is `None`, any existing definition for
+/// the keycode is removed. Similarly, if the given `KeyBinding::Unknown`
+/// is negative or zero, any existing string for the given definition
+/// is removed.
 pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
     let def = match definition {
         None    => ptr::null_mut(),
@@ -606,7 +607,7 @@ pub fn delay_output(ms: time::Duration) -> result!(()) {
     }
 }
 
-/// Delete any character at current position.
+/// Equivalent of `wdelch()` using `stdscr()` as window `handle`.
 pub fn delch() -> result!(()) {
     match ncurses::delch() {
         OK => Ok(()),
@@ -629,6 +630,9 @@ pub fn delscreen(screen: SCREEN) {
     unsafe { ncurses::delscreen(screen) }
 }
 
+/// Deletes the named window, freeing all memory associated with it
+/// (it does not actually erase the window's screen image). Sub-windows
+/// must be deleted before the main window can be deleted.
 pub fn delwin(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::delwin(handle) } {
         OK => Ok(()),
@@ -661,6 +665,7 @@ pub fn doupdate() -> result!(()) {
     }
 }
 
+/// Creates an exact duplicate of the window `handle`.
 pub fn dupwin(handle: WINDOW) -> result!(WINDOW) {
     unsafe { ncurses::dupwin(handle).ok_or(ncurses_function_error!("dupwin")) }
 }
@@ -674,6 +679,7 @@ pub fn echo() -> result!(()) {
     }
 }
 
+/// Equivalent of `wecho_wchar()` using `stdscr()` as window `handle`.
 pub fn echo_wchar(wch: ComplexChar) -> result!(()) {
     match ncurses::echo_wchar(&ComplexChar::into(wch)) {
         OK => Ok(()),
@@ -681,8 +687,7 @@ pub fn echo_wchar(wch: ComplexChar) -> result!(()) {
     }
 }
 
-/// Add character ch with attribute, and immediately call `refresh()`
-/// on the standard window.
+/// Equivalent of `wechochar()` using `stdscr()` as window `handle`.
 pub fn echochar(ch: ChtypeChar) -> result!(()) {
     match ncurses::echochar(ChtypeChar::into(ch)) {
         OK => Ok(()),
@@ -698,7 +703,7 @@ pub fn endwin() -> result!(()) {
     }
 }
 
-/// Clear the window.
+/// Equivalent of `werase()` using `stdscr()` as window `handle`.
 pub fn erase() -> result!(()) {
     match ncurses::erase() {
         OK => Ok(()),
@@ -719,6 +724,7 @@ pub fn erasechar() -> result!(char) {
     }
 }
 
+/// Returns the current erase character as a wide character.
 pub fn erasewchar() -> result!(WideChar) {
     let mut wch: [wchar_t; 1] = [0];
 
@@ -729,6 +735,7 @@ pub fn erasewchar() -> result!(WideChar) {
 }
 
 #[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() instead")]
+/// The extended color version of the `color_content()` routine.
 pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
@@ -741,6 +748,7 @@ pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
 }
 
 #[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() instead")]
+/// The extended color version of the `pair_content()` routine.
 pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
@@ -751,6 +759,7 @@ pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::C
     }
 }
 
+/// The extended color version of the `slk_color()` routine.
 pub fn extended_slk_color(color_pair: extend::ColorPair) -> result!(()) {
     match ncurses::extended_slk_color(color_pair.number()) {
         OK => Ok(()),
@@ -788,7 +797,8 @@ pub fn flushinp() -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.1.3", note = "specified color_pair must go out of scope before reuse of it's color pair number otherwise unpredicable results may occur.")]
+#[deprecated(since = "0.1.3", note = "use with caution as the specified color_pair must go out of scope before reuse of it's color pair number otherwise the color pair will default to terminal default foreground and backgound colors.")]
+/// Marks the given color pair as unused, i.e., like color pair 0.
 pub fn free_pair<P, T>(color_pair: P) -> result!(())
     where P:   ColorPairType<T>,
           i32: From<T>,
@@ -800,11 +810,12 @@ pub fn free_pair<P, T>(color_pair: P) -> result!(())
     }
 }
 
+/// Returns the escape delay.
 pub fn get_escdelay() -> result!(time::Duration) {
     Ok(time::Duration::from_millis(u64::try_from(ncurses::get_escdelay())?))
 }
 
-/// Get a wide character.
+/// Equivalent of `wget_wch()` using `stdscr()` as window `handle`.
 pub fn get_wch() -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
@@ -833,7 +844,8 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use getn_wstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use getn_wstr() instead")]
+/// Equivalent of `wget_wstr()` using `stdscr()` as window `handle`.
 pub fn get_wstr() -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -862,6 +874,11 @@ pub fn get_wstr() -> result!(WideString) {
     }
 }
 
+/// Returns the same attribute data as `wattr_get()`. However, `getattrs()`
+/// internally returns an integer (actually a chtype), while `wattr_get()`
+/// returns the current color pair in a separate parameter. In the
+/// wide-character library configuration, color pairs may not fit into
+/// a chtype, so `wattr_get()` is the only way to obtain the color information.
 pub fn getattrs(handle: WINDOW) -> normal::Attributes {
     normal::Attributes::from(unsafe { ncurses::getattrs(handle) as attr_t })
 }
@@ -902,11 +919,12 @@ pub fn getbegyx(handle: WINDOW) -> result!(Origin) {
     }
 }
 
-/// Return the given window’s current background character/attribute pair.
+/// Return the given window’s current background character (with rendition).
 pub fn getbkgd(handle: WINDOW) -> ChtypeChar {
     ChtypeChar::from(unsafe { ncurses::getbkgd(handle) })
 }
 
+/// Equivalent of `wgetbkgrnd()` using `stdscr()` as window `handle`.
 pub fn getbkgrnd() -> result!(ComplexChar) {
     let mut wch: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -916,11 +934,12 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
     }
 }
 
+/// Get a widecharacter string and rendition from a complex character.
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
     _getcchar(None, wcval)
 }
 
-/// Get a character.
+/// Equivalent of `wgetch()` using `stdscr()` as window `handle`.
 pub fn getch() -> result!(CharacterResult<char>) {
     match ncurses::getch() {
         EINTR      => Err(NCurseswError::InterruptedCall),
@@ -940,6 +959,7 @@ pub fn getch() -> result!(CharacterResult<char>) {
     }
 }
 
+/// Return the `x` coordinate of the current cursor position.
 pub fn getcurx(handle: WINDOW) -> result!(i32) {
     let x = unsafe { ncurses::getcurx(handle) };
 
@@ -950,6 +970,7 @@ pub fn getcurx(handle: WINDOW) -> result!(i32) {
     }
 }
 
+/// Return the `y` coordinate of the current cursor position.
 pub fn getcury(handle: WINDOW) -> result!(i32) {
     let y = unsafe { ncurses::getcury(handle) };
 
@@ -960,17 +981,9 @@ pub fn getcury(handle: WINDOW) -> result!(i32) {
     }
 }
 
+/// Return the `origin` coordinates of the current cursor position.
 pub fn getcuryx(handle: WINDOW) -> result!(Origin) {
-    let y = unsafe { ncurses::getcury(handle) };
-    let x = unsafe { ncurses::getcurx(handle) };
-
-    if y < 0 {
-        Err(ncurses_function_error_with_rc!("getcuryx (y)", y))
-    } else if x < 0 {
-        Err(ncurses_function_error_with_rc!("getcuryx (x)", x))
-    } else {
-        Ok(Origin { y, x })
-    }
+    Ok(Origin { y: getcury(handle)?, x: getcurx(handle)? })
 }
 
 /// Return the height of the window.
@@ -997,18 +1010,10 @@ pub fn getmaxy(handle: WINDOW) -> result!(i32) {
 
 /// Return the height and width of the window.
 pub fn getmaxyx(handle: WINDOW) -> result!(Size) {
-    let lines = unsafe { ncurses::getmaxy(handle) };
-    let columns = unsafe { ncurses::getmaxx(handle) };
-
-    if lines < 0 {
-        Err(ncurses_function_error_with_rc!("getmaxyx (y)", lines))
-    } else if columns < 0 {
-        Err(ncurses_function_error_with_rc!("getmaxyx (x)", columns))
-    } else {
-        Ok(Size { lines, columns })
-    }
+    Ok(Size { lines: getmaxy(handle)?, columns: getmaxx(handle)? })
 }
 
+/// Equivalent of `wgetn_wstr()` using `stdscr()` as window `handle`.
 pub fn getn_wstr(number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}getn_wstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1039,6 +1044,7 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
     }
 }
 
+/// Equivalent of `wgetnstr()` using `stdscr()` as window `handle`.
 pub fn getnstr(number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}getnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1061,7 +1067,7 @@ pub fn getnstr(number: i32) -> result!(String) {
     }
 }
 
-/// Return the `x` coordinates of this window relative to its parent window.
+/// Return the `x` coordinate of this window relative to its parent window.
 pub fn getparx(handle: WINDOW) -> result!(i32) {
     let x = unsafe { ncurses::getparx(handle) };
 
@@ -1072,7 +1078,7 @@ pub fn getparx(handle: WINDOW) -> result!(i32) {
     }
 }
 
-/// Return the `y` coordinates of this window relative to its parent window.
+/// Return the `y` coordinate of this window relative to its parent window.
 pub fn getpary(handle: WINDOW) -> result!(i32) {
     let y = unsafe { ncurses::getpary(handle) };
 
@@ -1085,19 +1091,11 @@ pub fn getpary(handle: WINDOW) -> result!(i32) {
 
 /// Return the beginning coordinates of this window relative to its parent window.
 pub fn getparyx(handle: WINDOW) -> result!(Origin) {
-    let y = unsafe { ncurses::getpary(handle) };
-    let x = unsafe { ncurses::getparx(handle) };
-
-    if y < 0 {
-        Err(ncurses_function_error_with_rc!("getparyx (y)", y))
-    } else if x < 0 {
-        Err(ncurses_function_error_with_rc!("getparyx (x)", x))
-    } else {
-        Ok(Origin { y, x })
-    }
+    Ok(Origin { y: getpary(handle)?, x: getparx(handle)? })
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use getnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use getnstr() instead")]
+/// Equivalent of `wgetstr()` using `stdscr()` as window `handle`.
 pub fn getstr() -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1119,7 +1117,7 @@ pub fn getstr() -> result!(String) {
 }
 
 /// Return the current coordinates of the virtual screen cursor.
-/// If leaveok is currently `true`, then return (-1, -1).
+/// If leaveok is currently `true`, then return `Origin { y: -1, x: -1 }`.
 pub fn getsyx() -> result!(Origin) {
     if is_leaveok(newscr()) {
         Ok(Origin { y: -1, x: -1 })
@@ -1173,7 +1171,7 @@ pub fn has_key(ch: KeyBinding) -> bool {
     ncurses::has_key(KeyBinding::into(ch)) == TRUE
 }
 
-/// Display a horizontal line with length n consisting of the character ch.
+/// Equivalent of `whline()` using `stdscr()` as window `handle`.
 pub fn hline(ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::hline(ChtypeChar::into(ch), number) {
         OK => Ok(()),
@@ -1181,7 +1179,7 @@ pub fn hline(ch: ChtypeChar, number: i32) -> result!(()) {
     }
 }
 
-/// Display a horizontal line with length n consisting of the character wch.
+/// Equivalent of `whline_set()` using `stdscr()` as window `handle`.
 pub fn hline_set(wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::hline_set(&ComplexChar::into(wch), number) {
         OK => Ok(()),
@@ -1214,6 +1212,7 @@ pub fn immedok(handle: WINDOW, flag: bool) {
     unsafe { ncurses::immedok(handle, flag) }
 }
 
+/// Equivalent of `win_wch()` using `stdscr()` as window `handle`.
 pub fn in_wch() -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -1223,6 +1222,7 @@ pub fn in_wch() -> result!(ComplexChar) {
     }
 }
 
+/// Equivalent of `win_wchnstr()` using `stdscr()` as window `handle`.
 pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "{}in_wchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1239,7 +1239,8 @@ pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use in_wchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use in_wchnstr() instead")]
+/// Equivalent of `win_wchstr()` using `stdscr()` as window `handle`.
 pub fn in_wchstr() -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -1254,10 +1255,12 @@ pub fn in_wchstr() -> result!(ComplexString) {
     }
 }
 
+/// Equivalent of `winch()` using `stdscr()` as window `handle`.
 pub fn inch() -> ChtypeChar {
     ChtypeChar::from(ncurses::inch())
 }
 
+/// Equivalent of `winchnstr()` using `stdscr()` as window `handle`.
 pub fn inchnstr(number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "{}inchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1276,7 +1279,8 @@ pub fn inchnstr(number: i32) -> result!(ChtypeString) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use inchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use inchnstr() instead")]
+/// Equivalent of `winchstr()` using `stdscr()` as window `handle`.
 pub fn inchstr() -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -1317,6 +1321,7 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
 }
 
 #[deprecated(since = "0.4.0", note = "Use extend::Color::new() instead")]
+/// The extended color version of the `init_color()` routine.
 pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -1333,6 +1338,7 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(exten
 }
 
 #[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() instead")]
+/// The extended color version of the `init_pair()` routine.
 pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
     if pair_number >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
@@ -1387,6 +1393,7 @@ pub fn initscr() -> result!(WINDOW) {
     unsafe { ncurses::initscr().ok_or(ncurses_function_error!("initscr")) }
 }
 
+/// Equivalent of `winnstr()` using `stdscr()` as window `handle`.
 pub fn innstr(number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}innstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1405,6 +1412,7 @@ pub fn innstr(number: i32) -> result!(String) {
     }
 }
 
+/// Equivalent of `winnwstr()` using `stdscr()` as window `handle`.
 pub fn innwstr(number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}innwstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1423,6 +1431,7 @@ pub fn innwstr(number: i32) -> result!(WideString) {
     }
 }
 
+/// Equivalent of `ins_nwstr()` using `stdscr()` as window `handle`.
 pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::ins_nwstr(raw_with_nul_as_slice!(wstr), number) {
         OK => Ok(()),
@@ -1430,6 +1439,7 @@ pub fn ins_nwstr(wstr: &WideString, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `ins_wch()` using `stdscr()` as window `handle`.
 pub fn ins_wch(wch: ComplexChar) -> result!(()) {
     match ncurses::ins_wch(&ComplexChar::into(wch)) {
         OK => Ok(()),
@@ -1437,6 +1447,7 @@ pub fn ins_wch(wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `ins_wstr()` using `stdscr()` as window `handle`.
 pub fn ins_wstr(wstr: &WideString) -> result!(()) {
     match ncurses::ins_wstr(raw_with_nul_as_slice!(wstr)) {
         OK => Ok(()),
@@ -1444,6 +1455,7 @@ pub fn ins_wstr(wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Equivalent of `insch()` using `stdscr()` as window `handle`.
 pub fn insch(ch: ChtypeChar) -> result!(()) {
     match ncurses::insch(ChtypeChar::into(ch)) {
         OK => Ok(()),
@@ -1451,6 +1463,7 @@ pub fn insch(ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `insdelln()` using `stdscr()` as window `handle`.
 pub fn insdelln(n: i32) -> result!(()) {
     match ncurses::insdelln(n) {
         OK => Ok(()),
@@ -1458,7 +1471,7 @@ pub fn insdelln(n: i32) -> result!(()) {
     }
 }
 
-/// Insert a blank line under the cursor. All following lines are moved down by one line.
+/// Equivalent of `insertln()` using `stdscr()` as window `handle`.
 pub fn insertln() -> result!(()) {
     match ncurses::insertln() {
         OK => Ok(()),
@@ -1466,6 +1479,7 @@ pub fn insertln() -> result!(()) {
     }
 }
 
+/// Equivalent of `insnstr()` using `stdscr()` as window `handle`.
 pub fn insnstr(str: &str, number: i32) -> result!(()) {
     match ncurses::insnstr(unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
@@ -1473,6 +1487,7 @@ pub fn insnstr(str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `insstr()` using `stdscr()` as window `handle`.
 pub fn insstr(str: &str) -> result!(()) {
     match ncurses::insstr(unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
@@ -1480,7 +1495,8 @@ pub fn insstr(str: &str) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use innstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use innstr() instead")]
+/// Equivalent of `instr()` using `stdscr()` as window `handle`.
 pub fn instr() -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1497,6 +1513,13 @@ pub fn instr() -> result!(String) {
     }
 }
 
+/// If the `intrflush()` option is enabled (`flag` is `true`), and an interrupt
+/// key is pressed on the keyboard (interrupt, break, quit), all output in the
+/// tty driver queue will be flushed, giving the effect of faster response to
+/// the interrupt, but causing NCurses to have the wrong idea of what is on the
+/// screen. Disabling the option (`flag` is `false`) prevents the flush.
+/// The default for the option is inherited from the tty driver settings.
+/// The window argument is ignored.
 pub fn intrflush(handle: WINDOW, flag: bool) -> result!(()) {
     match unsafe { ncurses::intrflush(handle, flag) } {
         OK => Ok(()),
@@ -1504,7 +1527,8 @@ pub fn intrflush(handle: WINDOW, flag: bool) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use innwstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use innwstr() instead")]
+/// Equivalent of `inwstr()` using `stdscr()` as window `handle`.
 pub fn inwstr() -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -1519,26 +1543,32 @@ pub fn inwstr() -> result!(WideString) {
     }
 }
 
+/// Returns the value set in `clearok()`.
 pub fn is_cleared(handle: WINDOW) -> bool {
     unsafe { ncurses::is_cleared(handle) }
 }
 
+/// Returns the value set in `idcok()`.
 pub fn is_idcok(handle: WINDOW) -> bool {
     unsafe { ncurses::is_idcok(handle) }
 }
 
+/// Returns the value set in `idlok()`.
 pub fn is_idlok(handle: WINDOW) -> bool {
     unsafe { ncurses::is_idlok(handle) }
 }
 
+/// Returns the value set in `immedok()`.
 pub fn is_immedok(handle: WINDOW) -> bool {
     unsafe { ncurses::is_immedok(handle) }
 }
 
+/// Returns the value set in `keypad()`.
 pub fn is_keypad(handle: WINDOW) -> bool {
     unsafe { ncurses::is_keypad(handle) }
 }
 
+/// Returns the value set in `leaveok()`.
 pub fn is_leaveok(handle: WINDOW) -> bool {
     unsafe { ncurses::is_leaveok(handle) }
 }
@@ -1549,22 +1579,33 @@ pub fn is_linetouched(handle: WINDOW, line: i32) -> bool {
     unsafe { ncurses::is_linetouched(handle, line) }
 }
 
+/// Returns the value set in `nodelay()`.
 pub fn is_nodelay(handle: WINDOW) -> bool {
     unsafe { ncurses::is_nodelay(handle) }
 }
 
+/// Returns the value set in `notimeout()`.
 pub fn is_notimeout(handle: WINDOW) -> bool {
     unsafe { ncurses::is_notimeout(handle) }
 }
 
+/// Returns `true` if the window is a pad i.e., created by `newpad()`.
 pub fn is_pad(handle: WINDOW) -> bool {
     unsafe { ncurses::is_pad(handle) }
 }
 
+/// Returns the value set in `scrollok()`.
 pub fn is_scrollok(handle: WINDOW) -> bool {
     unsafe { ncurses::is_scrollok(handle) }
 }
 
+/// Returns `true` if the window is a sub-window, i.e., created by
+/// `subwin()` or `derwin()`.
+pub fn is_subwin(handle: WINDOW) -> bool {
+    unsafe { ncurses::is_subwin(handle) }
+}
+
+/// Returns the value set in `syncok()`.
 pub fn is_syncok(handle: WINDOW) -> bool {
     unsafe { ncurses::is_syncok(handle) }
 }
@@ -1587,6 +1628,8 @@ pub fn isendwin() -> bool {
     ncurses::isendwin()
 }
 
+/// Permits an application to determine if a string is currently bound
+/// to any `KeyBindind`.
 pub fn key_defined(definition: &str) -> result!(KeyBinding) {
     let c = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
 
@@ -1597,10 +1640,13 @@ pub fn key_defined(definition: &str) -> result!(KeyBinding) {
     }
 }
 
+/// Returns a string corresponding to a given `KeyBinding`.
 pub fn key_name(w: KeyBinding) -> result!(String) {
     ncurses::key_name(KeyBinding::into(w)).ok_or(ncurses_function_error!("key_name"))
 }
 
+/// Permits an application to determine the string which is defined
+/// in the terminfo for specific keycodes.
 pub fn keybound(keycode: KeyBinding, count: i32) -> result!(String) {
     ncurses::keybound(KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound"))
 }
@@ -1616,6 +1662,9 @@ pub fn keyname(c: KeyBinding) -> result!(String) {
     ncurses::keyname(KeyBinding::into(c)).ok_or(ncurses_function_error!("keyname"))
 }
 
+/// Permits an application to disable specific `KeyBinding`, rather than use
+/// the keypad function to disable all keycodes. Keys that have been disabled
+/// can be re-enabled.
 pub fn keyok(keycode: KeyBinding, enable: bool) -> result!(()) {
     match ncurses::keyok(KeyBinding::into(keycode), enable) {
         OK => Ok(()),
@@ -1646,6 +1695,9 @@ pub fn killchar() -> result!(char) {
     }
 }
 
+/// Return the user’s current line kill character as a wide character.
+/// Under Unix operating systems this is a property of the controlling
+/// tty of the NCurses program, and is not set by the NCurses library itself.
 pub fn killwchar() -> result!(WideChar) {
     let mut wch: [wchar_t; 1] = [0];
 
@@ -1674,6 +1726,18 @@ pub fn longname() -> result!(String) {
     ncurses::longname().ok_or(ncurses_function_error!("longname"))
 }
 
+/// Ship binary data to printer.
+///
+/// This function uses the mc5p or mc4 and mc5 capabilities, if they are
+/// present, to ship given data to a printer attached to the terminal.
+///
+/// Note that the `mcprint()` code has no way to do flow control with the
+/// printer or to know how much buffering it has. Your application is
+/// responsible for keeping the rate of writes to the printer below its
+/// continuous throughput rate (typically about half of its nominal cps
+/// rating). Dot-matrix printers and 6-page-per-minute lasers can typically
+/// handle 80cps, so a good conservative rule of thumb is to sleep for a
+/// second after shipping each 80-character line.
 pub fn mcprint(data: &[i8], len: i32) -> result!(i32) {
     match unsafe { ncurses::mcprint(data.as_ptr() as *mut i8, len) } {
         ERR => Err(NCurseswError::OSError { func: String::from("mcprint"), errno: errno::errno() }),
@@ -1690,7 +1754,7 @@ pub fn meta(handle: WINDOW, flag: bool) -> result!(()) {
     }
 }
 
-/// Move cursor to `origin`.
+/// Equivalent of `wmove()` using `stdscr()` as window `handle`.
 pub fn r#move(origin: Origin) -> result!(()) {
     match ncurses::r#move(origin.y, origin.x) {
         OK => Ok(()),
@@ -1698,6 +1762,7 @@ pub fn r#move(origin: Origin) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwadd_wch()` using `stdscr()` as window `handle`.
 pub fn mvadd_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvadd_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
         OK => Ok(()),
@@ -1705,6 +1770,7 @@ pub fn mvadd_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwadd_wchnstr()` using `stdscr()` as window `handle`.
 pub fn mvadd_wchnstr(origin: Origin, wchstr: &ComplexString, number: i32) -> result!(()) {
     match ncurses::mvadd_wchnstr(origin.y, origin.x, raw_with_nul_as_slice!(wchstr), number) {
         OK => Ok(()),
@@ -1712,6 +1778,7 @@ pub fn mvadd_wchnstr(origin: Origin, wchstr: &ComplexString, number: i32) -> res
     }
 }
 
+/// Equivalent of `mvwadd_wchstr()` using `stdscr()` as window `handle`.
 pub fn mvadd_wchstr(origin: Origin, wchstr: &ComplexString) -> result!(()) {
     match ncurses::mvadd_wchstr(origin.y, origin.x, raw_with_nul_as_slice!(wchstr)) {
         OK => Ok(()),
@@ -1719,6 +1786,7 @@ pub fn mvadd_wchstr(origin: Origin, wchstr: &ComplexString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddch()` using `stdscr()` as window `handle`.
 pub fn mvaddch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvaddch(origin.y, origin.x, ChtypeChar::into(ch)) {
         OK => Ok(()),
@@ -1726,6 +1794,7 @@ pub fn mvaddch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddchnstr()` using `stdscr()` as window `handle`.
 pub fn mvaddchnstr(origin: Origin, chstr: &ChtypeString, number: i32) -> result!(()) {
     match ncurses::mvaddchnstr(origin.y, origin.x, raw_with_nul_as_slice!(chstr), number) {
         OK => Ok(()),
@@ -1733,6 +1802,7 @@ pub fn mvaddchnstr(origin: Origin, chstr: &ChtypeString, number: i32) -> result!
     }
 }
 
+/// Equivalent of `mvwaddchstr()` using `stdscr()` as window `handle`.
 pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
     match ncurses::mvaddchstr(origin.y, origin.x, raw_with_nul_as_slice!(chstr)) {
         OK => Ok(()),
@@ -1740,6 +1810,7 @@ pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddnstr()` using `stdscr()` as window `handle`.
 pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvaddnstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
@@ -1747,6 +1818,7 @@ pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddnwstr()` using `stdscr()` as window `handle`.
 pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvaddnwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         OK => Ok(()),
@@ -1754,6 +1826,7 @@ pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(())
     }
 }
 
+/// Equivalent of `mvwaddstr()` using `stdscr()` as window `handle`.
 pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvaddstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
@@ -1761,6 +1834,7 @@ pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddwstr()` using `stdscr()` as window `handle`.
 pub fn mvaddwstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvaddwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         OK => Ok(()),
@@ -1768,6 +1842,7 @@ pub fn mvaddwstr(origin: Origin, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwchgat()` using `stdscr()` as window `handle`.
 pub fn mvchgat<A, P, T>(origin: Origin, number: i32, attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -1779,6 +1854,8 @@ pub fn mvchgat<A, P, T>(origin: Origin, number: i32, attrs: A, color_pair: P) ->
     }
 }
 
+/// The `mvcur()` routine provides low-level cursor motion.
+/// It takes effect immediately (rather than at the next refresh).
 pub fn mvcur(old: Origin, new: Origin) -> result!(()) {
     match ncurses::mvcur(old.y, old.x, new.y, new.x) {
         OK => Ok(()),
@@ -1804,7 +1881,7 @@ pub fn mvderwin(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
-/// Get a wide character.
+/// Equivalent of `mvwget_wch()` using `stdscr()` as window `handle`.
 pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
@@ -1833,7 +1910,8 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvgetn_wstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvgetn_wstr() instead")]
+/// Equivalent of `mvwget_wstr()` using `stdscr()` as window `handle`.
 pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -1862,7 +1940,7 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
     }
 }
 
-/// Get a character.
+/// Equivalent of `mvwgetch()` using `stdscr()` as window `handle`.
 pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
     match ncurses::mvgetch(origin.y, origin.x) {
         EINTR      => Err(NCurseswError::InterruptedCall),
@@ -1882,6 +1960,7 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
     }
 }
 
+/// Equivalent of `mvwgetn_wstr()` using `stdscr()` as window `handle`.
 pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}mvgetn_wstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1912,6 +1991,7 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
     }
 }
 
+/// Equivalent of `mvwgetnstr()` using `stdscr()` as window `handle`.
 pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}mvgetnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1934,7 +2014,8 @@ pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvgetnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvgetnstr() instead")]
+/// Equivalent of `mvwgetstr()` using `stdscr()` as window `handle`.
 pub fn mvgetstr(origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -1955,7 +2036,7 @@ pub fn mvgetstr(origin: Origin) -> result!(String) {
     }
 }
 
-/// Display a horizontal line with length n consisting of the character ch.
+/// Equivalent of `mvwhline()` using `stdscr()` as window `handle`.
 pub fn mvhline(origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::mvhline(origin.y, origin.x, ChtypeChar::into(ch), number) {
         OK => Ok(()),
@@ -1963,7 +2044,7 @@ pub fn mvhline(origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     }
 }
 
-/// Display a horizontal line with length n consisting of the character wch.
+/// Equivalent of `mvwhline_set()` using `stdscr()` as window `handle`.
 pub fn mvhline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::mvhline_set(origin.y, origin.x, &ComplexChar::into(wch), number) {
         OK => Ok(()),
@@ -1971,6 +2052,7 @@ pub fn mvhline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(())
     }
 }
 
+/// Equivalent of `mvwin_wch()` using `stdscr()` as window `handle`.
 pub fn mvin_wch(origin: Origin) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -1980,6 +2062,7 @@ pub fn mvin_wch(origin: Origin) -> result!(ComplexChar) {
     }
 }
 
+/// Equivalent of `mvwin_wchnstr()` using `stdscr()` as window `handle`.
 pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "{}mvin_wchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -1996,7 +2079,8 @@ pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvin_wchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvin_wchnstr() instead")]
+/// Equivalent of `mvwin_wchstr()` using `stdscr()` as window `handle`.
 pub fn mvin_wchstr(origin: Origin) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -2011,10 +2095,12 @@ pub fn mvin_wchstr(origin: Origin) -> result!(ComplexString) {
     }
 }
 
+/// Equivalent of `mvwinch()` using `stdscr()` as window `handle`.
 pub fn mvinch(origin: Origin) -> ChtypeChar {
     ChtypeChar::from(ncurses::mvinch(origin.y, origin.x))
 }
 
+/// Equivalent of `mvwinchnstr()` using `stdscr()` as window `handle`.
 pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "{}mvinchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2033,7 +2119,8 @@ pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvinchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvinchnstr() instead")]
+/// Equivalent of `mvwinchstr()` using `stdscr()` as window `handle`.
 pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -2050,6 +2137,7 @@ pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
     }
 }
 
+/// Equivalent of `mvwinnstr()` using `stdscr()` as window `handle`.
 pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}mvinnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2068,6 +2156,7 @@ pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
     }
 }
 
+/// Equivalent of `mvwinnwstr()` using `stdscr()` as window `handle`.
 pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}mvinnwstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2086,6 +2175,7 @@ pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
     }
 }
 
+/// Equivalent of `mvwins_nwstr()` using `stdscr()` as window `handle`.
 pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match ncurses::mvins_nwstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) {
         OK => Ok(()),
@@ -2093,6 +2183,7 @@ pub fn mvins_nwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(()
     }
 }
 
+/// Equivalent of `mvwins_wch()` using `stdscr()` as window `handle`.
 pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     match ncurses::mvins_wch(origin.y, origin.x, &ComplexChar::into(wch)) {
         OK => Ok(()),
@@ -2100,6 +2191,7 @@ pub fn mvins_wch(origin: Origin, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwins_wstr()` using `stdscr()` as window `handle`.
 pub fn mvins_wstr(origin: Origin, wstr: &WideString) -> result!(()) {
     match ncurses::mvins_wstr(origin.y, origin.x, raw_with_nul_as_slice!(wstr)) {
         OK => Ok(()),
@@ -2107,6 +2199,7 @@ pub fn mvins_wstr(origin: Origin, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwinsch()` using `stdscr()` as window `handle`.
 pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     match ncurses::mvinsch(origin.y, origin.x, ChtypeChar::into(ch)) {
         OK => Ok(()),
@@ -2114,6 +2207,7 @@ pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwinsnstr()` using `stdscr()` as window `handle`.
 pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     match ncurses::mvinsnstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
@@ -2121,6 +2215,7 @@ pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwinsstr()` using `stdscr()` as window `handle`.
 pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
     match ncurses::mvinsstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
@@ -2128,7 +2223,8 @@ pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvinnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvinnstr() instead")]
+/// Equivalent of `mvwinstr()` using `stdscr()` as window `handle`.
 pub fn mvinstr(origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2145,7 +2241,8 @@ pub fn mvinstr(origin: Origin) -> result!(String) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvinnwstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvinnwstr() instead")]
+/// Equivalent of `mvwinwstr()` using `stdscr()` as window `handle`.
 pub fn mvinwstr(origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -2160,7 +2257,7 @@ pub fn mvinwstr(origin: Origin) -> result!(WideString) {
     }
 }
 
-/// Display a vertical line with length `number` consisting of the character `ch`.
+/// Equivalent of `mvwvline()` using `stdscr()` as window `handle`.
 pub fn mvvline(origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match ncurses::mvvline(origin.y, origin.x, ChtypeChar::into(ch), number) {
         OK => Ok(()),
@@ -2168,7 +2265,7 @@ pub fn mvvline(origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     }
 }
 
-/// Display a vertical line with length `number` consisting of the character `ch`.
+/// Equivalent of `mvwvline_set()` using `stdscr()` as window `handle`.
 pub fn mvvline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match ncurses::mvvline_set(origin.y, origin.x, &ComplexChar::into(wch), number) {
         OK => Ok(()),
@@ -2176,6 +2273,13 @@ pub fn mvvline_set(origin: Origin, wch: ComplexChar, number: i32) -> result!(())
     }
 }
 
+/// Paint a complex character `wch` at `origin`, overwriting any character
+/// previously painted at that location.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwadd_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::mvwadd_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -2183,6 +2287,13 @@ pub fn mvwadd_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!((
     }
 }
 
+/// Paint a complex character string of at most `number` characters of `wchstr`
+/// at `origin`, overwriting anything previously on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwadd_wchnstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwadd_wchnstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wchstr), number) } {
         OK => Ok(()),
@@ -2190,6 +2301,13 @@ pub fn mvwadd_wchnstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString, nu
     }
 }
 
+/// Paint a complex character string of `wchstr` at `origin`,
+/// overwriting anything previously on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwadd_wchstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString) -> result!(()) {
     match unsafe { ncurses::mvwadd_wchstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wchstr)) } {
         OK => Ok(()),
@@ -2197,6 +2315,13 @@ pub fn mvwadd_wchstr(handle: WINDOW, origin: Origin, wchstr: &ComplexString) -> 
     }
 }
 
+/// Paint character `ch` at `origin`, overwriting any character previously
+/// painted at that location.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::mvwaddch(handle, origin.y, origin.x, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -2204,6 +2329,13 @@ pub fn mvwaddch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Paint a character string (with rendition) of `chstr` of at most `number`
+/// characters at `origin`, overwriting anything previously on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddchnstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwaddchnstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(chstr), number) } {
         OK => Ok(()),
@@ -2211,6 +2343,13 @@ pub fn mvwaddchnstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString, number
     }
 }
 
+/// Paint a character string (with rendition) of `chstr` at `origin`,
+/// overwriting anything previously on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> result!(()) {
     match unsafe { ncurses::mvwaddchstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(chstr)) } {
         OK => Ok(()),
@@ -2218,6 +2357,13 @@ pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> resu
     }
 }
 
+/// Paint a string of `str` with at most `number` characters` at `origin`,
+/// overwriting anything previously on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwaddnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) } {
         OK => Ok(()),
@@ -2225,6 +2371,13 @@ pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
     }
 }
 
+/// Paint a wide string of `wstr` with at most `number` characters at `origin`,
+/// overwriting anything previously on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwaddnwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) } {
         OK => Ok(()),
@@ -2232,6 +2385,13 @@ pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i3
     }
 }
 
+/// Paint a string of `str` at `origin`, overwriting anything previously
+/// on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match unsafe { ncurses::mvwaddstr(handle, origin.y, origin.x, c_str_with_nul!(str)) } {
         OK => Ok(()),
@@ -2239,6 +2399,13 @@ pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     }
 }
 
+/// Paint a wide string of `wstr` at `origin`, overwriting anything previously
+/// on the window.
+///
+/// Writing outside the window, sub-window, or pad raises a `NCurseswError`.
+/// Attempting to write to the lower right corner of a window, sub-window,
+/// or pad will cause an `NCurseswError` to be raised after the character
+/// is printed.
 pub fn mvwaddwstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match unsafe { ncurses::mvwaddwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) } {
         OK => Ok(()),
@@ -2246,6 +2413,10 @@ pub fn mvwaddwstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(
     }
 }
 
+/// Set the attributes of `number` characters at the position `origin`.
+/// This routine moves cursor to position `origin`. The changed line
+/// will be touched using the `touchline()` method so that the contents
+/// will be redisplayed by the next window `refresh()`.
 pub fn mvwchgat<A, P, T>(handle: WINDOW, origin: Origin, number: i32, attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -2257,7 +2428,7 @@ pub fn mvwchgat<A, P, T>(handle: WINDOW, origin: Origin, number: i32, attrs: A, 
     }
 }
 
-/// Delete any character at origin on window.
+/// Delete any character at `origin` on window.
 pub fn mvwdelch(handle: WINDOW, origin: Origin) -> result!(()) {
     match unsafe { ncurses::mvwdelch(handle, origin.y, origin.x) } {
         OK => Ok(()),
@@ -2265,7 +2436,9 @@ pub fn mvwdelch(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
-/// Get a wide character.
+/// Get a wide character. Return a character for most keys, or an `KeyBinding`
+/// for function keys, keypad keys, and other special keys. In no-delay mode,
+/// raise a `NCurseswError` if there is no input.
 pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
@@ -2294,7 +2467,8 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwgetn_wstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvwgetn_wstr() instead")]
+/// Read a wide string from the user at `origin`, with primitive line editing capacity.
 pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -2323,7 +2497,9 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     }
 }
 
-/// Get a character.
+/// Return a character for most keys, or an `KeyBinding` for function keys,
+/// keypad keys, and other special keys. In no-delay mode, raise a `NCurseswError`
+/// if there is no input.
 pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>) {
     match unsafe { ncurses::mvwgetch(handle, origin.y, origin.x) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
@@ -2343,6 +2519,8 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
     }
 }
 
+/// Read a wide string of at most `number` characters from the user at
+/// `origin`, with primitive line editing capacity.
 pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}mvwgetn_wstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2373,6 +2551,8 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
     }
 }
 
+/// Read a string of at most `number` characters from the user at `origin`,
+/// with primitive line editing capacity.
 pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}mvwgetnstr() : number={}, LINE_MAX{}", MODULE_PATH, number, LINE_MAX);
 
@@ -2395,7 +2575,8 @@ pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwgetnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvwgetnstr() instead")]
+/// Read a string from the user at `origin`, with primitive line editing capacity.
 pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2416,7 +2597,8 @@ pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
     }
 }
 
-/// Display a horizontal line with length n consisting of the character ch.
+/// Display a horizontal line with length `number` consisting of the
+/// character `ch` at `origin`.
 pub fn mvwhline(handle: WINDOW, origin: Origin, ch: ChtypeChar, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwhline(handle, origin.y, origin.x, ChtypeChar::into(ch), number) } {
         OK => Ok(()),
@@ -2424,7 +2606,8 @@ pub fn mvwhline(handle: WINDOW, origin: Origin, ch: ChtypeChar, number: i32) -> 
     }
 }
 
-/// Display a horizontal line with length n consisting of the character wch.
+/// Display a horizontal line with length `number` consisting of the
+/// character `wch` at `origin`.
 pub fn mvwhline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwhline_set(handle, origin.y, origin.x, &ComplexChar::into(wch), number) } {
         OK => Ok(()),
@@ -2433,6 +2616,10 @@ pub fn mvwhline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i3
 }
 
 /// Move the window so its upper-left corner is at `origin`.
+///
+/// If the move would cause the window to be off the screen, it is an error
+/// and the window is not moved. Moving sub-windows is allowed, but should
+/// be avoided.
 pub fn mvwin(handle: WINDOW, origin: Origin) -> result!(()) {
     match unsafe { ncurses::mvwin(handle, origin.y, origin.x) } {
         OK => Ok(()),
@@ -2440,6 +2627,7 @@ pub fn mvwin(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
+/// Return the complex character at the given `origin` in the window.
 pub fn mvwin_wch(handle: WINDOW, origin: Origin) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -2449,6 +2637,8 @@ pub fn mvwin_wch(handle: WINDOW, origin: Origin) -> result!(ComplexChar) {
     }
 }
 
+/// Return the complex character string of length `number` at the
+/// given `origin` in the window.
 pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "{}mvwin_wchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2465,7 +2655,8 @@ pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Com
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwin_wchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvwin_wchnstr() instead")]
+/// Return the complex character string given `origin` in the window.
 pub fn mvwin_wchstr(handle: WINDOW, origin: Origin) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -2480,10 +2671,13 @@ pub fn mvwin_wchstr(handle: WINDOW, origin: Origin) -> result!(ComplexString) {
     }
 }
 
+/// Return the character and rendition at the given `origin` in the window.
 pub fn mvwinch(handle: WINDOW, origin: Origin) -> ChtypeChar {
     ChtypeChar::from(unsafe { ncurses::mvwinch(handle, origin.y, origin.x) })
 }
 
+/// Return the character string and rendition of length `number` at the
+/// given `origin` in the window.
 pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "{}mvwinchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2502,7 +2696,8 @@ pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Chtyp
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwinchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvwinchnstr() instead")]
+/// Return the character string and rendion at the given `origin` in the window.
 pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -2519,6 +2714,7 @@ pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
     }
 }
 
+/// Return the character string of length `number` at the given `origin` in the window.
 pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}mvwinnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2537,6 +2733,7 @@ pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String)
     }
 }
 
+/// Return the wide character string of length `number` at the given `origin` in the window.
 pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}mvwinnwstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -2555,6 +2752,11 @@ pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideSt
     }
 }
 
+/// Insert a wide string (as many characters as will fit on the line) before the
+/// character at `origin`, up to `number` characters. If `number` is zero or
+/// negative, the entire string is inserted. All characters to the right of
+/// the cursor are shifted right, with the rightmost characters on the line
+/// being lost. The cursor position does not change (after moving to `origin`).
 pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwins_nwstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr), number) } {
         OK => Ok(()),
@@ -2562,6 +2764,8 @@ pub fn mvwins_nwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i
     }
 }
 
+/// Insert the complex character `wch` at `origin`, moving the cursor position from
+/// `origin.x` right by one character.
 pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::mvwins_wch(handle, origin.y, origin.x, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -2569,6 +2773,10 @@ pub fn mvwins_wch(handle: WINDOW, origin: Origin, wch: ComplexChar) -> result!((
     }
 }
 
+/// Insert a wide string (as many characters as will fit on the line) before the
+/// character at `origin`. All characters to the right of the cursor are shifted
+/// right, with the rightmost characters on the line being lost. The cursor
+/// position does not change (after moving to `origin`).
 pub fn mvwins_wstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!(()) {
     match unsafe { ncurses::mvwins_wstr(handle, origin.y, origin.x, raw_with_nul_as_slice!(wstr)) } {
         OK => Ok(()),
@@ -2576,6 +2784,8 @@ pub fn mvwins_wstr(handle: WINDOW, origin: Origin, wstr: &WideString) -> result!
     }
 }
 
+/// Insert character `ch` at `origin`, moving the cursor position from
+/// `origin.x` right by one character.
 pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::mvwinsch(handle, origin.y, origin.x, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -2583,6 +2793,11 @@ pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Insert a string (as many characters as will fit on the line) before the
+/// character at `origin`, up to `number` characters. If `number` is zero or
+/// negative, the entire string is inserted. All characters to the right of
+/// the cursor are shifted right, with the rightmost characters on the line
+/// being lost. The cursor position does not change (after moving to `origin`).
 pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwinsnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) } {
         OK => Ok(()),
@@ -2590,6 +2805,10 @@ pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
     }
 }
 
+/// Insert a string (as many characters as will fit on the line) before the
+/// character at `origin`. All characters to the right of the cursor are shifted
+/// right, with the rightmost characters on the line being lost. The cursor
+/// position does not change (after moving to `origin`).
 pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     match unsafe { ncurses::mvwinsstr(handle, origin.y, origin.x, c_str_with_nul!(str)) } {
         OK => Ok(()),
@@ -2597,7 +2816,8 @@ pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwinnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvwinnstr() instead")]
+/// Return the string at the given `origin` in the window.
 pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -2614,7 +2834,8 @@ pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use mvwinnwstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use mvwinnwstr() instead")]
+/// Return the wide string at the given `origin` in the window.
 pub fn mvwinwstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -2637,7 +2858,7 @@ pub fn mvwvline(handle: WINDOW, origin: Origin, ch: ChtypeChar, number: i32) -> 
     }
 }
 
-/// Display a vertical line with length `number` consisting of the character `ch`.
+/// Display a vertical line with length `number` consisting of the character `wch`.
 pub fn mvwvline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i32) -> result!(()) {
     match unsafe { ncurses::mvwvline_set(handle, origin.y, origin.x, &ComplexChar::into(wch), number) } {
         OK => Ok(()),
@@ -2656,21 +2877,36 @@ pub fn napms(ms: time::Duration) -> result!(()) {
     }
 }
 
-/// Create and return a pointer to a new pad data structure with the
-/// given size. Return a pad as a window pointer.
+/// The `newpad()` routine creates and returns a pointer to a new pad data
+/// structure with the given `size`. A pad is like a window, except that it
+/// is not restricted by the screen size, and is not necessarily associated
+/// with a particular part of the screen. Pads can be used when a large
+/// window is needed, and only a part of the window will be on the screen at
+/// one time. Automatic refreshes of pads (e.g., from scrolling or echoing
+/// of input) do not occur.
 ///
-/// A pad is like a window, except that it is not restricted by the
-/// screen size, and is not necessarily associated with a particular
-/// part of the screen. Pads can be used when a large window is needed,
-/// and only a part of the window will be on the screen at one time.
-/// Automatic refreshes of pads (such as from scrolling or echoing of
-/// input) do not occur. The `refresh()` and n`outrefresh() `methods
-/// of a pad require arguments to specify the part of the pad to be
-/// displayed and the location on the screen to be used for the display.
+/// It is not legal to call `wrefresh()` with a pad as an argument; the
+/// routines `prefresh()` or `pnoutrefresh()` should be called instead.
+/// Note that these routines require additional parameters to specify the
+/// part of the pad to be displayed and the location on the screen to be
+/// used for the display.
 pub fn newpad(size: Size) -> result!(WINDOW) {
     unsafe { ncurses::newpad(size.lines, size.columns).ok_or(ncurses_function_error!("newpad")) }
 }
 
+/// A program that outputs to more than one terminal should use the `newterm()`
+/// routine for each terminal instead of `initscr()`. A program that needs to
+/// inspect capabilities, so it can continue to run in a line-oriented mode
+/// if the terminal cannot support a screen-oriented program, would also use
+/// `newterm()`. The routine `newterm()` should be called once for each terminal.
+/// It returns a pointer of type SCREEN which should be saved as a reference
+/// to that terminal. newterm's arguments are:
+///
+/// - the type of the terminal to be used in place of $TERM,
+/// - a file descriptor for output to the terminal, and...
+/// - another file descriptor for input from the terminal
+///
+/// If the `term_type` parameter is `None`, $TERM will be used.
 pub fn newterm<O, I>(term_type: Option<&str>, output: O, input: I) -> result!(SCREEN)
     where O: AsRawFd + Write,
           I: AsRawFd + Read
@@ -2771,7 +3007,7 @@ pub fn notimeout(handle: WINDOW, flag: bool) -> result!(()) {
     }
 }
 
-/// Overlay the window on top of destwin. The windows need not be the same size,
+/// Overlay the window on top of `destwin`. The windows need not be the same size,
 /// only the overlapping region is copied. This copy is non-destructive, which
 /// means that the current background character does not overwrite the old
 /// contents of destwin.
@@ -2787,6 +3023,8 @@ pub fn overlay(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     }
 }
 
+/// Overlay the window on top of `destwin` in the same way as `overlay()`
+/// but in a destructive manner.
 pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::overwrite(src_handle, dst_handle) } {
         OK => Ok(()),
@@ -2807,6 +3045,14 @@ pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
     }
 }
 
+/// The `pechochar()` routine is functionally equivalent to a call to `addch()`
+/// followed by a call to `refresh()`, a call to `waddch()` followed by a call
+/// to `wrefresh()`, or a call to `waddch()` followed by a call to `prefresh()`.
+/// The knowledge that only a single character is being output is taken into
+/// consideration and, for non-control characters, a considerable performance
+/// gain might be seen by using these routines instead of their equivalents.
+/// In the case of `pechochar()`, the last location of the pad on the screen
+/// is reused for the arguments to `prefresh()`.
 pub fn pechochar(pad: WINDOW, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::pechochar(pad, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -2814,6 +3060,9 @@ pub fn pechochar(pad: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// The `pecho_wchar()` function is the analogous wide-character form of `pechochar()`.
+/// It outputs one character to a pad and immediately refreshes the pad. It does this
+/// by a call to `wadd_wch()` followed by a call to `prefresh()`.
 pub fn pecho_wchar(pad: WINDOW, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::pecho_wchar(pad, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -2821,6 +3070,19 @@ pub fn pecho_wchar(pad: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// The `pnoutrefresh()` routine is analogous to `wnoutrefresh()` except that they relate
+/// to pads instead of windows. The additional parameters are needed to indicate what part
+/// of the pad and screen are involved.
+///
+/// - The `pmin.y`, `pmin.x` parameters specify the upper left-hand corner of the rectangle
+///   to be displayed in the pad.
+/// - The `smin.y`, `smin.y`, `smax.y`, and `smax.x` parameters specify the edges of the
+///   rectangle to be displayed on the screen.
+///
+/// The lower right-hand corner of the rectangle to be displayed in the pad is calculated
+/// from the screen coordinates, since the rectangles must be the same size. Both rectangles
+/// must be entirely contained within their respective structures. Negative values of
+/// pmin.{y,x}, smin.{y,x} are treated as if they were zero.
 pub fn pnoutrefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> result!(()) {
     match unsafe { ncurses::pnoutrefresh(pad, pmin.y, pmin.x, smin.y, smin.x, smax.y, smax.x) } {
         OK => Ok(()),
@@ -2828,6 +3090,19 @@ pub fn pnoutrefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> re
     }
 }
 
+/// The `prefresh()` routine is analogous to `wrefresh()` except that they relate to pads
+/// instead of windows. The additional parameters are needed to indicate what part of the
+/// pad and screen are involved.
+///
+/// - The `pmin.y`, `pmin.x` parameters specify the upper left-hand corner of the rectangle
+///   to be displayed in the pad.
+/// - The `smin.y`, `smin.y`, `smax.y`, and `smax.x` parameters specify the edges of the
+///   rectangle to be displayed on the screen.
+///
+/// The lower right-hand corner of the rectangle to be displayed in the pad is calculated
+/// from the screen coordinates, since the rectangles must be the same size. Both rectangles
+/// must be entirely contained within their respective structures. Negative values of
+/// pmin.{y,x}, smin.{y,x} are treated as if they were zero.
 pub fn prefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> result!(()) {
     match unsafe { ncurses::prefresh(pad, pmin.y, pmin.x, smin.y, smin.x, smax.y, smax.x) } {
         OK => Ok(()),
@@ -2835,6 +3110,7 @@ pub fn prefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> result
     }
 }
 
+/// At present this function is unimplemented.
 pub fn putp(_str: &str) -> i32 {
     unimplemented!();
 }
@@ -2864,6 +3140,8 @@ pub fn raw() -> result!(()) {
     }
 }
 
+/// Touch the entire window, causing it to be completely redrawn on the
+/// next call to `refresh()`.
 pub fn redrawwin(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::redrawwin(handle) } {
         OK => Ok(()),
@@ -2880,6 +3158,8 @@ pub fn refresh() -> result!(()) {
     }
 }
 
+#[deprecated(since = "0.5.0", note = "use with caution as this routine will reset all color pairs potentially before they go out of scope and the color pairs will default to terminal default foreground and backgound colors.")]
+/// Reset all defined color pairs.
 pub fn reset_color_pairs() {
     ncurses::reset_color_pairs()
 }
@@ -2931,6 +3211,20 @@ pub fn resizeterm(size: Size) -> result!(()) {
     }
 }
 
+/// The `ripoffline()` routine provides access to the same facility that `slk_init()`
+/// uses to reduce the size of the screen. `ripoffline()` must be called before
+/// `initscr()` or `newterm()` is called.
+///
+/// When the resulting initialization is done inside `initscr()`, the routine init
+/// (supplied by the user) is called with two arguments:
+/// - a window pointer to the one-line window that has been allocated and
+/// - an `i32` with the number of columns in the window.
+///
+/// Inside this initialization routine, the `i32` variables `LINE`S and `COLS` are
+/// not guaranteed to be accurate and `wrefresh()` or `doupdate()` must not be called.
+/// It is allowable to call `wnoutrefresh()` during the initialization routine.
+///
+/// `ripoffline()` can be called up to five times before calling `initscr()` or `newterm()`.
 pub fn ripoffline(line: Orientation, init: RipoffInit) -> result!(()) {
     match ncurses::ripoffline(line.value(), init) {
         OK => Ok(()),
@@ -3023,6 +3317,7 @@ pub fn scrollok(handle: WINDOW, flag: bool) -> result!(()) {
     }
 }
 
+/// Sets the escape delay delay.
 pub fn set_escdelay(ms: time::Duration) -> result!(()) {
     match ncurses::set_escdelay(i32::try_from(ms.as_millis())?) {
         OK => Ok(()),
@@ -3030,6 +3325,7 @@ pub fn set_escdelay(ms: time::Duration) -> result!(()) {
     }
 }
 
+/// Sets the tab size.
 pub fn set_tabsize(size: i32) -> result!(()) {
     match ncurses::set_tabsize(size) {
         OK => Ok(()),
@@ -3037,10 +3333,16 @@ pub fn set_tabsize(size: i32) -> result!(()) {
     }
 }
 
+/// The `set_term()` routine is used to switch between different terminals.
+/// The screen reference new becomes the new current terminal. The previous
+/// terminal is returned by the routine. This is the only routine which
+/// manipulates SCREEN pointers; all other routines affect only the current
+/// terminal.
 pub fn set_term(screen: SCREEN) -> result!(SCREEN) {
     unsafe { ncurses::set_term(screen) }.ok_or(ncurses_function_error!("set_term"))
 }
 
+/// Sets a complex character from a character and rendition.
 pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(ComplexChar)
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -3072,7 +3374,7 @@ pub fn setscrreg(region: Region) -> result!(()) {
 /// Set the virtual screen cursor to `origin`. If y and x are both -1,
 /// then leaveok is set `true`.
 pub fn setsyx(origin: Origin) -> result!(()) {
-    if origin.y == -1 && origin.x == -1 {
+    if origin == (Origin { y: -1, x: -1 }) {
         leaveok(newscr(), true)
     } else {
         leaveok(newscr(), false)?;
@@ -3080,6 +3382,7 @@ pub fn setsyx(origin: Origin) -> result!(()) {
     }
 }
 
+/// Retrieve attributes of soft label.
 // convert into the attributes type of your choice with
 //     normal::Attributes::from(slk_attr()) or
 //     extend::Attributes::from(slk_attr())
@@ -3087,6 +3390,7 @@ pub fn slk_attr() -> attr_t {
     ncurses::slk_attr()
 }
 
+/// Turn off soft label attributes, without affecting other attributes.
 pub fn slk_attr_off<A, T>(attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -3097,6 +3401,7 @@ pub fn slk_attr_off<A, T>(attrs: A) -> result!(())
     }
 }
 
+/// Turn on soft label attributes, without affecting other attributes.
 pub fn slk_attr_on<A, T>(attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -3107,6 +3412,7 @@ pub fn slk_attr_on<A, T>(attrs: A) -> result!(())
     }
 }
 
+/// Sets the soft label attributes to `attrs`, with color specified by `color_pair`.
 pub fn slk_attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -3118,6 +3424,7 @@ pub fn slk_attr_set<A, P, T>(attrs: A, color_pair: P) -> result!(())
     }
 }
 
+/// Turn off attribute `attrs` of the soft labels.
 pub fn slk_attroff(attrs: normal::Attributes) -> result!(()) {
     match ncurses::slk_attroff(normal::Attributes::into(attrs)) {
         OK => Ok(()),
@@ -3125,6 +3432,7 @@ pub fn slk_attroff(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Turn on attribute `attrs` of the soft labels.
 pub fn slk_attron(attrs: normal::Attributes) -> result!(()) {
     match ncurses::slk_attron(normal::Attributes::into(attrs)) {
         OK => Ok(()),
@@ -3132,6 +3440,7 @@ pub fn slk_attron(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Sets attribute `attrs` of the soft labels.
 pub fn slk_attrset(attrs: normal::Attributes) -> result!(()) {
     match ncurses::slk_attrset(normal::Attributes::into(attrs)) {
         OK => Ok(()),
@@ -3139,6 +3448,7 @@ pub fn slk_attrset(attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Clears the soft labels from the screen.
 pub fn slk_clear() -> result!(()) {
     match ncurses::slk_clear() {
         OK => Ok(()),
@@ -3146,6 +3456,8 @@ pub fn slk_clear() -> result!(()) {
     }
 }
 
+/// Corresponds to `color_set()` routine. It has an effect only if
+/// soft labels are simulated on the bottom line of the screen.
 pub fn slk_color(color_pair: normal::ColorPair) -> result!(()) {
     match ncurses::slk_color(color_pair.number()) {
         OK => Ok(()),
@@ -3153,6 +3465,10 @@ pub fn slk_color(color_pair: normal::ColorPair) -> result!(()) {
     }
 }
 
+/// The `slk_init()` routine must be called before `initscr()` or `newterm()`
+/// is called. `initscr()` eventually uses a line from `stdscr()` to emulate
+/// the soft labels, then `fmt` determines how the labels are arranged on
+/// the screen.
 pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
     match ncurses::slk_init(fmt.value()) {
         OK => Ok(()),
@@ -3160,10 +3476,15 @@ pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
     }
 }
 
-pub fn slk_label(number: i32) -> result!(String) {
-    ncurses::slk_label(number).ok_or(ncurses_function_error!("slk_label"))
+/// Returns the current label for label number `labnum`, with leading and
+/// trailing blanks stripped.
+pub fn slk_label(labnum: i32) -> result!(String) {
+    ncurses::slk_label(labnum).ok_or(ncurses_function_error!("slk_label"))
 }
 
+/// Mark for refresh but wait. This function updates the data structure representing
+/// the desired state of the soft labels, but does not force an update of
+/// the physical screen. To accomplish that, call `doupdate()`.
 pub fn slk_noutrefresh() -> result!(()) {
     match ncurses::slk_noutrefresh() {
         OK => Ok(()),
@@ -3171,6 +3492,7 @@ pub fn slk_noutrefresh() -> result!(()) {
     }
 }
 
+/// Update the soft labels immediately.
 pub fn slk_refresh() -> result!(()) {
     match ncurses::slk_refresh() {
         OK => Ok(()),
@@ -3178,6 +3500,8 @@ pub fn slk_refresh() -> result!(()) {
     }
 }
 
+/// Restores the soft labels to the screen after a `slk_clear()` has
+/// been performed.
 pub fn slk_restore() -> result!(()) {
     match ncurses::slk_restore() {
         OK => Ok(()),
@@ -3185,13 +3509,24 @@ pub fn slk_restore() -> result!(()) {
     }
 }
 
-pub fn slk_set(label_number: i32, label: &str, fmt: Justification) -> result!(()) {
-    match ncurses::slk_set(label_number, unsafe { c_str_with_nul!(label) }, fmt.value()) {
+/// The `slk_set()` routine sets a soft label.
+///
+/// - labnum: is the label number, from 1 to 8 (12 if `slk_init()` was called
+///           with `SoftLabelType::{FourFour,FourFourIndex}`);
+/// - label:  is be the string to put on the label, up to eight (five if
+///           `slk_init() was called with `SoftLabelType::{FourFour,FourFourIndex}`)
+///           characters in length.
+/// - fmt:    indicating whether the label is to be left-justified, centered
+///           or right-justified.
+pub fn slk_set(labnum: i32, label: &str, fmt: Justification) -> result!(()) {
+    match ncurses::slk_set(labnum, unsafe { c_str_with_nul!(label) }, fmt.value()) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
 }
 
+/// Forces all the soft labels to be output the next time a `slk_noutrefresh()`
+/// is performed.
 pub fn slk_touch() -> result!(()) {
     match ncurses::slk_touch() {
         OK => Ok(()),
@@ -3199,8 +3534,9 @@ pub fn slk_touch() -> result!(()) {
     }
 }
 
-pub fn slk_wset(label_number: i32, label: &WideString, fmt: Justification) -> result!(()) {
-    match ncurses::slk_wset(label_number, raw_with_nul_as_slice!(label), fmt.value()) {
+/// The wide character version of the `slk_set()` routine.
+pub fn slk_wset(labnum: i32, label: &WideString, fmt: Justification) -> result!(()) {
+    match ncurses::slk_wset(labnum, raw_with_nul_as_slice!(label), fmt.value()) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
@@ -3222,7 +3558,7 @@ pub fn standout() -> result!(()) {
         rc => Err(ncurses_function_error_with_rc!("standout", rc))
     }
 }
- 
+
 /// Must be called if the programmer wants to use colors, and before any other
 /// color manipulation routine is called. It is good practice to call this
 /// routine right after `initscr()`.
@@ -3248,6 +3584,11 @@ pub fn subpad(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
 ///
 /// By default, the sub-window will extend from the specified position to the
 /// lower right corner of the window.
+///
+/// The sub-window shares memory with the window orig, so that changes made to
+/// one window will affect both windows. When using this routine, it is necessary
+/// to call `touchwin()` or `touchline()` on orig before calling `wrefresh()`
+/// on the sub-window.
 pub fn subwin(handle: WINDOW, size: Size, origin: Origin) -> result!(WINDOW) {
     unsafe { ncurses::subwin(handle, size.lines, size.columns, origin.y, origin.x).ok_or(ncurses_function_error!("subwin")) }
 }
@@ -3260,13 +3601,16 @@ pub fn syncok(handle: WINDOW, flag: bool) -> result!(()) {
     }
 }
 
+/// At present this function is unimplemented.
 pub fn term_attrs() -> attr_t {
     unimplemented!();
 }
 
-// Return a logical OR of all video attributes supported by the terminal.
-// This information is useful when a NCurses program needs complete control
-// over the appearance of the screen.
+/// At present this function is unimplemented.
+///
+/// Return a logical OR of all video attributes supported by the terminal.
+/// This information is useful when a NCurses program needs complete control
+/// over the appearance of the screen.
 pub fn termattrs() -> chtype {
     unimplemented!();
 }
@@ -3277,26 +3621,32 @@ pub fn termname() -> result!(String) {
     ncurses::termname().ok_or(ncurses_function_error!("termname"))
 }
 
-// Return the value of the Boolean capability corresponding to the terminfo
-// capability name capname as an integer. Return the value -1 if capname is
-// not a Boolean capability, or 0 if it is canceled or absent from the
-// terminal description.
+/// At present this function is unimplemented.
+///
+/// Return the value of the Boolean capability corresponding to the terminfo
+/// capability name capname as an integer. Return the value -1 if capname is
+/// not a Boolean capability, or 0 if it is canceled or absent from the
+/// terminal description.
 pub fn tigetflag(_capname: &str) -> i32 {
     unimplemented!();
 }
 
-// Return the value of the numeric capability corresponding to the terminfo
-// capability name capname as an integer. Return the value -2 if capname is
-// not a numeric capability, or -1 if it is canceled or absent from the
-// terminal description.
+/// At present this function is unimplemented.
+///
+/// Return the value of the numeric capability corresponding to the terminfo
+/// capability name capname as an integer. Return the value -2 if capname is
+/// not a numeric capability, or -1 if it is canceled or absent from the
+/// terminal description.
 pub fn tigetnum(_capname: &str) -> i32 {
     unimplemented!();
 }
 
-// Return the value of the string capability corresponding to the terminfo
-// capability name capname as a bytes object. Return None if capname is not
-// a terminfo “string capability”, or is canceled or absent from the terminal
-// description.
+/// At present this function is unimplemented.
+///
+/// Return the value of the string capability corresponding to the terminfo
+/// capability name capname as a bytes object. Return None if capname is not
+/// a terminfo “string capability”, or is canceled or absent from the terminal
+/// description.
 pub fn tigetstr(_capname: &str) -> String {
     unimplemented!();
 }
@@ -3310,14 +3660,29 @@ pub fn timeout(ms: time::Duration) -> result!(()) {
     Ok(())
 }
 
-pub fn touchline(handle: WINDOW, region: Region) -> result!(()) {
-    match unsafe { ncurses::touchline(handle, region.top, region.bottom) } {
+/// Pretend that `count` lines have been changed, beginning with line `start`.
+///
+/// This routines throw away all optimization information about which parts
+/// of the window have been touched, by pretending that the entire window
+/// has been drawn on. This is sometimes necessary when using overlapping
+/// windows, since a change to one window affects the other window, but the
+/// records of which lines have been changed in the other window do not
+/// reflect the change.
+pub fn touchline(handle: WINDOW, count: i32, start: i32) -> result!(()) {
+    match unsafe { ncurses::touchline(handle, count, start) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("touchline", rc))
     }
 }
 
 /// Pretend the whole window has been changed, for purposes of drawing optimizations.
+///
+/// This routines throw away all optimization information about which parts
+/// of the window have been touched, by pretending that the entire window
+/// has been drawn on. This is sometimes necessary when using overlapping
+/// windows, since a change to one window affects the other window, but the
+/// records of which lines have been changed in the other window do not
+/// reflect the change.
 pub fn touchwin(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::touchwin(handle) } {
         OK => Ok(()),
@@ -3325,6 +3690,7 @@ pub fn touchwin(handle: WINDOW) -> result!(()) {
     }
 }
 
+/// At present this function is unimplemented.
 pub fn tparm(_s: &str) -> String {
     unimplemented!();
 }
@@ -3359,7 +3725,7 @@ pub fn unctrl(c: ChtypeChar) -> result!(String) {
 
 /// Push ch so the next `get_wch()` will return it.
 ///
-/// Note: Only one ch can be pushed before `get_wch()` is called. 
+/// Note: Only one ch can be pushed before `get_wch()` is called.
 pub fn unget_wch(ch: WideChar) -> result!(()) {
     match ncurses::unget_wch(WideChar::into(ch)) {
         OK => Ok(()),
@@ -3387,7 +3753,7 @@ pub fn untouchwin(handle: WINDOW) -> result!(()) {
 
 /// Allow use of default values for colors on terminals supporting this
 /// feature. Use this to support transparency in your application.
-/// The default color is assigned to the color number -1.
+/// The default color is assigned to the color `Color::TerminalDefault`.
 pub fn use_default_colors() -> result!(()) {
     match ncurses::use_default_colors() {
         OK => Ok(()),
@@ -3405,24 +3771,65 @@ pub fn use_env(flag: bool) {
     ncurses::use_env(flag)
 }
 
+/// Controls whether the calling application is able to use user-defined or
+/// nonstandard names which may be compiled into the terminfo description,
+/// i.e., via the terminfo or termcap interfaces.
+/// Normally these names are available for use, since the essential decision
+/// is made by using the -x option of tic to compile extended terminal
+/// definitions. However you can disable this feature to ensure compatibility
+/// with other implementations of curses.
 pub fn use_extended_names(enable: bool) -> bool {
     ncurses::use_extended_names(enable) == TRUE
 }
 
+/// Override locale-encoding checks.
+///
+/// The `use_legacy_coding()` function is an extension to the NCurses library.
+/// It allows the caller to change the result of `unctrl()`, and suppress
+/// related checks within the library that would normally cause nonprinting
+/// characters to be rendered in visible form. This affects only 8-bit characters.
 pub fn use_legacy_coding(level: Legacy) -> result!(Legacy) {
     let rc = ncurses::use_legacy_coding(level.value());
 
     Legacy::new(rc).ok_or(ncurses_function_error_with_rc!("use_legacy_coding", rc))
 }
 
-pub fn use_tioctl(f: bool) {
-    ncurses::use_tioctl(f)
+/// Determine how to compute terminal size. The `use_tioctl()` routine,
+/// if used, should be called before `initscr()` or `newterm()` are called
+/// (because those compute the screen size).
+///
+/// After `use_tioctl()` is called with `true` as an argument, NCurses
+/// modifies the last step in its computation of screen size as follows:
+/// - Checks if the $LINES and $COLUMNS environment variables are set to
+///   a number greater than zero.
+/// - for each, NCurses updates the corresponding environment variable
+///   with the value that it has obtained via operating system call or
+///   from the terminal database.
+/// - NCurses re-fetches the value of the environment variables so that
+///   it is still the environment variables which set the screen size.
+///
+/// The `use_env()` and `use_tioctl()` routines combine as summarized here:
+///
+/// use_env   use_tioctl   Summary
+/// ----------------------------------------------------------------
+/// true      false        This is the default behavior. NCurses uses operating
+///                        system calls unless overridden by $LINES or $COLUMNS
+///                        environment variables.
+/// true      true         NCurses updates $LINES and $COLUMNS based on operating
+///                        system calls.
+/// false     true         NCurses ignores $LINES and $COLUMNS, uses operating
+///                        system calls to obtain size.
+/// false     false        NCurses relies on the terminal database to determine size.
+pub fn use_tioctl(flag: bool) {
+    ncurses::use_tioctl(flag)
 }
 
+/// At present this function is unimplemented.
 pub fn vid_attr(_attrs: attr_t, _pair: short_t) -> i32 {
     unimplemented!();
 }
 
+/// At present this function is unimplemented.
 pub fn vidattr(_attrs: chtype) -> i32 {
     unimplemented!();
 }
@@ -3443,6 +3850,7 @@ pub fn vline_set(wch: ComplexChar, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwadd_wch()` using `getcuryx()` as `origin`.
 pub fn wadd_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::wadd_wch(handle, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -3450,6 +3858,7 @@ pub fn wadd_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwadd_wchnstr()` using `getcuryx()` as `origin`.
 pub fn wadd_wchnstr(handle: WINDOW, wchstr: &ComplexString, number: i32) -> result!(()) {
     match unsafe { ncurses::wadd_wchnstr(handle, raw_with_nul_as_slice!(wchstr), number) } {
         OK => Ok(()),
@@ -3457,6 +3866,7 @@ pub fn wadd_wchnstr(handle: WINDOW, wchstr: &ComplexString, number: i32) -> resu
     }
 }
 
+/// Equivalent of `mvwadd_wchstr()` using `getcuryx()` as `origin`.
 pub fn wadd_wchstr(handle: WINDOW, wchstr: &ComplexString) -> result!(()) {
     match unsafe { ncurses::wadd_wchstr(handle, raw_with_nul_as_slice!(wchstr)) } {
         OK => Ok(()),
@@ -3464,6 +3874,7 @@ pub fn wadd_wchstr(handle: WINDOW, wchstr: &ComplexString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddch()` using `getcuryx()` as `origin`.
 pub fn waddch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::waddch(handle, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -3471,6 +3882,7 @@ pub fn waddch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddchnstr()` using `getcuryx()` as `origin`.
 pub fn waddchnstr(handle: WINDOW, chstr: &ChtypeString, number: i32) -> result!(()) {
     match unsafe { ncurses::waddchnstr(handle, raw_with_nul_as_slice!(chstr), number) } {
         OK => Ok(()),
@@ -3478,6 +3890,7 @@ pub fn waddchnstr(handle: WINDOW, chstr: &ChtypeString, number: i32) -> result!(
     }
 }
 
+/// Equivalent of `mvwaddchstr()` using `getcuryx()` as `origin`.
 pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
     match unsafe { ncurses::waddchstr(handle, raw_with_nul_as_slice!(chstr)) } {
         OK => Ok(()),
@@ -3485,6 +3898,7 @@ pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddnstr()` using `getcuryx()` as `origin`.
 pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match unsafe { ncurses::waddnstr(handle, c_str_with_nul!(str), number) } {
         OK => Ok(()),
@@ -3492,6 +3906,7 @@ pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddnwstr()` using `getcuryx()` as `origin`.
 pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match unsafe { ncurses::waddnwstr(handle, raw_with_nul_as_slice!(wstr), number) } {
         OK => Ok(()),
@@ -3499,6 +3914,7 @@ pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) 
     }
 }
 
+/// Equivalent of `mvwaddstr()` using `getcuryx()` as `origin`.
 pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     match unsafe { ncurses::waddstr(handle, c_str_with_nul!(str)) } {
         OK => Ok(()),
@@ -3506,6 +3922,7 @@ pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwaddwstr()` using `getcuryx()` as `origin`.
 pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match unsafe { ncurses::waddwstr(handle, raw_with_nul_as_slice!(wstr)) } {
         OK => Ok(()),
@@ -3513,10 +3930,12 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Retrieve attributes for the given window.
 pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
     _wattr_get(None, handle)
 }
 
+/// Turn off window attributes, without affecting other attributes.
 pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -3527,6 +3946,7 @@ pub fn wattr_off<A, T>(handle: WINDOW, attrs: A) -> result!(())
     }
 }
 
+/// Turn on window attributes, without affecting other attributes.
 pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
     where A: AttributesType<T>,
           T: ColorAttributeTypes
@@ -3537,6 +3957,8 @@ pub fn wattr_on<A, T>(handle: WINDOW, attrs: A) -> result!(())
     }
 }
 
+/// Sets the current attributes of the given window to `attrs`,
+/// with color specified by `color_pair`.
 pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -3548,6 +3970,8 @@ pub fn wattr_set<A, P, T>(handle: WINDOW, attrs: A, color_pair: P) -> result!(()
     }
 }
 
+/// Remove attribute attrs from the “background” set applied to all writes
+/// to the current window.
 pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match unsafe { ncurses::wattroff(handle, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -3555,6 +3979,8 @@ pub fn wattroff(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Add attribute attrs from the “background” set applied to all writes to
+/// the current window.
 pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match unsafe { ncurses::wattron(handle, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -3562,6 +3988,8 @@ pub fn wattron(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Set the “background” set of attributes to attrs. This set is initially
+/// no attributes.
 pub fn wattrset(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     match unsafe { ncurses::wattrset(handle, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -3569,6 +3997,12 @@ pub fn wattrset(handle: WINDOW, attrs: normal::Attributes) -> result!(()) {
     }
 }
 
+/// Set the background property of the specified window and then apply this setting
+/// to every character position in that window.
+///
+/// According to X/Open Curses, it should do this:
+/// - The rendition of every character on the screen is changed to the new background rendition.
+/// - Wherever the former background character appears, it is changed to the new background character.
 pub fn wbkgd(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::wbkgd(handle, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -3576,10 +4010,26 @@ pub fn wbkgd(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Manipulate the background of the specified window. The window background is a
+/// character (with rendition). The attribute part of the background is combined
+/// (OR'ed) with all non-blank characters that are written into the window with
+/// `waddch()`. Both the character and attribute parts of the background are
+/// combined with the blank characters. The background becomes a property of the
+/// character and moves with the character through any scrolling and insert/delete
+/// line/character operations.
+///
+/// To the extent possible on a particular terminal, the attribute part of the
+/// background is displayed as the graphic rendition of the character put on the screen.
 pub fn wbkgdset(handle: WINDOW, ch: ChtypeChar) {
     unsafe { ncurses::wbkgdset(handle, ChtypeChar::into(ch)) }
 }
 
+/// Set the background property of the window to the complex character `wch`.
+/// The change is then applied to every character position in that window:
+/// - The attribute of every character in the window is changed to the new
+///   background attribute.
+/// - Wherever the former background character appears, it is changed to
+///   the new background character.
 pub fn wbkgrnd(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::wbkgrnd(handle, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -3587,10 +4037,30 @@ pub fn wbkgrnd(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Set the window’s background. A window’s background consists of a character
+/// and it's combination of attributes as a complex character. The attribute
+/// part of the background is combined (OR’ed) with all non-blank characters
+/// that are written into the window. Both the character and attribute parts
+/// of the background are combined with the blank characters. The background
+/// becomes a property of the character and moves with the character through
+/// any scrolling and insert/delete line/character operations.
 pub fn wbkgrndset(handle: WINDOW, wch: ComplexChar) {
     unsafe { ncurses::wbkgrndset(handle, &ComplexChar::into(wch)) }
 }
 
+/// Draw a border around the edges of the window. Each parameter specifies the
+/// character to use for a specific part of the border.
+///
+/// See the table below for more details.
+///
+/// ls : Left side
+/// rs : Right side
+/// ts : Top
+/// bs : Bottom
+/// tl : Upper-left corner
+/// tr : Upper-right corner
+/// bl : Bottom-left corner
+/// br : Bottom-right corner
 pub fn wborder(
     handle: WINDOW,
     ls: ChtypeChar,
@@ -3618,6 +4088,19 @@ pub fn wborder(
     }
 }
 
+/// Draw a border around the edges of the window. Each parameter specifies the
+/// character to use for a specific part of the border.
+///
+/// See the table below for more details.
+///
+/// ls : Left side
+/// rs : Right side
+/// ts : Top
+/// bs : Bottom
+/// tl : Upper-left corner
+/// tr : Upper-right corner
+/// bl : Bottom-left corner
+/// br : Bottom-right corner
 pub fn wborder_set(
     handle: WINDOW,
     ls: ComplexChar,
@@ -3645,6 +4128,7 @@ pub fn wborder_set(
     }
 }
 
+/// Equivalent of `mvwchgat()` using `getcuryx()` as `origin`.
 pub fn wchgat<A, P, T>(handle: WINDOW, number: i32, attrs: A, color_pair: P) -> result!(())
     where A: AttributesType<T>,
           P: ColorPairType<T>,
@@ -3656,6 +4140,8 @@ pub fn wchgat<A, P, T>(handle: WINDOW, number: i32, attrs: A, color_pair: P) -> 
     }
 }
 
+/// Like `erase()`, but also cause the whole window to be repainted upon
+/// next call to `refresh()`.
 pub fn wclear(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::wclear(handle) } {
         OK => Ok(()),
@@ -3663,6 +4149,8 @@ pub fn wclear(handle: WINDOW) -> result!(()) {
     }
 }
 
+/// Erase from cursor to the end of the window: all lines below the cursor
+/// are deleted, and then the equivalent of `clrtoeol()` is performed.
 pub fn wclrtobot(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::wclrtobot(handle) } {
         OK => Ok(()),
@@ -3670,6 +4158,7 @@ pub fn wclrtobot(handle: WINDOW) -> result!(()) {
     }
 }
 
+/// Erase from cursor to the end of the line.
 pub fn wclrtoeol(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::wclrtoeol(handle) } {
         OK => Ok(()),
@@ -3677,6 +4166,8 @@ pub fn wclrtoeol(handle: WINDOW) -> result!(()) {
     }
 }
 
+/// Sets the current color of the given window to the foreground/background
+/// combination described by the color_pair parameter.
 pub fn wcolor_set<P, T>(handle: WINDOW, color_pair: P) -> result!(())
     where P: ColorPairType<T>,
           T: ColorAttributeTypes
@@ -3693,6 +4184,7 @@ pub fn wcursyncup(handle: WINDOW) {
     unsafe { ncurses::wcursyncup(handle) }
 }
 
+/// Delete any character at current position.
 pub fn wdelch(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::wdelch(handle) } {
         OK => Ok(()),
@@ -3700,6 +4192,7 @@ pub fn wdelch(handle: WINDOW) -> result!(()) {
     }
 }
 
+/// Add a complex character `wch`, and immediately call `refresh()` on the window.
 pub fn wecho_wchar(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::wecho_wchar(handle, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -3707,7 +4200,7 @@ pub fn wecho_wchar(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
-/// Add character ch with attribute, and immediately call `refresh()` on the window.
+/// Add a character (withrendition) `ch`, and immediately call `refresh()` on the window.
 pub fn wechochar(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::wechochar(handle, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -3715,6 +4208,7 @@ pub fn wechochar(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// Clear the window.
 pub fn werase(handle: WINDOW) -> result!(()) {
     match unsafe { ncurses::werase(handle) } {
         OK => Ok(()),
@@ -3722,7 +4216,7 @@ pub fn werase(handle: WINDOW) -> result!(()) {
     }
 }
 
-/// Get a wide character.
+/// Equivalent of `mvwget_wch()` using `getcuryx()` as `origin`.
 pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
@@ -3751,7 +4245,8 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use wgetn_wstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use wgetn_wstr() instead")]
+/// Equivalent of `mvwget_wstr()` using `getcuryx()` as `origin`.
 pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
     let mut buf: [wint_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wint_t = buf.as_mut_ptr();
@@ -3780,6 +4275,7 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
     }
 }
 
+/// Returns the specified window's current background character as a complex character.
 pub fn wgetbkgrnd(handle: WINDOW) -> result!(ComplexChar) {
     let mut wch: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -3789,7 +4285,7 @@ pub fn wgetbkgrnd(handle: WINDOW) -> result!(ComplexChar) {
     }
 }
 
-/// Get a character.
+/// Equivalent of `mvwgetch()` using `getcuryx()` as `origin`.
 pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
     match unsafe { ncurses::wgetch(handle) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
@@ -3809,12 +4305,12 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
     }
 }
 
+/// Returns the delay timeout as set in `wtimeout()`.
 pub fn wgetdelay(handle: WINDOW) -> result!(time::Duration) {
-    let delay = time::Duration::from_millis(u64::try_from(unsafe { ncurses::wgetdelay(handle) })?);
-
-    Ok(delay)
+    Ok(time::Duration::from_millis(u64::try_from(unsafe { ncurses::wgetdelay(handle) })?))
 }
 
+/// Equivalent of `mvwgetn_wstr()` using `getcuryx()` as `origin`.
 pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}wgetn_wstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -3845,6 +4341,7 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
     }
 }
 
+/// Equivalent of `mvwgetnstr()` using `getcuryx()` as `origin`.
 pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}wgetnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -3867,10 +4364,14 @@ pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
     }
 }
 
+/// Returns the parent WINDOW pointer for sub-windows, or `None` for
+/// windows having no parent.
 pub fn wgetparent(handle: WINDOW) -> Option<WINDOW> {
     unsafe { ncurses::wgetparent(handle) }
 }
 
+/// Returns the top and bottom rows for the scrolling margin as set
+/// by `wsetscrreg()`.
 pub fn wgetscrreg(handle: WINDOW) -> result!(Region) {
     let mut top: [i32; 1] = [0];
     let mut bottom: [i32; 1] = [0];
@@ -3881,7 +4382,8 @@ pub fn wgetscrreg(handle: WINDOW) -> result!(Region) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use wgetnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use wgetnstr() instead")]
+/// Equivalent of `mvwgetstr()` using `getcuryx()` as `origin`.
 pub fn wgetstr(handle: WINDOW) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -3902,7 +4404,7 @@ pub fn wgetstr(handle: WINDOW) -> result!(String) {
     }
 }
 
-/// Display a horizontal line with length n consisting of the character ch.
+/// Equivalent of `mvwhline()` using `getcuryx()` as `origin`.
 pub fn whline(handle: WINDOW, ch: ChtypeChar, number: i32) -> result!(()) {
     match unsafe { ncurses::whline(handle, ChtypeChar::into(ch), number) } {
         OK => Ok(()),
@@ -3910,7 +4412,7 @@ pub fn whline(handle: WINDOW, ch: ChtypeChar, number: i32) -> result!(()) {
     }
 }
 
-/// Display a horizontal line with length n consisting of the character wch.
+/// Equivalent of `mvwhline_set()` using `getcuryx()` as `origin`.
 pub fn whline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) {
     match unsafe { ncurses::whline_set(handle, &ComplexChar::into(wch), number) } {
         OK => Ok(()),
@@ -3918,6 +4420,7 @@ pub fn whline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) 
     }
 }
 
+/// Equivalent of `mvwin_wch()` using `getcuryx()` as `origin`.
 pub fn win_wch(handle: WINDOW) -> result!(ComplexChar) {
     let mut wcval: [cchar_t; 1] = unsafe { mem::zeroed() };
 
@@ -3927,6 +4430,7 @@ pub fn win_wch(handle: WINDOW) -> result!(ComplexChar) {
     }
 }
 
+/// Equivalent of `mvwin_wchnstr()` using `getcuryx()` as `origin`.
 pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
     assert!(number <= LINE_MAX as i32, "{}win_wchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -3943,7 +4447,8 @@ pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use win_wchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use win_wchnstr() instead")]
+/// Equivalent of `mvwin_wchstr()` using `getcuryx()` as `origin`.
 pub fn win_wchstr(handle: WINDOW) -> result!(ComplexString) {
     let mut buf: [cchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut cchar_t = buf.as_mut_ptr();
@@ -3958,10 +4463,12 @@ pub fn win_wchstr(handle: WINDOW) -> result!(ComplexString) {
     }
 }
 
+/// Equivalent of `mvwinch()` using `getcuryx()` as `origin`.
 pub fn winch(handle: WINDOW) -> ChtypeChar {
     ChtypeChar::from(unsafe { ncurses::winch(handle) })
 }
 
+/// Equivalent of `mvwinchnstr()` using `getcuryx()` as `origin`.
 pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
     assert!(number <= LINE_MAX as i32, "{}winchnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -3980,7 +4487,8 @@ pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use winchnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use winchnstr() instead")]
+/// Equivalent of `mvwinchstr()` using `getcuryx()` as `origin`.
 pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
     let mut buf: [chtype; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut chtype = buf.as_mut_ptr();
@@ -3997,6 +4505,7 @@ pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
     }
 }
 
+/// Equivalent of `mvwinnstr()` using `getcuryx()` as `origin`.
 pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
     assert!(number <= LINE_MAX as i32, "{}winnstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -4015,6 +4524,7 @@ pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
     }
 }
 
+/// Equivalent of `mvwinnwstr()` using `getcuryx()` as `origin`.
 pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
     assert!(number <= LINE_MAX as i32, "{}winnwstr() : number={}, LINE_MAX={}", MODULE_PATH, number, LINE_MAX);
 
@@ -4033,6 +4543,7 @@ pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
     }
 }
 
+/// Equivalent of `mvwins_nwstr()` using `getcuryx()` as `origin`.
 pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) {
     match unsafe { ncurses::wins_nwstr(handle, raw_with_nul_as_slice!(wstr), number) } {
         OK => Ok(()),
@@ -4040,6 +4551,7 @@ pub fn wins_nwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(())
     }
 }
 
+/// Equivalent of `mvwins_wch()` using `getcuryx()` as `origin`.
 pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     match unsafe { ncurses::wins_wch(handle, &ComplexChar::into(wch)) } {
         OK => Ok(()),
@@ -4047,6 +4559,7 @@ pub fn wins_wch(handle: WINDOW, wch: ComplexChar) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwins_wstr()` using `getcuryx()` as `origin`.
 pub fn wins_wstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     match unsafe { ncurses::wins_wstr(handle, raw_with_nul_as_slice!(wstr)) } {
         OK => Ok(()),
@@ -4054,6 +4567,7 @@ pub fn wins_wstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwinsch()` using `getcuryx()` as `origin`.
 pub fn winsch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     match unsafe { ncurses::winsch(handle, ChtypeChar::into(ch)) } {
         OK => Ok(()),
@@ -4061,6 +4575,11 @@ pub fn winsch(handle: WINDOW, ch: ChtypeChar) -> result!(()) {
     }
 }
 
+/// For positive `n`, insert `n` lines into the specified window above the
+/// current line. The `n` bottom lines are lost. For negative `n`, delete
+/// `n` lines (starting with the one under the cursor), and move the
+/// remaining lines up. The bottom `n` lines are cleared. The current
+/// cursor position remains the same.
 pub fn winsdelln(handle: WINDOW, n: i32) -> result!(()) {
     match unsafe { ncurses::winsdelln(handle, n) } {
         OK => Ok(()),
@@ -4076,6 +4595,7 @@ pub fn winsertln(handle: WINDOW) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwinsnstr()` using `getcuryx()` as `origin`.
 pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     match unsafe { ncurses::winsnstr(handle, c_str_with_nul!(str), number) } {
         OK => Ok(()),
@@ -4083,6 +4603,7 @@ pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
     }
 }
 
+/// Equivalent of `mvwinsstr()` using `getcuryx()` as `origin`.
 pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
     match unsafe { ncurses::winsstr(handle, c_str_with_nul!(str)) } {
         OK => Ok(()),
@@ -4090,7 +4611,8 @@ pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use winnstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use winnstr() instead")]
+/// Equivalent of `mvwinstr()` using `getcuryx()` as `origin`.
 pub fn winstr(handle: WINDOW) -> result!(String) {
     let mut buf: [i8; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut i8 = buf.as_mut_ptr();
@@ -4107,7 +4629,8 @@ pub fn winstr(handle: WINDOW) -> result!(String) {
     }
 }
 
-#[deprecated(since = "0.1.2", note = "underlying native function can cause issues. Use winnwstr() instead")]
+#[deprecated(since = "0.1.2", note = "underlying native function can cause undefined behaviour. Use winnwstr() instead")]
+/// Equivalent of `mvwinwstr()` using `getcuryx()` as `origin`.
 pub fn winwstr(handle: WINDOW) -> result!(WideString) {
     let mut buf: [wchar_t; LINE_MAX] = unsafe { mem::zeroed() };
     let ptr: *mut wchar_t = buf.as_mut_ptr();
@@ -4122,6 +4645,7 @@ pub fn winwstr(handle: WINDOW) -> result!(WideString) {
     }
 }
 
+/// Move cursor to `origin`.
 pub fn wmove(handle: WINDOW, origin: Origin) -> result!(()) {
     match unsafe { ncurses::wmove(handle, origin.y, origin.x) } {
         OK => Ok(()),
@@ -4227,6 +4751,9 @@ pub fn wtimeout(handle: WINDOW, ms: time::Duration) -> result!(()) {
     Ok(())
 }
 
+/// The `wtouchln()` routine makes `n` lines in the window, starting at `line`,
+/// look as if they have (Changed::True) or have not (Changed::False) been
+/// changed since the last call to `wrefresh()`.
 pub fn wtouchln(handle: WINDOW, line: i32, n: i32, changed: Changed) -> result!(()) {
     let change = match changed {
         Changed::True  => 1,
@@ -4239,6 +4766,9 @@ pub fn wtouchln(handle: WINDOW, line: i32, n: i32, changed: Changed) -> result!(
     }
 }
 
+/// The `wunctrl()` routine returns a wide character string which is a printable
+/// representation of the character `ch`, ignoring attributes. Control characters
+/// are displayed in the ^X notation. Printing characters are displayed as is.
 pub fn wunctrl(ch: ComplexChar) -> result!(WideChar) {
     let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
 
@@ -4248,7 +4778,7 @@ pub fn wunctrl(ch: ComplexChar) -> result!(WideChar) {
     }
 }
 
-/// Display a vertical line with length `number` consisting of the character `ch`.
+/// Equivalent of `mvwvline()` using `getcuryx()` as `origin`.
 pub fn wvline(handle: WINDOW, ch: ChtypeChar, number: i32) -> result!(()) {
     match unsafe { ncurses::wvline(handle, ChtypeChar::into(ch), number) } {
         OK => Ok(()),
@@ -4256,7 +4786,7 @@ pub fn wvline(handle: WINDOW, ch: ChtypeChar, number: i32) -> result!(()) {
     }
 }
 
-/// Display a vertical line with length `number` consisting of the character `ch`.
+/// Equivalent of `mvwvline_set()` using `getcuryx()` as `origin`.
 pub fn wvline_set(handle: WINDOW, wch: ComplexChar, number: i32) -> result!(()) {
     match unsafe { ncurses::wvline_set(handle, &ComplexChar::into(wch), number) } {
         OK => Ok(()),
@@ -4771,6 +5301,7 @@ pub fn raw_sp(screen: SCREEN) -> result!(()) {
     }
 }
 
+#[deprecated(since = "0.5.0", note = "use with caution as this routine will reset all color pairs potentially before they go out of scope and the color pairs will default to terminal default foreground and backgound colors.")]
 /// Screen function of `reset_color_pairs()`.
 pub fn reset_color_pairs_sp(screen: SCREEN) {
     unsafe { ncurses::reset_color_pairs_sp(screen) }
@@ -4994,10 +5525,12 @@ pub fn start_color_sp(screen: SCREEN) -> result!(()) {
     }
 }
 
+/// Screen function of `term_attrs()`.
 pub fn term_attrs_sp(_screen: SCREEN) -> attr_t {
     unimplemented!();
 }
 
+/// Screen function of `termattrs()`.
 pub fn termattrs_sp(_screen: SCREEN) -> chtype {
     unimplemented!();
 }
@@ -5066,10 +5599,12 @@ pub fn use_legacy_coding_sp(screen: SCREEN, level: Legacy) -> result!(Legacy) {
     Legacy::new(rc).ok_or(ncurses_function_error_with_rc!("use_legacy_coding_sp", rc))
 }
 
+/// Screen function of `vid_attr()`.
 pub fn vid_attr_sp(_screen: SCREEN, _attrs: attr_t, _pair: short_t) -> i32 {
     unimplemented!();
 }
 
+/// Screen function of `vidattr()`.
 pub fn vidattr_sp(_screen: SCREEN, _attrs: chtype) -> i32 {
     unimplemented!();
 }
@@ -5207,10 +5742,12 @@ fn _wattr_get(screen: Option<SCREEN>, handle: WINDOW) -> result!(AttributesColor
 
 // private functions.
 
+// get a file stream from a file descriptor.
 fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
     unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() }) }
 }
 
+// obtain a slice from a path.
 fn path_as_slice(path: &Path) -> result!(&[i8]) {
     let fqname = format!("{}", path.display());
     let s = fqname.as_str();

@@ -2,37 +2,40 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
-## [0.5.0] - ????.??.?? [BC]
-- NCurses form module implemented as `ncursesw::form`.
-- `ncursesw::menu_request_by_name()` now returns a `Result<Option<ncursesw::menu::MenuRequest>, ncursesw::NCurseswMenuError>` instead of `Result<bool, ncursesw::NCurseswMenuError>`. [BC]
-- `ncursesw::menu::menu_request_name()` now takes a `ncursesw::menu::MenuRequest` instead of `i32`. [BC]
-- `ncursesw::menu::set_menu_pad()` now takes a `char` instead of `i32`. [BC]
-- `ncursesw::menu::menu_driver()` now returns a `Result<Option<ncursesw::menu::MenuRequest>, ncursesw::NCurseswMenuError>` instead of `Result<Option<i32>, ncursesw::NCurseswMenuError>`. [BC]
+## [0.5.0] - 2020.01.29 [BC]
 - `bindgen` will now only create bindings against version 6.1 and above of the NCurses library.
-- `ncursesw::newterm()` implemented (was calling `unimplemented!()` and signature now takes `O: std::os::unix::io::AsRawFd + std::io::Write` and `I: std::os::unix::io::AsRawFd + std::io::Write` instead of `shims::bindings::FILE` for both. [BC]
-- `ncursesw::{scr_dump,scr_init,scr_restore,scr_set}` functions implemented (all where calling `unimplemented!()`, signatures now take `&std::path::Path` instead of `&str` for all. [BC]
-- `ncursesw::getwin()` now takes `I: std::os::unix::io::AsRawFd + std::io::Read` instead of `&std::path::Path`. [BC]
-- `ncursesw::putwin()` now takes `O: std::os::unix::io::AsRawFd + std::io::Write` instead of `&std::path::Path`. [BC]
-- `ncursesw::shims::ncurses::wunctrl()` now returns `Option<*mut wchar_t>` instead of `*mut wchar_t`. [BC]
+- NCurses form module implemented as `form`.
 - Added missing NCurses `_sp` (screen) functions.
-- `ncursesw::normal::alloc_pair()` now returns a `Result<ncursesw::normal::ColorPair, ncursesw::NCurseswError>` instead of `ncursesw::normal::ColorPair`. [BC]
-- `ncursesw::normal::find_pair()` now returns a `Result<Option<ncursesw::normal::ColorPair>, ncursesw::NCurseswError>` instead of `Option<ncursesw::normal::ColorPair>`. [BC]
-- `ncursesw::free_pair()` signature now takes  `i32: From<T>` instead of `i32: From<P>`. [BC]
-- Added `ncursesw::{normal,extend}::Attribute::Default` trait which returns `ncursesw::{normal,extend}::Attribute::Normal`.
-- Added `ncursesw::{normal,extend}::Color::Default` trait which returns `ncursesw::{normal,extend}::Color::TerminalDefault`.
-- Added `ncursesw::{normal,extend}::Colors::Default` trait which returns `ncursesw::{normal,extend}::Colors { foreground: ncursesw::{normal,extend}::Color::TerminalDefault, background: ncursesw::{normal,extend}::Color::TerminalDefault }`.
-- Added `ncursesw::{normal,extend}::AttributesColorPair::Default` trait which returns `ncursesw::AttributesColorPair { attributes: ncursesw::{normal,extend}::Attributes::Normal, color_pair: ncursesw::{normal,extend}::ColorPair::default() }`.
-- Removed `ncursesw::mouse::set_mouseinterval()`, replaced by `ncursesw::mouse::mouseinterval(std::time::Duration)`. [BC]
-- `ncursesw::mouse::mouseinterval()` signature has changed from `mouseinterval(delay: std::time::Duration) -> Result<(), ncursesw::NCurseswMouseError>` to `mouseinterval(delay: Option<std::time::Duration>) -> Result<std::time::Duration, ncursesw::NCurseswMouseError>`. [BC]
+- Added missing `is_subwin()`, `getsyx()` and `setyx()` routines (`{get,set}syx()` are not implemented in the `ncursesw::shims::ncurses` layer).
+- Added `{normal,extend}::Attribute::Default` trait which returns `{normal,extend}::Attribute::Normal`.
+- Added `{normal,extend}::Color::Default` trait which returns `{normal,extend}::Color::TerminalDefault`.
+- Added `{normal,extend}::Colors::Default` trait which returns `{normal,extend}::Colors { foreground: {normal,extend}::Color::TerminalDefault, background: {normal,extend}::Color::TerminalDefault }`.
+- Added `{normal,extend}::AttributesColorPair::Default` trait which returns `AttributesColorPair { attributes: {normal,extend}::Attributes::Normal, color_pair: {normal,extend}::ColorPair::default() }`.
+- Removed `setlocale()` and `LcCategory`.
+- `newterm()` implemented (was calling `unimplemented!()` and signature now takes `O: std::os::unix::io::AsRawFd + std::io::Write` and `I: std::os::unix::io::AsRawFd + std::io::Write` instead of `shims::bindings::FILE` for both. [BC]
+- `{scr_dump,scr_init,scr_restore,scr_set}` functions implemented (all where calling `unimplemented!()`, signatures now take `&std::path::Path` instead of `&str` for all. [BC]
+- `getwin()` now takes `I: std::os::unix::io::AsRawFd + std::io::Read` instead of `&std::path::Path`. [BC]
+- `putwin()` now takes `O: std::os::unix::io::AsRawFd + std::io::Write` instead of `&std::path::Path`. [BC]
+- `normal::alloc_pair()` now returns a `Result<normal::ColorPair, NCurseswError>` instead of `normal::ColorPair`. [BC]
+- `normal::find_pair()` now returns a `Result<Option<normal::ColorPair>, NCurseswError>` instead of `Option<normal::ColorPair>`. [BC]
+- `free_pair()` signature now takes  `i32: From<T>` instead of `i32: From<P>`. [BC]
+- `shims::ncurses::wunctrl()` now returns `Option<*mut wchar_t>` instead of `*mut wchar_t`. [BC]
+- `menu_request_by_name()` now returns a `Result<Option<menu::MenuRequest>, NCurseswMenuError>` instead of `Result<bool, NCurseswMenuError>`. [BC]
+- `menu::menu_request_name()` now takes a `menu::MenuRequest` instead of `i32`. [BC]
+- `menu::set_menu_pad()` now takes a `char` instead of `i32`. [BC]
+- `menu::menu_driver()` now returns a `Result<Option<menu::MenuRequest>, NCurseswMenuError>` instead of `Result<Option<i32>, NCurseswMenuError>`. [BC]
+- `mouse::mouseinterval()` signature has changed from `mouseinterval(delay: std::time::Duration) -> Result<(), mouse::NCurseswMouseError>` to `mouseinterval(delay: Option<std::time::Duration>) -> Result<std::time::Duration, mouse::NCurseswMouseError>`. [BC]
+- `mouse::mousemask()` signature changed from `mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> Result<mouse::mmask_t, mouse::NCurseswMouseError>` to `mousemask(newmask: mmask_t) -> Result<mouse::mmask_t, mouse::NCurseswMouseError>`. [BC]
+- Removed `mouse::set_mouseinterval()` which is replaced by calling `mouse::mouseinterval(Some(std::time::Duration))`. [BC]
 
 ## [0.4.0] - 2019-12-09 [BC]
-- NCurses menu module implemented as `ncursesw::menu`.
+- NCurses menu module implemented as `menu`.
 - Minor API changes. [BC]
 - NCurses panels module functions are now correctly linked to.
 - Depreciated NCurses color type functions in favor of encapsulated color type structures.
 
 ## [0.3.2] - 2019-11-02
-- NCurses mouse functionality implemented in `ncursesw::mouse`.
+- NCurses mouse functionality implemented in `mouse`.
 
 ## [0.3.1] - 2019-10-25
 - ...

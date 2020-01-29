@@ -1,7 +1,7 @@
 /*
     src/menu/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-mod constants;
 mod funcs;
 mod itemoption;
 mod itemoptions;
@@ -32,7 +31,6 @@ mod menusize;
 mod menuuserptr;
 mod ncurseswmenuerror;
 
-pub use menu::constants::*;
 pub use menu::funcs::*;
 pub use menu::itemoption::*;
 pub use menu::itemoptions::*;

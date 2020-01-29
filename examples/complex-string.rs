@@ -21,9 +21,15 @@
 */
 
 extern crate ncursesw;
+extern crate gettextrs;
 
-use ncursesw::{initscr, endwin, setlocale, mvadd_wchstr, WideString, ComplexString, refresh, mvgetch, LcCategory, Origin, NCurseswError};
-use ncursesw::normal::{ColorPair, Attribute};
+use gettextrs::*;
+
+use ncursesw::{
+    initscr, endwin, mvadd_wchstr, refresh, mvgetch,
+    WideString, ComplexString, Origin, NCurseswError,
+    normal::{ColorPair, Attribute}
+};
 
 pub fn main() {
     if let Err(e) = main_routine() {
@@ -33,7 +39,7 @@ pub fn main() {
 }
 
 pub fn main_routine() -> Result<(), NCurseswError> {
-    setlocale(LcCategory::All, "")?;
+    setlocale(LocaleCategory::LcAll, "");
 
     initscr()?;
 

@@ -1,7 +1,7 @@
 /*
     src/complex/string.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -28,6 +28,7 @@ use ncurseswerror::NCurseswError;
 use shims::ncurses::{wchar_t, cchar_t};
 use wide::WideString;
 
+/// Complex character string (wide characters and renditions).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ComplexString {
     raw: Vec<cchar_t>

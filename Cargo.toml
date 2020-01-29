@@ -26,6 +26,9 @@ ascii = "1.0"
 semver = "0.9"
 lazy_static = "1.4"
 
+[dev-dependencies]
+gettext-rs = "0.4"
+
 [build-dependencies]
 pkg-config = "0.3"
 bindgen = "0.52"

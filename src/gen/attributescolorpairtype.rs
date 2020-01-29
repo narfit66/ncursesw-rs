@@ -1,7 +1,7 @@
 /*
     src/gen/attributescolorpairtype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,8 +20,9 @@
     IN THE SOFTWARE.
 */
 
-use gen::{AttributesType, ColorPairType, ColorAttributeTypes};
+use crate::{AttributesType, ColorPairType, ColorAttributeTypes};
 
+/// Attribute and color pairs.
 pub trait AttributesColorPairType<A, P, T>
     where A: AttributesType<T>,
           P: ColorPairType<T>,

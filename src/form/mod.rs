@@ -1,7 +1,7 @@
 /*
     src/form/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,7 +20,6 @@
     IN THE SOFTWARE.
 */
 
-mod constants;
 mod fieldinfo;
 mod fieldjustification;
 mod fieldoption;
@@ -32,7 +31,6 @@ mod formrequest;
 mod funcs;
 mod ncurseswformerror;
 
-pub use form::constants::*;
 pub use form::fieldinfo::*;
 pub use form::fieldjustification::*;
 pub use form::fieldoption::*;

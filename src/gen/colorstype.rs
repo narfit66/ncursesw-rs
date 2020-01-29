@@ -1,7 +1,7 @@
 /*
     src/gen/colorstype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,11 +22,17 @@
 
 use gen::{ColorType, ColorAttributeTypes};
 
+/// Background and foreground colors.
 pub trait ColorsType<C, T>
     where C: ColorType<T>,
           T: ColorAttributeTypes
 {
+    /// Create a new instance.
     fn new(foreground: C, background: C) -> Self;
+
+    /// Foreground color.
     fn foreground(&self) -> C;
+
+    /// Background color.
     fn background(&self) -> C;
 }

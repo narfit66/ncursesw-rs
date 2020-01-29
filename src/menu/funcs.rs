@@ -49,7 +49,7 @@ pub fn current_item(menu: MENU) -> menu_result!(ITEM) {
     unsafe { nmenu::current_item(menu).ok_or_else(|| menu_function_error!("current_item")) }
 }
 
-/// de-allocates a menu item.
+/// De-allocates a menu item.
 pub fn free_item(item: ITEM) -> menu_result!(()) {
     assert!(!item.is_null(), "{}free_item() : item.is_null()", MODULE_PATH);
 
@@ -75,9 +75,9 @@ pub fn free_item(item: ITEM) -> menu_result!(()) {
     }
 }
 
-/// disconnects menu from its item array and frees the storage allocated for the menu.
+/// Disconnects menu from its item array and frees the storage allocated for the menu.
 ///
-/// make sure that `free_menu()` is called before `free_item()` otherwise the menu
+/// Make sure that `free_menu()` is called before `free_item()` otherwise the menu
 /// item will still be connected to the menu.
 pub fn free_menu(menu: MENU) -> menu_result!(()) {
     match unsafe { nmenu::free_menu(menu) } {
@@ -333,7 +333,7 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 
 /// Creates a new menu connected to a specified vector of menu item.
 ///
-/// when `new_menu()` is called make sure that the memory for the item_handles
+/// When `new_menu()` is called make sure that the memory for the item_handles
 /// is contiguous and does not go out of scope until after `free_menu()` has
 /// been called otherwise unpredicable results may occur, this is because the
 /// underlying ncurses menu functions use this memory directly.
@@ -514,7 +514,7 @@ pub fn set_menu_mark(menu: MENU, mark: &str) -> menu_result!(()) {
     }
 }
 
-/// sets all the given item's options.
+/// Sets all the given item's options.
 pub fn set_menu_opts(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_opts(menu, opts.into()) } {
         E_OK => Ok(()),
