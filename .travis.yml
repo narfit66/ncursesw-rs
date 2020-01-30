@@ -11,4 +11,5 @@ install:
     ./.travis/ncurses-install
 script:
     - cargo build -vv
+    - cargo build -vv --features docs-rs
     - cargo run --example ncursesw-version
