@@ -2,6 +2,9 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
+## [0.5.1] - 2020.01.30
+- Fix so that crate compiles on `docs.rs` for documentation.
+
 ## [0.5.0] - 2020.01.29 [BC]
 - `bindgen` will now only create bindings against version 6.1 and above of the NCurses library.
 - NCurses form module implemented as `form`.
