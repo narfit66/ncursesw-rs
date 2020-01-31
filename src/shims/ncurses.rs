@@ -3365,7 +3365,8 @@ pub unsafe fn init_pair_sp(sp: SCREEN, pair: short_t, f: short_t, b: short_t) ->
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn intrflush_sp(sp: SCREEN, win: WINDOW, bf: bool) -> i32 {
     assert!(!sp.is_null(), "{}intrflush_sp() : sp.is_null()", MODULE_PATH);
-    assert!(!win.is_null(), "{}intrflush_sp() : win.is_null()", MODULE_PATH);
+    // no asset needed as according to the documentation the win parameter is ignored!.
+    //assert!(!win.is_null(), "{}intrflush_sp() : win.is_null()", MODULE_PATH);
 
     bindings::intrflush_sp(sp, win, bf)
 }

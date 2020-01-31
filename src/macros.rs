@@ -50,14 +50,7 @@ macro_rules! raw_with_nul_as_slice { ($name: ident) => { $name.clone().raw_with_
 
 macro_rules! ptr_to_string { ($ptr: ident) => { std::str::from_utf8_unchecked(CStr::from_ptr($ptr).to_bytes()).to_owned() } }
 
-macro_rules! return_mut_ptr {
-    ($ptr: ident) => {
-        match $ptr {
-            Some(ptr) => ptr,
-            None      => std::ptr::null_mut()
-        }
-    }
-}
+macro_rules! return_mut_ptr { ($ptr: ident) => { $ptr.unwrap_or(std::ptr::null_mut()) } }
 
 macro_rules! option_getter {
     ($func: ident, $attr: ident) => {

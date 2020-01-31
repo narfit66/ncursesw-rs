@@ -1382,13 +1382,15 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
 
 /// Initialize the NCurses data structures and return the standard screen.
 ///
-/// `initscr` is normally the first NCurses routine to call when initializing a program. A few special
-/// routines sometimes need to be called before it; these are `slk_init`, `filter`, `ripoffline`, `use_env`.
-/// For multiple-terminal applications, `newterm()` may be called before `initscr`.
+/// `initscr()` is normally the first NCurses routine to call when initializing
+/// a program. A few special routines sometimes need to be called before it; these
+/// are `slk_init()`, `filter()`, `ripoffline()`, `use_env()`.  For multiple-terminal
+/// applications, `newterm()` may be called before `initscr`.
 ///
-/// The `initscr` code determines the terminal type and initializes all NCurses data structures. `initscr`
-/// also causes the first call to `refresh` to clear the screen. If errors occur, `initscr` writes an
-/// appropriate error message to standard error and exits; otherwise, a pointer is returned to `stdscr`.
+/// The `initscr()` code determines the terminal type and initializes all NCurses data
+/// structures. `initscr()` also causes the first call to `refresh()` to clear the
+/// screen. If errors occur, `initscr()` writes an appropriate error message to
+/// standard error and exits; otherwise, a pointer is returned to `stdscr()`.
 pub fn initscr() -> result!(WINDOW) {
     unsafe { ncurses::initscr().ok_or(ncurses_function_error!("initscr")) }
 }

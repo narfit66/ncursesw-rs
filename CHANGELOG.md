@@ -2,6 +2,9 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
+## [?.?.?] - ????.??.??
+- `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
+
 ## [0.5.1] - 2020.01.30
 - Fix so that crate compiles on `docs.rs` for documentation.
 
@@ -14,7 +17,7 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Added `{normal,extend}::Color::Default` trait which returns `{normal,extend}::Color::TerminalDefault`.
 - Added `{normal,extend}::Colors::Default` trait which returns `{normal,extend}::Colors { foreground: {normal,extend}::Color::TerminalDefault, background: {normal,extend}::Color::TerminalDefault }`.
 - Added `{normal,extend}::AttributesColorPair::Default` trait which returns `AttributesColorPair { attributes: {normal,extend}::Attributes::Normal, color_pair: {normal,extend}::ColorPair::default() }`.
-- Removed `setlocale()` and `LcCategory`.
+- Removed `setlocale()` and `LcCategory` [BC].
 - `newterm()` implemented (was calling `unimplemented!()` and signature now takes `O: std::os::unix::io::AsRawFd + std::io::Write` and `I: std::os::unix::io::AsRawFd + std::io::Write` instead of `shims::bindings::FILE` for both. [BC]
 - `{scr_dump,scr_init,scr_restore,scr_set}` functions implemented (all where calling `unimplemented!()`, signatures now take `&std::path::Path` instead of `&str` for all. [BC]
 - `getwin()` now takes `I: std::os::unix::io::AsRawFd + std::io::Read` instead of `&std::path::Path`. [BC]

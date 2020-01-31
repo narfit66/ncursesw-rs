@@ -79,8 +79,6 @@ pub fn ungetmouse(event: nmouse::MEVENT) -> mouse_result!(()) {
 /// set the mouse events to be reported. By default, no mouse events are
 /// reported. The function will return a mask to indicate which of the
 /// specified mouse events can be reported; on complete failure it returns 0.
-/// If oldmask is a `Some`, this function fills the indicated location with
-/// the previous value of the given window's mouse event mask.
 ///
 /// As a side effect, setting a zero mousemask may turn off the mouse pointer;
 /// setting a nonzero mask may turn it on. Whether this happens is device-dependent.

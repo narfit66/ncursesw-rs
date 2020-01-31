@@ -58,7 +58,7 @@ If set, `NCURSESW_RUSTC_LINK_LIB` will be used for the `cargo:rustc-link-lib` se
 
 ## Features
 
-By default this crate will be compiled so that the following NCurses functions `getch()`, `mvgetch()`, `mvwgetch()`, `wgetch()`, `get_wch()`, `mvget_wch()`, `mvwget_wch()` and `wget_ch()` will pass a `KEY_RESIZE` on event of the terminal being resized or a `KEY_EVENT` back to the client code as `KeyBinding::ResizeEvent` and `KeyBinding::Event` respectivly. The follwing setting in the client code crates `Cargo.toml` will cause this crate to be compiled so that they will be passed back as `NCurseswError::KeyResize` and `NCurseswError::Event` error types instead.
+By default this crate will be compiled so that the following NCurses functions `getch()`, `mvgetch()`, `mvwgetch()`, `wgetch()`, `get_wch()`, `mvget_wch()`, `mvwget_wch()` and `wget_wch()` will pass a `KEY_RESIZE` on event of the terminal being resized or a `KEY_EVENT` back to the client code as `KeyBinding::ResizeEvent` and `KeyBinding::Event` respectivly. The follwing setting in the client code crates `Cargo.toml` will cause this crate to be compiled so that they will be passed back as `NCurseswError::KeyResize` and `NCurseswError::Event` error types instead.
 
 ```
 [features]
@@ -104,9 +104,9 @@ To use the form functions
 use ncursesw::form::*;
 ```
 
-To use wide (utf-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate is used for this purpose.
+To use wide (utf-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate has been used for this purpose.
 
-All features are supported as of NCurses ABI 6.1 including extended color pairs, soft labels, ripoff lines, panels, mouse, menus, forms and screen functions. I would suggest examining NCurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html), [menu](https://invisible-island.net/ncurses/man/menu.3x.html), [form](https://invisible-island.net/ncurses/man/form.3x.html) and [screen](https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html) documentation. If you get the chance have a read of the book `Dan Gookin's Guide to NCurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
+All features are supported as of NCurses ABI 6.1 including ansi 8-bit (normal) colors and color pairs, extended colors and color pairs, characters and strings (with attribute/color rendition), wide (UTF-8) characters and strings, complex characters and strings, soft labels (normal and extended), ripoff lines, panels, mouse, menus, forms and screen functions. I would suggest examining NCurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html), [menu](https://invisible-island.net/ncurses/man/menu.3x.html), [form](https://invisible-island.net/ncurses/man/form.3x.html) and [screen](https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html) documentation. If you get the chance have a read of the book `Dan Gookin's Guide to NCurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
 
 Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate with the express purpose of not exposing the NCurses library raw pointers and encapsulating them in formalised structures.
 
