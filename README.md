@@ -9,7 +9,7 @@ There are actually three layers of NCurses functions exposed within this library
 
 A layer above this which are mainly `unsafe` but protect the calling code to a certian degree with assetions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are on the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}` and you can consider this layer as the equivalent of a `-sys` crate for the NCurses library.
 
-Last but not least there are the safe (within the limits of NCurses itself) functions in `ncursesw` and `ncursesw::{panels, mouse, menu, form}` which retain there original ncurses names but have been rustified.
+Last but not least there are the safe (within the limits of NCurses itself) functions in `ncursesw` and `ncursesw::{panels, mouse, menu, form}` which retain there original NCurses names but have been rustified.
 
 There is a companion crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which acts as a wrapper around this crate and encapsulates the raw pointers that NCurses uses and provides a higher level of functionality.
 

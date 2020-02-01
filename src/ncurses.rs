@@ -1742,7 +1742,7 @@ pub fn longname() -> result!(String) {
 /// second after shipping each 80-character line.
 pub fn mcprint(data: &[i8], len: i32) -> result!(i32) {
     match unsafe { ncurses::mcprint(data.as_ptr() as *mut i8, len) } {
-        ERR => Err(NCurseswError::OSError { func: String::from("mcprint"), errno: errno::errno() }),
+        ERR => Err(ncurses_os_error!("mcprint")),
         rc  => Ok(rc)
     }
 }
@@ -5171,7 +5171,7 @@ pub fn longname_sp(screen: SCREEN) -> result!(String) {
 /// Screen function of `mcprint()`.
 pub fn mcprint_sp(screen: SCREEN, data: &[i8], len: i32) -> result!(i32) {
     match unsafe { ncurses::mcprint_sp(screen, data.as_ptr() as *mut i8, len) } {
-        ERR => Err(NCurseswError::OSError { func: String::from("mcprint_sp"), errno: errno::errno() }),
+        ERR => Err(ncurses_os_error!("mcprint_sp")),
         rc  => Ok(rc)
     }
 }
@@ -5746,7 +5746,7 @@ fn _wattr_get(screen: Option<SCREEN>, handle: WINDOW) -> result!(AttributesColor
 
 // get a file stream from a file descriptor.
 fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
-    unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(NCurseswError::OSError { func: String::from("fdopen"), errno: errno::errno() }) }
+    unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(ncurses_os_error!("fdopen")) }
 }
 
 // obtain a slice from a path.

@@ -30,6 +30,7 @@ macro_rules! form_result { ($type: ty) => { Result<$type, NCurseswFormError> } }
 
 macro_rules! ncurses_function_error { ($func: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: ERR } } }
 macro_rules! ncurses_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: $rc } } }
+macro_rules! ncurses_os_error { ($func: expr) => { NCurseswError::OSError { func: String::from($func), errno: errno::errno() } } }
 
 macro_rules! panels_function_error { ($func: expr) => { NCurseswPanelsError::LibraryError { func: String::from($func), rc: ERR } } }
 macro_rules! panels_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswPanelsError::LibraryError { func: String::from($func), rc: $rc } } }
