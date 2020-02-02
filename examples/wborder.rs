@@ -1,7 +1,7 @@
 /*
     examples/wborder.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,13 +23,14 @@
 extern crate ncursesw;
 
 use std::error::Error;
+
 use ncursesw::*;
-use shims::ncurses::{
+use ncursesw::shims::ncurses::{
     ACS_VLINE, ACS_HLINE, ACS_ULCORNER,
     ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER
 };
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let win = initscr()?;
 
     let ls = ChtypeChar::from_chtype(ACS_VLINE());

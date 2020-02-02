@@ -24,24 +24,28 @@ use std::ptr;
 
 use errno::errno;
 
-use normal;
-
-use cstring::*;
-use shims::{
-    nform, nform::FieldType, ncurses::{SCREEN, WINDOW}, bindings::va_list,
-    constants::{
-        E_OK, E_UNKNOWN_COMMAND, E_NO_MATCH, NO_JUSTIFICATION, JUSTIFY_LEFT,
-        JUSTIFY_CENTER, JUSTIFY_RIGHT
-    }
+use crate::{
+    normal,
+    cstring::*,
+    shims::{
+        nform, nform::FieldType, ncurses::{SCREEN, WINDOW}, bindings::va_list,
+        constants::{
+            E_OK, E_UNKNOWN_COMMAND, E_NO_MATCH, NO_JUSTIFICATION, JUSTIFY_LEFT,
+            JUSTIFY_CENTER, JUSTIFY_RIGHT
+        }
+    },
+    form::{
+        FormOptions, FormRequest, FieldInfo,
+        FieldJustification, FieldOptions, FieldParameters,
+        ncurseswformerror::{
+            NCurseswFormError, ncursesw_form_error_system_error,
+            ncursesw_form_error_from_rc
+        }
+    },
+    wide::WideChar,
+    origin::Origin,
+    size::Size
 };
-use form::{
-    FormOptions, FormRequest, FieldInfo, FieldJustification, FieldOptions, FieldParameters,
-    ncurseswformerror::{
-        NCurseswFormError, ncursesw_form_error_system_error, ncursesw_form_error_from_rc
-    }
-};
-use wide::WideChar;
-use crate::{Origin, Size};
 
 /// Form.
 pub type FORM = nform::FORM;

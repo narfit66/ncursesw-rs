@@ -1,7 +1,7 @@
 /*
     src/normal/attributes.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,10 +23,11 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use normal::{Attribute, ColorPair};
-use crate::{COLOR_PAIR, PAIR_NUMBER};
-
-use shims::ncurses::short_t;
+use crate::{
+    normal::{Attribute, ColorPair},
+    ncurses::{COLOR_PAIR, PAIR_NUMBER},
+    shims::ncurses::short_t
+};
 
 include!("../include/attributes.rs");
 

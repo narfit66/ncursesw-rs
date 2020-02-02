@@ -1,7 +1,7 @@
 /*
     src/wide/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -24,6 +24,4 @@ mod charandattributes;
 mod char;
 mod string;
 
-pub use wide::charandattributes::*;
-pub use wide::char::*;
-pub use wide::string::*;
+pub use self::{charandattributes::*, char::*, string::*};

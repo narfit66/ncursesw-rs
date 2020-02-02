@@ -1,7 +1,7 @@
 /*
     src/characterresult.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use gen::GetCharacterType;
-use keybinding::KeyBinding;
+use crate::{gen::GetCharacterType, keybinding::KeyBinding};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CharacterResult<T: GetCharacterType> {

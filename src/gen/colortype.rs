@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use gen::ColorAttributeTypes;
+use crate::gen::ColorAttributeTypes;
 
 /// Color.
 pub trait ColorType<T>

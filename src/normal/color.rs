@@ -25,14 +25,16 @@
 
 use std::convert::{From, Into};
 
-use basecolor::BaseColor;
-use gen::ColorType;
-use ncurseswerror::NCurseswError;
-use ncursescolortype::*;
-use normal::rgb::RGB;
-use shims::{ncurses::short_t, constants::COLOR_WHITE};
 use crate::{
-    SCREEN, init_color, color_content, init_color_sp, color_content_sp
+    basecolor::BaseColor,
+    gen::ColorType,
+    ncurseswerror::NCurseswError,
+    ncursescolortype::*,
+    normal::rgb::RGB,
+    shims::{ncurses::{short_t, SCREEN}, constants::COLOR_WHITE},
+    ncurses::{
+        init_color, color_content, init_color_sp, color_content_sp
+    }
 };
 
 const LIGHT_COLOR_OFFSET: i16 = COLOR_WHITE + 1;

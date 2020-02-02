@@ -22,7 +22,7 @@
 
 macro_rules! define_colors {
     ($type: ty, $extend: expr) => {
-        use ncursescolortype::set_ncurses_colortype;
+        use crate::ncursescolortype::set_ncurses_colortype;
 
         /// Foreground and background colors.
         #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]

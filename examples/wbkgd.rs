@@ -1,7 +1,7 @@
 /*
     examples/wbkgd.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,14 +23,15 @@
 extern crate ncursesw;
 extern crate ascii;
 
+use std::{str::FromStr, error::Error};
+
 use ascii::*;
-use std::str::FromStr;
-use std::error::Error;
+
 use ncursesw::*;
 use ncursesw::normal::*;
-use shims::ncurses::ACS_CKBOARD;
+use ncursesw::shims::ncurses::ACS_CKBOARD;
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let win = initscr()?;
 
     let color_pair = if has_colors() {

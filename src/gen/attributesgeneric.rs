@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use shims::ncurses::attr_t;
+use crate::shims::ncurses::attr_t;
 
 /// Generic attributes methods.
 pub trait AttributesGeneric {

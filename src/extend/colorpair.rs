@@ -25,16 +25,16 @@
 
 use std::convert::Into;
 
-use shims::ncurses;
-use extend::{Colors, Color};
-use gen::{ColorPairType, ColorPairGeneric, ColorPairColors};
-use gen::{ColorType, ColorsType};
-use ncursescolortype::*;
-use ncurseswerror::NCurseswError;
 use crate::{
-    SCREEN,
-    init_extended_pair, extended_pair_content,
-    init_extended_pair_sp, extended_pair_content_sp
+    shims::{ncurses, ncurses::SCREEN},
+    extend::{Colors, Color},
+    gen::{ColorPairType, ColorPairGeneric, ColorPairColors, ColorType, ColorsType},
+    ncursescolortype::*,
+    ncurseswerror::NCurseswError,
+    ncurses::{
+        init_extended_pair, extended_pair_content,
+        init_extended_pair_sp, extended_pair_content_sp
+    }
 };
 
 /// A extended color pair.

@@ -26,22 +26,24 @@
 
 use std::{mem, slice, ptr};
 
-use crate::shims::{
-    bindings,
-    bindings::{
-        chtype, wchar_t, va_list, TYPE_ALNUM, TYPE_ALPHA, TYPE_ENUM,
-        TYPE_INTEGER, TYPE_NUMERIC, TYPE_REGEXP, TYPE_IPV4
+use crate::{
+    shims::{
+        bindings,
+        bindings::{
+            chtype, wchar_t, va_list, TYPE_ALNUM, TYPE_ALPHA, TYPE_ENUM,
+            TYPE_INTEGER, TYPE_NUMERIC, TYPE_REGEXP, TYPE_IPV4
+        },
+        ncurses::{SCREEN, WINDOW}
     },
-    ncurses::{SCREEN, WINDOW}
+    cstring::FromCStr,
+    nform::fieldtype::FieldType
 };
-use cstring::FromCStr;
-use nform::fieldtype::FieldType;
 
 pub type FIELD = *mut bindings::FIELD;
 pub type FIELDTYPE = *mut bindings::FIELDTYPE;
 pub type FORM = *mut bindings::FORM;
 
-pub use bindings::Form_Hook;
+pub use crate::bindings::Form_Hook;
 
 static MODULE_PATH: &str = "ncursesw::shims::nform::";
 

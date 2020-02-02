@@ -1,7 +1,7 @@
 /*
     src/panels/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -26,6 +26,4 @@ mod funcs;
 mod ncurseswpanelserror;
 mod paneluserptr;
 
-pub use panels::funcs::*;
-pub use panels::ncurseswpanelserror::*;
-pub use panels::paneluserptr::*;
+pub use self::{funcs::*, ncurseswpanelserror::*, paneluserptr::*};

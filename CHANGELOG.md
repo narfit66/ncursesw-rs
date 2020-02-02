@@ -3,6 +3,7 @@
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
 ## [?.?.?] - ????.??.??
+- Upgraded source code to rust 2018 edition.
 - `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
 
 ## [0.5.1] - 2020.01.30

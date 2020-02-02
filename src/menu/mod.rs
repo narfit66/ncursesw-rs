@@ -31,13 +31,7 @@ mod menusize;
 mod menuuserptr;
 mod ncurseswmenuerror;
 
-pub use menu::funcs::*;
-pub use menu::itemoption::*;
-pub use menu::itemoptions::*;
-pub use menu::menuoption::*;
-pub use menu::menuoptions::*;
-pub use menu::menurequest::*;
-pub use menu::menuspacing::*;
-pub use menu::menusize::*;
-pub use menu::menuuserptr::*;
-pub use menu::ncurseswmenuerror::*;
+pub use self::{
+    funcs::*, itemoption::*, itemoptions::*, menuoption::*, menuoptions::*,
+    menurequest::*, menuspacing::*, menusize::*, menuuserptr::*, ncurseswmenuerror::*
+};

@@ -26,10 +26,10 @@
 #![allow(missing_debug_implementations)]
 #![allow(clippy::missing_safety_doc)]
 
-use bindings;
-use shims::ncurses;
-
-use constants::{TRUE, FALSE};
+use crate::shims::{
+    bindings, ncurses,
+    constants::{TRUE, FALSE}
+};
 
 pub type PANEL = *mut bindings::panel;
 pub type PANEL_USERPTR = *const libc::c_void;

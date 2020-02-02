@@ -20,9 +20,11 @@
     IN THE SOFTWARE.
 */
 
-use origin::Origin;
-use shims::{ncurses, npanels, constants::{OK, ERR}};
-use panels::{NCurseswPanelsError, PanelUserPtr};
+use crate::{
+    origin::Origin,
+    shims::{ncurses, npanels, constants::{OK, ERR}},
+    panels::{NCurseswPanelsError, PanelUserPtr}
+};
 
 type WINDOW = ncurses::WINDOW;
 

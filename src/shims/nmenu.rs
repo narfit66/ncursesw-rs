@@ -28,8 +28,10 @@
 
 use std::{mem, slice, ffi::CStr};
 
-use shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::{SCREEN, WINDOW}};
-use cstring::FromCStr;
+use crate::{
+    shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::{SCREEN, WINDOW}},
+    cstring::FromCStr
+};
 
 pub type MENU = *mut bindings::MENU;
 pub type ITEM = *mut bindings::ITEM;

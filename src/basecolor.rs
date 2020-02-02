@@ -1,7 +1,7 @@
 /*
     src/basecolor.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -24,13 +24,15 @@
 
 use std::str::FromStr;
 
-use ncurseswerror::NCurseswError;
-use shims::{
-    constants::{
-        COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-        COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
-    },
-    ncurses::short_t
+use crate::{
+    ncurseswerror::NCurseswError,
+    shims::{
+        constants::{
+            COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+            COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+        },
+        ncurses::short_t
+    }
 };
 
 /// One of the 8 base colors.

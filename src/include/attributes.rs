@@ -1,7 +1,7 @@
 /*
     src/include/attributes.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,16 +20,19 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, Into};
-use std::ops::{BitOr, BitXor};
+use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
 
-use gen::{AttributesType, AttributesGeneric};
-
-use shims::ncurses::attr_t;
-use shims::constants::{
-    A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE, A_REVERSE, A_BLINK, A_DIM,
-    A_BOLD, A_ALTCHARSET, A_INVIS, A_PROTECT, A_HORIZONTAL, A_LEFT, A_LOW,
-    A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC
+use crate::{
+    gen::{AttributesType, AttributesGeneric},
+    shims::{
+        ncurses::attr_t,
+        constants::{
+            A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE,
+            A_REVERSE, A_BLINK, A_DIM, A_BOLD, A_ALTCHARSET,
+            A_INVIS, A_PROTECT, A_HORIZONTAL, A_LEFT, A_LOW,
+            A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC
+        }
+    }
 };
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

@@ -23,8 +23,7 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::missing_safety_doc)]
 
-use bindings;
-use shims;
+use crate::{bindings, shims};
 
 type WINDOW = shims::ncurses::WINDOW;
 type SCREEN = shims::ncurses::SCREEN;

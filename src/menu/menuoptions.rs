@@ -22,8 +22,7 @@
 
 use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
 
-use menu::MenuOption;
-use shims::constants;
+use crate::{menu::MenuOption, shims::constants};
 
 /// Menu options.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]

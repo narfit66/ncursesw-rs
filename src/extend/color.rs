@@ -25,15 +25,17 @@
 
 use std::convert::{From, Into};
 
-use basecolor::BaseColor;
-use gen::ColorType;
-use ncurseswerror::NCurseswError;
-use ncursescolortype::*;
-use extend::rgb::RGB;
-use shims::constants::COLOR_WHITE;
 use crate::{
-    SCREEN, init_extended_color, extended_color_content,
-    init_extended_color_sp, extended_color_content_sp
+    basecolor::BaseColor,
+    gen::ColorType,
+    ncurseswerror::NCurseswError,
+    ncursescolortype::*,
+    extend::rgb::RGB,
+    shims::{ncurses::SCREEN, constants::COLOR_WHITE},
+    ncurses::{
+        init_extended_color, extended_color_content,
+        init_extended_color_sp, extended_color_content_sp
+    }
 };
 
 const EXT_COLOR_WHITE: i32 = COLOR_WHITE as i32;

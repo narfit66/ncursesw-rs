@@ -28,8 +28,7 @@
 
 use std::{char, ptr};
 
-use cstring::*;
-use shims::bindings;
+use crate::{cstring::*, shims::bindings};
 
 pub type short_t = i16;
 pub type chtype = bindings::chtype;
@@ -46,7 +45,7 @@ static MODULE_PATH: &str = "ncursesw::shims::ncurses::";
 
 mod wrapped {
     use libc::{c_int, c_char};
-    use bindings::{chtype, WINDOW};
+    use crate::bindings::{chtype, WINDOW};
 
     extern "C" {
         pub static curscr: *mut WINDOW;

@@ -22,11 +22,13 @@
 
 use std::convert::{From, TryInto, Into};
 
-use gen::{AttributesType, ColorPairType, ColorAttributeTypes};
-use ncurseswerror::NCurseswError;
-use shims::bindings::cchar_t;
-use wide::WideChar;
-use crate::{setcchar, wunctrl};
+use crate::{
+    gen::{AttributesType, ColorPairType, ColorAttributeTypes},
+    ncurseswerror::NCurseswError,
+    shims::bindings::cchar_t,
+    wide::WideChar,
+    ncurses::{setcchar, wunctrl}
+};
 
 /// Complex character (wide character and rendition).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

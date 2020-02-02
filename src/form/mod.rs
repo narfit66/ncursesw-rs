@@ -31,13 +31,8 @@ mod formrequest;
 mod funcs;
 mod ncurseswformerror;
 
-pub use form::fieldinfo::*;
-pub use form::fieldjustification::*;
-pub use form::fieldoption::*;
-pub use form::fieldoptions::*;
-pub use form::fieldparameters::*;
-pub use form::formoption::*;
-pub use form::formoptions::*;
-pub use form::formrequest::*;
-pub use form::funcs::*;
-pub use form::ncurseswformerror::*;
+pub use self::{
+    fieldinfo::*, fieldjustification::*, fieldoption::*, fieldoptions::*,
+    fieldparameters::*, formoption::*, formoptions::*, formrequest::*,
+    funcs::*, ncurseswformerror::*
+};

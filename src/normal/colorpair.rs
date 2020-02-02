@@ -25,15 +25,17 @@
 
 use std::{convert::{TryFrom, From, Into}, ops::BitOr};
 
-use gen::{ColorType, ColorsType, ColorPairType, ColorPairGeneric, ColorPairColors};
-use normal::{Attribute, Attributes, Colors, Color};
-use ncursescolortype::*;
-use ncurseswerror::NCurseswError;
-use shims::{ncurses, ncurses::{attr_t, short_t}};
 use crate::{
-    SCREEN, COLOR_PAIR, PAIR_NUMBER,
-    init_pair, pair_content,
-    init_pair_sp, pair_content_sp
+    gen::{ColorType, ColorsType, ColorPairType, ColorPairGeneric, ColorPairColors},
+    normal::{Attribute, Attributes, Colors, Color},
+    ncursescolortype::*,
+    ncurseswerror::NCurseswError,
+    shims::{ncurses, ncurses::{SCREEN, attr_t, short_t}},
+    ncurses::{
+        COLOR_PAIR, PAIR_NUMBER,
+        init_pair, pair_content,
+        init_pair_sp, pair_content_sp
+    }
 };
 
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]

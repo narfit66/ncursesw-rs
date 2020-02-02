@@ -22,12 +22,13 @@
 
 #![allow(non_camel_case_types)]
 
-use std::time;
-use std::convert::TryFrom;
+use std::{time, convert::TryFrom};
 
-use mouse::{NCurseswMouseError, OriginResult, constants::NCURSES_MOUSE_VERSION};
-use crate::Origin;
-use shims::{ncurses, nmouse, bindings, constants::{OK, ERR}};
+use crate::{
+    mouse::{NCurseswMouseError, OriginResult, constants::NCURSES_MOUSE_VERSION},
+    origin::Origin,
+    shims::{ncurses, nmouse, bindings, constants::{OK, ERR}}
+};
 
 type WINDOW = ncurses::WINDOW;
 type SCREEN = ncurses::SCREEN;

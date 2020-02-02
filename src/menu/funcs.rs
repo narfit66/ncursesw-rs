@@ -24,14 +24,20 @@ use std::{ptr, ffi::CString};
 
 use errno::errno;
 
-use normal;
-
-use cstring::*;
-use shims::{nmenu, bindings, ncurses::{SCREEN, WINDOW}, constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND}};
-use menu::{
-    ItemOptions, MenuOptions, MenuSpacing, MenuRequest, MenuSize, MenuUserPtr,
-    ncurseswmenuerror::{
-        NCurseswMenuError, ncursesw_menu_error_system_error, ncursesw_menu_error_from_rc
+use crate::{
+    normal,
+    cstring::*,
+    shims::{
+        nmenu, bindings, ncurses::{SCREEN, WINDOW},
+        constants::{E_OK, E_NO_MATCH, E_UNKNOWN_COMMAND}
+    },
+    menu::{
+        ItemOptions, MenuOptions, MenuSpacing, MenuRequest,
+        MenuSize, MenuUserPtr,
+        ncurseswmenuerror::{
+            NCurseswMenuError, ncursesw_menu_error_system_error,
+            ncursesw_menu_error_from_rc
+        }
     }
 };
 

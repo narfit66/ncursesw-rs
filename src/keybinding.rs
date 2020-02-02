@@ -1,7 +1,7 @@
 /*
     src/keybinding.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use shims::constants::*;
+use crate::shims::constants::*;
 
 /// Keys returned by ncurses `get` functions.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

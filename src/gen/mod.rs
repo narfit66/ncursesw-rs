@@ -1,7 +1,7 @@
 /*
     src/gen/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -32,14 +32,9 @@ mod colortype;
 mod getcharactertype;
 mod rawwithnul;
 
-pub use gen::attributescolorpairtype::*;
-pub use gen::attributesgeneric::*;
-pub use gen::attributestype::*;
-pub use gen::colorattributetypes::*;
-pub use gen::colorpaircolors::*;
-pub(crate) use gen::colorpairgeneric::*;
-pub use gen::colorpairtype::*;
-pub use gen::colorstype::*;
-pub use gen::colortype::*;
-pub use gen::getcharactertype::*;
-pub(in crate) use gen::rawwithnul::*;
+pub use self::{
+    attributescolorpairtype::*, attributesgeneric::*, attributestype::*,
+    colorattributetypes::*, colorpaircolors::*, colorpairtype::*,
+    colorstype::*, colortype::*, getcharactertype::*
+};
+pub(in crate) use crate::gen::{colorpairgeneric::*, rawwithnul::*};

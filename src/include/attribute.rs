@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use shims::constants::{
+use crate::shims::constants::{
     A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE, A_REVERSE, A_BLINK, A_DIM,
     A_BOLD, A_ALTCHARSET, A_INVIS, A_PROTECT, A_HORIZONTAL, A_LEFT, A_LOW,
     A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC

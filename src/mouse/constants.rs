@@ -1,7 +1,7 @@
 /*
     src/mouse/constants.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,14 +20,14 @@
     IN THE SOFTWARE.
 */
 
-use bindings;
+use crate::shims::bindings;
 
 wrap_const!(NCURSES_MOUSE_VERSION: i32);
 
 const MASK_SHIFT: i32     = 7 - NCURSES_MOUSE_VERSION;
 const MODIFIER_SHIFT: i32 = 4 + NCURSES_MOUSE_VERSION;
 
-/* Mouse Support */
+// Mouse Support
 macro_rules! ncurses_mouse_mask( ($b: expr, $m: expr) => ($m << (($b - 1) * MASK_SHIFT)); );
 
 wrap_const!(NCURSES_BUTTON_RELEASED: i32);
@@ -37,7 +37,7 @@ wrap_const!(NCURSES_DOUBLE_CLICKED: i32);
 wrap_const!(NCURSES_TRIPLE_CLICKED: i32);
 wrap_const!(NCURSES_RESERVED_EVENT: i32);
 
-/* event masks */
+// Event masks
 pub const BUTTON1_RELEASED: i32       = ncurses_mouse_mask!(1, NCURSES_BUTTON_RELEASED);
 pub const BUTTON1_PRESSED: i32        = ncurses_mouse_mask!(1, NCURSES_BUTTON_PRESSED);
 pub const BUTTON1_CLICKED: i32        = ncurses_mouse_mask!(1, NCURSES_BUTTON_CLICKED);

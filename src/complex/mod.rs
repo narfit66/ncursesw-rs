@@ -1,7 +1,7 @@
 /*
     src/complex/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -24,6 +24,4 @@ mod cchart;
 mod char;
 mod string;
 
-pub use complex::cchart::*;
-pub use complex::char::*;
-pub use complex::string::*;
+pub use self::{cchart::*, char::*, string::*};

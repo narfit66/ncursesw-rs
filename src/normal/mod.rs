@@ -1,7 +1,7 @@
 /*
     src/normal/mod.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -28,10 +28,7 @@ mod colorpair;
 mod colors;
 mod rgb;
 
-pub use normal::attribute::*;
-pub use normal::attributes::*;
-pub use normal::attributescolorpair::*;
-pub use normal::color::*;
-pub use normal::colorpair::*;
-pub use normal::colors::*;
-pub use normal::rgb::*;
+pub use self::{
+    attribute::*, attributes::*, attributescolorpair::*, color::*,
+    colorpair::*, colors::*, rgb::*
+};

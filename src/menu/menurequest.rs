@@ -22,8 +22,7 @@
 
 use std::convert::TryFrom;
 
-use shims::constants;
-use menu::NCurseswMenuError;
+use crate::{shims::constants, menu::NCurseswMenuError};
 
 /// Menu request.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

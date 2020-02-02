@@ -108,29 +108,16 @@ mod region;
 mod size;
 mod softlabeltype;
 
-pub use chtypet::*;
-pub use complex::*;
-pub use wide::*;
+pub use crate::{
+    chtypet::*, complex::*, wide::*,
 
-pub use attributescolorpairset::*;
-pub use basecolor::*;
-pub use characterresult::*;
-pub use changed::*;
-pub use cursortype::*;
-pub use funcs::*;
-pub use gen::*;
-pub use justification::*;
-pub use keybinding::*;
-pub use legacy::*;
-pub use ncurses::*;
-pub use ncursescolortype::*;
-pub use ncurseswerror::*;
-pub use origin::*;
-pub use orientation::*;
-pub use region::*;
-use shims::*;
-pub use size::*;
-pub use softlabeltype::*;
+    attributescolorpairset::*, basecolor::*, characterresult::*,
+    changed::*, cursortype::*, funcs::*, gen::*, justification::*,
+    keybinding::*, legacy::*, ncurses::*, ncursescolortype::*,
+    ncurseswerror::*, origin::*, orientation::*, region::*,
+    size::*, softlabeltype::*
+};
+use crate::shims::*;
 
 /// NCurses window raw pointer.
 pub type WINDOW = shims::ncurses::WINDOW;

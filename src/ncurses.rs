@@ -30,32 +30,19 @@ use std::{
     path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
 
-use constants::{
-    ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
-    KEY_EVENT, TRUE, FALSE
+use crate::{
+    constants::{
+        ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
+        KEY_EVENT, TRUE, FALSE
+    },
+    normal, extend,
+    attributescolorpairset::*, changed::*, characterresult::*,
+    chtypet::*, complex::*, cursortype::*, cstring::*, gen::*,
+    keybinding::*, legacy::*, origin::*, orientation::*,
+    justification::*, wide::*, ncursescolortype::*,
+    ncurseswerror::*, region::*, size::*, softlabeltype::*,
+    shims::{funcs, ncurses, bindings}
 };
-
-use {normal, extend};
-use attributescolorpairset::*;
-use changed::*;
-use characterresult::*;
-use chtypet::*;
-use complex::*;
-use cursortype::*;
-use cstring::*;
-use gen::*;
-use keybinding::*;
-use legacy::*;
-use origin::*;
-use orientation::*;
-use justification::*;
-use wide::*;
-use ncursescolortype::*;
-use ncurseswerror::*;
-use region::*;
-use size::*;
-use softlabeltype::*;
-use shims::{funcs, ncurses, bindings};
 
 static MODULE_PATH: &str = "ncursesw::ncurses::";
 

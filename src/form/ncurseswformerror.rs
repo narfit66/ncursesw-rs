@@ -23,7 +23,8 @@
 use std::{num, ffi, convert};
 
 use errno::{Errno, errno};
-use shims::constants;
+
+use crate::shims::constants;
 
 custom_error::custom_error! {
 /// NCursesw form errors.

@@ -22,7 +22,7 @@
 
 use semver::Version;
 
-use shims::bindings;
+use crate::shims::bindings;
 
 /// Return the semantic version of the NCurses library.
 pub fn ncurses_version() -> Version {

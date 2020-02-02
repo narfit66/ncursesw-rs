@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use gen::{ColorType, ColorAttributeTypes};
+use crate::gen::{ColorType, ColorAttributeTypes};
 
 /// Background and foreground colors.
 pub trait ColorsType<C, T>

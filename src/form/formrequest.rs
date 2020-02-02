@@ -22,8 +22,7 @@
 
 use std::convert::TryFrom;
 
-use shims::constants;
-use form::NCurseswFormError;
+use crate::{shims::constants, form::NCurseswFormError};
 
 /// Form request.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

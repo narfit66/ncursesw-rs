@@ -1,7 +1,7 @@
 /*
     src/wide/string.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -24,9 +24,7 @@
 
 use std::convert::{From, Into};
 
-use gen::*;
-use shims::ncurses::wchar_t;
-use wide::WideChar;
+use crate::{gen::*, shims::ncurses::wchar_t, wide::WideChar};
 
 /// Wide character string (UTF-8).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

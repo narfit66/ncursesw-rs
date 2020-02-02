@@ -1,7 +1,7 @@
 /*
     src/shims/nform/fieldtype.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use bindings::{FIELDTYPE, va_list};
+use crate::shims::bindings::{FIELDTYPE, va_list};
 
 pub enum FieldType {
     AlphaNumeric(i32),

@@ -20,14 +20,16 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, Into};
-use std::ops::{BitOr, BitXor};
+use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
+
 use ascii::AsciiString;
 
-use gen::*;
-use chtypet::ChtypeChar;
-use shims::ncurses::{chtype, attr_t};
-use normal::{Attribute, Attributes};
+use crate::{
+    gen::*,
+    chtypet::ChtypeChar,
+    shims::ncurses::{chtype, attr_t},
+    normal::{Attribute, Attributes}
+};
 
 /// Ascii string and rendition.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

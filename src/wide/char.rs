@@ -1,7 +1,7 @@
 /*
     src/wide/char.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,12 +20,21 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{TryFrom, From, TryInto, Into};
-use std::char::{CharTryFromError, EscapeUnicode, EscapeDebug, EscapeDefault, ToLowercase, ToUppercase};
+use std::{
+    convert::{TryFrom, From, TryInto, Into},
+    char::{
+        CharTryFromError, EscapeUnicode, EscapeDebug,
+        EscapeDefault, ToLowercase, ToUppercase
+    }
+};
 
-use ncurseswerror::NCurseswError;
-use shims::bindings::WEOF;
-use shims::ncurses::{wint_t, wchar_t};
+use crate::{
+    ncurseswerror::NCurseswError,
+    shims::{
+        bindings::WEOF,
+        ncurses::{wint_t, wchar_t}
+    }
+};
 
 /// Wide character (UTF-8 character).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

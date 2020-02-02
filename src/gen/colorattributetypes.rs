@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use shims::ncurses::short_t;
+use crate::shims::ncurses::short_t;
 
 /// Color attribute type in the NCurses library.
 pub trait ColorAttributeTypes { }
