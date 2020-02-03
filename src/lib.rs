@@ -46,6 +46,8 @@ pub mod features;
 ///
 /// Your program should set up the locale, e.g.,
 /// ```text
+/// use gettextrs;
+///
 /// ncursesw::setlocale(LcCategory::All, "")?;
 /// ```
 /// so that input/output processing will work.

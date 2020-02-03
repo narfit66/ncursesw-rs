@@ -35,7 +35,7 @@ ncursesw = { git = "https://github.com/narfit66/ncursesw-rs" }
 
 As noted above this crate has *only* been tested on Debian based x86_64 Linux.
 
-You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install ncurses into `/usr/lib` with wide character and extended color support.
+You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install NCurses into `/usr/lib` with wide character and extended color support.
 
 To downland, compile and install the NCurses library.
 
@@ -104,7 +104,7 @@ To use the form functions
 use ncursesw::form::*;
 ```
 
-To use wide (utf-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate has been used for this purpose.
+To use wide (UTF-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate has been used for this purpose.
 
 All features are supported as of NCurses ABI 6.1 including ansi 8-bit (normal) colors and color pairs, extended colors and color pairs, characters and strings (with attribute/color rendition), wide (UTF-8) characters and strings, complex characters and strings, soft labels (normal and extended), ripoff lines, panels, mouse, menus, forms and screen functions. I would suggest examining NCurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html), [menu](https://invisible-island.net/ncurses/man/menu.3x.html), [form](https://invisible-island.net/ncurses/man/form.3x.html) and [screen](https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html) documentation. If you get the chance have a read of the book `Dan Gookin's Guide to NCurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
 

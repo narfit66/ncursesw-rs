@@ -1836,12 +1836,7 @@ pub unsafe fn newterm(ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCRE
     assert!(!outfd.is_null(), "{}newterm() : outfd.is_null()", MODULE_PATH);
     assert!(!infd.is_null(), "{}newterm() : infd.is_null()", MODULE_PATH);
 
-    let term_type = match ty {
-        Some(term) => term.as_ptr(),
-        None       => ptr::null()
-    };
-
-    bindings::newterm(term_type, outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
+    bindings::newterm(ty.map_or_else(|| ptr::null(), |term| term.as_ptr()), outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
@@ -3475,12 +3470,7 @@ pub unsafe fn newterm_sp(sp: SCREEN, ty: Option<&[i8]>, outfd: FILE, infd: FILE)
     assert!(!outfd.is_null(), "{}newterm_sp() : outfd.is_null()", MODULE_PATH);
     assert!(!infd.is_null(), "{}newterm_sp() : infd.is_null()", MODULE_PATH);
 
-    let term_type = match ty {
-        Some(term) => term.as_ptr(),
-        None       => ptr::null()
-    };
-
-    bindings::newterm_sp(sp, term_type, outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
+    bindings::newterm_sp(sp, ty.map_or_else(|| ptr::null(), |term| term.as_ptr()), outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>

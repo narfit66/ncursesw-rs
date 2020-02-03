@@ -575,12 +575,7 @@ pub fn def_shell_mode() -> result!(()) {
 /// is negative or zero, any existing string for the given definition
 /// is removed.
 pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    let def = match definition {
-        None    => ptr::null_mut(),
-        Some(s) => unsafe { c_str_with_nul!(s).as_ptr() as *mut i8 }
-    };
-
-    match unsafe { ncurses::define_key(def, KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key(option_str_as_ptr(definition)?, KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key", rc))
     }
@@ -2896,16 +2891,14 @@ pub fn newpad(size: Size) -> result!(WINDOW) {
 /// - another file descriptor for input from the terminal
 ///
 /// If the `term_type` parameter is `None`, $TERM will be used.
-pub fn newterm<O, I>(term_type: Option<&str>, output: O, input: I) -> result!(SCREEN)
+pub fn newterm<O, I>(term: Option<&str>, output: O, input: I) -> result!(SCREEN)
     where O: AsRawFd + Write,
           I: AsRawFd + Read
 {
-    let term = match term_type {
-        Some(ty) => Some(unsafe { c_str_with_nul!(ty) }),
-        None     => None
-    };
-
-    unsafe { ncurses::newterm(term, fdopen(output, "wb+")?, fdopen(input, "rb+")?).ok_or(ncurses_function_error!("newterm")) }
+    unsafe {
+        ncurses::newterm(option_str_as_option_slice(term)?, fdopen(output, "wb+")?, fdopen(input, "rb+")?)
+            .ok_or(ncurses_function_error!("newterm"))
+    }
 }
 
 /// Return a new window, whose left-upper corner is at origin,
@@ -3694,12 +3687,7 @@ pub fn tparm(_s: &str) -> String {
 /// commands typed in advance. This function allows specifying a different
 /// file descriptor for typeahead checking.
 pub fn typeahead<FD: AsRawFd + Read>(file: Option<FD>) -> result!(()) {
-    let fd = match file {
-        Some(f) => f.as_raw_fd(),
-        None    => -1
-    };
-
-    match ncurses::typeahead(fd) {
+    match ncurses::typeahead(file.map_or_else(|| -1, |file| file.as_raw_fd())) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("typeahead", rc))
     }
@@ -4845,12 +4833,7 @@ pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
 
 /// Screen function of `define_key()`.
 pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    let def = match definition {
-        None    => ptr::null_mut(),
-        Some(s) => unsafe { c_str_with_nul!(s).as_ptr() as *mut i8 }
-    };
-
-    match unsafe { ncurses::define_key_sp(screen, def, KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key_sp(screen, option_str_as_ptr(definition)?, KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
     }
@@ -5198,16 +5181,14 @@ pub fn new_prescr() -> result!(SCREEN) {
 }
 
 /// Screen function of `newterm()`.
-pub fn newterm_sp<O, I>(screen: SCREEN, term_type: Option<&str>, output: O, input: I) -> result!(SCREEN)
+pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: O, input: I) -> result!(SCREEN)
     where O: AsRawFd + Write,
           I: AsRawFd + Read
 {
-    let term = match term_type {
-        Some(ty) => Some(unsafe { c_str_with_nul!(ty) }),
-        None     => None
-    };
-
-    unsafe { ncurses::newterm_sp(screen, term, fdopen(output, "wb+")?, fdopen(input, "rb+")?).ok_or(ncurses_function_error!("newterm_sp")) }
+    unsafe {
+        ncurses::newterm_sp(screen, option_str_as_option_slice(term)?, fdopen(output, "wb+")?, fdopen(input, "rb+")?)
+            .ok_or(ncurses_function_error!("newterm_sp"))
+    }
 }
 
 /// Screen function of `newwin()`.
@@ -5531,12 +5512,7 @@ pub fn termname_sp(screen: SCREEN) -> result!(String) {
 
 /// Screen function of `typeahead()`.
 pub fn typeahead_sp<FD: AsRawFd + Read>(screen: SCREEN, file: Option<FD>) -> result!(()) {
-    let fd = match file {
-        Some(f) => f.as_raw_fd(),
-        None    => -1
-    };
-
-    match unsafe { ncurses::typeahead_sp(screen, fd) } {
+    match unsafe { ncurses::typeahead_sp(screen, file.map_or_else(|| -1, |file| file.as_raw_fd())) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("typeahead_sp", rc))
     }
@@ -5655,7 +5631,7 @@ fn _attr_get(screen: Option<SCREEN>) -> result!(AttributesColorPairSet) {
                 )
             }
         }),
-        rc => Err(ncurses_function_error_with_rc!(if screen.is_none() { "attr_get" } else { "attr_get_sp" }, rc))
+        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "attr_get", |_| "attr_get_sp"), rc))
     }
 }
 
@@ -5697,7 +5673,7 @@ fn _getcchar(screen: Option<SCREEN>, wcval: ComplexChar) -> result!(WideCharAndA
 
             Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
         },
-        rc => Err(ncurses_function_error_with_rc!(if screen.is_none() { "getcchar" } else { "getcchar_sp" }, rc))
+        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "getcchar", |_| "getcchar_sp"), rc))
     }
 }
 
@@ -5725,7 +5701,7 @@ fn _wattr_get(screen: Option<SCREEN>, handle: WINDOW) -> result!(AttributesColor
                          )
                      }
               }),
-        rc => Err(ncurses_function_error_with_rc!(if screen.is_none() { "wattr_get" } else { "wattr_get_sp" }, rc))
+        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "wattr_get", |_| "wattr_get_sp"), rc))
     }
 }
 
@@ -5742,4 +5718,20 @@ fn path_as_slice(path: &Path) -> result!(&[i8]) {
     let s = fqname.as_str();
 
     Ok(unsafe { c_str_with_nul!(s) })
+}
+
+// convert a optional &str to a pointer of type i8.
+fn option_str_as_ptr(str: Option<&str>) -> result!(*mut i8) {
+    Ok(match str {
+        Some(str) => unsafe { c_str_with_nul!(str).as_ptr() as *mut i8 },
+        None      => ptr::null_mut()
+    })
+}
+
+// convert a optional &str to a optional slice of type i8.
+fn option_str_as_option_slice(str: Option<&str>) -> result!(Option<&[i8]>) {
+    Ok(match str {
+        Some(str) => Some(unsafe { c_str_with_nul!(str) }),
+        None      => None
+    })
 }

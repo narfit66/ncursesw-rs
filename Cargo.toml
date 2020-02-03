@@ -32,7 +32,7 @@ gettext-rs = "0.4"
 
 [build-dependencies]
 pkg-config = "0.3"
-bindgen = "0.52"
+bindgen = "0.53"
 
 [features]
 # conditional compulation of KEY_RESIZE to return as a NCurseswError::KeyResize (the default) for getch(), mvgetch(),
