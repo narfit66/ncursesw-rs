@@ -808,7 +808,7 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
-            match wch[0] as i32 {
+            match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
@@ -935,7 +935,7 @@ pub fn getch() -> result!(CharacterResult<char>) {
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
-                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+                Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
             }
         }
     }
@@ -1367,7 +1367,7 @@ pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal
 /// `initscr()` is normally the first NCurses routine to call when initializing
 /// a program. A few special routines sometimes need to be called before it; these
 /// are `slk_init()`, `filter()`, `ripoffline()`, `use_env()`.  For multiple-terminal
-/// applications, `newterm()` may be called before `initscr`.
+/// applications, `newterm()` may be called before `initscr()`.
 ///
 /// The `initscr()` code determines the terminal type and initializes all NCurses data
 /// structures. `initscr()` also causes the first call to `refresh()` to clear the
@@ -1876,7 +1876,7 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
-            match wch[0] as i32 {
+            match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
@@ -1938,7 +1938,7 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
-                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+                Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
             }
         }
     }
@@ -2433,7 +2433,7 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
-            match wch[0] as i32 {
+            match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
@@ -2497,7 +2497,7 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
-                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+                Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
             }
         }
     }
@@ -3710,9 +3710,9 @@ pub fn unget_wch(ch: WideChar) -> result!(()) {
     }
 }
 
-/// Push ch so the next getch() will return it.
+/// Push `ch` so the next `getch()` will return it.
 ///
-/// Note: Only one ch can be pushed before `getch()` is called.
+/// Note: Only one `ch` can be pushed before `getch()` is called.
 pub fn ungetch(ch: char) -> result!(()) {
     match ncurses::ungetch(i32::from(ch as u8)) {
         OK => Ok(()),
@@ -3731,6 +3731,12 @@ pub fn untouchwin(handle: WINDOW) -> result!(()) {
 /// Allow use of default values for colors on terminals supporting this
 /// feature. Use this to support transparency in your application.
 /// The default color is assigned to the color `Color::TerminalDefault`.
+///
+/// The following are equivalent:
+/// ```text
+/// use_default_colors()?;
+/// assume_default_colors(Colors::new(Color::TerminalDefault, Color::TerminalDefault));
+/// ```
 pub fn use_default_colors() -> result!(()) {
     match ncurses::use_default_colors() {
         OK => Ok(()),
@@ -4204,7 +4210,7 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
-            match wch[0] as i32 {
+            match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
@@ -4276,7 +4282,7 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
-                Ok(CharacterResult::Character(char::from(rc as i8 as u8)))
+                Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
             }
         }
     }
