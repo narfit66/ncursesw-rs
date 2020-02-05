@@ -76,7 +76,7 @@ use ncursesw::*;
 
 This crate follows the basic principles that are used when using NCurses with `C`, it supports the standard ascii functions (the `add` type functions seem to support unicode characters out of the box in NCurses ABI 6.1 if not earlier), ascii characters with rendition (`chtype`), wide characters (`wchar_t`/`wint_t`) and complex characters with rendition (`cchar_t`).
 
-Color pairs and attributes (rendition) are dealt with in two modules. The `normal` module deals with the standard `ansi` color pairs defined internally within NCurses as `short_t/i16` and the `extend` module is for extended color pairs that are defined internally within NCurses as `i32`. Because the `normal` color pairs are actually an attribute within NCurses both modules also implement there own `attribute` and `attributes` types.
+Color pairs and attributes (rendition) are dealt with in two modules. The `normal` module deals with the standard `ansi` color pairs defined internally within NCurses as `short_t/i16` and the `extend` module is for extended color pairs that are defined internally within NCurses as `i32`. Because the `normal` color pairs are actually an attribute within NCurses both modules also implement there own `Attribute` and `Attributes` types.
 
 To use attributes and color pairs
 ```

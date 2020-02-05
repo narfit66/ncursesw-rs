@@ -1,5 +1,5 @@
 /*
-    examples/getch-test.rs
+    examples/get_wch-test.rs
 
     Copyright (c) 2020 Stephen Whittle  All rights reserved.
 
@@ -51,7 +51,7 @@ fn menu_test() -> Result<(), NCurseswError> {
     origin.x = 19;
 
     loop {
-        let result_type = getch()?;
+        let result_type = get_wch()?;
 
         r#move(origin)?;
         clrtoeol()?;
@@ -64,11 +64,11 @@ fn menu_test() -> Result<(), NCurseswError> {
                     mvaddstr(origin, &format!("{:?}, KeyBinding = {:?}", result_type, result_type_as_keybinding))?;
                 }
             },
-            CharacterResult::Character(result_type_as_char)  => {             // received a character.
-                if result_type_as_char.to_ascii_lowercase() == 'q' {          // recieved a 'q' or 'Q' character.
-                    mvaddstr(origin, &format!("'{}' is not for quit.", result_type_as_char))?;
+            CharacterResult::Character(result_type_as_widechar)  => {         // received a character.
+                if result_type_as_widechar.to_ascii_lowercase() == 'q' {      // recieved a 'q' or 'Q' character.
+                    mvaddstr(origin, &format!("'{}' is not for quit.", result_type_as_widechar.as_char()?))?;
                 } else {
-                    mvaddstr(origin, &format!("{:?}, char = {}", result_type, result_type_as_char))?;
+                    mvaddstr(origin, &format!("{:?}, char = {}", result_type, result_type_as_widechar.as_char()?))?;
                 }
             }
         };
