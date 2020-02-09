@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{ptr, ffi::CString};
+use std::{ptr, ffi::CString, convert::TryFrom};
 
 use errno::errno;
 
@@ -264,8 +264,8 @@ pub fn menu_opts_on(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 }
 
 /// Returns the given menu's pad character. The default is a blank.
-pub fn menu_pad(menu: MENU) -> char {
-    unsafe { nmenu::menu_pad(menu) as u8 as char }
+pub fn menu_pad(menu: MENU) -> menu_result!(char) {
+    Ok(char::from(u8::try_from(u32::try_from(unsafe { nmenu::menu_pad(menu) })?)?))
 }
 
 /// Returns the pattern buffer of the given menu.
@@ -531,7 +531,7 @@ pub fn set_menu_opts(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 /// Sets the character used to fill the space between the name and description
 /// parts of a menu item.
 pub fn set_menu_pad(menu: MENU, pad: char) -> menu_result!(()) {
-    match unsafe { nmenu::set_menu_pad(menu, i32::from(pad as u8)) } {
+    match unsafe { nmenu::set_menu_pad(menu, i32::from(u8::try_from(u32::from(pad))?)) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_pad", rc))
     }

@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::ptr;
+use std::{ptr, convert::TryFrom};
 
 use errno::errno;
 
@@ -203,8 +203,8 @@ pub fn field_opts_on(field: FIELD, opts: FieldOptions) -> form_result!(()) {
 }
 
 /// Returns the given form's pad character. The default is a blank.
-pub fn field_pad(field: FIELD) -> char {
-    unsafe { nform::field_pad(field) as u8 as char }
+pub fn field_pad(field: FIELD) -> form_result!(char) {
+    Ok(char::from(u8::try_from(u32::try_from(unsafe { nform::field_pad(field) })?)?))
 }
 
 /// Gets the current field status value. The status is `true` whenever the field changes.
@@ -543,7 +543,7 @@ pub fn set_field_opts(field: FIELD, opts: FieldOptions) -> form_result!(()) {
 
 /// Sets the character used to fill the field.
 pub fn set_field_pad(field: FIELD, pad: char) -> form_result!(()) {
-    match unsafe { nform::set_field_pad(field, i32::from(pad as u8)) } {
+    match unsafe { nform::set_field_pad(field, i32::from(u8::try_from(u32::from(pad))?)) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_pad", rc))
     }
