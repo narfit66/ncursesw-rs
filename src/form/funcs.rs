@@ -124,8 +124,8 @@ pub fn field_buffer(field: FIELD, buffer_number: i32) -> form_result!(Vec<i8>) {
 pub fn field_count(form: FORM) -> form_result!(i32) {
     let rc = unsafe { nform::field_count(form) };
 
-    if rc < 0 {
-        Err(NCurseswFormError::UnknownError { func: "field_count".to_string(), errno: rc })
+    if rc.is_negative() {
+        Err(form_function_unknown_error!("field_count", rc))
     } else {
         Ok(rc)
     }
@@ -140,8 +140,8 @@ pub fn field_fore(field: FIELD) -> normal::Attributes {
 pub fn field_index(field: FIELD) -> form_result!(i32) {
     let rc = unsafe { nform::field_index(field) };
 
-    if rc < 0 {
-        Err(NCurseswFormError::UnknownError { func: "field_index".to_string(), errno: rc })
+    if rc.is_negative() {
+        Err(form_function_unknown_error!("field_index", rc))
     } else {
         Ok(rc)
     }
@@ -310,8 +310,8 @@ pub fn form_opts_on(form: FORM, opts: FormOptions) -> form_result!(()) {
 pub fn form_page(form: FORM) -> form_result!(i32) {
     let rc = unsafe { nform::form_page(form) };
 
-    if rc < 0 {
-        Err(NCurseswFormError::UnknownError { func: "form_page".to_string(), errno: rc })
+    if rc.is_negative() {
+        Err(form_function_unknown_error!("form_page", rc))
     } else {
         Ok(rc)
     }
@@ -490,8 +490,11 @@ pub fn set_field_back(field: FIELD, attr: normal::Attributes) -> form_result!(()
     }
 }
 
-/// Sets the associated status flag of field; field_status gets the current value.
-/// The status flag is set to a nonzero value whenever the field changes.
+/// Sets the numbered buffer of the given field to contain a given string:
+///
+/// - Buffer 0 is the displayed value of the field.
+/// - Other numbered buffers may be allocated by applications but are not
+///   manipulated by the forms library.
 pub fn set_field_buffer(field: FIELD, buffer_number: i32, buffer: &[i8]) -> form_result!(()) {
     match unsafe { nform::set_field_buffer(field, buffer_number, buffer) } {
         E_OK => Ok(()),

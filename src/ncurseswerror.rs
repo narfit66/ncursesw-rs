@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{num, char, ffi};
+use std::{num, char, ffi, convert};
 use errno::Errno;
 use crate::{
     COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
@@ -42,6 +42,7 @@ pub NCurseswError
     IntError { source: num::TryFromIntError } = "{source}",
     CharError { source: char::CharTryFromError } = "{source}",
     NulError { source: ffi::NulError } = "{source}",
+    Infallible { source: convert::Infallible } = "{source}",
 
     // Error types for internal module errors.
 

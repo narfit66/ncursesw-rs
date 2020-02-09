@@ -40,9 +40,11 @@ macro_rules! mouse_function_error_with_rc { ($func: expr, $rc: expr) => { NCurse
 
 macro_rules! menu_function_error { ($func: expr) => { ncursesw_menu_error_system_error($func) } }
 macro_rules! menu_function_error_with_rc { ($func: expr, $rc: expr) => { ncursesw_menu_error_from_rc($func, $rc) } }
+macro_rules! menu_function_unknown_error { ($func: expr, $rc: expr) => { NCurseswMenuError::UnknownError { func: String::from($func), errno: $rc } } }
 
 macro_rules! form_function_error { ($func: expr) => { ncursesw_form_error_system_error($func) } }
 macro_rules! form_function_error_with_rc { ($func: expr, $rc: expr) => { ncursesw_form_error_from_rc($func, $rc) } }
+macro_rules! form_function_unknown_error { ($func: expr, $rc: expr) => { NCurseswFormError::UnknownError { func: String::from($func), errno: $rc } } }
 
 macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type = bindings::$name as $type; } }
 

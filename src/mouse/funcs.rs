@@ -106,7 +106,7 @@ pub fn mouseinterval(delay: Option<time::Duration>) -> mouse_result!(time::Durat
         nmouse::mouseinterval(-1)
     };
 
-    if rc < 0 {
+    if rc.is_negative() {
         Err(mouse_function_error_with_rc!("mouseinterval", rc))
     } else {
         Ok(time::Duration::from_millis(u64::try_from(rc)?))
@@ -192,7 +192,7 @@ pub fn mouseinterval_sp(screen: SCREEN, delay: Option<time::Duration>) -> mouse_
         nmouse::mouseinterval_sp(screen, -1)
     }};
 
-    if rc < 0 {
+    if rc.is_negative() {
         Err(mouse_function_error_with_rc!("mouseinterval_sp", rc))
     } else {
         Ok(time::Duration::from_millis(u64::try_from(rc)?))

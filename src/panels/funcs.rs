@@ -124,8 +124,8 @@ pub fn panel_below(panel: Option<PANEL>) -> panels_result!(PANEL) {
 } 
 
 /// Sets the panel's user pointer.
-pub fn set_panel_userptr(panel: PANEL, ptr: PanelUserPtr) -> panels_result!(()) {
-    match unsafe { npanels::set_panel_userptr(panel, ptr) } {
+pub fn set_panel_userptr(panel: PANEL, userptr: PanelUserPtr) -> panels_result!(()) {
+    match unsafe { npanels::set_panel_userptr(panel, userptr) } {
         OK => Ok(()),
         rc => Err(panels_function_error_with_rc!("set_panel_userptr", rc))
     }

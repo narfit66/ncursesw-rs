@@ -22,6 +22,8 @@
 
 use crate::{gen::GetCharacterType, keybinding::KeyBinding};
 
+/// Return a `GetCharacterType` from the `getch()` and
+/// `get_wch()` families of functions.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CharacterResult<T: GetCharacterType> {
     Key(KeyBinding),

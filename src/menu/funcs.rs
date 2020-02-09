@@ -96,8 +96,8 @@ pub fn free_menu(menu: MENU) -> menu_result!(()) {
 pub fn item_count(menu: MENU) -> menu_result!(i32) {
     let rc = unsafe { nmenu::item_count(menu) };
 
-    if rc < 0 {
-        Err(NCurseswMenuError::UnknownError { func: "item_count".to_string(), errno: rc })
+    if rc.is_negative() {
+        Err(menu_function_unknown_error!("item_count", rc))
     } else {
         Ok(rc)
     }
@@ -112,8 +112,8 @@ pub fn item_description(item: ITEM) -> menu_result!(String) {
 pub fn item_index(item: ITEM) -> menu_result!(i32) {
     let rc = unsafe { nmenu::item_index(item) };
 
-    if rc < 0 {
-        Err(NCurseswMenuError::UnknownError { func: "item_index".to_string(), errno: rc })
+    if rc.is_negative() {
+        Err(menu_function_unknown_error!("item_index", rc))
     } else {
         Ok(rc)
     }

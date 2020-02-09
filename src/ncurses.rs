@@ -699,10 +699,10 @@ pub fn erase() -> result!(()) {
 pub fn erasechar() -> result!(char) {
     let rc = ncurses::erasechar();
 
-    if rc < 0 {
+    if rc.is_negative() {
         Err(ncurses_function_error_with_rc!("erasechar", i32::from(rc)))
     } else {
-        Ok(char::from(rc as u8))
+        Ok(char::from(u8::try_from(rc)?))
     }
 }
 
@@ -813,11 +813,11 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
         rc           => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("get_wch", rc))
             } else {
                 Ok(CharacterResult::Character(WideChar::from(wch[0])))
@@ -837,7 +837,7 @@ pub fn get_wstr() -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("get_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}get_wstr() : ptr.is_null()", MODULE_PATH);
@@ -869,7 +869,7 @@ pub fn getattrs(handle: WINDOW) -> normal::Attributes {
 pub fn getbegx(handle: WINDOW) -> result!(i32) {
     let x = unsafe { ncurses::getbegx(handle) };
 
-    if x < 0 {
+    if x.is_negative() {
         Err(ncurses_function_error_with_rc!("getbegx", x))
     } else {
         Ok(x)
@@ -880,7 +880,7 @@ pub fn getbegx(handle: WINDOW) -> result!(i32) {
 pub fn getbegy(handle: WINDOW) -> result!(i32) {
     let y = unsafe { ncurses::getbegy(handle) };
 
-    if y < 0 {
+    if y.is_negative() {
         Err(ncurses_function_error_with_rc!("getbegy", y))
     } else {
         Ok(y)
@@ -892,9 +892,9 @@ pub fn getbegyx(handle: WINDOW) -> result!(Origin) {
     let y = unsafe { ncurses::getbegy(handle) };
     let x = unsafe { ncurses::getbegx(handle) };
 
-    if y < 0 {
+    if y.is_negative() {
         Err(ncurses_function_error_with_rc!("getbegyx (y)", y))
-    } else if x < 0 {
+    } else if x.is_negative() {
         Err(ncurses_function_error_with_rc!("getbegyx (x)", x))
     } else {
         Ok(Origin { y, x })
@@ -930,7 +930,7 @@ pub fn getch() -> result!(CharacterResult<char>) {
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getch", rc))
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
@@ -945,7 +945,7 @@ pub fn getch() -> result!(CharacterResult<char>) {
 pub fn getcurx(handle: WINDOW) -> result!(i32) {
     let x = unsafe { ncurses::getcurx(handle) };
 
-    if x < 0 {
+    if x.is_negative() {
         Err(ncurses_function_error_with_rc!("getcurx", x))
     } else {
         Ok(x)
@@ -956,7 +956,7 @@ pub fn getcurx(handle: WINDOW) -> result!(i32) {
 pub fn getcury(handle: WINDOW) -> result!(i32) {
     let y = unsafe { ncurses::getcury(handle) };
 
-    if y < 0 {
+    if y.is_negative() {
         Err(ncurses_function_error_with_rc!("getcury", y))
     } else {
         Ok(y)
@@ -972,7 +972,7 @@ pub fn getcuryx(handle: WINDOW) -> result!(Origin) {
 pub fn getmaxx(handle: WINDOW) -> result!(i32) {
     let x = unsafe { ncurses::getmaxx(handle) };
 
-    if x < 0 {
+    if x.is_negative() {
         Err(ncurses_function_error_with_rc!("getmaxx", x))
     } else {
         Ok(x)
@@ -983,7 +983,7 @@ pub fn getmaxx(handle: WINDOW) -> result!(i32) {
 pub fn getmaxy(handle: WINDOW) -> result!(i32) {
     let y = unsafe { ncurses::getmaxy(handle) };
 
-    if y < 0 {
+    if y.is_negative() {
         Err(ncurses_function_error_with_rc!("getmaxy", y))
     } else {
         Ok(y)
@@ -1007,7 +1007,7 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getn_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}getn_wstr() : ptr.is_null()", MODULE_PATH);
@@ -1038,7 +1038,7 @@ pub fn getnstr(number: i32) -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getnstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}getnstr() : ptr.is_null()", MODULE_PATH);
@@ -1053,7 +1053,7 @@ pub fn getnstr(number: i32) -> result!(String) {
 pub fn getparx(handle: WINDOW) -> result!(i32) {
     let x = unsafe { ncurses::getparx(handle) };
 
-    if x < 0 {
+    if x.is_negative() {
         Err(ncurses_function_error_with_rc!("getparx", x))
     } else {
         Ok(x)
@@ -1064,7 +1064,7 @@ pub fn getparx(handle: WINDOW) -> result!(i32) {
 pub fn getpary(handle: WINDOW) -> result!(i32) {
     let y = unsafe { ncurses::getpary(handle) };
 
-    if y < 0 {
+    if y.is_negative() {
         Err(ncurses_function_error_with_rc!("getpary", y))
     } else {
         Ok(y)
@@ -1087,7 +1087,7 @@ pub fn getstr() -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}getstr() : ptr.is_null()", MODULE_PATH);
@@ -1215,7 +1215,7 @@ pub fn in_wchnstr(number: i32) -> result!(ComplexString) {
         OK => {
             assert!(!ptr.is_null(), "{}in_wchnstr() : ptr.is_null()", MODULE_PATH);
 
-            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
+            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(number)?) }))
         },
         rc => Err(ncurses_function_error_with_rc!("in_wchnstr", rc))
     }
@@ -1251,13 +1251,13 @@ pub fn inchnstr(number: i32) -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::inchnstr(ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("inchnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}inchnstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}inchnstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -1269,13 +1269,13 @@ pub fn inchstr() -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::inchstr(ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("inchstr", len))
     } else {
         assert!(!ptr.is_null(), "{}inchstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}inchstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -1386,7 +1386,7 @@ pub fn innstr(number: i32) -> result!(String) {
 
     let len = unsafe { ncurses::innstr(ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("innstr", len))
     } else {
         assert!(!ptr.is_null(), "{}innstr() : ptr.is_null()", MODULE_PATH);
@@ -1405,13 +1405,13 @@ pub fn innwstr(number: i32) -> result!(WideString) {
 
     let len = unsafe { ncurses::innwstr(ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("innwstr", len))
     } else {
         assert!(!ptr.is_null(), "{}innwstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}innwstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -1487,7 +1487,7 @@ pub fn instr() -> result!(String) {
 
     let len = unsafe { ncurses::instr(ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("instr", len))
     } else {
         assert!(!ptr.is_null(), "{}instr() : ptr.is_null()", MODULE_PATH);
@@ -1617,7 +1617,7 @@ pub fn isendwin() -> bool {
 pub fn key_defined(definition: &str) -> result!(KeyBinding) {
     let c = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
 
-    if c < 0 {
+    if c.is_negative() {
         Err(ncurses_function_error_with_rc!("key_defined", c))
     } else {
         Ok(KeyBinding::from(c))
@@ -1672,10 +1672,10 @@ pub fn keypad(handle: WINDOW, flag: bool) -> result!(()) {
 pub fn killchar() -> result!(char) {
     let rc = ncurses::killchar();
 
-    if rc < 0 {
+    if rc.is_negative() {
         Err(ncurses_function_error_with_rc!("killchar", i32::from(rc)))
     } else {
-        Ok(char::from(rc as u8))
+        Ok(char::from(u8::try_from(rc)?))
     }
 }
 
@@ -1881,11 +1881,11 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
         rc           => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvget_wch", rc))
             } else {
                 Ok(CharacterResult::Character(WideChar::from(wch[0])))
@@ -1905,7 +1905,7 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvget_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvget_wstr() : ptr.is_null()", MODULE_PATH);
@@ -1933,7 +1933,7 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetch", rc))
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
@@ -1956,7 +1956,7 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetn_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvgetn_wstr() : ptr.is_null()", MODULE_PATH);
@@ -1987,7 +1987,7 @@ pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetnstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvgetnstr() : ptr.is_null()", MODULE_PATH);
@@ -2009,7 +2009,7 @@ pub fn mvgetstr(origin: Origin) -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvgetstr() : ptr.is_null()", MODULE_PATH);
@@ -2057,7 +2057,7 @@ pub fn mvin_wchnstr(origin: Origin, number: i32) -> result!(ComplexString) {
         OK => {
             assert!(!ptr.is_null(), "{}mvin_wchnstr() : ptr.is_null()", MODULE_PATH);
 
-            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
+            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(number)?) }))
         },
         rc => Err(ncurses_function_error_with_rc!("mvin_wchnstr", rc))
     }
@@ -2093,13 +2093,13 @@ pub fn mvinchnstr(origin: Origin, number: i32) -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::mvinchnstr(origin.y, origin.x, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvinchnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvinchnstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}mvinchnstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -2111,13 +2111,13 @@ pub fn mvinchstr(origin: Origin) -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::mvinchstr(origin.y, origin.x, ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvinchstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvinchstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}mvinchstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -2130,7 +2130,7 @@ pub fn mvinnstr(origin: Origin, number: i32) -> result!(String) {
 
     let len = unsafe { ncurses::mvinnstr(origin.y, origin.x, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvinnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvinnstr() : ptr.is_null()", MODULE_PATH);
@@ -2149,13 +2149,13 @@ pub fn mvinnwstr(origin: Origin, number: i32) -> result!(WideString) {
 
     let len = unsafe { ncurses::mvinnwstr(origin.y, origin.x, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvinnwstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvinnwstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}mvinnwstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -2215,7 +2215,7 @@ pub fn mvinstr(origin: Origin) -> result!(String) {
 
     let len = unsafe { ncurses::mvinstr(origin.y, origin.x, ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvinstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvinstr() : ptr.is_null()", MODULE_PATH);
@@ -2420,9 +2420,16 @@ pub fn mvwdelch(handle: WINDOW, origin: Origin) -> result!(()) {
     }
 }
 
-/// Get a wide character. Return a character for most keys, or an `KeyBinding`
-/// for function keys, keypad keys, and other special keys. In no-delay mode,
-/// raise a `NCurseswError` if there is no input.
+/// Return an enum of `CharacterResult::Character(WideChar)` for most keys, or
+/// a `CharacterResult::Key(KeyBinding)` for function keys, keypad keys, and
+/// other special keys. In no-delay mode, raise a `NCurseswError` if there is
+/// no input.
+///
+/// If the `keypad()` function has been called with a `flag` of `true` the
+/// NCurses library will interpret some keys such as function keys, keypad
+/// keys and other special keys (this may also include such things as mouse
+/// and resizing events) and return these wrapped in the enum `CharacterResult::Key()`
+/// or a `CharacterResult::Character()` for non-interpreted keys.
 pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<WideChar>) {
     let mut wch: [wint_t; 1] = [0];
 
@@ -2438,11 +2445,11 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
         rc           => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwget_wch", rc))
             } else {
                 Ok(CharacterResult::Character(WideChar::from(wch[0])))
@@ -2462,7 +2469,7 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwget_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvwget_wstr() : ptr.is_null()", MODULE_PATH);
@@ -2481,9 +2488,16 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     }
 }
 
-/// Return a character for most keys, or an `KeyBinding` for function keys,
-/// keypad keys, and other special keys. In no-delay mode, raise a `NCurseswError`
-/// if there is no input.
+/// Return an enum of `CharacterResult::Character(char)` for most keys, or a
+/// `CharacterResult::Key(KeyBinding)` for function keys, keypad keys, and
+/// other special keys. In no-delay mode, raise a `NCurseswError` if there is
+/// no input.
+///
+/// If the `keypad()` function has been called with a `flag` of `true` the
+/// NCurses library will interpret some keys such as function keys, keypad
+/// keys and other special keys (this may also include such things as mouse
+/// and resizing events) and return these wrapped in the enum `CharacterResult::Key()`
+/// or a `CharacterResult::Character()` for non-interpreted keys.
 pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>) {
     match unsafe { ncurses::mvwgetch(handle, origin.y, origin.x) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
@@ -2492,7 +2506,7 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetch", rc))
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
@@ -2516,7 +2530,7 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetn_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvwgetn_wstr() : ptr.is_null()", MODULE_PATH);
@@ -2548,7 +2562,7 @@ pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetnstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvwgetnstr() : ptr.is_null()", MODULE_PATH);
@@ -2570,7 +2584,7 @@ pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}mvwgetstr() : ptr.is_null()", MODULE_PATH);
@@ -2633,7 +2647,7 @@ pub fn mvwin_wchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Com
         OK => {
             assert!(!ptr.is_null(), "{}mvwin_wchnstr() : ptr.is_null()", MODULE_PATH);
 
-            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
+            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(number)?) }))
         },
         rc => Err(ncurses_function_error_with_rc!("mvwin_wchnstr", rc))
     }
@@ -2670,13 +2684,13 @@ pub fn mvwinchnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Chtyp
 
     let len = unsafe { ncurses::mvwinchnstr(handle, origin.y, origin.x, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvwinchnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvwinchnstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}mvwinchnstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -2688,13 +2702,13 @@ pub fn mvwinchstr(handle: WINDOW, origin: Origin) -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::mvwinchstr(handle, origin.y, origin.x, ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvwinchstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvwinchstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}mvwinchstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -2707,7 +2721,7 @@ pub fn mvwinnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String)
 
     let len = unsafe { ncurses::mvwinnstr(handle, origin.y, origin.x, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvwinnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvwinnstr() : ptr.is_null()", MODULE_PATH);
@@ -2726,13 +2740,13 @@ pub fn mvwinnwstr(handle: WINDOW, origin: Origin, number: i32) -> result!(WideSt
 
     let len = unsafe { ncurses::mvwinnwstr(handle, origin.y, origin.x, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvwinnwstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvwinnwstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}mvwinnwstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -2808,7 +2822,7 @@ pub fn mvwinstr(handle: WINDOW, origin: Origin) -> result!(String) {
 
     let len = unsafe { ncurses::mvwinstr(handle, origin.y, origin.x, ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("mvwinstr", len))
     } else {
         assert!(!ptr.is_null(), "{}mvwinstr() : ptr.is_null()", MODULE_PATH);
@@ -3331,7 +3345,7 @@ pub fn setcchar<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(Complex
           T: ColorAttributeTypes
 {
     let mut cchar_buf: [cchar_t; 1] = unsafe { mem::zeroed() };
-    let wchar_buf: [wchar_t; 2] = [u32::from(ch) as wchar_t, 0x00];
+    let wchar_buf: [wchar_t; 2] = [wchar_t::try_from(u32::from(ch))?, 0x00];
 
     let cchar_ptr: *mut cchar_t = cchar_buf.as_mut_ptr();
 
@@ -4215,11 +4229,11 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
                 #[cfg(feature = "key_event_as_error")]
                 KEY_EVENT  => Err(NCurseswError::KeyEvent),
-                _          => Ok(CharacterResult::Key(KeyBinding::from(wch[0])))
+                _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
         rc           => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wget_wch", rc))
             } else {
                 Ok(CharacterResult::Character(WideChar::from(wch[0])))
@@ -4239,7 +4253,7 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wget_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}wget_wstr() : ptr.is_null()", MODULE_PATH);
@@ -4277,7 +4291,7 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
         #[cfg(feature = "key_event_as_error")]
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetch", rc))
             } else if rc >= KEY_MIN && rc <= KEY_MAX {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
@@ -4305,7 +4319,7 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetn_wstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}wgetn_wstr() : ptr.is_null()", MODULE_PATH);
@@ -4336,7 +4350,7 @@ pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetnstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}wgetnstr() : ptr.is_null()", MODULE_PATH);
@@ -4376,7 +4390,7 @@ pub fn wgetstr(handle: WINDOW) -> result!(String) {
         KEY_RESIZE => Err(NCurseswError::KeyResize),
         KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
-            if rc < 0 {
+            if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetstr", rc))
             } else {
                 assert!(!ptr.is_null(), "{}wgetstr() : ptr.is_null()", MODULE_PATH);
@@ -4424,7 +4438,7 @@ pub fn win_wchnstr(handle: WINDOW, number: i32) -> result!(ComplexString) {
         OK => {
             assert!(!ptr.is_null(), "{}win_wchnstr() : ptr.is_null()", MODULE_PATH);
 
-            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, number as usize) }))
+            Ok(ComplexString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(number)?) }))
         },
         rc => Err(ncurses_function_error_with_rc!("win_wchnstr", rc))
     }
@@ -4460,13 +4474,13 @@ pub fn winchnstr(handle: WINDOW, number: i32) -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::winchnstr(handle, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("winchnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}winchnstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}winchnstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -4478,13 +4492,13 @@ pub fn winchstr(handle: WINDOW) -> result!(ChtypeString) {
 
     let len = unsafe { ncurses::winchstr(handle, ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("inchstr", len))
     } else {
         assert!(!ptr.is_null(), "{}winchstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}winchstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(ChtypeString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -4497,7 +4511,7 @@ pub fn winnstr(handle: WINDOW, number: i32) -> result!(String) {
 
     let len = unsafe { ncurses::winnstr(handle, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("winnstr", len))
     } else {
         assert!(!ptr.is_null(), "{}winnstr() : ptr.is_null()", MODULE_PATH);
@@ -4516,13 +4530,13 @@ pub fn winnwstr(handle: WINDOW, number: i32) -> result!(WideString) {
 
     let len = unsafe { ncurses::winnwstr(handle, ptr, number) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("winnwstr", len))
     } else {
         assert!(!ptr.is_null(), "{}winnwstr() : ptr.is_null()", MODULE_PATH);
         assert!(len > 0 && len <= LINE_MAX as i32, "{}winnwstr() : len={}, LINE_MAX={}", MODULE_PATH, len, LINE_MAX);
 
-        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, len as usize) }))
+        Ok(WideString::from(unsafe { slice::from_raw_parts(ptr, usize::try_from(len)?) }))
     }
 }
 
@@ -4602,7 +4616,7 @@ pub fn winstr(handle: WINDOW) -> result!(String) {
 
     let len = unsafe { ncurses::winstr(handle, ptr) };
 
-    if len < 0 {
+    if len.is_negative() {
         Err(ncurses_function_error_with_rc!("winstr", len))
     } else {
         assert!(!ptr.is_null(), "{}winstr() : ptr.is_null()", MODULE_PATH);
@@ -4756,7 +4770,7 @@ pub fn wunctrl(ch: ComplexChar) -> result!(WideChar) {
     let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
 
     match unsafe { ncurses::wunctrl(wch.as_mut_ptr()) } {
-        Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] as wchar_t })),
+        Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
         None      => Err(ncurses_function_error!("wunctrl"))
     }
 }
@@ -4897,10 +4911,10 @@ pub fn endwin_sp(screen: SCREEN) -> result!(()) {
 pub fn erasechar_sp(screen: SCREEN) -> result!(char) {
     let rc = unsafe { ncurses::erasechar_sp(screen) };
 
-    if rc < 0 {
+    if rc.is_negative() {
         Err(ncurses_function_error_with_rc!("erasechar_sp", i32::from(rc)))
     } else {
-        Ok(char::from(rc as u8))
+        Ok(char::from(u8::try_from(rc)?))
     }
 }
 
@@ -5108,7 +5122,7 @@ pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> result!(S
 pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(KeyBinding) {
     let c = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
 
-    if c < 0 {
+    if c.is_negative() {
         Err(ncurses_function_error_with_rc!("key_defined_sp", c))
     } else {
         Ok(KeyBinding::from(c))
@@ -5132,10 +5146,10 @@ pub fn keyok_sp(screen: SCREEN, keycode: KeyBinding, enable: bool) -> result!(()
 pub fn killchar_sp(screen: SCREEN) -> result!(char) {
     let rc = unsafe { ncurses::killchar_sp(screen) };
 
-    if rc < 0 {
+    if rc.is_negative() {
         Err(ncurses_function_error_with_rc!("killchar_sp", i32::from(rc)))
     } else {
-        Ok(char::from(rc as u8))
+        Ok(char::from(u8::try_from(rc)?))
     }
 }
 
@@ -5589,7 +5603,7 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
     let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
 
     match unsafe { ncurses::wunctrl_sp(screen, wch.as_mut_ptr()) } {
-        Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] as wchar_t })),
+        Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
         None      => Err(ncurses_function_error!("wunctrl_sp"))
     }
 }

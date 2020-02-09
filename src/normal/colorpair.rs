@@ -38,6 +38,7 @@ use crate::{
     }
 };
 
+/// A color pair comprising of a foreground and background color.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct ColorPair {
     screen: Option<SCREEN>,
@@ -80,11 +81,7 @@ impl ColorPair {
 
 impl ColorPairColors<Colors, Color, short_t> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        if let Some(sp) = self.screen {
-            pair_content_sp(sp, *self)
-        } else {
-            pair_content(*self)
-        }
+        self.screen.map_or_else(|| pair_content(*self), |screen| pair_content_sp(screen, *self))
     }
 }
 
@@ -126,6 +123,18 @@ impl Into<i32> for ColorPair {
     }
 }
 
+/// Accepts a parameter for foreground and background color, and checks if
+/// that color combination is already associated with a color pair, returning
+/// an existing color pair or a new color pair.
+///
+/// - If the combination already exists, returns the existing pair.
+/// - If the combination does not exist, allocates a new color pair and
+///   returns that.
+/// - If the table fills up, discards the least-recently allocated entry
+///   and allocates a new color pair.
+///
+/// All of the color pairs are allocated from a table of possible color pairs.
+/// The size of the table is determined by the terminfo pairs capability.
 pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
     let number = ncurses::alloc_pair(colors.foreground().number(), colors.background().number());
 
@@ -136,6 +145,8 @@ pub fn alloc_pair(colors: Colors) -> result!(ColorPair) {
     }
 }
 
+/// Returns a color pair if the given color combination has been associated
+/// with a color pair, or `None` if not.
 pub fn find_pair(colors: Colors) -> result!(Option<ColorPair>) {
     let number = ncurses::find_pair(colors.foreground().number(), colors.background().number());
 
@@ -146,7 +157,8 @@ pub fn find_pair(colors: Colors) -> result!(Option<ColorPair>) {
     })
 }
 
-pub fn alloc_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(ColorPair) {
+/// Screen function of `alloc_pair()`.
+pub fn alloc_pair_sp(screen: SCREEN, colors: Colors) -> result!(ColorPair) {
     let number = unsafe { ncurses::alloc_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
 
     if number.is_negative() {
@@ -156,7 +168,8 @@ pub fn alloc_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(ColorPa
     }
 }
 
-pub fn find_pair_sp(screen: ncurses::SCREEN, colors: Colors) -> result!(Option<ColorPair>) {
+/// Screen function of `find_pair()`.
+pub fn find_pair_sp(screen: SCREEN, colors: Colors) -> result!(Option<ColorPair>) {
     let number = unsafe { ncurses::find_pair_sp(screen, colors.foreground().number(), colors.background().number()) };
 
     Ok(if number.is_negative() {
