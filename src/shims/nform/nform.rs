@@ -562,9 +562,7 @@ pub unsafe fn set_fieldtype_choice(
 /// <https://invisible-island.net/ncurses/man/form_field_userptr.3x.html>
 pub unsafe fn set_field_userptr(field: FIELD, userptr: Option<*mut libc::c_void>) -> i32 {
     assert!(!field.is_null(), "{}set_field_userptr() : field.is_null()", MODULE_PATH);
-    if let Some(userptr) = userptr {
-        assert!(!userptr.is_null(), "{}set_field_userptr() : userptr.is_null()", MODULE_PATH);
-    }
+    assert!(userptr.map_or_else(|| true, |userptr| !userptr.is_null()), "{}set_field_userptr() : userptr.is_null()", MODULE_PATH);
 
     bindings::set_field_userptr(field, return_mut_ptr!(userptr))
 }
@@ -601,12 +599,8 @@ pub unsafe fn set_form_page(form: FORM, n: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>
 pub unsafe fn set_form_sub(form: Option<FORM>, sub: Option<WINDOW>) -> i32 {
-    if let Some(form) = form {
-        assert!(!form.is_null(), "{}set_form_sub() : form.is_null()", MODULE_PATH);
-    }
-    if let Some(sub) = sub {
-        assert!(!sub.is_null(), "{}set_form_sub() : sub.is_null()", MODULE_PATH);
-    }
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_form_sub() : form.is_null()", MODULE_PATH);
+    assert!(sub.map_or_else(|| true, |sub| !sub.is_null()), "{}set_form_sub() : sub.is_null()", MODULE_PATH);
 
     bindings::set_form_sub(return_mut_ptr!(form), return_mut_ptr!(sub))
 }
@@ -621,21 +615,15 @@ pub unsafe fn set_form_term(form: FORM, func: Form_Hook) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_userptr.3x.html>
 pub unsafe fn set_form_userptr(form: FORM, userptr: Option<*mut libc::c_void>) -> i32 {
     assert!(!form.is_null(), "{}set_form_userptr() : form.is_null()", MODULE_PATH);
-    if let Some(userptr) = userptr {
-        assert!(!userptr.is_null(), "{}set_form_userptr() : userptr.is_null()", MODULE_PATH);
-    }
+    assert!(userptr.map_or_else(|| true, |userptr| !userptr.is_null()), "{}set_form_userptr() : userptr.is_null()", MODULE_PATH);
 
     bindings::set_form_userptr(form, return_mut_ptr!(userptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>
 pub unsafe fn set_form_win(form: Option<FORM>, win: Option<WINDOW>) -> i32 {
-    if let Some(form) = form {
-        assert!(!form.is_null(), "{}set_form_win() : form.is_null()", MODULE_PATH);
-    }
-    if let Some(win) = win {
-        assert!(!win.is_null(), "{}set_form_win() : win.is_null()", MODULE_PATH);
-    }
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_form_win() : form.is_null()", MODULE_PATH);
+    assert!(win.map_or_else(|| true, |win| !win.is_null()), "{}set_form_win() : win.is_null()", MODULE_PATH);
 
     bindings::set_form_win(return_mut_ptr!(form), return_mut_ptr!(win))
 }

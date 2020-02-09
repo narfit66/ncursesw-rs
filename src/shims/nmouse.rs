@@ -60,9 +60,7 @@ pub fn mouseinterval(erval: i32) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmask_t {
-    if let Some(mask) = oldmask {
-        assert!(!mask.is_null(), "{}mousemask() : oldmask.is_null()", MODULE_PATH);
-    }
+    assert!(oldmask.map_or_else(|| true, |oldmask| !oldmask.is_null()), "{}mousemask() : oldmask.is_null()", MODULE_PATH);
 
     bindings::mousemask(newmask, return_mut_ptr!(oldmask))
 }
@@ -117,9 +115,7 @@ pub unsafe fn mouseinterval_sp(sp: SCREEN, erval: i32) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn mousemask_sp(sp: SCREEN, newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmask_t {
     assert!(!sp.is_null(), "{}mousemask_sp() : sp.is_null()", MODULE_PATH);
-    if let Some(mask) = oldmask {
-        assert!(!mask.is_null(), "{}mousemask_sp() : oldmask.is_null()", MODULE_PATH);
-    }
+    assert!(oldmask.map_or_else(|| true, |oldmask| !oldmask.is_null()), "{}mousemask_sp() : oldmask.is_null()", MODULE_PATH);
 
     bindings::mousemask_sp(sp, newmask, return_mut_ptr!(oldmask))
 }
