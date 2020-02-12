@@ -26,7 +26,7 @@
 
 use libc::{c_void, EINTR};
 use std::{
-    convert::{From, TryFrom}, char, ptr, slice, time, mem,
+    convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
     path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
 
@@ -88,16 +88,16 @@ pub fn COLORS() -> i32 {
     ncurses::COLORS()
 }
 
-#[deprecated(since = "0.4.0", note = "no publicly exposed equivalent.")]
+#[deprecated(since = "0.4.0", note = "use shims::ncurses::COLOR_PAIR() instead")]
 /// Return the attribute value of a given `normal` color pair.
-pub fn COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t {
-    ncurses::COLOR_PAIR(normal::ColorPair::into(color_pair)) as attr_t
+pub fn COLOR_PAIR(color_pair: i32) -> attr_t {
+    ncurses::COLOR_PAIR(color_pair) as attr_t
 }
 
 #[deprecated(since = "0.4.0", note = "use normal::Attributes::color_pair() instead")]
-/// Return the color pair from  given `normal` attributes value.
-pub fn PAIR_NUMBER(attrs: normal::Attributes) -> normal::ColorPair {
-    normal::ColorPair::_from(None, ncurses::PAIR_NUMBER(normal::Attributes::into(attrs)) as short_t)
+/// Return the color pair number from  given `normal` attributes value.
+pub fn PAIR_NUMBER(attrs: attr_t) -> short_t {
+    ncurses::PAIR_NUMBER(attrs.try_into().unwrap()) as short_t
 }
 
 /// Return the number of color pairs available.
@@ -474,17 +474,17 @@ pub fn clrtoeol() -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() or shims::ncurses::color_content() instead")]
 /// Return the intensity of the red, green, and blue (RGB) components in
 /// the color, which must be between 0 and COLORS. Return a structure,
 /// containing the R,G,B values for the given color, which will be
 /// between 0 (no component) and 1000 (maximum amount of component).
-pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
+pub fn color_content(color_number: short_t) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
     let mut b: [short_t; 1] = [0];
 
-    match unsafe { ncurses::color_content(normal::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::color_content(color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(normal::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("color_content", rc))
     }
@@ -716,27 +716,29 @@ pub fn erasewchar() -> result!(WideChar) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() or shims::ncurses::extended_color_content() instead")]
 /// The extended color version of the `color_content()` routine.
-pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
+pub fn extended_color_content(color_number: i32) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
     let mut b: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_color_content(extend::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::extended_color_content(color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(extend::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("extended_color_content", rc))
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() or shims::ncurses::extended_pair_content() instead")]
 /// The extended color version of the `pair_content()` routine.
-pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::Colors) {
+pub fn extended_pair_content(color_pair: i32) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_pair_content(extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0]))),
+    let color_palette = |color_number: i32| extend::ColorPalette::_from(color_number);
+
+    match unsafe { ncurses::extended_pair_content(color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(extend::Colors::new(extend::Color::_from(None, color_palette(fg[0])), extend::Color::_from(None, color_palette(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("extended_pair_content", rc))
     }
 }
@@ -1099,12 +1101,12 @@ pub fn getstr() -> result!(String) {
 }
 
 /// Return the current coordinates of the virtual screen cursor.
-/// If leaveok is currently `true`, then return `Origin { y: -1, x: -1 }`.
-pub fn getsyx() -> result!(Origin) {
+/// If leaveok is currently `true`, then return `None`.
+pub fn getsyx() -> result!(Option<Origin>) {
     if is_leaveok(newscr()) {
-        Ok(Origin { y: -1, x: -1 })
+        Ok(None)
     } else {
-        getcuryx(newscr())
+        Ok(Some(getcuryx(newscr())?))
     }
 }
 
@@ -1279,7 +1281,7 @@ pub fn inchstr() -> result!(ChtypeString) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::Color::set_rgb() or shims::ncurses::init_color() instead")]
 /// Change the definition of a color, taking the number of the color to be
 /// changed followed by three RGB values (for the amounts of red, green,
 /// and blue components). The value of color_number must be between 0 and
@@ -1287,7 +1289,7 @@ pub fn inchstr() -> result!(ChtypeString) {
 /// `init_color()` is used, all occurrences of that color on the screen
 /// immediately change to the new definition. This function is a no-op on
 /// most terminals; it is active only if `can_change_color()` returns `true`.
-pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
+pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(()) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
@@ -1295,16 +1297,16 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
             OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
-                Ok(normal::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_color", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::set_rgb() or shims::ncurses::init_extended_color() instead")]
 /// The extended color version of the `init_color()` routine.
-pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
+pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(()) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
@@ -1312,51 +1314,43 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(exten
             OK => {
                 set_ncurses_colortype(NCursesColorType::Extended);
 
-                Ok(extend::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_extended_color", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() or shims::ncurses::init_extended_pair() instead")]
 /// The extended color version of the `init_pair()` routine.
-pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if pair_number >= COLOR_PAIRS() {
+pub fn init_extended_pair(color_pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
+    if color_pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_extended_pair(pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
-
-                Ok(extend::ColorPair::_from(None, pair_number))
-            },
+        match ncurses::init_extended_pair(color_pair, colors.foreground().number(), colors.background().number()) {
+            OK => Ok(extend::ColorPair::_from(None, color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_extended_pair", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() or shims::ncurses::init_pair() instead")]
 /// Change the definition of a color-pair. It takes two arguments: the number
 /// of the color-pair to be changed, and the foreground and background colors.
-/// The value of pair_number must be between 1 and COLOR_PAIRS - 1 (the 0 color
+/// The value of color_pair must be between 1 and COLOR_PAIRS - 1 (the 0 color
 /// pair is wired to white on black and cannot be changed).
 /// If the color-pair was previously initialized, the screen is refreshed and
 /// all occurrences of that color-pair are changed to the new definition.
-pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(pair_number) >= COLOR_PAIRS() {
+pub fn init_pair(color_pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
+    if i32::from(color_pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_pair(pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Normal);
-
-                Ok(normal::ColorPair::_from(None, pair_number))
-            },
+        match ncurses::init_pair(color_pair, short_t::try_from(colors.foreground().number())?, short_t::try_from(colors.background().number())?) {
+            OK => Ok(normal::ColorPair::_from(None, color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_pair", rc))
         }
     }
@@ -1503,9 +1497,8 @@ pub fn instr() -> result!(String) {
 /// the interrupt, but causing NCurses to have the wrong idea of what is on the
 /// screen. Disabling the option (`flag` is `false`) prevents the flush.
 /// The default for the option is inherited from the tty driver settings.
-/// The window argument is ignored.
-pub fn intrflush(handle: WINDOW, flag: bool) -> result!(()) {
-    match unsafe { ncurses::intrflush(handle, flag) } {
+pub fn intrflush(flag: bool) -> result!(()) {
+    match unsafe { ncurses::intrflush(ptr::null_mut(), flag) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("intrflush", rc))
     }
@@ -3028,15 +3021,17 @@ pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() or shims::ncurses::pair_content() instead")]
 /// Return a structure containing the colors for the requested color pair.
 /// The value of `color_pair` must be between 1 and COLOR_PAIRS - 1.
-pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
+pub fn pair_content(color_pair: short_t) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    match unsafe { ncurses::pair_content(normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0]))),
+    let color_palette = |color_number: short_t| normal::ColorPalette::_from(color_number);
+
+    match unsafe { ncurses::pair_content(color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(normal::Colors::new(normal::Color::_from(None, color_palette(fg[0])), normal::Color::_from(None, color_palette(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("pair_content", rc))
     }
 }
@@ -4831,14 +4826,14 @@ pub fn cbreak_sp(screen: SCREEN) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::Color::rgb_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::Color::rgb() or shims::ncurses::color_content_sp() instead")]
 /// Screen function of `color_content()`.
-pub fn color_content_sp(screen: SCREEN, color: normal::Color) -> result!(normal::RGB) {
+pub fn color_content_sp(screen: SCREEN, color_number: short_t) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
     let mut b: [short_t; 1] = [0];
 
-    match unsafe { ncurses::color_content_sp(screen, normal::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::color_content_sp(screen, color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(normal::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("color_content_sp", rc))
     }
@@ -4918,27 +4913,29 @@ pub fn erasechar_sp(screen: SCREEN) -> result!(char) {
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use extend::Color::rgb_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::Color::rgb() or shims::ncurses::extended_color_content_sp() instead")]
 /// Screen function of `extended_color_content()`.
-pub fn extended_color_content_sp(screen: SCREEN, color: extend::Color) -> result!(extend::RGB) {
+pub fn extended_color_content_sp(screen: SCREEN, color_number: i32) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
     let mut b: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_color_content_sp(screen, extend::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::extended_color_content_sp(screen, color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(extend::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("extended_color_content_sp", rc))
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::colors() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::colors() or shims::ncurses::extended_pair_content_sp() instead")]
 /// Screen function of `extended_pair_content()`.
-pub fn extended_pair_content_sp(screen: SCREEN, color_pair: extend::ColorPair) -> result!(extend::Colors) {
+pub fn extended_pair_content_sp(screen: SCREEN, color_pair: i32) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_pair_content_sp(screen, extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0]))),
+    let color_palette = |color_number: i32| extend::ColorPalette::_from(color_number);
+
+    match unsafe { ncurses::extended_pair_content_sp(screen, color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(extend::Colors::new(extend::Color::_from(Some(screen), color_palette(fg[0])), extend::Color::_from(Some(screen), color_palette(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("extended_pair_content_sp", rc))
     }
 }
@@ -5023,9 +5020,9 @@ pub fn has_key_sp(screen: SCREEN, ch: KeyBinding) -> bool {
     unsafe { ncurses::has_key_sp(screen, KeyBinding::into(ch)) == TRUE }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::Color::new_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::Color::set_rgb() or shims::ncurses::init_color_sp() instead")]
 /// Screen function of `init_color()`.
-pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
+pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> result!(()) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
@@ -5033,16 +5030,16 @@ pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) ->
             OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
-                Ok(normal::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_color_sp", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::Color::new_sp() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::set_rgb() or shims::ncurses::init_extended_color_sp() instead")]
 /// Screen function of `init_extended_color()`.
-pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
+pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> result!(()) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
@@ -5050,54 +5047,46 @@ pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RG
             OK => {
                 set_ncurses_colortype(NCursesColorType::Extended);
 
-                Ok(extend::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_extended_color_sp", rc))
         }
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::new_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::new_sp() or shims::ncurses::init_extended_pair_sp() instead")]
 /// Screen function of `init_extended_pair()`.
-pub fn init_extended_pair_sp(screen: SCREEN, pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if pair_number >= COLOR_PAIRS() {
+pub fn init_extended_pair_sp(screen: SCREEN, color_pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
+    if color_pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match unsafe { ncurses::init_extended_pair_sp(screen, pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) } {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
-
-                Ok(extend::ColorPair::_from(Some(screen), pair_number))
-            },
+        match unsafe { ncurses::init_extended_pair_sp(screen, color_pair, colors.foreground().number(), colors.background().number()) } {
+            OK => Ok(extend::ColorPair::_from(Some(screen), color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_extended_pair_sp", rc))
         }
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::new_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::new_sp() or shims::ncurses::init_pair_sp() instead")]
 /// Screen function of `init_pair()`.
-pub fn init_pair_sp(screen: SCREEN, pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(pair_number) >= COLOR_PAIRS() {
+pub fn init_pair_sp(screen: SCREEN, color_pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
+    if i32::from(color_pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match unsafe { ncurses::init_pair_sp(screen, pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) } {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Normal);
-
-                Ok(normal::ColorPair::_from(Some(screen), pair_number))
-            },
+        match unsafe { ncurses::init_pair_sp(screen, color_pair, short_t::try_from(colors.foreground().number())?, short_t::try_from(colors.background().number())?) } {
+            OK => Ok(normal::ColorPair::_from(Some(screen), color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_pair_sp", rc))
         }
     }
 }
 
 /// Screen function of `intrflush()`.
-pub fn intrflush_sp(screen: SCREEN, window: WINDOW, flag: bool) -> result!(()) {
-    match unsafe { ncurses::intrflush_sp(screen, window, flag) } {
+pub fn intrflush_sp(screen: SCREEN, flag: bool) -> result!(()) {
+    match unsafe { ncurses::intrflush_sp(screen, ptr::null_mut(), flag) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("intrflush_sp", rc))
     }
@@ -5266,14 +5255,16 @@ pub fn noraw_sp(screen: SCREEN) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::colors() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::colors() or shims::ncurses::pair_content_sp() instead")]
 /// Screen function of `pair_content()`.
-pub fn pair_content_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(normal::Colors) {
+pub fn pair_content_sp(screen: SCREEN, color_pair: short_t) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    match unsafe { ncurses::pair_content_sp(screen, normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0]))),
+    let color_palette = |color_number: short_t| normal::ColorPalette::_from(color_number);
+
+    match unsafe { ncurses::pair_content_sp(screen, color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(normal::Colors::new(normal::Color::_from(Some(screen), color_palette(fg[0])), normal::Color::_from(Some(screen), color_palette(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("pair_content_sp", rc))
     }
 }

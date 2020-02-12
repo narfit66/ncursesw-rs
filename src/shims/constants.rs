@@ -35,14 +35,14 @@ wrap_const!(TRUE: i32);
 wrap_const!(FALSE: i32);
 
 // Colors.
-wrap_const!(COLOR_BLACK: i16);
-wrap_const!(COLOR_RED: i16);
-wrap_const!(COLOR_GREEN: i16);
-wrap_const!(COLOR_YELLOW: i16);
-wrap_const!(COLOR_BLUE: i16);
-wrap_const!(COLOR_MAGENTA: i16);
-wrap_const!(COLOR_CYAN: i16);
-wrap_const!(COLOR_WHITE: i16);
+wrap_const!(COLOR_BLACK: i32);
+wrap_const!(COLOR_RED: i32);
+wrap_const!(COLOR_GREEN: i32);
+wrap_const!(COLOR_YELLOW: i32);
+wrap_const!(COLOR_BLUE: i32);
+wrap_const!(COLOR_MAGENTA: i32);
+wrap_const!(COLOR_CYAN: i32);
+wrap_const!(COLOR_WHITE: i32);
 
 /*
  * This value is used in the firstchar and lastchar fields to mark

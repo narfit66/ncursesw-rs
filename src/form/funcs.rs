@@ -99,8 +99,13 @@ pub fn field_arg(field: FIELD) -> form_result!(*mut libc::c_void) {
 }
 
 /// Returns the background attribute. The default is `normal::Attributes::Normal`.
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the field is attached to a form created using `new_form_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
 pub fn field_back(field: FIELD) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nform::field_back(field)) }
+    unsafe { normal::Attributes::_from(None, nform::field_back(field)) }
 }
 
 /// Returns a vector of the contents of the given numbered buffer:
@@ -132,8 +137,13 @@ pub fn field_count(form: FORM) -> form_result!(i32) {
 }
 
 /// Returns the foreground attribute. The default is `normal::Attributes::Standout`.
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the field is attached to a form created using `new_form_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
 pub fn field_fore(field: FIELD) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nform::field_fore(field)) }
+    unsafe { normal::Attributes::_from(None, nform::field_fore(field)) }
 }
 
 /// Returns the index of the field in the field array of the form it is connected to.

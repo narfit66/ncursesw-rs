@@ -25,7 +25,7 @@ macro_rules! define_colors {
         use crate::ncursescolortype::set_ncurses_colortype;
 
         /// Foreground and background colors.
-        #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
+        #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
         pub struct Colors {
             foreground: Color,
             background: Color
@@ -34,6 +34,8 @@ macro_rules! define_colors {
         impl ColorsType<Color, $type> for Colors {
             /// Create a new instance of foreground and background colors.
             fn new(foreground: Color, background: Color) -> Self {
+                assert!(foreground.screen() == background.screen());
+
                 set_ncurses_colortype($extend);
 
                 Self { foreground, background }
