@@ -25,6 +25,7 @@
 
 use crate::{
     normal::{Attribute, ColorPair},
+    gen::ColorPairType,
     ncurses::{COLOR_PAIR, PAIR_NUMBER},
     shims::ncurses::short_t
 };
@@ -34,8 +35,12 @@ include!("../include/attributes.rs");
 impl_attributes_type!(short_t);
 
 impl Attributes {
+    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+        self.screen = screen
+    }
+
     pub fn color_pair(&self) -> ColorPair {
-        PAIR_NUMBER(*self)
+        ColorPair::_from(self.screen, PAIR_NUMBER(self.attrs))
     }
 }
 
@@ -47,8 +52,10 @@ impl BitOr<ColorPair> for Attributes {
     type Output = Attributes;
 
     fn bitor(mut self, rhs: ColorPair) -> Self::Output {
-        self.raw ^= COLOR_PAIR(self.color_pair());
-        self.raw |= COLOR_PAIR(rhs);
+        assert!(self.screen == rhs.screen());
+
+        self.attrs ^= COLOR_PAIR(i32::from(self.color_pair().number()));
+        self.attrs |= COLOR_PAIR(i32::from(rhs.number()));
 
         self
     }
@@ -58,7 +65,9 @@ impl BitXor<ColorPair> for Attributes {
     type Output = Self;
 
     fn bitxor(mut self, rhs: ColorPair) -> Self::Output {
-        self.raw ^= COLOR_PAIR(rhs);
+        assert!(self.screen == rhs.screen());
+
+        self.attrs ^= COLOR_PAIR(i32::from(rhs.number()));
 
         self
     }
@@ -66,6 +75,6 @@ impl BitXor<ColorPair> for Attributes {
 
 impl Into<i32> for Attributes {
     fn into(self) -> i32 {
-        self.raw as i32
+        self.attrs as i32
     }
 }

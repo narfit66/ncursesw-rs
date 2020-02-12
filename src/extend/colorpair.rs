@@ -23,8 +23,6 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::convert::Into;
-
 use crate::{
     shims::{ncurses, ncurses::SCREEN},
     extend::{Colors, Color},
@@ -46,6 +44,8 @@ pub struct ColorPair {
 
 impl ColorPair {
     pub(in crate) fn _from(screen: Option<SCREEN>, number: i32) -> Self {
+        assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Color::_from() : screen.is_null()");
+
         set_ncurses_colortype(NCursesColorType::Extended);
 
         Self { screen, number }
@@ -72,7 +72,7 @@ impl ColorPair {
 
 impl ColorPairColors<Colors, Color, i32> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        self.screen.map_or_else(|| extended_pair_content(*self), |screen| extended_pair_content_sp(screen, *self))
+        self.screen.map_or_else(|| extended_pair_content(self.number()), |screen| extended_pair_content_sp(screen, self.number()))
     }
 }
 
@@ -95,12 +95,6 @@ impl ColorPairGeneric<i32> for ColorPair {
         let ptr: *mut i32 = &mut color_pair;
 
         ptr as *mut libc::c_void
-    }
-}
-
-impl Into<i32> for ColorPair {
-    fn into(self) -> i32 {
-        self.number
     }
 }
 

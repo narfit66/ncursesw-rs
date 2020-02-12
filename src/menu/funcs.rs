@@ -171,8 +171,13 @@ pub fn item_visible(item: ITEM) -> bool {
 }
 
 /// Returns the background attribute. The default is `normal::Attributes::Normal`.
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the menu being accessed was created using `new_menu_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
 pub fn menu_back(menu: MENU) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nmenu::menu_back(menu)) }
+    unsafe { normal::Attributes::_from(None, nmenu::menu_back(menu)) }
 }
 
 /// command-processing loop of the menu system.
@@ -207,8 +212,13 @@ pub fn menu_driver(menu: MENU, request: MenuRequest) -> menu_result!(Option<Menu
 }
 
 /// Returns the foreground attribute. The default is `normal::Attributes::Reverse`.
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the menu being accessed was created using `new_menu_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
 pub fn menu_fore(menu: MENU) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nmenu::menu_fore(menu)) }
+    unsafe { normal::Attributes::_from(None, nmenu::menu_fore(menu)) }
 }
 
 /// Returns the maximum-size constraints for the given menu into the storage
@@ -223,8 +233,13 @@ pub fn menu_format(menu: MENU) -> MenuSize {
 }
 
 /// Returns the grey attribute. The default is `normal::Attributes::Underline`.
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the menu being accessed was created using `new_menu_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
 pub fn menu_grey(menu: MENU) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nmenu::menu_grey(menu)) }
+    unsafe { normal::Attributes::_from(None, nmenu::menu_grey(menu)) }
 }
 
 /// Returns the current menu init hook.

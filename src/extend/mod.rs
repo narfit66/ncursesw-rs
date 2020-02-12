@@ -24,11 +24,12 @@ mod attribute;
 mod attributes;
 mod attributescolorpair;
 mod color;
+mod colorpalette;
 mod colorpair;
 mod colors;
 mod rgb;
 
 pub use self::{
     attribute::*, attributes::*, attributescolorpair::*,
-    color::*, colorpair::*, colors::*, rgb::*
+    color::*, colorpalette::*, colorpair::*, colors::*, rgb::*
 };

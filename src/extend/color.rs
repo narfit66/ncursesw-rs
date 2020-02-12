@@ -20,99 +20,64 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::convert::{From, Into};
-
 use crate::{
-    basecolor::BaseColor,
+    NCurseswError,
     gen::ColorType,
-    ncurseswerror::NCurseswError,
     ncursescolortype::*,
-    extend::rgb::RGB,
-    shims::{ncurses::SCREEN, constants::COLOR_WHITE},
+    extend::{ColorPalette, RGB},
+    shims::ncurses::SCREEN,
     ncurses::{
         init_extended_color, extended_color_content,
         init_extended_color_sp, extended_color_content_sp
     }
 };
 
-const EXT_COLOR_WHITE: i32 = COLOR_WHITE as i32;
-const LIGHT_COLOR_OFFSET: i32 = EXT_COLOR_WHITE + 1;
-
-include!("../include/color.rs");
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-#[repr(i32)]
-pub enum Color {
-    TerminalDefault,
-    Dark(BaseColor),
-    Light(BaseColor),
-    Custom(i32)
+pub struct Color {
+    screen:        Option<SCREEN>,
+    color_palette: ColorPalette
 }
 
 impl Color {
-    pub fn new(number: i32, rgb: RGB) -> result!(Self) {
-        let color = init_extended_color(number, rgb)?;
+    pub(in crate) fn _from(screen: Option<SCREEN>, color_palette: ColorPalette) -> Self {
+        assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Color::_from() : screen.is_null()");
 
         set_ncurses_colortype(NCursesColorType::Extended);
 
-        Ok(color)
+        Self { screen, color_palette }
+    }
+}
+
+impl Color {
+    pub fn new(color_palette: ColorPalette) -> Self {
+        Self::_from(None, color_palette)
     }
 
-    pub fn new_sp(screen: SCREEN, number: i32, rgb: RGB) -> result!(Self) {
-        let color = init_extended_color_sp(screen, number, rgb)?;
+    pub fn new_sp(screen: SCREEN, color_palette: ColorPalette) -> Self {
+        Self::_from(Some(screen), color_palette)
+    }
 
-        set_ncurses_colortype(NCursesColorType::Extended);
+    pub fn screen(&self) -> Option<SCREEN> {
+        self.screen
+    }
 
-        Ok(color)
+    pub fn color_palette(&self) -> ColorPalette {
+        self.color_palette
+    }
+
+    pub fn set_rgb(&self, rgb: RGB) -> result!(()) {
+        self.screen.map_or_else(|| init_extended_color(self.number(), rgb), |screen| init_extended_color_sp(screen, self.number(), rgb))
     }
 
     pub fn rgb(&self) -> result!(RGB) {
-        extended_color_content(*self)
-    }
-
-    pub fn rgb_sp(&self, screen: SCREEN) -> result!(RGB) {
-        extended_color_content_sp(screen, *self)
+        self.screen.map_or_else(|| extended_color_content(self.number()), |screen| extended_color_content_sp(screen, self.number()))
     }
 }
 
 impl ColorType<i32> for Color {
     fn number(&self) -> i32 {
-        Self::into(*self)
-    }
-}
-
-impl From<i32> for Color {
-    fn from(color: i32) -> Self {
-        if color == -1 {
-            Color::default()
-        } else if color <= EXT_COLOR_WHITE {
-            Color::Dark(BaseColor::from_i32(color))
-        } else if color <= EXT_COLOR_WHITE + LIGHT_COLOR_OFFSET {
-            Color::Light(BaseColor::from_i32(color - LIGHT_COLOR_OFFSET))
-        } else {
-            Color::Custom(color)
-        }
-    }
-}
-
-impl Into<i32> for Color {
-    fn into(self) -> i32 {
-        match self {
-            Color::TerminalDefault => -1,
-            Color::Dark(color)     => i32::from(color.dark()),
-            Color::Light(color)    => i32::from(color.light()),
-            Color::Custom(n)       => n
-        }
-    }
-}
-
-impl Default for Color {
-    fn default() -> Self {
-        set_ncurses_colortype(NCursesColorType::Extended);
-
-        Color::TerminalDefault
+        self.color_palette.number()
     }
 }

@@ -2,9 +2,32 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
-## [?.?.?] - ????.??.??
+## [0.6.0] - ????.??.??
 - Upgraded source code to rust 2018 edition.
+- Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
+- Changed signature of `intrflush()` and `intrflush_sp()` to ignore `handle/window` parameter as this is ignored in the NCurses library. [BC]
 - `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
+- Have removed examples "showing" how to use individual functions.
+
+The way that colors are defined has been changed as of this release to cater for screen functionality. The `BaseColor` enum has been replaced by the `ColorPalette` enum which defines the basic colors available (which can be considered the dark colors and were originally wrapped in the `BaseColor::Dark()` enum) and the extended light colors (originally wrapped in the `BaseColor::Light()` enum).
+
+There is an known issue when using the `normal` module and screen functions, this occurs when extracting the `ColorPair` from `Attributes` as the internal screen pointer may not accuratly represent the correct screen, it is up to the client code to rectify this by using either the `Attributes::set_screen()` or `ColorPair::set_screen()` functions to set the screen pointer correctly. This statement is also repeated in [ISSUES.md](https://github.com/narfit66/ncursesw-rs/blob/api-v0.6.0/ISSUES.md).
+
+Although deprecated it should be noted that the following functions have changed their signatures and should be considered as breaking changes:
+- `COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t` has become `COLOR_PAIR(color_pair: i32) -> attr_t`
+- `PAIR_NUMBER(attrs: normal::Attributes) -> normal::ColorPair` has become `PAIR_NUMBER(attrs: attr_t) -> short_t`
+- `color_content(color_number: normal::Color) -> Result<normal::RGB, NCurseswError>` has become `color_content(color_number: short_t) -> Result<normal::RGB, NCurseswError>`
+- `extended_color_content(color_number: extend::Color) -> Result<extend::RGB, NCurseswError>` has become `extended_color_content(color_number: i32) -> Result<extend::RGB, NCurseswError>`
+- `extended_pair_content(color_pair: extend::ColorPair) -> Result<extend::Colors, NCurseswError>` has become `extended_pair_content(color_pair: i32) -> Result<extend::Colors, NCurseswError>`
+- `init_color(color_number: short_t, rgb: normal::RGB) -> Result<normal::Color, NCurseswError>` has become `init_color(color_number: short_t, rgb: normal::RGB) -> Result<(), NCurseswError>`
+- `init_extended_color(color_number: i32, rgb: extend::RGB) -> Result<extend::Color, NCurseswError>` has become `init_extended_color(color_number: i32, rgb: extend::RGB) -> Result<(), NCurseswError>`
+- `pair_content(color_pair: normal::ColorPair) -> Result<normal::Colors, NCurseswError>` has become `pair_content(color_pair: short_t) -> Result<normal::Colors, NCurseswError>`
+- `color_content_sp(screen: SCREEN, color_number: normal::Color) -> Result<normal::RGB, NCurseswError>` has become `color_content_sp(screen: SCREEN, color_number: short_t) -> Result<normal::RGB, NCurseswError>`
+- `extended_color_content_sp(screen: SCREEN, color_number: extend::Color) -> Result<extend::RGB, NCurseswError>` has become `extended_color_content_sp(screen: SCREEN, color_number: i32) -> Result<extend::RGB, NCurseswError>`
+- `extended_pair_content_sp(screen: SCREEN, color_pair: extend::ColorPair) -> Result<extend::Colors, NCurseswError>` has become `extended_pair_content_sp(screen: SCREEN, color_pair: i32) -> Result<extend::Colors, NCurseswError>`
+- `init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> Result<normal::Color, NCurseswError>` has become `init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> Result<(), NCurseswError>`
+- `init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> Result<extend::Color, NCurseswError>` has become `init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> Result<(), NCurseswError>`
+- `pair_content_sp(screen: SCREEN, color_pair: normal::ColorPair) -> Result<normal::Colors, NCurseswError>` has become `pair_content_sp(screen: SCREEN, color_pair: short_t) -> Result<normal::Colors, NCurseswError>`
 
 ## [0.5.1] - 2020.01.30
 - Fix so that crate compiles on `docs.rs` for documentation.

@@ -20,12 +20,12 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
+use std::ops::{BitOr, BitXor};
 
 use crate::{
     gen::{AttributesType, AttributesGeneric},
     shims::{
-        ncurses::attr_t,
+        ncurses::{SCREEN, attr_t},
         constants::{
             A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE,
             A_REVERSE, A_BLINK, A_DIM, A_BOLD, A_ALTCHARSET,
@@ -37,13 +37,22 @@ use crate::{
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Attributes {
-    raw: attr_t
+    screen: Option<SCREEN>,
+    attrs:  attr_t
+}
+
+impl Attributes {
+    pub(in crate) fn _from(screen: Option<SCREEN>, attrs: attr_t) -> Self {
+        assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Attributes::_from() : screen.is_null()");
+
+        Self { screen, attrs }
+    }
 }
 
 macro_rules! attributes_getter {
     ($func: ident, $attr: ident) => {
         fn $func(&self) -> bool {
-            (self.raw & $attr) > 0
+            (self.attrs & $attr) > 0
         }
     };
 }
@@ -52,9 +61,9 @@ macro_rules! attributes_setter {
     ($func: ident, $attr: ident) => {
         fn $func(&mut self, enabled: bool) {
             if enabled {
-                self.raw |= $attr;
+                self.attrs |= $attr;
             } else {
-                self.raw ^= $attr;
+                self.attrs ^= $attr;
             }
         }
     };
@@ -64,11 +73,11 @@ macro_rules! impl_attributes_type {
     ($type: ty) => {
         impl AttributesType<$type> for Attributes {
             fn is_normal(&self) -> bool {
-                self.raw == A_NORMAL
+                self.attrs == A_NORMAL
             }
 
             fn set_normal(&mut self) {
-                self.raw = A_NORMAL
+                self.attrs = A_NORMAL
             }
 
             attributes_getter!(is_char_text, A_CHARTEXT);
@@ -127,7 +136,7 @@ macro_rules! impl_attributes_type {
 
 impl AttributesGeneric for Attributes {
     fn as_attr_t(&self) -> attr_t {
-        self.raw
+        self.attrs
     }
 }
 
@@ -136,7 +145,9 @@ impl BitOr for Attributes {
     type Output = Self;
 
     fn bitor(self, rhs: Self) -> Self::Output {
-        Self { raw: self.raw | rhs.raw }
+        assert!(self.screen == rhs.screen);
+
+        Self::_from(self.screen, self.attrs | rhs.attrs)
     }
 }
 
@@ -145,7 +156,9 @@ impl BitXor for Attributes {
     type Output = Self;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
-        Self { raw: self.raw ^ rhs.raw }
+        assert!(self.screen == rhs.screen);
+
+        Self::_from(self.screen, self.attrs ^ rhs.attrs)
     }
 }
 
@@ -211,7 +224,7 @@ impl BitXor<Attribute> for Attributes {
 
 impl Default for Attributes {
     fn default() -> Self {
-        Self { raw: A_NORMAL }
+        Self::_from(None, A_NORMAL)
     }
 }
 
@@ -222,13 +235,13 @@ impl From<Attribute> for Attributes {
 }
 
 impl From<attr_t> for Attributes {
-    fn from(raw: attr_t) -> Self {
-        Self { raw }
+    fn from(attrs: attr_t) -> Self {
+        Self::_from(None, attrs)
     }
 }
 
 impl Into<attr_t> for Attributes {
     fn into(self) -> attr_t {
-        self.raw
+        self.attrs
     }
 }

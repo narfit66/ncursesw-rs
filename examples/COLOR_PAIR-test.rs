@@ -1,7 +1,7 @@
 /*
-    examples/COLOR_PAIR.rs
+    examples/COLOR_PAIR-test.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -25,20 +25,18 @@
 
 extern crate ncursesw;
 
-use std::str::FromStr;
-use std::error::Error;
-use ncursesw::*;
-use ncursesw::normal::*;
+use std::{str::FromStr, error::Error};
+use ncursesw::{*, normal::*};
 
 fn main() -> Result<(), Box<Error>> {
-    let h = initscr()?;
+    let stdscr = initscr()?;
 
     if has_colors() {
         start_color()?;
 
-        let yellow = Color::from_str("yellow")?;
-        let blue = Color::from_str("blue")?;
-        let green = Color::from_str("blue")?;
+        let yellow = Color::new(ColorPalette::from_str("yellow")?);
+        let blue = Color::new(ColorPalette::from_str("blue")?);
+        let green = Color::new(ColorPalette::from_str("blue")?);
  
         let color_pair0 = ColorPair::default();
         let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
@@ -48,13 +46,13 @@ fn main() -> Result<(), Box<Error>> {
         let color_pair5 = ColorPair::new(5, Colors::new(green, yellow))?;
         let color_pair6 = ColorPair::new(6, Colors::new(green, blue))?;
 
-        addstr(&format!("color pair 0 attribute 0b{:016b}\n", COLOR_PAIR(color_pair0)))?;
-        addstr(&format!("color pair 1 attribute 0b{:016b}\n", COLOR_PAIR(color_pair1)))?;
-        addstr(&format!("color pair 2 attribute 0b{:016b}\n", COLOR_PAIR(color_pair2)))?;
-        addstr(&format!("color pair 3 attribute 0b{:016b}\n", COLOR_PAIR(color_pair3)))?;
-        addstr(&format!("color pair 4 attribute 0b{:016b}\n", COLOR_PAIR(color_pair4)))?;
-        addstr(&format!("color pair 5 attribute 0b{:016b}\n", COLOR_PAIR(color_pair5)))?;
-        addstr(&format!("color pair 6 attribute 0b{:016b}\n", COLOR_PAIR(color_pair6)))?;
+        addstr(&format!("color pair 0 attribute 0b{:016b}\n", COLOR_PAIR(color_pair0.number().into())))?;
+        addstr(&format!("color pair 1 attribute 0b{:016b}\n", COLOR_PAIR(color_pair1.number().into())))?;
+        addstr(&format!("color pair 2 attribute 0b{:016b}\n", COLOR_PAIR(color_pair2.number().into())))?;
+        addstr(&format!("color pair 3 attribute 0b{:016b}\n", COLOR_PAIR(color_pair3.number().into())))?;
+        addstr(&format!("color pair 4 attribute 0b{:016b}\n", COLOR_PAIR(color_pair4.number().into())))?;
+        addstr(&format!("color pair 5 attribute 0b{:016b}\n", COLOR_PAIR(color_pair5.number().into())))?;
+        addstr(&format!("color pair 6 attribute 0b{:016b}\n", COLOR_PAIR(color_pair6.number().into())))?;
     } else {
         addstr("terminal has no color support!!!")?;
     }
@@ -62,7 +60,7 @@ fn main() -> Result<(), Box<Error>> {
     addstr("\n\nhit <return> to continue ")?;
     getch()?;
 
-    delwin(h)?;
+    delwin(stdscr)?;
     endwin()?;
 
     Ok(())

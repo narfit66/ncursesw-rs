@@ -23,10 +23,13 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::{convert::{TryFrom, From, Into}, ops::BitOr};
+use std::{convert::TryFrom, ops::BitOr};
 
 use crate::{
-    gen::{ColorType, ColorsType, ColorPairType, ColorPairGeneric, ColorPairColors},
+    gen::{
+        ColorType, ColorsType, ColorPairType, ColorPairGeneric,
+        ColorPairColors, AttributesGeneric
+    },
     normal::{Attribute, Attributes, Colors, Color},
     ncursescolortype::*,
     ncurseswerror::NCurseswError,
@@ -47,6 +50,8 @@ pub struct ColorPair {
 
 impl ColorPair {
     pub(in crate) fn _from(screen: Option<SCREEN>, number: short_t) -> Self {
+        assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Color::_from() : screen.is_null()");
+
         set_ncurses_colortype(NCursesColorType::Normal);
 
         Self { screen, number }
@@ -71,7 +76,7 @@ impl ColorPair {
     }
 
     pub(in crate) fn as_attr_t(&self) -> attr_t {
-        COLOR_PAIR(*self)
+        COLOR_PAIR(i32::from(self.number()))
     }
 
     pub fn default_sp(screen: SCREEN) -> Self {
@@ -81,7 +86,7 @@ impl ColorPair {
 
 impl ColorPairColors<Colors, Color, short_t> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        self.screen.map_or_else(|| pair_content(*self), |screen| pair_content_sp(screen, *self))
+        self.screen.map_or_else(|| pair_content(self.number()), |screen| pair_content_sp(screen, self.number()))
     }
 }
 
@@ -105,21 +110,9 @@ impl BitOr<Attribute> for ColorPair {
     }
 }
 
-impl Into<short_t> for ColorPair {
-    fn into(self) -> short_t {
-        self.number
-    }
-}
-
 impl From<Attributes> for ColorPair {
     fn from(attrs: Attributes) -> Self {
-        PAIR_NUMBER(attrs)
-    }
-}
-
-impl Into<i32> for ColorPair {
-    fn into(self) -> i32 {
-        i32::from(self.number)
+        Self::_from(None, PAIR_NUMBER(attrs.as_attr_t()))
     }
 }
 
