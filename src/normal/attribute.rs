@@ -22,7 +22,7 @@
 
 use std::{convert::Into, ops::BitOr};
 
-use crate::{normal::{Attributes, ColorPair}, shims::ncurses::attr_t};
+use crate::{ColorPairType, normal::{Attributes, ColorPair}, shims::ncurses::attr_t};
 
 include!("../include/attribute.rs");
 
@@ -43,6 +43,6 @@ impl BitOr<ColorPair> for Attribute {
         let attributes: attr_t = Attributes::into(Attributes::default());
         let attribute: attr_t = Self::into(self);
 
-        Attributes::from(attributes | attribute | rhs.as_attr_t())
+        Attributes::_from(rhs.screen(), attributes | attribute | rhs.as_attr_t())
     }
 }

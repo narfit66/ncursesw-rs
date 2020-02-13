@@ -227,7 +227,31 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
 
 /// Equivalent of `wattr_get()` using `stdscr()` as window `handle`.
 pub fn attr_get() -> result!(AttributesColorPairSet) {
-    _attr_get(None)
+    let mut attrs: [attr_t; 1] = [0];
+    let mut color_pair: [short_t; 1] = [0];
+    let mut opts: [i32; 1] = [0];
+
+    match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
+        OK => Ok(match ncurses_colortype() {
+            NCursesColorType::Normal => {
+                AttributesColorPairSet::Normal(
+                    normal::AttributesColorPair::new(
+                        normal::Attributes::_from(None, attrs[0]),
+                        normal::ColorPair::_from(None, color_pair[0])
+                    )
+                )
+            },
+            NCursesColorType::Extended => {
+                AttributesColorPairSet::Extended(
+                    extend::AttributesColorPair::new(
+                        extend::Attributes::_from(None, attrs[0]),
+                        extend::ColorPair::_from(None, opts[0])
+                    )
+                )
+            }
+        }),
+        rc => Err(ncurses_function_error_with_rc!("attr_get", rc))
+    }
 }
 
 /// Equivalent of `wattr_off()` using `stdscr()` as window `handle`.
@@ -864,7 +888,7 @@ pub fn get_wstr() -> result!(WideString) {
 /// wide-character library configuration, color pairs may not fit into
 /// a chtype, so `wattr_get()` is the only way to obtain the color information.
 pub fn getattrs(handle: WINDOW) -> normal::Attributes {
-    normal::Attributes::from(unsafe { ncurses::getattrs(handle) as attr_t })
+    normal::Attributes::_from(None, unsafe { ncurses::getattrs(handle) as attr_t })
 }
 
 /// Return a `x` of co-ordinates of upper-left corner.
@@ -920,7 +944,45 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
 
 /// Get a widecharacter string and rendition from a complex character.
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    _getcchar(None, wcval)
+    let mut wch: [wchar_t; bindings::CCHARW_MAX as usize] = [0; bindings::CCHARW_MAX as usize];
+    let mut attrs: [attr_t; 1] = [0];
+    let mut color_pair: [short_t; 1] = [0];
+    let opts: *mut i32 = ptr::null_mut();
+
+    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, ext_color_pair: i32| -> AttributesColorPairSet {
+        match ncurses_colortype() {
+            NCursesColorType::Normal   => {
+                AttributesColorPairSet::Normal(
+                    normal::AttributesColorPair::new(
+                        normal::Attributes::_from(None, attrs),
+                        normal::ColorPair::_from(None, color_pair)
+                    )
+                )
+            },
+            NCursesColorType::Extended => {
+                AttributesColorPairSet::Extended(
+                    extend::AttributesColorPair::new(
+                        extend::Attributes::_from(None, attrs),
+                        extend::ColorPair::_from(None, ext_color_pair)
+                    )
+                )
+            }
+        }
+    };
+
+    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
+        OK => {
+            // TODO : get opts working correct so not to rely on bodge!
+            //assert!(!opts.is_null(), "{}getcchar() : opts.is_null()", MODULE_PATH);
+            //
+            //Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], unsafe { ptr::read(opts) })))
+
+            let c: cchar_t = ComplexChar::into(wcval); // bodge to get extended color pair.
+
+            Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
+        },
+        rc => Err(ncurses_function_error_with_rc!("getcchar", rc))
+    }
 }
 
 /// Equivalent of `wgetch()` using `stdscr()` as window `handle`.
@@ -1703,7 +1765,8 @@ pub fn longname() -> result!(String) {
     ncurses::longname().ok_or(ncurses_function_error!("longname"))
 }
 
-/// Ship binary data to printer.
+/// Ship binary data to printer. Returns the number of characters
+/// actually sent to the printer.
 ///
 /// This function uses the mc5p or mc4 and mc5 capabilities, if they are
 /// present, to ship given data to a printer attached to the terminal.
@@ -3924,7 +3987,31 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
 
 /// Retrieve attributes for the given window.
 pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
-    _wattr_get(None, handle)
+    let mut attrs: [attr_t; 1] = [0];
+    let mut color_pair: [short_t; 1] = [0];
+    let mut opts: [i32; 1] = [0];
+
+    match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
+        OK => Ok(match ncurses_colortype() {
+                     NCursesColorType::Normal => {
+                         AttributesColorPairSet::Normal(
+                             normal::AttributesColorPair::new(
+                                 normal::Attributes::_from(None, attrs[0]),
+                                 normal::ColorPair::_from(None, color_pair[0])
+                             )
+                         )
+                     },
+                     NCursesColorType::Extended => {
+                         AttributesColorPairSet::Extended(
+                             extend::AttributesColorPair::new(
+                                 extend::Attributes::_from(None, attrs[0]),
+                                 extend::ColorPair::_from(None, opts[0])
+                             )
+                         )
+                     }
+              }),
+        rc => Err(ncurses_function_error_with_rc!("wattr_get", rc))
+    }
 }
 
 /// Turn off window attributes, without affecting other attributes.
@@ -4794,6 +4881,8 @@ pub fn assume_default_colors_sp<S, C, T>(screen: SCREEN, colors: S) -> result!((
           C: ColorType<T>,
           T: ColorAttributeTypes
 {
+    assert!(screen == colors.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::assume_default_colors_sp(screen, colors.foreground().number(), colors.background().number()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("assume_default_colors_sp", rc))
@@ -4960,6 +5049,8 @@ pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
           i32: From<T>,
           T:   ColorAttributeTypes
 {
+    assert!(screen == color_pair.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::free_pair_sp(screen, i32::from(color_pair.number())) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("free_pair_sp", rc))
@@ -5390,6 +5481,8 @@ pub fn set_tabsize_sp(screen: SCREEN, size: i32) -> result!(()) {
 
 /// Screen function of `slk_attroff()`.
 pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::slk_attroff_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attroff_sp", rc))
@@ -5398,6 +5491,8 @@ pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) 
 
 /// Screen function of `slk_attron()`.
 pub fn slk_attron_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::slk_attron_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attron_sp", rc))
@@ -5410,6 +5505,9 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
           P: ColorPairType<T>,
           T: ColorAttributeTypes
 {
+    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == color_pair.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::slk_attr_set_sp(screen, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attr_set_sp", rc))
@@ -5418,6 +5516,8 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
 
 /// Screen function of `slk_attrset()`.
 pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::slk_attrset_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attrset_sp", rc))
@@ -5439,6 +5539,8 @@ pub fn slk_clear_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `slk_color()`.
 pub fn slk_color_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(()) {
+    assert!(screen == color_pair.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+
     match unsafe { ncurses::slk_color_sp(screen, color_pair.number()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_color_sp", rc))
@@ -5596,123 +5698,6 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
     match unsafe { ncurses::wunctrl_sp(screen, wch.as_mut_ptr()) } {
         Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
         None      => Err(ncurses_function_error!("wunctrl_sp"))
-    }
-}
-
-// additional screen functions specific to `ncursesw`.
-
-/// Screen function of `attr_get()`. additional functionality not found in NCurses library.
-pub fn attr_get_sp(screen: SCREEN) -> result!(AttributesColorPairSet) {
-    _attr_get(Some(screen))
-}
-
-/// Screen function of `getcchar()`. additional functionality not found in NCurses library.
-pub fn getcchar_sp(screen: SCREEN, wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    _getcchar(Some(screen), wcval)
-}
-
-/// Screen function of `wattr_get()`. additional functionality not found in NCurses library.
-pub fn wattr_get_sp(screen: SCREEN, handle: WINDOW) -> result!(AttributesColorPairSet) {
-    _wattr_get(Some(screen), handle)
-}
-
-// private functions implementing NCurses functionality.
-
-fn _attr_get(screen: Option<SCREEN>) -> result!(AttributesColorPairSet) {
-    let mut attrs: [attr_t; 1] = [0];
-    let mut color_pair: [short_t; 1] = [0];
-    let mut opts: [i32; 1] = [0];
-
-    match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
-        OK => Ok(match ncurses_colortype() {
-            NCursesColorType::Normal => {
-                AttributesColorPairSet::Normal(
-                    normal::AttributesColorPair::new(
-                        normal::Attributes::from(attrs[0]),
-                        normal::ColorPair::_from(screen, color_pair[0])
-                    )
-                )
-            },
-            NCursesColorType::Extended => {
-                AttributesColorPairSet::Extended(
-                    extend::AttributesColorPair::new(
-                        extend::Attributes::from(attrs[0]),
-                        extend::ColorPair::_from(screen, opts[0])
-                    )
-                )
-            }
-        }),
-        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "attr_get", |_| "attr_get_sp"), rc))
-    }
-}
-
-fn _getcchar(screen: Option<SCREEN>, wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    let mut wch: [wchar_t; bindings::CCHARW_MAX as usize] = [0; bindings::CCHARW_MAX as usize];
-    let mut attrs: [attr_t; 1] = [0];
-    let mut color_pair: [short_t; 1] = [0];
-    let opts: *mut i32 = ptr::null_mut();
-
-    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, ext_color_pair: i32| -> AttributesColorPairSet {
-        match ncurses_colortype() {
-            NCursesColorType::Normal   => {
-                AttributesColorPairSet::Normal(
-                    normal::AttributesColorPair::new(
-                        normal::Attributes::from(attrs),
-                        normal::ColorPair::_from(screen, color_pair)
-                    )
-                )
-            },
-            NCursesColorType::Extended => {
-                AttributesColorPairSet::Extended(
-                    extend::AttributesColorPair::new(
-                        extend::Attributes::from(attrs),
-                        extend::ColorPair::_from(screen, ext_color_pair)
-                    )
-                )
-            }
-        }
-    };
-
-    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
-        OK => {
-            // TODO : get opts working correct so not to rely on bodge!
-            //assert!(!opts.is_null(), "{}getcchar() : opts.is_null()", MODULE_PATH);
-            //
-            //Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], unsafe { ptr::read(opts) })))
-
-            let c: cchar_t = ComplexChar::into(wcval); // bodge to get extended color pair.
-
-            Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
-        },
-        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "getcchar", |_| "getcchar_sp"), rc))
-    }
-}
-
-fn _wattr_get(screen: Option<SCREEN>, handle: WINDOW) -> result!(AttributesColorPairSet) {
-    let mut attrs: [attr_t; 1] = [0];
-    let mut color_pair: [short_t; 1] = [0];
-    let mut opts: [i32; 1] = [0];
-
-    match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
-        OK => Ok(match ncurses_colortype() {
-                     NCursesColorType::Normal => {
-                         AttributesColorPairSet::Normal(
-                             normal::AttributesColorPair::new(
-                                 normal::Attributes::from(attrs[0]),
-                                 normal::ColorPair::_from(screen, color_pair[0])
-                             )
-                         )
-                     },
-                     NCursesColorType::Extended => {
-                         AttributesColorPairSet::Extended(
-                             extend::AttributesColorPair::new(
-                                 extend::Attributes::from(attrs[0]),
-                                 extend::ColorPair::_from(screen, opts[0])
-                             )
-                         )
-                     }
-              }),
-        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "wattr_get", |_| "wattr_get_sp"), rc))
     }
 }
 

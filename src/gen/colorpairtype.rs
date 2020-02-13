@@ -20,11 +20,12 @@
     IN THE SOFTWARE.
 */
 
-use crate::{ColorPairGeneric, ColorAttributeTypes};
+use crate::{SCREEN, ColorPairGeneric, ColorAttributeTypes};
 
 /// Color pair.
 pub trait ColorPairType<T>: ColorPairGeneric<T>
     where T: ColorAttributeTypes
 {
+    fn screen(&self) -> Option<SCREEN>;
     fn number(&self) -> T;
 }

@@ -20,9 +20,10 @@
     IN THE SOFTWARE.
 */
 
-use crate::shims::ncurses::attr_t;
+use crate::shims::ncurses::{SCREEN, attr_t};
 
 /// Generic attributes methods.
 pub trait AttributesGeneric {
+    fn screen(&self) -> Option<SCREEN>;
     fn as_attr_t(&self) -> attr_t;
 }

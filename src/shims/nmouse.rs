@@ -55,6 +55,8 @@ pub unsafe fn mouse_trafo(py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub fn mouseinterval(erval: i32) -> i32 {
+    assert!(erval >= -1, "{}mouseinterval() : erval = {}", MODULE_PATH, erval);
+
     unsafe { bindings::mouseinterval(erval) }
 }
 
@@ -108,6 +110,7 @@ pub unsafe fn has_mouse_sp(sp: SCREEN) -> bool {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn mouseinterval_sp(sp: SCREEN, erval: i32) -> i32 {
     assert!(!sp.is_null(), "{}mouseinterval_sp() : sp.is_null()", MODULE_PATH);
+    assert!(erval >= -1, "{}mouseinterval_sp() : erval = {}", MODULE_PATH, erval);
 
     bindings::mouseinterval_sp(sp, erval)
 }

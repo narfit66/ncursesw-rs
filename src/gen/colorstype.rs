@@ -20,19 +20,19 @@
     IN THE SOFTWARE.
 */
 
-use crate::gen::{ColorType, ColorAttributeTypes};
+use crate::{SCREEN, gen::{ColorType, ColorAttributeTypes}};
 
 /// Background and foreground colors.
 pub trait ColorsType<C, T>
     where C: ColorType<T>,
           T: ColorAttributeTypes
 {
-    /// Create a new instance.
-    fn new(foreground: C, background: C) -> Self;
+    /// Returns the screen pointer of the foreground and background colors.
+    fn screen(&self) -> Option<SCREEN>;
 
-    /// Foreground color.
+    /// Return the foreground color.
     fn foreground(&self) -> C;
 
-    /// Background color.
+    /// Return the background color.
     fn background(&self) -> C;
 }

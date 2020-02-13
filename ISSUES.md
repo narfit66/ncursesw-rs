@@ -1,6 +1,6 @@
 ## Known Issues
 
-There is an known issue when using the `normal` module and screen functions, this occurs when extracting the `ColorPair` from `Attributes` as the internal screen pointer may not accuratly represent the correct screen, it is up to the client code to rectify this by using either the `Attributes::set_screen()` or `ColorPair::set_screen()` functions to set the screen pointer correctly.
+There is an known issue when using the `normal` module and screen functions, this occurs when extracting the `ColorPair` from `Attributes` as the internal screen pointer may not accuratly represent the correct screen, it is up to the client code to rectify this by using either the `Attributes::set_screen()` functions to set the screen pointer correctly.
 
 ## Issues with Travis CI
 
