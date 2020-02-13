@@ -25,3 +25,9 @@ use crate::extend::Attribute;
 include!("../include/attributes.rs");
 
 impl_attributes_type!(i32);
+
+impl Attributes {
+    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+        self.screen = screen
+    }
+}

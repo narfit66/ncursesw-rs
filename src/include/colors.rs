@@ -21,32 +21,37 @@
 */
 
 macro_rules! define_colors {
-    ($type: ty, $extend: expr) => {
-        use crate::ncursescolortype::set_ncurses_colortype;
+    ($type: ty) => {
+        use crate::SCREEN;
 
         /// Foreground and background colors.
         #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
         pub struct Colors {
+            screen:     Option<SCREEN>,
             foreground: Color,
             background: Color
         }
 
-        impl ColorsType<Color, $type> for Colors {
+        impl Colors {
             /// Create a new instance of foreground and background colors.
-            fn new(foreground: Color, background: Color) -> Self {
+            pub fn new(foreground: Color, background: Color) -> Self {
                 assert!(foreground.screen() == background.screen());
 
-                set_ncurses_colortype($extend);
+                Self { screen: foreground.screen(), foreground, background }
+            }
+        }
 
-                Self { foreground, background }
+        impl ColorsType<Color, $type> for Colors {
+            fn screen(&self) -> Option<SCREEN> {
+                self.screen
             }
 
-            /// Foreground color.
+            /// Returns the foreground color.
             fn foreground(&self) -> Color {
                 self.foreground
             }
 
-            /// Background color.
+            /// Returns the background color.
             fn background(&self) -> Color {
                 self.background
             }

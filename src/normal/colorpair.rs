@@ -67,10 +67,6 @@ impl ColorPair {
         init_pair_sp(screen, pair, colors)
     }
 
-    pub fn screen(&self) -> Option<SCREEN> {
-        self.screen
-    }
-
     pub fn set_screen(&mut self, screen: Option<SCREEN>) {
         self.screen = screen
     }
@@ -91,6 +87,10 @@ impl ColorPairColors<Colors, Color, short_t> for ColorPair {
 }
 
 impl ColorPairType<short_t> for ColorPair {
+    fn screen(&self) -> Option<SCREEN> {
+        self.screen
+    }
+
     fn number(&self) -> short_t {
         self.number
     }

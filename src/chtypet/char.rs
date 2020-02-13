@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
+use std::ops::{BitOr, BitXor};
 use ascii::AsciiChar;
 
 use crate::{
@@ -94,7 +94,7 @@ impl ChtypeChar {
 
     /// Get the attributes of the Chtype character.
     pub fn get_attributes(self) -> Attributes {
-        Attributes::from(self.raw & A_ATTRIBUTES)
+        Attributes::_from(None, self.raw & A_ATTRIBUTES)
     }
 }
 

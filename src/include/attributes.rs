@@ -135,6 +135,10 @@ macro_rules! impl_attributes_type {
 }
 
 impl AttributesGeneric for Attributes {
+    fn screen(&self) -> Option<SCREEN> {
+        self.screen
+    }
+
     fn as_attr_t(&self) -> attr_t {
         self.attrs
     }
@@ -231,12 +235,6 @@ impl Default for Attributes {
 impl From<Attribute> for Attributes {
     fn from(attribute: Attribute) -> Self {
         Self::default() | attribute
-    }
-}
-
-impl From<attr_t> for Attributes {
-    fn from(attrs: attr_t) -> Self {
-        Self::_from(None, attrs)
     }
 }
 
