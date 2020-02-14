@@ -61,18 +61,21 @@ impl ColorPair {
         init_extended_pair_sp(screen, pair, colors)
     }
 
+    /// Set the screen pointer of the `ColorPair`.
+    ///
+    /// Use with caution!!! This function only need's to be used if using the screen type
+    /// functions and is provided to allow the alignment of the screen pointer with the
+    /// screen that the `ColorPair` are for as this crate will apply a screen of `None`
+    /// by default when retriving `Attributes` from functions such as `attr_get()` and
+    /// `wattr_get()`.
     pub fn set_screen(&mut self, screen: Option<SCREEN>) {
         self.screen = screen
-    }
-
-    pub fn default_sp(screen: SCREEN) -> Self {
-        Self::_from(Some(screen), 0)
     }
 }
 
 impl ColorPairColors<Colors, Color, i32> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        self.screen.map_or_else(|| extended_pair_content(self.number()), |screen| extended_pair_content_sp(screen, self.number()))
+        self.screen.map_or_else(|| extended_pair_content(self.number), |screen| extended_pair_content_sp(screen, self.number))
     }
 }
 
@@ -88,14 +91,14 @@ impl ColorPairType<i32> for ColorPair {
 
 impl ColorPairGeneric<i32> for ColorPair {
     fn as_const_ptr(&self) -> *const libc::c_void {
-        let color_pair = self.number();
+        let color_pair = self.number;
         let ptr: *const i32 = &color_pair;
 
         ptr as *const libc::c_void
     }
 
     fn as_mut_ptr(&self) -> *mut libc::c_void {
-        let mut color_pair = self.number();
+        let mut color_pair = self.number;
         let ptr: *mut i32 = &mut color_pair;
 
         ptr as *mut libc::c_void

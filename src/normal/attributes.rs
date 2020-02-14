@@ -35,19 +35,16 @@ include!("../include/attributes.rs");
 impl_attributes_type!(short_t);
 
 impl Attributes {
-    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
-        self.screen = screen
-    }
-
+    /// Return the `ColorPair` associated with the `Attributes`.
     pub fn color_pair(&self) -> ColorPair {
         ColorPair::_from(self.screen, PAIR_NUMBER(self.attrs))
     }
 }
 
-/// Implement the | operator for setting a color pair on an `Attributes` object
+/// Implement the | operator for setting a `ColorPair` on a `Attributes`.
 ///
 /// Note: as only one color pair can be applied to attributes at any one time any previously Or'd
-/// color_pair will be Xor'd out of the attributes before Or'ing the new color pair..
+/// color_pair will be Xor'd out of the attributes before Or'ing the new color pair.
 impl BitOr<ColorPair> for Attributes {
     type Output = Attributes;
 
@@ -61,6 +58,7 @@ impl BitOr<ColorPair> for Attributes {
     }
 }
 
+/// Implement the ^ operator for removing a `ColorPair` on a `Attributes`.
 impl BitXor<ColorPair> for Attributes {
     type Output = Self;
 

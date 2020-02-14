@@ -6,17 +6,19 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Upgraded source code to rust 2018 edition.
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
 - Changed signature of `intrflush()` and `intrflush_sp()` to ignore `handle/window` parameter as this is ignored in the NCurses library. [BC]
-- `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
-- Have removed examples "showing" how to use individual functions.
-- Added `fn screen(&self) -> Option<SCREEN>` to `ColorPairType` trait [BC].
-- Added `fn screen(&self) -> Option<SCREEN>` to `ColorsType` trait [BC].
-- Added `fn screen(&self) -> Option<SCREEN>` to `AttributesGeneric` trait [BC].
-- Removed `fn new(_: C, _: C) -> Self` from `ColorsType` trait [BC].
 - Removed `attr_get_sp()`, `getcchar_sp()` and `wattr_get_sp()` which where non-NCurses function and specific to this crate. [BC]
+- `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
+- Added `fn screen(&self) -> Option<SCREEN>` to `ColorsType` trait. [BC]
+- Added `fn screen(&self) -> Option<SCREEN>` to `ColorPairType` trait. [BC]
+- Removed `fn new(_: C, _: C) -> Self` from `ColorsType` trait. [BC]
+- Removed `AttributesGeneric` trait. [BC]
+- Changed `AttributesType` trait to have prototypes of `fn screen(&self) -> Option<SCREEN>` and `fn as_attr_t(&self) -> attr_t`. [BC]
+- Changed `Attributes` set type methods to return `Self` so they can be chained together i.e. `attrs = attrs.set_bold(true).set_blink(true);` as well as `attrs.set_bold(true);`.
+- Have removed examples "showing" how to use individual functions.
 
 The way that colors are defined has been changed as of this release to cater for screen functionality. The `BaseColor` enum has been replaced by the `ColorPalette` enum which defines the basic colors available (which can be considered the dark colors and were originally wrapped in the `BaseColor::Dark()` enum) and the extended light colors (originally wrapped in the `BaseColor::Light()` enum).
 
-There is an known issue when using the `normal` module and screen functions, this occurs when extracting the `ColorPair` from `Attributes` as the internal screen pointer may not accuratly represent the correct screen, it is up to the client code to rectify this by using either the `Attributes::set_screen()` functions to set the screen pointer correctly. This statement is also repeated in [ISSUES.md](https://github.com/narfit66/ncursesw-rs/blob/api-v0.6.0/ISSUES.md).
+When the client code is using screens, functions that return `Attributes` and `ColorPair` types such as `attr_get()`, `wattr_get()` and `getcchar()` will always set the screen attribute of what they are returning as a `None`, it is upto the clinet code to rectify this by calling `Attributes::set_screen()` and/or `ColorPair::set_screen()`.
 
 Although deprecated it should be noted that the following functions have changed their signatures and should be considered as breaking changes:
 - `COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t` has become `COLOR_PAIR(color_pair: i32) -> attr_t`
