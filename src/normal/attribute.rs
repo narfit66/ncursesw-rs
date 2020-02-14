@@ -20,9 +20,12 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::Into, ops::BitOr};
+use std::ops::BitOr;
 
-use crate::{ColorPairType, normal::{Attributes, ColorPair}, shims::ncurses::attr_t};
+use crate::{
+    ColorPairType, AttributesType, normal::{Attributes, ColorPair},
+    shims::ncurses::attr_t
+};
 
 include!("../include/attribute.rs");
 
@@ -40,9 +43,8 @@ impl BitOr<ColorPair> for Attribute {
     type Output = Attributes;
 
     fn bitor(self, rhs: ColorPair) -> Self::Output {
-        let attributes: attr_t = Attributes::into(Attributes::default());
         let attribute: attr_t = Self::into(self);
 
-        Attributes::_from(rhs.screen(), attributes | attribute | rhs.as_attr_t())
+        Attributes::_from(rhs.screen(), Attributes::default().as_attr_t() | attribute | rhs.as_attr_t())
     }
 }

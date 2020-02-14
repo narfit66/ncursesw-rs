@@ -23,7 +23,7 @@
 use std::ops::{BitOr, BitXor};
 
 use crate::{
-    gen::{AttributesType, AttributesGeneric},
+    gen::AttributesType,
     shims::{
         ncurses::{SCREEN, attr_t},
         constants::{
@@ -35,6 +35,43 @@ use crate::{
     }
 };
 
+macro_rules! attributes_getter {
+    ($func: ident, $attr: ident) => {
+        pub fn $func(&self) -> bool {
+            (self.attrs & $attr) > 0
+        }
+    };
+}
+
+macro_rules! attributes_setter {
+    ($func: ident, $attr: ident) => {
+        pub fn $func(&mut self, enabled: bool) -> Self {
+            if enabled {
+                self.attrs |= $attr;
+            } else {
+                self.attrs ^= $attr;
+            }
+
+            Self::_from(self.screen, self.attrs)
+        }
+    };
+}
+
+macro_rules! impl_attributes_type {
+    ($type: ty) => {
+        impl AttributesType<$type> for Attributes {
+            fn screen(&self) -> Option<SCREEN> {
+                self.screen
+            }
+
+            fn as_attr_t(&self) -> attr_t {
+                self.attrs
+            }
+        }
+    };
+}
+
+/// Attributes.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Attributes {
     screen: Option<SCREEN>,
@@ -49,99 +86,78 @@ impl Attributes {
     }
 }
 
-macro_rules! attributes_getter {
-    ($func: ident, $attr: ident) => {
-        fn $func(&self) -> bool {
-            (self.attrs & $attr) > 0
-        }
-    };
-}
-
-macro_rules! attributes_setter {
-    ($func: ident, $attr: ident) => {
-        fn $func(&mut self, enabled: bool) {
-            if enabled {
-                self.attrs |= $attr;
-            } else {
-                self.attrs ^= $attr;
-            }
-        }
-    };
-}
-
-macro_rules! impl_attributes_type {
-    ($type: ty) => {
-        impl AttributesType<$type> for Attributes {
-            fn is_normal(&self) -> bool {
-                self.attrs == A_NORMAL
-            }
-
-            fn set_normal(&mut self) {
-                self.attrs = A_NORMAL
-            }
-
-            attributes_getter!(is_char_text, A_CHARTEXT);
-            attributes_setter!(set_char_text, A_CHARTEXT);
-
-            attributes_getter!(is_standout, A_STANDOUT);
-            attributes_setter!(set_standout, A_STANDOUT);
-
-            attributes_getter!(is_underline, A_UNDERLINE);
-            attributes_setter!(set_underline, A_UNDERLINE);
-
-            attributes_getter!(is_reverse, A_REVERSE);
-            attributes_setter!(set_reverse, A_REVERSE);
-
-            attributes_getter!(is_blink, A_BLINK);
-            attributes_setter!(set_blink, A_BLINK);
-
-            attributes_getter!(is_dim, A_DIM);
-            attributes_setter!(set_dim, A_DIM);
-
-            attributes_getter!(is_bold, A_BOLD);
-            attributes_setter!(set_bold, A_BOLD);
-
-            attributes_getter!(is_alternate_char_set, A_ALTCHARSET);
-            attributes_setter!(set_alternative_char_set, A_ALTCHARSET);
-
-            attributes_getter!(is_invisible, A_INVIS);
-            attributes_setter!(set_invisible, A_INVIS);
-
-            attributes_getter!(is_protected, A_PROTECT);
-            attributes_setter!(set_protected, A_PROTECT);
-
-            attributes_getter!(is_horizontal, A_HORIZONTAL);
-            attributes_setter!(set_horizontal, A_HORIZONTAL);
-
-            attributes_getter!(is_left, A_LEFT);
-            attributes_setter!(set_left, A_LEFT);
-
-            attributes_getter!(is_low, A_LOW);
-            attributes_setter!(set_low, A_LOW);
-
-            attributes_getter!(is_right, A_RIGHT);
-            attributes_setter!(set_right, A_RIGHT);
-
-            attributes_getter!(is_top, A_TOP);
-            attributes_setter!(set_top, A_TOP);
-
-            attributes_getter!(is_vertical, A_VERTICAL);
-            attributes_setter!(set_vertical, A_VERTICAL);
-
-            attributes_getter!(is_italic, A_ITALIC);
-            attributes_setter!(set_italic, A_ITALIC);
-        }
-    };
-}
-
-impl AttributesGeneric for Attributes {
-    fn screen(&self) -> Option<SCREEN> {
-        self.screen
+impl Attributes {
+    /// Set the screen pointer of the `Attributes`.
+    ///
+    /// Use with caution!!! This function only need's to be used if using the screen type
+    /// functions and is provided to allow the alignment of the screen pointer with the
+    /// screen that the `Attributes` are for as this crate will apply a screen of `None`
+    /// by default when retriving `Attributes` from functions such as `attr_get()` and
+    /// `wattr_get()`.
+    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+        self.screen = screen
     }
 
-    fn as_attr_t(&self) -> attr_t {
-        self.attrs
+    pub fn is_normal(&self) -> bool {
+        self.attrs == A_NORMAL
     }
+
+    pub fn set_normal(&mut self) -> Self {
+        self.attrs = A_NORMAL;
+
+        Self::_from(self.screen, self.attrs)
+    }
+
+    attributes_getter!(is_char_text, A_CHARTEXT);
+    attributes_setter!(set_char_text, A_CHARTEXT);
+
+    attributes_getter!(is_standout, A_STANDOUT);
+    attributes_setter!(set_standout, A_STANDOUT);
+
+    attributes_getter!(is_underline, A_UNDERLINE);
+    attributes_setter!(set_underline, A_UNDERLINE);
+
+    attributes_getter!(is_reverse, A_REVERSE);
+    attributes_setter!(set_reverse, A_REVERSE);
+
+    attributes_getter!(is_blink, A_BLINK);
+    attributes_setter!(set_blink, A_BLINK);
+
+    attributes_getter!(is_dim, A_DIM);
+    attributes_setter!(set_dim, A_DIM);
+
+    attributes_getter!(is_bold, A_BOLD);
+    attributes_setter!(set_bold, A_BOLD);
+
+    attributes_getter!(is_alternate_char_set, A_ALTCHARSET);
+    attributes_setter!(set_alternative_char_set, A_ALTCHARSET);
+
+    attributes_getter!(is_invisible, A_INVIS);
+    attributes_setter!(set_invisible, A_INVIS);
+
+    attributes_getter!(is_protected, A_PROTECT);
+    attributes_setter!(set_protected, A_PROTECT);
+
+    attributes_getter!(is_horizontal, A_HORIZONTAL);
+    attributes_setter!(set_horizontal, A_HORIZONTAL);
+
+    attributes_getter!(is_left, A_LEFT);
+    attributes_setter!(set_left, A_LEFT);
+
+    attributes_getter!(is_low, A_LOW);
+    attributes_setter!(set_low, A_LOW);
+
+    attributes_getter!(is_right, A_RIGHT);
+    attributes_setter!(set_right, A_RIGHT);
+
+    attributes_getter!(is_top, A_TOP);
+    attributes_setter!(set_top, A_TOP);
+
+    attributes_getter!(is_vertical, A_VERTICAL);
+    attributes_setter!(set_vertical, A_VERTICAL);
+
+    attributes_getter!(is_italic, A_ITALIC);
+    attributes_setter!(set_italic, A_ITALIC);
 }
 
 /// Implement the | operator for adding Attributes to Attributes
@@ -191,8 +207,6 @@ impl BitOr<Attribute> for Attributes {
             Attribute::Vertical           => self.set_vertical(true),
             Attribute::Italic             => self.set_italic(true)
         }
-
-        self
     }
 }
 
@@ -202,7 +216,7 @@ impl BitXor<Attribute> for Attributes {
 
     fn bitxor(mut self, rhs: Attribute) -> Self::Output {
         match rhs {
-            Attribute::Normal             => (),
+            Attribute::Normal             => self.set_normal(),
             Attribute::CharText           => self.set_char_text(false),
             Attribute::Standout           => self.set_standout(false),
             Attribute::Underline          => self.set_underline(false),
@@ -221,8 +235,6 @@ impl BitXor<Attribute> for Attributes {
             Attribute::Vertical           => self.set_vertical(false),
             Attribute::Italic             => self.set_italic(false)
         }
-
-        self
     }
 }
 

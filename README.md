@@ -5,7 +5,7 @@ This is a **fat** wrapper around the [NCurses TUI library](https://github.com/mi
 
 This crate supports NCurses ABI 6.1 and above.
 
-There are actually three layers of NCurses functions exposed within this library, the raw `extern "C"` functions that are generated with `bindgen` which are available in `ncursesw::shims::bindings`.
+There are actually three layers of NCurses functions exposed within this library, the raw `extern "C"` functions that are generated with [bindgen](https://crates.io/crates/bindgen) which are available in `ncursesw::shims::bindings`.
 
 A layer above this which are mainly `unsafe` but protect the calling code to a certian degree with assetions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are on the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}` and you can consider this layer as the equivalent of a `-sys` crate for the NCurses library.
 

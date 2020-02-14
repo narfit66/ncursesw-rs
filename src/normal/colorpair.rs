@@ -28,7 +28,7 @@ use std::{convert::TryFrom, ops::BitOr};
 use crate::{
     gen::{
         ColorType, ColorsType, ColorPairType, ColorPairGeneric,
-        ColorPairColors, AttributesGeneric
+        ColorPairColors, AttributesType
     },
     normal::{Attribute, Attributes, Colors, Color},
     ncursescolortype::*,
@@ -67,22 +67,25 @@ impl ColorPair {
         init_pair_sp(screen, pair, colors)
     }
 
+    /// Set the screen pointer of the `ColorPair`.
+    ///
+    /// Use with caution!!! This function only need's to be used if using the screen type
+    /// functions and is provided to allow the alignment of the screen pointer with the
+    /// screen that the `ColorPair` are for as this crate will apply a screen of `None`
+    /// by default when retriving `ColorPair` from functions such as `attr_get()` and
+    /// `wattr_get()`.
     pub fn set_screen(&mut self, screen: Option<SCREEN>) {
         self.screen = screen
     }
 
     pub(in crate) fn as_attr_t(&self) -> attr_t {
-        COLOR_PAIR(i32::from(self.number()))
-    }
-
-    pub fn default_sp(screen: SCREEN) -> Self {
-        Self::_from(Some(screen), 0)
+        COLOR_PAIR(i32::from(self.number))
     }
 }
 
 impl ColorPairColors<Colors, Color, short_t> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        self.screen.map_or_else(|| pair_content(self.number()), |screen| pair_content_sp(screen, self.number()))
+        self.screen.map_or_else(|| pair_content(self.number), |screen| pair_content_sp(screen, self.number))
     }
 }
 
@@ -98,7 +101,7 @@ impl ColorPairType<short_t> for ColorPair {
 
 impl ColorPairGeneric<short_t> for ColorPair {
     fn as_short_t(&self) -> short_t {
-        self.number()
+        self.number
     }
 }
 
@@ -106,13 +109,13 @@ impl BitOr<Attribute> for ColorPair {
     type Output = Attributes;
 
     fn bitor(self, rhs: Attribute) -> Self::Output {
-        Attributes::default() | self | rhs
+        Attributes::_from(self.screen, (Attributes::default() | self | rhs).as_attr_t())
     }
 }
 
 impl From<Attributes> for ColorPair {
     fn from(attrs: Attributes) -> Self {
-        Self::_from(None, PAIR_NUMBER(attrs.as_attr_t()))
+        Self::_from(attrs.screen(), PAIR_NUMBER(attrs.as_attr_t()))
     }
 }
 

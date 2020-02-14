@@ -26,6 +26,7 @@ use errno::errno;
 
 use crate::{
     normal,
+    Origin, Size, WideChar,
     cstring::*,
     shims::{
         nform, nform::FieldType, ncurses::{SCREEN, WINDOW}, bindings::va_list,
@@ -41,10 +42,7 @@ use crate::{
             NCurseswFormError, ncursesw_form_error_system_error,
             ncursesw_form_error_from_rc
         }
-    },
-    wide::WideChar,
-    origin::Origin,
-    size::Size
+    }
 };
 
 /// Form.

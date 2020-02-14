@@ -632,6 +632,7 @@ pub unsafe fn getcchar(wcval: &cchar_t, wch: *mut wchar_t, attrs: *mut attr_t, p
     assert!(!wch.is_null(), "{}getcchar() : wch.is_null()", MODULE_PATH);
     assert!(!attrs.is_null(), "{}getcchar() : attrs.is_null()", MODULE_PATH);
     assert!(!pair.is_null(), "{}getcchar() : pair.is_null()", MODULE_PATH);
+    //assert!(!opts.is_null(), "{}getcchar() : opts.is_null()", MODULE_PATH);
 
     bindings::getcchar(wcval, wch, attrs, pair, opts)
 }
@@ -2190,6 +2191,7 @@ pub unsafe fn setcchar(wcval: *mut cchar_t, wch: *const wchar_t, attrs: attr_t, 
     assert!(!wcval.is_null(), "{}setcchar() : wcval.is_null()", MODULE_PATH);
     assert!(!wch.is_null(), "{}setcchar() : wch.is_null()", MODULE_PATH);
     assert!(pair >= 0, "{}setcchar() : pair = {}", MODULE_PATH, pair);
+    //assert!(!opts.is_null(), "{}setcchar() : opts.is_null()", MODULE_PATH);
 
     bindings::setcchar(wcval, wch, attrs, pair, opts)
 }

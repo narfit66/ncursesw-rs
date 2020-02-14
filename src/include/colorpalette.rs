@@ -22,7 +22,103 @@
 
 use std::str::FromStr;
 
-use crate::NCurseswError;
+use crate::{
+    NCurseswError, COLORS,
+    shims::constants::{
+        COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+        COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE
+    }
+};
+
+const COLOR_DEFAULT: i32       = COLOR_BLACK - 1;
+const COLOR_LIGHT_BLACK: i32   = COLOR_BLACK + 8;
+const COLOR_LIGHT_RED: i32     = COLOR_RED + 8;
+const COLOR_LIGHT_GREEN: i32   = COLOR_GREEN + 8;
+const COLOR_LIGHT_YELLOW: i32  = COLOR_YELLOW + 8;
+const COLOR_LIGHT_BLUE: i32    = COLOR_BLUE + 8;
+const COLOR_LIGHT_MAGENTA: i32 = COLOR_MAGENTA + 8;
+const COLOR_LIGHT_CYAN: i32    = COLOR_CYAN + 8;
+const COLOR_LIGHT_WHITE: i32   = COLOR_WHITE + 8;
+
+macro_rules! color_palette_enum {
+    ($type: ty) => {
+        /// The color palette.
+        ///
+        /// The first 8 color's are considered dark colors, the next 8
+        /// (if available) are considered light colors.
+        #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+        pub enum ColorPalette {
+            /// Color #-1
+            TerminalDefault,
+            /// Black color
+            ///
+            /// Color #0
+            Black,
+            /// Red color
+            ///
+            /// Color #1
+            Red,
+            /// Green color
+            ///
+            /// Color #2
+            Green,
+            /// Yellow/Brown color (Red + Green)
+            ///
+            /// Color #3
+            Yellow,
+            /// Blue color
+            ///
+            /// Color #4
+            Blue,
+            /// Magenta color (Red + Blue)
+            ///
+            /// Color #5
+            Magenta,
+            /// Cyan color (Green + Blue)
+            ///
+            /// Color #6
+            Cyan,
+            /// White color (Red + Green + Blue)
+            ///
+            /// Color #7
+            White,
+            /// Light black color
+            ///
+            /// Color #8
+            LightBlack,
+            /// Light red color
+            ///
+            /// Color #9
+            LightRed,
+            /// Light green color
+            ///
+            /// Color #10
+            LightGreen,
+            /// Light yellow color (LightRed + LightGreen)
+            ///
+            /// Color #11
+            LightYellow,
+            /// Light blue color
+            ///
+            /// Color #12
+            LightBlue,
+            /// Light magenta color (LightRed + LightBlue)
+            ///
+            /// Color #13
+            LightMagenta,
+            /// Light cyan color (LightGreen + LightBlue)
+            ///
+            /// Color #14
+            LightCyan,
+            /// Light white color (LightRed + LightGreen + LightBlue)
+            ///
+            /// Color #15
+            LightWhite,
+            /// Custom color
+            Custom($type)
+        }
+    }
+}
 
 impl FromStr for ColorPalette {
     type Err = NCurseswError;
@@ -33,56 +129,6 @@ impl FromStr for ColorPalette {
     ///     'default', 'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
     ///     'light black', 'light red', 'light green', 'light yellow', 'light blue',
     ///     'light magenta', 'light cyan', 'light white'
-    ///
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// # use std::error::Error;
-    /// use std::str::FromStr;
-    /// use ncursesw::*;
-    ///
-    /// #
-    /// # fn main() -> Result<(), Box<dyn Error>> {
-    /// let default = ColorPalette::from_str("default")?;
-    /// let black = ColorPalette::from_str("black")?;
-    /// let red = ColorPalette::from_str("red")?;
-    /// let green = ColorPalette::from_str("green")?;
-    /// let yellow = ColorPalette::from_str("yellow")?;
-    /// let blue = ColorPalette::from_str("blue")?;
-    /// let magenta = ColorPalette::from_str("magenta")?;
-    /// let cyan = ColorPalette::from_str("cyan")?;
-    /// let white = ColorPalette::from_str("white")?;
-    /// let light_black = ColorPalette::from_str("light black")?;
-    /// let light_red = ColorPalette::from_str("light red")?;
-    /// let light_green = ColorPalette::from_str("light green")?;
-    /// let light_yellow = ColorPalette::from_str("light yellow")?;
-    /// let light_blue = ColorPalette::from_str("light blue")?;
-    /// let light_magenta = ColorPalette::from_str("light magenta")?;
-    /// let light_cyan = ColorPalette::from_str("light cyan")?;
-    /// let light_white = ColorPalette::from_str("light white")?;
-    ///
-    /// assert!(default == ColorPalette::TerminalDefault);
-    /// assert!(black == ColorPalette::Black);
-    /// assert!(red == ColorPalette::Red);
-    /// assert!(green == ColorPalette::Green);
-    /// assert!(yellow == ColorPalette::Yellow);
-    /// assert!(blue == ColorPalette::Blue);
-    /// assert!(magenta == ColorPalette::Magenta);
-    /// assert!(cyan == ColorPalette::Cyan);
-    /// assert!(white == ColorPalette::White);
-    /// assert!(light_black == ColorPalette::LightBlack);
-    /// assert!(light_red == ColorPalette::LightRed);
-    /// assert!(light_green == ColorPalette::LightGreen);
-    /// assert!(light_yellow == ColorPalette::LightYellow);
-    /// assert!(light_blue == ColorPalette::LightBlue);
-    /// assert!(light_magenta == ColorPalette::LightMagenta);
-    /// assert!(light_cyan == ColorPalette::LightCyan);
-    /// assert!(light_white == ColorPalette::LightWhite);
-    /// #
-    /// #     Ok(())
-    /// # }
-    /// ```
     fn from_str(color: &str) -> Result<Self, Self::Err> {
         match color {
             "default"       => Ok(ColorPalette::TerminalDefault),

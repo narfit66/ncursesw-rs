@@ -21,7 +21,6 @@
 */
 
 mod attributescolorpairtype;
-mod attributesgeneric;
 mod attributestype;
 mod colorattributetypes;
 mod colorpaircolors;
@@ -33,8 +32,7 @@ mod getcharactertype;
 mod rawwithnul;
 
 pub use self::{
-    attributescolorpairtype::*, attributesgeneric::*, attributestype::*,
-    colorattributetypes::*, colorpaircolors::*, colorpairtype::*,
-    colorstype::*, colortype::*, getcharactertype::*
+    attributescolorpairtype::*, attributestype::*, colorattributetypes::*,
+    colorpaircolors::*, colorpairtype::*, colorstype::*, colortype::*, getcharactertype::*
 };
 pub(in crate) use crate::gen::{colorpairgeneric::*, rawwithnul::*};
