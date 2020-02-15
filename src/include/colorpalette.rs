@@ -120,6 +120,12 @@ macro_rules! color_palette_enum {
     }
 }
 
+impl Default for ColorPalette {
+    fn default() -> Self {
+        ColorPalette::TerminalDefault
+    }
+}
+
 impl FromStr for ColorPalette {
     type Err = NCurseswError;
 

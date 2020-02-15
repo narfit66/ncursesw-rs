@@ -22,8 +22,6 @@
 
 #![allow(deprecated)]
 
-use std::convert::TryFrom;
-
 use crate::{
     NCurseswError,
     gen::ColorType,
@@ -69,15 +67,17 @@ impl Color {
     }
 
     pub fn set_rgb(&self, rgb: RGB) -> result!(()) {
-        let number = short_t::try_from(self.number())?;
-
-        self.screen.map_or_else(|| init_color(number, rgb), |screen| init_color_sp(screen, number, rgb))
+        self.screen.map_or_else(|| init_color(self.color_palette.number(), rgb), |screen| init_color_sp(screen, self.color_palette.number(), rgb))
     }
 
     pub fn rgb(&self) -> result!(RGB) {
-        let number = short_t::try_from(self.number())?;
+        self.screen.map_or_else(|| color_content(self.color_palette.number()), |screen| color_content_sp(screen, self.color_palette.number()))
+    }
+}
 
-        self.screen.map_or_else(|| color_content(number), |screen| color_content_sp(screen, number))
+impl Default for Color {
+    fn default() -> Self {
+        Self::_from(None, ColorPalette::default())
     }
 }
 

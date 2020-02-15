@@ -68,11 +68,17 @@ impl Color {
     }
 
     pub fn set_rgb(&self, rgb: RGB) -> result!(()) {
-        self.screen.map_or_else(|| init_extended_color(self.number(), rgb), |screen| init_extended_color_sp(screen, self.number(), rgb))
+        self.screen.map_or_else(|| init_extended_color(self.color_palette.number(), rgb), |screen| init_extended_color_sp(screen, self.color_palette.number(), rgb))
     }
 
     pub fn rgb(&self) -> result!(RGB) {
-        self.screen.map_or_else(|| extended_color_content(self.number()), |screen| extended_color_content_sp(screen, self.number()))
+        self.screen.map_or_else(|| extended_color_content(self.color_palette.number()), |screen| extended_color_content_sp(screen, self.color_palette.number()))
+    }
+}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self::_from(None, ColorPalette::default())
     }
 }
 
