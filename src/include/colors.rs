@@ -25,7 +25,7 @@ macro_rules! define_colors {
         use crate::SCREEN;
 
         /// Foreground and background colors.
-        #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+        #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
         pub struct Colors {
             screen:     Option<SCREEN>,
             foreground: Color,
