@@ -23,7 +23,7 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
-use std::{convert::TryFrom, ops::BitOr};
+use std::{ptr, convert::TryFrom, ops::BitOr};
 
 use crate::{
     gen::{
@@ -60,10 +60,14 @@ impl ColorPair {
 
 impl ColorPair {
     pub fn new(pair: short_t, colors: Colors) -> result!(Self) {
+        assert!(colors.screen().is_none());
+
         init_pair(pair, colors)
     }
 
     pub fn new_sp(screen: SCREEN, pair: short_t, colors: Colors) -> result!(Self) {
+        assert!(colors.screen().map_or_else(|| false, |colors_screen| ptr::eq(screen, colors_screen)));
+
         init_pair_sp(screen, pair, colors)
     }
 

@@ -48,10 +48,10 @@ pub use crate::bindings::Form_Hook;
 static MODULE_PATH: &str = "ncursesw::shims::nform::";
 
 /// <https://invisible-island.net/ncurses/man/form_page.3x.html>
-pub unsafe fn current_field(form: FORM) -> Option<FIELD> {
-    assert!(!form.is_null(), "{}current_field() : form.is_null()", MODULE_PATH);
+pub unsafe fn current_field(form: Option<FORM>) -> Option<FIELD> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}current_field() : form.is_null()", MODULE_PATH);
 
-    bindings::current_field(form).as_mut().map(|ptr| ptr as FIELD)
+    bindings::current_field(return_mut_ptr!(form)).as_mut().map(|ptr| ptr as FIELD)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_data.3x.html>
@@ -88,17 +88,17 @@ pub unsafe fn dynamic_field_info(field: FIELD, rows: *mut i32, cols: *mut i32, m
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_validation.3x.html>
-pub unsafe fn field_arg(field: FIELD) -> Option<*mut libc::c_void> {
-    assert!(!field.is_null(), "{}field_arg() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_arg(field: Option<FIELD>) -> Option<*mut libc::c_void> {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_arg() : field.is_null()", MODULE_PATH);
 
-    bindings::field_arg(field).as_mut().map(|ptr| ptr as *mut libc::c_void)
+    bindings::field_arg(return_mut_ptr!(field)).as_mut().map(|ptr| ptr as *mut libc::c_void)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_attributes.3x.html>
-pub unsafe fn field_back(field: FIELD) -> chtype {
-    assert!(!field.is_null(), "{}field_back() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_back(field: Option<FIELD>) -> chtype {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_back() : field.is_null()", MODULE_PATH);
 
-    bindings::field_back(field)
+    bindings::field_back(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
@@ -129,17 +129,17 @@ pub unsafe fn field_buffer(field: FIELD, buf: i32) -> Option<Vec<i8>> {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field.3x.html>
-pub unsafe fn field_count(form: FORM) -> i32 {
-    assert!(!form.is_null(), "{}field_count() : form.is_null()", MODULE_PATH);
+pub unsafe fn field_count(form: Option<FORM>) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}field_count() : form.is_null()", MODULE_PATH);
 
-    bindings::field_count(form)
+    bindings::field_count(return_mut_ptr!(form))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_attributes.3x.html>
-pub unsafe fn field_fore(field: FIELD) -> chtype {
-    assert!(!field.is_null(), "{}field_fore() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_fore(field: Option<FIELD>) -> chtype {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_fore() : field.is_null()", MODULE_PATH);
 
-    bindings::field_fore(field)
+    bindings::field_fore(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_page.3x.html>
@@ -163,73 +163,73 @@ pub unsafe fn field_info(field: FIELD, rows: *mut i32, cols: *mut i32, frow: *mu
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn field_init(form: FORM) -> Option<Form_Hook> {
-    assert!(!form.is_null(), "{}field_init() : form.is_null()", MODULE_PATH);
+pub unsafe fn field_init(form: Option<FORM>) -> Option<Form_Hook> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}field_init() : form.is_null()", MODULE_PATH);
 
-    (bindings::field_init(form) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    (bindings::field_init(return_mut_ptr!(form)) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_just.3x.html>
-pub unsafe fn field_just(field: FIELD) -> i32 {
-    assert!(!field.is_null(), "{}field_just() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_just(field: Option<FIELD>) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_just() : field.is_null()", MODULE_PATH);
 
-    bindings::field_just(field)
+    bindings::field_just(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_opts.3x.html>
-pub unsafe fn field_opts(field: FIELD) -> i32 {
-    assert!(!field.is_null(), "{}field_opts() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_opts(field: Option<FIELD>) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_opts() : field.is_null()", MODULE_PATH);
 
-    bindings::field_opts(field)
+    bindings::field_opts(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_opts.3x.html>
-pub unsafe fn field_opts_off(field: FIELD, opts: i32) -> i32 {
-    assert!(!field.is_null(), "{}field_opts_off() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_opts_off(field: Option<FIELD>, opts: i32) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_opts_off() : field.is_null()", MODULE_PATH);
 
-    bindings::field_opts_off(field, opts)
+    bindings::field_opts_off(return_mut_ptr!(field), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_opts.3x.html>
-pub unsafe fn field_opts_on(field: FIELD, opts: i32) -> i32 {
-    assert!(!field.is_null(), "{}field_opts_on() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_opts_on(field: Option<FIELD>, opts: i32) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_opts_on() : field.is_null()", MODULE_PATH);
 
-    bindings::field_opts_on(field, opts)
+    bindings::field_opts_on(return_mut_ptr!(field), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_attributes.3x.html>
-pub unsafe fn field_pad(field: FIELD) -> i32 {
-    assert!(!field.is_null(), "{}field_pad() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_pad(field: Option<FIELD>) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_pad() : field.is_null()", MODULE_PATH);
 
-    bindings::field_pad(field)
+    bindings::field_pad(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
-pub unsafe fn field_status(field: FIELD) -> bool {
-    assert!(!field.is_null(), "{}field_status() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_status(field: Option<FIELD>) -> bool {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_status() : field.is_null()", MODULE_PATH);
 
-    bindings::field_status(field)
+    bindings::field_status(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn field_term(form: FORM) -> Option<Form_Hook> {
-    assert!(!form.is_null(), "{}field_term() : form.is_null()", MODULE_PATH);
+pub unsafe fn field_term(form: Option<FORM>) -> Option<Form_Hook> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}field_term() : form.is_null()", MODULE_PATH);
 
-    (bindings::field_term(form) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    (bindings::field_term(return_mut_ptr!(form)) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_validation.3x.html>
-pub unsafe fn field_type(field: FIELD) -> Option<FIELDTYPE> {
-    assert!(!field.is_null(), "{}field_type() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_type(field: Option<FIELD>) -> Option<FIELDTYPE> {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_type() : field.is_null()", MODULE_PATH);
 
-    bindings::field_type(field).as_mut().map(|ptr| ptr as FIELDTYPE)
+    bindings::field_type(return_mut_ptr!(field)).as_mut().map(|ptr| ptr as FIELDTYPE)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_userptr.3x.html>
-pub unsafe fn field_userptr(field: FIELD) -> Option<*mut libc::c_void> {
-    assert!(!field.is_null(), "{}field_userptr() : field.is_null()", MODULE_PATH);
+pub unsafe fn field_userptr(field: Option<FIELD>) -> Option<*mut libc::c_void> {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}field_userptr() : field.is_null()", MODULE_PATH);
 
-    bindings::field_userptr(field).as_mut().map(|ptr| ptr as *mut libc::c_void)
+    bindings::field_userptr(return_mut_ptr!(field)).as_mut().map(|ptr| ptr as *mut libc::c_void)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_driver.3x.html>
@@ -247,47 +247,47 @@ pub unsafe fn form_driver_w(form: FORM, c: i32, wch: wchar_t) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
-pub unsafe fn form_fields(form: FORM) -> Option<Vec<FIELD>> {
-    assert!(!form.is_null(), "{}form_fields() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_fields(form: Option<FORM>) -> Option<Vec<FIELD>> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_fields() : form.is_null()", MODULE_PATH);
 
-    bindings::form_fields(form)
+    bindings::form_fields(return_mut_ptr!(form))
         .as_mut()
-        .map(|ptr| slice::from_raw_parts(ptr, bindings::field_count(form) as usize).to_vec())
+        .map(|ptr| slice::from_raw_parts(ptr, bindings::field_count(return_mut_ptr!(form)) as usize).to_vec())
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn form_init(form: FORM) -> Option<Form_Hook> {
-    assert!(!form.is_null(), "{}form_init() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_init(form: Option<FORM>) -> Option<Form_Hook> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_init() : form.is_null()", MODULE_PATH);
 
-    (bindings::form_init(form) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    (bindings::form_init(return_mut_ptr!(form)) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_opts.3x.html>
-pub unsafe fn form_opts(form: FORM) -> i32 {
-    assert!(!form.is_null(), "{}form_opts() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_opts(form: Option<FORM>) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_opts() : form.is_null()", MODULE_PATH);
 
-    bindings::form_opts(form)
+    bindings::form_opts(return_mut_ptr!(form))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_opts.3x.html>
-pub unsafe fn form_opts_off(form: FORM, opts: i32) -> i32 {
-    assert!(!form.is_null(), "{}form_opts_off() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_opts_off(form: Option<FORM>, opts: i32) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_opts_off() : form.is_null()", MODULE_PATH);
 
-    bindings::form_opts_off(form, opts)
+    bindings::form_opts_off(return_mut_ptr!(form), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_opts.3x.html>
-pub unsafe fn form_opts_on(form: FORM, opts: i32) -> i32 {
-    assert!(!form.is_null(), "{}form_opts_on() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_opts_on(form: Option<FORM>, opts: i32) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_opts_on() : form.is_null()", MODULE_PATH);
 
-    bindings::form_opts_on(form, opts)
+    bindings::form_opts_on(return_mut_ptr!(form), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_page.3x.html>
-pub unsafe fn form_page(form: FORM) -> i32 {
-    assert!(!form.is_null(), "{}form_page() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_page(form: Option<FORM>) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_page() : form.is_null()", MODULE_PATH);
 
-    bindings::form_page(form)
+    bindings::form_page(return_mut_ptr!(form))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_requestname.3x.html>
@@ -301,31 +301,31 @@ pub fn form_request_name(request: i32) -> Option<String> {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>
-pub unsafe fn form_sub(form: FORM) -> Option<WINDOW> {
-    assert!(!form.is_null(), "{}form_sub() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_sub(form: Option<FORM>) -> Option<WINDOW> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_sub() : form.is_null()", MODULE_PATH);
 
-    bindings::form_sub(form).as_mut().map(|ptr| ptr as WINDOW)
+    bindings::form_sub(return_mut_ptr!(form)).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn form_term(form: FORM) -> Option<Form_Hook> {
-    assert!(!form.is_null(), "{}form_term() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_term(form: Option<FORM>) -> Option<Form_Hook> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_term() : form.is_null()", MODULE_PATH);
 
-    (bindings::form_term(form) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
+    (bindings::form_term(return_mut_ptr!(form)) as Form_Hook).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_userptr.3x.html>
-pub unsafe fn form_userptr(form: FORM) -> Option<*mut libc::c_void> {
-    assert!(!form.is_null(), "{}form_userptr() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_userptr(form: Option<FORM>) -> Option<*mut libc::c_void> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_userptr() : form.is_null()", MODULE_PATH);
 
-    bindings::form_userptr(form).as_mut().map(|ptr| ptr as *mut libc::c_void)
+    bindings::form_userptr(return_mut_ptr!(form)).as_mut().map(|ptr| ptr as *mut libc::c_void)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>
-pub unsafe fn form_win(form: FORM) -> Option<WINDOW> {
-    assert!(!form.is_null(), "{}form_sub() : form.is_null()", MODULE_PATH);
+pub unsafe fn form_win(form: Option<FORM>) -> Option<WINDOW> {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}form_win() : form.is_null()", MODULE_PATH);
 
-    bindings::form_win(form).as_mut().map(|ptr| ptr as WINDOW)
+    bindings::form_win(return_mut_ptr!(form)).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_new.3x.html>
@@ -404,10 +404,10 @@ pub unsafe fn new_form(fields: *mut FIELD) -> Option<FORM> {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_new_page.3x.html>
-pub unsafe fn new_page(field: FIELD) -> bool {
-    assert!(!field.is_null(), "{}new_page() : field.is_null()", MODULE_PATH);
+pub unsafe fn new_page(field: Option<FIELD>) -> bool {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}new_page() : field.is_null()", MODULE_PATH);
 
-    bindings::new_page(field)
+    bindings::new_page(return_mut_ptr!(field))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_cursor.3x.html>
@@ -442,10 +442,10 @@ pub unsafe fn set_current_field(form: FORM, field: FIELD) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_attributes.3x.html>
-pub unsafe fn set_field_back(field: FIELD, attr: chtype) -> i32 {
-    assert!(!field.is_null(), "{}set_field_back() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_back(field: Option<FIELD>, attr: chtype) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_back() : field.is_null()", MODULE_PATH);
 
-    bindings::set_field_back(field, attr)
+    bindings::set_field_back(return_mut_ptr!(field), attr)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
@@ -457,79 +457,79 @@ pub unsafe fn set_field_buffer(field: FIELD, buf: i32, value: &[i8]) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_attributes.3x.html>
-pub unsafe fn set_field_fore(field: FIELD, attr: chtype) -> i32 {
-    assert!(!field.is_null(), "{}set_field_fore() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_fore(field: Option<FIELD>, attr: chtype) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_fore() : field.is_null()", MODULE_PATH);
 
-    bindings::set_field_fore(field, attr)
+    bindings::set_field_fore(return_mut_ptr!(field), attr)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn set_field_init(form: FORM, func: Form_Hook) -> i32 {
-    assert!(!form.is_null(), "{}set_field_init() : form.is_null()", MODULE_PATH);
+pub unsafe fn set_field_init(form: Option<FORM>, func: Form_Hook) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_field_init() : form.is_null()", MODULE_PATH);
 
-    bindings::set_field_init(form, func)
+    bindings::set_field_init(return_mut_ptr!(form), func)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_just.3x.html>
-pub unsafe fn set_field_just(field: FIELD, justification: i32) -> i32 {
-    assert!(!field.is_null(), "{}set_field_just() : field.is_null()", MODULE_PATH);
-    assert!(justification >= 0, "{}set_field_just() : justification = {}", MODULE_PATH, justification);
+pub unsafe fn set_field_just(field: Option<FIELD>, justification: i32) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_just() : field.is_null()", MODULE_PATH);
+    assert!(justification >= 0 && justification <= 3, "{}set_field_just() : justification = {}", MODULE_PATH, justification);
 
-    bindings::set_field_just(field, justification)
+    bindings::set_field_just(return_mut_ptr!(field), justification)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_opts.3x.html>
-pub unsafe fn set_field_opts(field: FIELD, opts: i32) -> i32 {
-    assert!(!field.is_null(), "{}set_field_opts() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_opts(field: Option<FIELD>, opts: i32) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_opts() : field.is_null()", MODULE_PATH);
 
-    bindings::set_field_opts(field, opts)
+    bindings::set_field_opts(return_mut_ptr!(field), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_attributes.3x.html>
-pub unsafe fn set_field_pad(field: FIELD, pad: i32) -> i32 {
-    assert!(!field.is_null(), "{}set_field_pad() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_pad(field: Option<FIELD>, pad: i32) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_pad() : field.is_null()", MODULE_PATH);
 
-    bindings::set_field_pad(field, pad)
+    bindings::set_field_pad(return_mut_ptr!(field), pad)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
-pub unsafe fn set_field_status(field: FIELD, status: bool) -> i32 {
-    assert!(!field.is_null(), "{}set_field_status() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_status(field: Option<FIELD>, status: bool) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_status() : field.is_null()", MODULE_PATH);
 
-    bindings::set_field_status(field, status)
+    bindings::set_field_status(return_mut_ptr!(field), status)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn set_field_term(form: FORM, func: Form_Hook) -> i32 {
-    assert!(!form.is_null(), "{}set_field_term() : form.is_null()", MODULE_PATH);
+pub unsafe fn set_field_term(form: Option<FORM>, func: Form_Hook) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_field_term() : form.is_null()", MODULE_PATH);
 
-    bindings::set_field_term(form, func)
+    bindings::set_field_term(return_mut_ptr!(form), func)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_validation.3x.html>
-pub unsafe fn set_field_type(field: FIELD, fieldtype: FieldType) -> i32 {
-    assert!(!field.is_null(), "{}set_field_type() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_type(field: Option<FIELD>, fieldtype: FieldType) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_type() : field.is_null()", MODULE_PATH);
 
     match fieldtype {
-        FieldType::AlphaNumeric(width)                        => bindings::set_field_type(field, TYPE_ALNUM, width),
-        FieldType::Alpha(width)                               => bindings::set_field_type(field, TYPE_ALPHA, width),
+        FieldType::AlphaNumeric(width)                        => bindings::set_field_type(return_mut_ptr!(field), TYPE_ALNUM, width),
+        FieldType::Alpha(width)                               => bindings::set_field_type(return_mut_ptr!(field), TYPE_ALPHA, width),
         FieldType::Enum(value_list, check_case, check_unique) => {
             assert!(!value_list.is_null(), "{}set_field_type() : value_list.is_null()", MODULE_PATH);
 
-            bindings::set_field_type(field, TYPE_ENUM, value_list, i32::from(check_case), i32::from(check_unique))
+            bindings::set_field_type(return_mut_ptr!(field), TYPE_ENUM, value_list, i32::from(check_case), i32::from(check_unique))
         },
-        FieldType::Integer(padding, minimum, maximum)         => bindings::set_field_type(field, TYPE_INTEGER, padding, minimum, maximum),
-        FieldType::Numeric(padding, minimum, maximum)         => bindings::set_field_type(field, TYPE_NUMERIC, padding, minimum, maximum),
+        FieldType::Integer(padding, minimum, maximum)         => bindings::set_field_type(return_mut_ptr!(field), TYPE_INTEGER, padding, minimum, maximum),
+        FieldType::Numeric(padding, minimum, maximum)         => bindings::set_field_type(return_mut_ptr!(field), TYPE_NUMERIC, padding, minimum, maximum),
         FieldType::RegExp(regexp)                             => {
             assert!(!regexp.is_null(), "{}set_field_type() : regexp.is_null()", MODULE_PATH);
 
-            bindings::set_field_type(field, TYPE_REGEXP, regexp)
+            bindings::set_field_type(return_mut_ptr!(field), TYPE_REGEXP, regexp)
         },
-        FieldType::Ipv4                                       => bindings::set_field_type(field, TYPE_IPV4),
+        FieldType::Ipv4                                       => bindings::set_field_type(return_mut_ptr!(field), TYPE_IPV4),
         FieldType::Custom(fieldtype, args)                    => {
             assert!(!fieldtype.is_null(), "{}set_field_type() : fieldtype.is_null()", MODULE_PATH);
 
-            bindings::set_field_type(field, fieldtype, args)
+            bindings::set_field_type(return_mut_ptr!(field), fieldtype, args)
         }
     }
 }
@@ -560,11 +560,11 @@ pub unsafe fn set_fieldtype_choice(
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_userptr.3x.html>
-pub unsafe fn set_field_userptr(field: FIELD, userptr: Option<*mut libc::c_void>) -> i32 {
-    assert!(!field.is_null(), "{}set_field_userptr() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_field_userptr(field: Option<FIELD>, userptr: Option<*mut libc::c_void>) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_userptr() : field.is_null()", MODULE_PATH);
     assert!(userptr.map_or_else(|| true, |userptr| !userptr.is_null()), "{}set_field_userptr() : userptr.is_null()", MODULE_PATH);
 
-    bindings::set_field_userptr(field, return_mut_ptr!(userptr))
+    bindings::set_field_userptr(return_mut_ptr!(field), return_mut_ptr!(userptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_field_buffer.3x.html>
@@ -576,17 +576,17 @@ pub unsafe fn set_form_fields(form: FORM, fields: *mut FIELD) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn set_form_init(form: FORM, func: Form_Hook) -> i32 {
-    assert!(!form.is_null(), "{}set_form_init() : form.is_null()", MODULE_PATH);
+pub unsafe fn set_form_init(form: Option<FORM>, func: Form_Hook) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_form_init() : form.is_null()", MODULE_PATH);
 
-    bindings::set_form_init(form, func)
+    bindings::set_form_init(return_mut_ptr!(form), func)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_opts.3x.html>
-pub unsafe fn set_form_opts(form: FORM, opts: i32) -> i32 {
-    assert!(!form.is_null(), "{}set_form_opts() : form.is_null()", MODULE_PATH);
+pub unsafe fn set_form_opts(form: Option<FORM>, opts: i32) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_form_opts() : form.is_null()", MODULE_PATH);
 
-    bindings::set_form_opts(form, opts)
+    bindings::set_form_opts(return_mut_ptr!(form), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_page.3x.html>
@@ -606,18 +606,18 @@ pub unsafe fn set_form_sub(form: Option<FORM>, sub: Option<WINDOW>) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_hook.3x.html>
-pub unsafe fn set_form_term(form: FORM, func: Form_Hook) -> i32 {
-    assert!(!form.is_null(), "{}set_form_term() : form.is_null()", MODULE_PATH);
+pub unsafe fn set_form_term(form: Option<FORM>, func: Form_Hook) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_form_term() : form.is_null()", MODULE_PATH);
 
-    bindings::set_form_init(form, func)
+    bindings::set_form_init(return_mut_ptr!(form), func)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_userptr.3x.html>
-pub unsafe fn set_form_userptr(form: FORM, userptr: Option<*mut libc::c_void>) -> i32 {
-    assert!(!form.is_null(), "{}set_form_userptr() : form.is_null()", MODULE_PATH);
+pub unsafe fn set_form_userptr(form: Option<FORM>, userptr: Option<*mut libc::c_void>) -> i32 {
+    assert!(form.map_or_else(|| true, |form| !form.is_null()), "{}set_form_userptr() : form.is_null()", MODULE_PATH);
     assert!(userptr.map_or_else(|| true, |userptr| !userptr.is_null()), "{}set_form_userptr() : userptr.is_null()", MODULE_PATH);
 
-    bindings::set_form_userptr(form, return_mut_ptr!(userptr))
+    bindings::set_form_userptr(return_mut_ptr!(form), return_mut_ptr!(userptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/form_win.3x.html>
@@ -637,10 +637,10 @@ pub unsafe fn set_max_field(field: FIELD, max: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/form_new_page.3x.html>
-pub unsafe fn set_new_page(field: FIELD, new_page_flag: bool) -> i32 {
-    assert!(!field.is_null(), "{}set_new_page() : field.is_null()", MODULE_PATH);
+pub unsafe fn set_new_page(field: Option<FIELD>, new_page_flag: bool) -> i32 {
+    assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_new_page() : field.is_null()", MODULE_PATH);
 
-    bindings::set_new_page(field, new_page_flag)
+    bindings::set_new_page(return_mut_ptr!(field), new_page_flag)
 }
 
 /// <https://invisible-island.net/ncurses/man/form_page.3x.html>

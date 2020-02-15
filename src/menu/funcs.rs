@@ -120,7 +120,9 @@ pub fn item_index(item: ITEM) -> menu_result!(i32) {
 }
 
 /// Returns the current menu item init hook.
-pub fn item_init(menu: MENU) -> menu_result!(Menu_Hook) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn item_init(menu: Option<MENU>) -> menu_result!(Menu_Hook) {
     unsafe { nmenu::item_init(menu).ok_or_else(|| menu_function_error_with_rc!("item_init", errno().into())) }
 }
 
@@ -130,12 +132,16 @@ pub fn item_name(item: ITEM) -> menu_result!(String) {
 }
 
 /// Returns the item's current options.
-pub fn item_opts(item: ITEM) -> ItemOptions {
+///
+/// If `item` is `None` then the default value is returned.
+pub fn item_opts(item: Option<ITEM>) -> ItemOptions {
     unsafe { ItemOptions::from(nmenu::item_opts(item)) }
 }
 
 /// Turns off the given options, and leaves others alone.
-pub fn item_opts_off(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
+///
+/// If `item` is `None` then the default value is returned.
+pub fn item_opts_off(item: Option<ITEM>, opts: ItemOptions) -> menu_result!(()) {
     match unsafe { nmenu::item_opts_off(item, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("item_opts_off", rc))
@@ -143,7 +149,9 @@ pub fn item_opts_off(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
 }
 
 /// Turns on the given options, and leaves others alone.
-pub fn item_opts_on(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
+///
+/// If `item` is `None` then the default value is returned.
+pub fn item_opts_on(item: Option<ITEM>, opts: ItemOptions) -> menu_result!(()) {
     match unsafe { nmenu::item_opts_on(item, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("item_opts_on", rc))
@@ -151,12 +159,16 @@ pub fn item_opts_on(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
 }
 
 /// Returns the current menu item term hook.
-pub fn item_term(menu: MENU) -> menu_result!(Menu_Hook) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn item_term(menu: Option<MENU>) -> menu_result!(Menu_Hook) {
     unsafe { nmenu::item_term(menu).ok_or_else(|| menu_function_error_with_rc!("item_term", errno().into())) }
 }
 
 /// Returns the menu item user pointer.
-pub fn item_userptr(item: ITEM) -> MenuUserPtr {
+///
+/// If `item` is `None` then the default value is returned.
+pub fn item_userptr(item: Option<ITEM>) -> MenuUserPtr {
     unsafe { nmenu::item_userptr(item) }
 }
 
@@ -176,7 +188,9 @@ pub fn item_visible(item: ITEM) -> bool {
 /// value of `None`, if the menu being accessed was created using `new_menu_sp()`
 /// then `normal::Attributes::set_screen()` should be called to set the correct
 /// screen pointer, this is required to obtain the correct `normal::ColorPair`.
-pub fn menu_back(menu: MENU) -> normal::Attributes {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_back(menu: Option<MENU>) -> normal::Attributes {
     unsafe { normal::Attributes::_from(None, nmenu::menu_back(menu)) }
 }
 
@@ -217,13 +231,17 @@ pub fn menu_driver(menu: MENU, request: MenuRequest) -> menu_result!(Option<Menu
 /// value of `None`, if the menu being accessed was created using `new_menu_sp()`
 /// then `normal::Attributes::set_screen()` should be called to set the correct
 /// screen pointer, this is required to obtain the correct `normal::ColorPair`.
-pub fn menu_fore(menu: MENU) -> normal::Attributes {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_fore(menu: Option<MENU>) -> normal::Attributes {
     unsafe { normal::Attributes::_from(None, nmenu::menu_fore(menu)) }
 }
 
 /// Returns the maximum-size constraints for the given menu into the storage
 /// addressed by rows and cols.
-pub fn menu_format(menu: MENU) -> MenuSize {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_format(menu: Option<MENU>) -> MenuSize {
     let mut rows: [i32; 1] = [0];
     let mut cols: [i32; 1] = [0];
 
@@ -238,12 +256,16 @@ pub fn menu_format(menu: MENU) -> MenuSize {
 /// value of `None`, if the menu being accessed was created using `new_menu_sp()`
 /// then `normal::Attributes::set_screen()` should be called to set the correct
 /// screen pointer, this is required to obtain the correct `normal::ColorPair`.
-pub fn menu_grey(menu: MENU) -> normal::Attributes {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_grey(menu: Option<MENU>) -> normal::Attributes {
     unsafe { normal::Attributes::_from(None, nmenu::menu_grey(menu)) }
 }
 
 /// Returns the current menu init hook.
-pub fn menu_init(menu: MENU) -> menu_result!(Menu_Hook) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_init(menu: Option<MENU>) -> menu_result!(Menu_Hook) {
     unsafe { nmenu::menu_init(menu).ok_or_else(|| menu_function_error_with_rc!("menu_init", errno().into())) }
 }
 
@@ -253,17 +275,23 @@ pub fn menu_items(menu: MENU) -> menu_result!(Vec<ITEM>) {
 }
 
 /// Returns the menu's mark string.
-pub fn menu_mark(menu: MENU) -> menu_result!(String) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_mark(menu: Option<MENU>) -> menu_result!(String) {
     unsafe { nmenu::menu_mark(menu).ok_or_else(|| menu_function_error!("menu_mark")) }
 }
 
 /// Returns the menu's current options.
-pub fn menu_opts(menu: MENU) -> MenuOptions {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_opts(menu: Option<MENU>) -> MenuOptions {
     unsafe { MenuOptions::from(nmenu::menu_opts(menu)) }
 }
 
 /// Turns off the given options, and leaves others alone.
-pub fn menu_opts_off(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn menu_opts_off(menu: Option<MENU>, opts: MenuOptions) -> menu_result!(()) {
     match unsafe { nmenu::menu_opts_off(menu, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("menu_opts_off", rc))
@@ -271,7 +299,9 @@ pub fn menu_opts_off(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 }
 
 /// Turns on the given options, and leaves others alone.
-pub fn menu_opts_on(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn menu_opts_on(menu: Option<MENU>, opts: MenuOptions) -> menu_result!(()) {
     match unsafe { nmenu::menu_opts_on(menu, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("menu_opts_on", rc))
@@ -279,7 +309,9 @@ pub fn menu_opts_on(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 }
 
 /// Returns the given menu's pad character. The default is a blank.
-pub fn menu_pad(menu: MENU) -> menu_result!(char) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_pad(menu: Option<MENU>) -> menu_result!(char) {
     Ok(char::from(u8::try_from(u32::try_from(unsafe { nmenu::menu_pad(menu) })?)?))
 }
 
@@ -311,7 +343,9 @@ pub fn menu_request_name(request: MenuRequest) -> menu_result!(String) {
 }
 
 /// Returns the spacing info for the menu.
-pub fn menu_spacing(menu: MENU) -> menu_result!(MenuSpacing) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_spacing(menu: Option<MENU>) -> menu_result!(MenuSpacing) {
     let mut description: [i32; 1] = [0];
     let mut rows: [i32; 1] = [0];
     let mut cols: [i32; 1] = [0];
@@ -323,22 +357,30 @@ pub fn menu_spacing(menu: MENU) -> menu_result!(MenuSpacing) {
 }
 
 /// Returns the menus sub-window.
-pub fn menu_sub(menu: MENU) -> menu_result!(WINDOW) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_sub(menu: Option<MENU>) -> menu_result!(WINDOW) {
     unsafe { nmenu::menu_sub(menu).ok_or_else(|| menu_function_error!("menu_sub")) }
 }
 
 /// Returns the current menu term hook.
-pub fn menu_term(menu: MENU) -> menu_result!(Menu_Hook) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_term(menu: Option<MENU>) -> menu_result!(Menu_Hook) {
     unsafe { nmenu::menu_term(menu).ok_or_else(|| menu_function_error_with_rc!("menu_term", errno().into())) }
 }
 
 /// Returns the menu user pointer.
-pub fn menu_userptr(menu: MENU) -> MenuUserPtr {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_userptr(menu: Option<MENU>) -> MenuUserPtr {
     unsafe { nmenu::menu_userptr(menu) }
 }
 
 /// Returns the menus main-window.
-pub fn menu_win(menu: MENU) -> menu_result!(WINDOW) {
+///
+/// If `menu` is `None` then the default value is returned.
+pub fn menu_win(menu: Option<MENU>) -> menu_result!(WINDOW) {
     unsafe { nmenu::menu_win(menu).ok_or_else(|| menu_function_error!("menu_win")) }
 }
 
@@ -417,7 +459,9 @@ pub fn set_current_item(menu: MENU, item: ITEM) -> menu_result!(()) {
 
 /// Sets a hook to be called at menu-post time and each time the selected
 /// item changes (after the change).
-pub fn set_item_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_item_init(menu: Option<MENU>, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_item_init(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_item_init", rc))
@@ -425,7 +469,9 @@ pub fn set_item_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 /// Sets all the given item's options.
-pub fn set_item_opts(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
+///
+/// If `item` is `None` then the default value is set.
+pub fn set_item_opts(item: Option<ITEM>, opts: ItemOptions) -> menu_result!(()) {
     match unsafe { nmenu::set_item_opts(item, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_item_opts", rc))
@@ -434,7 +480,9 @@ pub fn set_item_opts(item: ITEM, opts: ItemOptions) -> menu_result!(()) {
 
 /// Sets a hook to be called at menu-unpost time and each time the selected
 /// item changes (before the change).
-pub fn set_item_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_item_term(menu: Option<MENU>, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_item_term(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_item_term", rc))
@@ -442,7 +490,9 @@ pub fn set_item_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 /// Sets the menu item user pointer.
-pub fn set_item_userptr(item: ITEM, userptr: MenuUserPtr) {
+///
+/// If `item` is `None` then the default value is set.
+pub fn set_item_userptr(item: Option<ITEM>, userptr: MenuUserPtr) {
     unsafe { nmenu::set_item_userptr(item, userptr) };
 }
 
@@ -456,7 +506,9 @@ pub fn set_item_value(item: ITEM, value: bool) -> menu_result!(()) {
 
 /// Sets the background attribute of menu. This is the highlight used for
 /// selectable (but not currently selected) menu items.
-pub fn set_menu_back(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_back(menu: Option<MENU>, attr: normal::Attributes) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_back(menu, attr.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_back", rc))
@@ -464,7 +516,9 @@ pub fn set_menu_back(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
 }
 
 /// Sets the foreground attribute of menu. This is the highlight used for selected menu items.
-pub fn set_menu_fore(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_fore(menu: Option<MENU>, attr: normal::Attributes) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_fore(menu, attr.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_fore", rc))
@@ -479,6 +533,8 @@ pub fn set_menu_fore(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
 /// The default format is 16 rows, 1 column. Calling `set_menu_format()` with a
 /// menu of `None` will change this default. A zero row or column argument to
 /// `set_menu_format()` is interpreted as a request not to change the current value.
+///
+/// If `menu` is `None` then the default value is set.
 pub fn set_menu_format(menu: Option<MENU>, menu_size: MenuSize) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_format(menu, menu_size.rows, menu_size.columns) } {
         E_OK => Ok(()),
@@ -488,7 +544,9 @@ pub fn set_menu_format(menu: Option<MENU>, menu_size: MenuSize) -> menu_result!(
 
 /// Sets the grey attribute of menu. This is the highlight used for un-selectable
 /// menu items in menus that permit more than one selection.
-pub fn set_menu_grey(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_grey(menu: Option<MENU>, attr: normal::Attributes) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_grey(menu, attr.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_grey", rc))
@@ -497,7 +555,9 @@ pub fn set_menu_grey(menu: MENU, attr: normal::Attributes) -> menu_result!(()) {
 
 /// Sets a hook to be called at menu-post time and just after the top row on the
 /// menu changes once it is posted.
-pub fn set_menu_init(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_init(menu: Option<MENU>, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_init(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_init", rc))
@@ -524,7 +584,9 @@ pub fn set_menu_items(menu: MENU, item_handles: &mut Vec<ITEM>) -> menu_result!(
 /// Sets the mark string for the given menu. Note that changing the length of
 /// the mark string for a menu while the menu is posted is likely to produce
 /// undefined behavior. The default string is "-" (a dash).
-pub fn set_menu_mark(menu: MENU, mark: &str) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_mark(menu: Option<MENU>, mark: &str) -> menu_result!(()) {
     if menu_mark(menu)? != '-'.to_string() {
         Err(NCurseswMenuError::BadArgument { func: "set_menu_mark".to_string() })
     } else {
@@ -536,7 +598,9 @@ pub fn set_menu_mark(menu: MENU, mark: &str) -> menu_result!(()) {
 }
 
 /// Sets all the given item's options.
-pub fn set_menu_opts(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_opts(menu: Option<MENU>, opts: MenuOptions) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_opts(menu, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_opts", rc))
@@ -545,7 +609,9 @@ pub fn set_menu_opts(menu: MENU, opts: MenuOptions) -> menu_result!(()) {
 
 /// Sets the character used to fill the space between the name and description
 /// parts of a menu item.
-pub fn set_menu_pad(menu: MENU, pad: char) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_pad(menu: Option<MENU>, pad: char) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_pad(menu, i32::from(u8::try_from(u32::from(pad))?)) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_pad", rc))
@@ -572,7 +638,9 @@ pub fn set_menu_pattern(menu: MENU, pattern: &str) -> menu_result!(()) {
 /// parameter controls the number of blanks between columns of items. It must not be larger
 /// than `TABSIZE`. A value of 0 for all the spacing values resets them to the default,
 /// which is 1 for all of them.
-pub fn set_menu_spacing(menu: MENU, menu_spacing: MenuSpacing) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_spacing(menu: Option<MENU>, menu_spacing: MenuSpacing) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_spacing(
         menu,
         menu_spacing.description,
@@ -595,7 +663,9 @@ pub fn set_menu_sub(menu: Option<MENU>, win: Option<WINDOW>) -> menu_result!(())
 
 /// Sets a hook to be called at menu-unpost time and just before the top row
 /// on the menu changes once it is posted.
-pub fn set_menu_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_term(menu: Option<MENU>, hook: Menu_Hook) -> menu_result!(()) {
     match unsafe { nmenu::set_menu_term(menu, hook) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_term", rc))
@@ -603,7 +673,9 @@ pub fn set_menu_term(menu: MENU, hook: Menu_Hook) -> menu_result!(()) {
 }
 
 /// Sets the menu user pointer.
-pub fn set_menu_userptr(menu: MENU, userptr: MenuUserPtr) {
+///
+/// If `menu` is `None` then the default value is set.
+pub fn set_menu_userptr(menu: Option<MENU>, userptr: MenuUserPtr) {
     unsafe { nmenu::set_menu_userptr(menu, userptr) };
 }
 
