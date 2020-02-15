@@ -82,10 +82,10 @@ pub unsafe fn item_index(item: ITEM) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn item_init(menu: MENU) -> Option<Menu_Hook> {
-    assert!(!menu.is_null(), "{}item_init() : menu.is_null()", MODULE_PATH);
+pub unsafe fn item_init(menu: Option<MENU>) -> Option<Menu_Hook> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}item_init() : menu.is_null()", MODULE_PATH);
 
-    bindings::item_init(menu).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::item_init(return_mut_ptr!(menu)).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_name.3x.html>
@@ -96,38 +96,38 @@ pub unsafe fn item_name(item: ITEM) -> Option<String> {
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_opts.3x.html>
-pub unsafe fn item_opts(item: ITEM) -> i32 {
-    assert!(!item.is_null(), "{}item_opts() : item.is_null()", MODULE_PATH);
+pub unsafe fn item_opts(item: Option<ITEM>) -> i32 {
+    assert!(item.map_or_else(|| true, |item| !item.is_null()), "{}item_opts() : item.is_null()", MODULE_PATH);
 
-    bindings::item_opts(item)
+    bindings::item_opts(return_mut_ptr!(item))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_opts.3x.html>
-pub unsafe fn item_opts_off(item: ITEM, opts: i32) -> i32 {
-    assert!(!item.is_null(), "{}item_opts_off() : item.is_null()", MODULE_PATH);
+pub unsafe fn item_opts_off(item: Option<ITEM>, opts: i32) -> i32 {
+    assert!(item.map_or_else(|| true, |item| !item.is_null()), "{}item_opts_off() : item.is_null()", MODULE_PATH);
 
-    bindings::item_opts_off(item, opts)
+    bindings::item_opts_off(return_mut_ptr!(item), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_opts.3x.html>
-pub unsafe fn item_opts_on(item: ITEM, opts: i32) -> i32 {
-    assert!(!item.is_null(), "{}item_opts_on() : item.is_null()", MODULE_PATH);
+pub unsafe fn item_opts_on(item: Option<ITEM>, opts: i32) -> i32 {
+    assert!(item.map_or_else(|| true, |item| !item.is_null()), "{}item_opts_on() : item.is_null()", MODULE_PATH);
 
-    bindings::item_opts_on(item, opts)
+    bindings::item_opts_on(return_mut_ptr!(item), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn item_term(menu: MENU) -> Option<Menu_Hook> {
-    assert!(!menu.is_null(), "{}item_term() : menu.is_null()", MODULE_PATH);
+pub unsafe fn item_term(menu: Option<MENU>) -> Option<Menu_Hook> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}item_term() : menu.is_null()", MODULE_PATH);
 
-    bindings::item_term(menu).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::item_term(return_mut_ptr!(menu)).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
-pub unsafe fn item_userptr(item: ITEM) -> Option<MENU_USERPTR> {
-    assert!(!item.is_null(), "{}item_userptr() : item.is_null()", MODULE_PATH);
+pub unsafe fn item_userptr(item: Option<ITEM>) -> Option<MENU_USERPTR> {
+    assert!(item.map_or_else(|| true, |item| !item.is_null()), "{}item_userptr() : item.is_null()", MODULE_PATH);
 
-    bindings::item_userptr(item).as_mut().map(|ptr| ptr as MENU_USERPTR)
+    bindings::item_userptr(return_mut_ptr!(item)).as_mut().map(|ptr| ptr as MENU_USERPTR)
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_value.3x.html>
@@ -145,10 +145,10 @@ pub unsafe fn item_visible(item: ITEM) -> bool {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn menu_back(menu: MENU) -> chtype {
-    assert!(!menu.is_null(), "{}menu_back() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_back(menu: Option<MENU>) -> chtype {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_back() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_back(menu)
+    bindings::menu_back(return_mut_ptr!(menu))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_driver.3x.html>
@@ -159,33 +159,33 @@ pub unsafe fn menu_driver(menu: MENU, c: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn menu_fore(menu: MENU) -> chtype {
-    assert!(!menu.is_null(), "{}menu_fore() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_fore(menu: Option<MENU>) -> chtype {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_fore() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_fore(menu)
+    bindings::menu_fore(return_mut_ptr!(menu))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_format.3x.html>
-pub unsafe fn menu_format(menu: MENU, rows: *mut i32, cols: *mut i32) {
-    assert!(!menu.is_null(), "{}menu_format() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_format(menu: Option<MENU>, rows: *mut i32, cols: *mut i32) {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_format() : menu.is_null()", MODULE_PATH);
     assert!(!rows.is_null(), "{}menu_format() : rows.is_null()", MODULE_PATH);
     assert!(!cols.is_null(), "{}menu_format() : cols.is_null()", MODULE_PATH);
 
-    bindings::menu_format(menu, rows, cols)
+    bindings::menu_format(return_mut_ptr!(menu), rows, cols)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn menu_grey(menu: MENU) -> chtype {
-    assert!(!menu.is_null(), "{}menu_grey() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_grey(menu: Option<MENU>) -> chtype {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_grey() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_grey(menu)
+    bindings::menu_grey(return_mut_ptr!(menu))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn menu_init(menu: MENU) -> Option<Menu_Hook> {
-    assert!(!menu.is_null(), "{}menu_init() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_init(menu: Option<MENU>) -> Option<Menu_Hook> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_init() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_init(menu).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::menu_init(return_mut_ptr!(menu)).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
@@ -198,38 +198,38 @@ pub unsafe fn menu_items(menu: MENU) -> Option<Vec<ITEM>> {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_mark.3x.html>
-pub unsafe fn menu_mark(menu: MENU) -> Option<String> {
-    assert!(!menu.is_null(), "{}menu_mark() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_mark(menu: Option<MENU>) -> Option<String> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_mark() : menu.is_null()", MODULE_PATH);
 
-    (bindings::menu_mark(menu) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+    (bindings::menu_mark(return_mut_ptr!(menu)) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_opts.3x.html>
-pub unsafe fn menu_opts(menu: MENU) -> i32 {
-    assert!(!menu.is_null(), "{}menu_opts() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_opts(menu: Option<MENU>) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_opts() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_opts(menu)
+    bindings::menu_opts(return_mut_ptr!(menu))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_opts.3x.html>
-pub unsafe fn menu_opts_off(menu: MENU, opts: i32) -> i32 {
-    assert!(!menu.is_null(), "{}menu_opts_off() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_opts_off(menu: Option<MENU>, opts: i32) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_opts_off() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_opts_off(menu, opts)
+    bindings::menu_opts_off(return_mut_ptr!(menu), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_opts.3x.html>
-pub unsafe fn menu_opts_on(menu: MENU, opts: i32) -> i32 {
-    assert!(!menu.is_null(), "{}menu_opts_on() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_opts_on(menu: Option<MENU>, opts: i32) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_opts_on() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_opts_on(menu, opts)
+    bindings::menu_opts_on(return_mut_ptr!(menu), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn menu_pad(menu: MENU) -> i32 {
-    assert!(!menu.is_null(), "{}menu_pad() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_pad(menu: Option<MENU>) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_pad() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_pad(menu)
+    bindings::menu_pad(return_mut_ptr!(menu))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_pattern.3x.html>
@@ -251,45 +251,45 @@ pub fn menu_request_name(request: i32) -> Option<String> {
 
 /// <https://invisible-island.net/ncurses/man/menu_spacing.3x.html>
 pub unsafe fn menu_spacing(
-    menu:            MENU,
+    menu:            Option<MENU>,
     spc_description: *mut i32,
     spc_rows:        *mut i32,
     spc_columns:     *mut i32
 ) -> i32 {
-    assert!(!menu.is_null(), "{}menu_spacing() : menu.is_null()", MODULE_PATH);
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_spacing() : menu.is_null()", MODULE_PATH);
     assert!(!spc_description.is_null(), "{}menu_spacing() : spc_description.is_null()", MODULE_PATH);
     assert!(!spc_rows.is_null(), "{}menu_spacing() : spc_rows.is_null()", MODULE_PATH);
     assert!(!spc_columns.is_null(), "{}menu_spacing() : spc_columns.is_null()", MODULE_PATH);
 
-    bindings::menu_spacing(menu, spc_description, spc_rows, spc_columns)
+    bindings::menu_spacing(return_mut_ptr!(menu), spc_description, spc_rows, spc_columns)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_win.3x.html>
-pub unsafe fn menu_sub(menu: MENU) -> Option<WINDOW> {
-    assert!(!menu.is_null(), "{}menu_sub() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_sub(menu: Option<MENU>) -> Option<WINDOW> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_sub() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_sub(menu).as_mut().map(|ptr| ptr as WINDOW)
+    bindings::menu_sub(return_mut_ptr!(menu)).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn menu_term(menu: MENU) -> Option<Menu_Hook> {
-    assert!(!menu.is_null(), "{}menu_term() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_term(menu: Option<MENU>) -> Option<Menu_Hook> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_term() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_term(menu).as_mut().map(|ptr| mem::transmute(ptr))
+    bindings::menu_term(return_mut_ptr!(menu)).as_mut().map(|ptr| mem::transmute(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>
-pub unsafe fn menu_userptr(menu: MENU) -> Option<MENU_USERPTR> {
-    assert!(!menu.is_null(), "{}menu_userptr() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_userptr(menu: Option<MENU>) -> Option<MENU_USERPTR> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_userptr() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_userptr(menu).as_mut().map(|ptr| ptr as MENU_USERPTR)
+    bindings::menu_userptr(return_mut_ptr!(menu)).as_mut().map(|ptr| ptr as MENU_USERPTR)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_win.3x.html>
-pub unsafe fn menu_win(menu: MENU) -> Option<WINDOW> {
-    assert!(!menu.is_null(), "{}menu_win() : menu.is_null()", MODULE_PATH);
+pub unsafe fn menu_win(menu: Option<MENU>) -> Option<WINDOW> {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}menu_win() : menu.is_null()", MODULE_PATH);
 
-    bindings::menu_win(menu).as_mut().map(|ptr| ptr as WINDOW)
+    bindings::menu_win(return_mut_ptr!(menu)).as_mut().map(|ptr| ptr as WINDOW)
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_new.3x.html>
@@ -339,32 +339,32 @@ pub unsafe fn set_current_item(menu: MENU, item: ITEM) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn set_item_init(menu: MENU, hook: Menu_Hook) -> i32 {
-    assert!(!menu.is_null(), "{}set_item_init() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_item_init(menu: Option<MENU>, hook: Menu_Hook) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_item_init() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_item_init(menu, hook)
+    bindings::set_item_init(return_mut_ptr!(menu), hook)
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_opts.3x.html>
-pub unsafe fn set_item_opts(item: ITEM, opts: i32) -> i32 {
-    assert!(!item.is_null(), "{}set_item_opts() : item.is_null()", MODULE_PATH);
+pub unsafe fn set_item_opts(item: Option<ITEM>, opts: i32) -> i32 {
+    assert!(item.map_or_else(|| true, |item| !item.is_null()), "{}set_item_opts() : item.is_null()", MODULE_PATH);
 
-    bindings::set_item_opts(item, opts)
+    bindings::set_item_opts(return_mut_ptr!(item), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn set_item_term(menu: MENU, hook: Menu_Hook) -> i32 {
-    assert!(!menu.is_null(), "{}set_item_term() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_item_term(menu: Option<MENU>, hook: Menu_Hook) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_item_term() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_item_term(menu, hook)
+    bindings::set_item_term(return_mut_ptr!(menu), hook)
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_userptr.3x.html>
-pub unsafe fn set_item_userptr(item: ITEM, userptr: Option<MENU_USERPTR>) -> i32 {
-    assert!(!item.is_null(), "{}set_item_userptr() : item.is_null()", MODULE_PATH);
+pub unsafe fn set_item_userptr(item: Option<ITEM>, userptr: Option<MENU_USERPTR>) -> i32 {
+    assert!(item.map_or_else(|| true, |item| !item.is_null()), "{}set_item_userptr() : item.is_null()", MODULE_PATH);
     assert!(userptr.map_or_else(|| true, |userptr| !userptr.is_null()), "{}set_item_userptr() : userptr.is_null()", MODULE_PATH);
 
-    bindings::set_item_userptr(item, return_mut_ptr!(userptr))
+    bindings::set_item_userptr(return_mut_ptr!(item), return_mut_ptr!(userptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_value.3x.html>
@@ -375,17 +375,17 @@ pub unsafe fn set_item_value(item: ITEM, value: bool) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn set_menu_back(menu: MENU, attr: chtype) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_back() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_back(menu: Option<MENU>, attr: chtype) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_back() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_back(menu, attr)
+    bindings::set_menu_back(return_mut_ptr!(menu), attr)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn set_menu_fore(menu: MENU, attr: chtype) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_fore() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_fore(menu: Option<MENU>, attr: chtype) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_fore() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_fore(menu, attr)
+    bindings::set_menu_fore(return_mut_ptr!(menu), attr)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_format.3x.html>
@@ -398,17 +398,17 @@ pub unsafe fn set_menu_format(menu: Option<MENU>, rows: i32, cols: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn set_menu_grey(menu: MENU, attr: chtype) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_grey() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_grey(menu: Option<MENU>, attr: chtype) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_grey() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_grey(menu, attr)
+    bindings::set_menu_grey(return_mut_ptr!(menu), attr)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn set_menu_init(menu: MENU, hook: Menu_Hook) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_init() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_init(menu: Option<MENU>, hook: Menu_Hook) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_init() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_init(menu, hook)
+    bindings::set_menu_init(return_mut_ptr!(menu), hook)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_items.3x.html>
@@ -420,24 +420,24 @@ pub unsafe fn set_menu_items(menu: MENU, item_handles: *mut ITEM) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_mark.3x.html>
-pub unsafe fn set_menu_mark(menu: MENU, mark: &[i8]) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_mark() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_mark(menu: Option<MENU>, mark: &[i8]) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_mark() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_mark(menu, mark.as_ptr())
+    bindings::set_menu_mark(return_mut_ptr!(menu), mark.as_ptr())
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_opts.3x.html>
-pub unsafe fn set_menu_opts(menu: MENU, opts: i32) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_opts() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_opts(menu: Option<MENU>, opts: i32) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_opts() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_opts(menu, opts)
+    bindings::set_menu_opts(return_mut_ptr!(menu), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_attributes.3x.html>
-pub unsafe fn set_menu_pad(menu: MENU, opts: i32) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_pad() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_pad(menu: Option<MENU>, opts: i32) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_pad() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_pad(menu, opts)
+    bindings::set_menu_pad(return_mut_ptr!(menu), opts)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_pattern.3x.html>
@@ -449,17 +449,17 @@ pub unsafe fn set_menu_pattern(menu: MENU, pattern: &[i8]) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/menu_spacing.3x.html>
 pub unsafe fn set_menu_spacing(
-    menu:            MENU,
+    menu:            Option<MENU>,
     spc_description: i32,
     spc_rows:        i32,
     spc_columns:     i32
 ) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_spacing() : menu.is_null()", MODULE_PATH);
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_spacing() : menu.is_null()", MODULE_PATH);
     assert!(spc_description >= 0, "{}set_menu_spacing() : spc_description = {}", MODULE_PATH, spc_description);
     assert!(spc_rows >= 0, "{}set_menu_spacing() : spc_rows = {}", MODULE_PATH, spc_rows);
     assert!(spc_columns >= 0, "{}set_menu_spacing() : spc_columns = {}", MODULE_PATH, spc_columns);
 
-    bindings::set_menu_spacing(menu, spc_description, spc_rows, spc_columns)
+    bindings::set_menu_spacing(return_mut_ptr!(menu), spc_description, spc_rows, spc_columns)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_win.3x.html>
@@ -471,18 +471,18 @@ pub unsafe fn set_menu_sub(menu: Option<MENU>, sub: Option<WINDOW>) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_hook.3x.html>
-pub unsafe fn set_menu_term(menu: MENU, hook: Menu_Hook) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_term() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_term(menu: Option<MENU>, hook: Menu_Hook) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_term() : menu.is_null()", MODULE_PATH);
 
-    bindings::set_menu_term(menu, hook)
+    bindings::set_menu_term(return_mut_ptr!(menu), hook)
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_userptr.3x.html>
-pub unsafe fn set_menu_userptr(menu: MENU, userptr: Option<MENU_USERPTR>) -> i32 {
-    assert!(!menu.is_null(), "{}set_menu_userptr() : menu.is_null()", MODULE_PATH);
+pub unsafe fn set_menu_userptr(menu: Option<MENU>, userptr: Option<MENU_USERPTR>) -> i32 {
+    assert!(menu.map_or_else(|| true, |menu| !menu.is_null()), "{}set_menu_userptr() : menu.is_null()", MODULE_PATH);
     assert!(userptr.map_or_else(|| true, |userptr| !userptr.is_null()), "{}set_menu_userptr() : userptr.is_null()", MODULE_PATH);
 
-    bindings::set_menu_userptr(menu, return_mut_ptr!(userptr))
+    bindings::set_menu_userptr(return_mut_ptr!(menu), return_mut_ptr!(userptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/menu_win.3x.html>

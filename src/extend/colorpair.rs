@@ -23,6 +23,8 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
+use std::ptr;
+
 use crate::{
     shims::{ncurses, ncurses::SCREEN},
     extend::{Colors, Color},
@@ -54,10 +56,14 @@ impl ColorPair {
 
 impl ColorPair {
     pub fn new(pair: i32, colors: Colors) -> result!(Self) {
+        assert!(colors.screen().is_none());
+
         init_extended_pair(pair, colors)
     }
 
     pub fn new_sp(screen: SCREEN, pair: i32, colors: Colors) -> result!(Self) {
+        assert!(colors.screen().map_or_else(|| false, |colors_screen| ptr::eq(screen, colors_screen)));
+
         init_extended_pair_sp(screen, pair, colors)
     }
 
