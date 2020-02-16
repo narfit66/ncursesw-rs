@@ -1,7 +1,7 @@
 /*
     src/features.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -33,5 +33,13 @@ pub fn key_event_as_error() -> bool {
     #[cfg(feature = "key_event_as_error")]
     return true;
     #[cfg(not(feature = "key_event_as_error"))]
+    return false;
+}
+
+/// Has the crate been compiled with the `docs-rs` feature.
+pub fn docs_rs() -> bool {
+    #[cfg(feature = "docs-rs")]
+    return true;
+    #[cfg(not(feature = "docs-rs"))]
     return false;
 }

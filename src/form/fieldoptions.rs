@@ -90,7 +90,7 @@ impl BitXor for FieldOptions {
 impl BitOr<FieldOption> for FieldOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: FieldOption) -> Self::Output {
+    fn bitor(self, rhs: FieldOption) -> Self::Output {
         match rhs {
             FieldOption::Visible        => self.set_visible(true),
             FieldOption::Active         => self.set_active(true),
@@ -112,7 +112,7 @@ impl BitOr<FieldOption> for FieldOptions {
 impl BitXor<FieldOption> for FieldOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: FieldOption) -> Self::Output {
+    fn bitxor(self, rhs: FieldOption) -> Self::Output {
         match rhs {
             FieldOption::Visible        => self.set_visible(false),
             FieldOption::Active         => self.set_active(false),

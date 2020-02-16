@@ -33,6 +33,7 @@ use crate::{
     }
 };
 
+/// A terminal color.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Color {
     screen:        Option<SCREEN>,

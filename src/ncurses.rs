@@ -241,8 +241,8 @@ pub fn attr_get() -> result!(AttributesColorPairSet) {
                     )
                 )
             },
-            NCursesColorType::Extended => {
-                AttributesColorPairSet::Extended(
+            NCursesColorType::Extend => {
+                AttributesColorPairSet::Extend(
                     extend::AttributesColorPair::new(
                         extend::Attributes::_from(None, attrs[0]),
                         extend::ColorPair::_from(None, opts[0])
@@ -959,8 +959,8 @@ pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
                     )
                 )
             },
-            NCursesColorType::Extended => {
-                AttributesColorPairSet::Extended(
+            NCursesColorType::Extend => {
+                AttributesColorPairSet::Extend(
                     extend::AttributesColorPair::new(
                         extend::Attributes::_from(None, attrs),
                         extend::ColorPair::_from(None, ext_color_pair)
@@ -1374,7 +1374,7 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(()) {
     } else {
         match ncurses::init_extended_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
             OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
+                set_ncurses_colortype(NCursesColorType::Extend);
 
                 Ok(())
             },
@@ -4001,8 +4001,8 @@ pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
                              )
                          )
                      },
-                     NCursesColorType::Extended => {
-                         AttributesColorPairSet::Extended(
+                     NCursesColorType::Extend => {
+                         AttributesColorPairSet::Extend(
                              extend::AttributesColorPair::new(
                                  extend::Attributes::_from(None, attrs[0]),
                                  extend::ColorPair::_from(None, opts[0])
@@ -5136,7 +5136,7 @@ pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RG
     } else {
         match unsafe { ncurses::init_extended_color_sp(screen, color_number, rgb.red(), rgb.green(), rgb.blue()) } {
             OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
+                set_ncurses_colortype(NCursesColorType::Extend);
 
                 Ok(())
             },

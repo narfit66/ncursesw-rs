@@ -1,5 +1,5 @@
 /*
-    examples/COLORS-test.rs
+    examples/wattr_get.rs
 
     Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
@@ -20,11 +20,9 @@
     IN THE SOFTWARE.
 */
 
-#![allow(non_snake_case)]
-
 extern crate ncursesw;
 
-use ncursesw::*;
+use ncursesw::{*, normal::*};
 
 fn main() {
     if let Err(source) = main_routine() {
@@ -38,14 +36,37 @@ fn main_routine() -> Result<(), NCurseswError> {
     if has_colors() {
         start_color()?;
 
-        addstr(&format!("terminal supports {} colors", COLORS()))?;
+        use_default_colors()?;
+
+        let yellow = Color::new(ColorPalette::Yellow);
+        let blue = Color::new(ColorPalette::Blue);
+
+        let color_pair0 = ColorPair::default();
+        let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+
+        let attrs0 = Attributes::default();
+        let attrs1 = Attributes::default().set_bold(true);
+
+        wattr_set(stdscr, attrs1, color_pair1)?;
+        waddstr(stdscr, "Test string printed with attr1 and color_pair1")?;
+
+        let retrived_attrs_colorpair = wattr_get(stdscr)?.unwrap_as_normal();
+
+        wattr_set(stdscr, attrs0, color_pair0)?;
+
+        waddstr(stdscr, "\n\nNormal attributes and color pair of `attrs1`...\n\n")?;
+        waddstr(stdscr, &format!("retrived_attrs.attributes={:?}\n", retrived_attrs_colorpair.attributes()))?;
+        waddstr(stdscr, &format!("retrived_attrs.is_normal={}\n", retrived_attrs_colorpair.attributes().is_normal()))?;
+        waddstr(stdscr, &format!("retrived_attrs.is_bold={}\n", retrived_attrs_colorpair.attributes().is_bold()))?;
+        waddstr(stdscr, &format!("retrived_attrs.color_pair={:?}", retrived_attrs_colorpair.color_pair()))?;
     } else {
-        addstr("terminal has no color support!!!")?;
+        waddstr(stdscr, "terminal has no color support!!!")?;
     }
 
-    addstr("\n\nhit <return> to continue ")?;
-    getch()?;
+    waddstr(stdscr, "\n\nhit <return> to continue ")?;
+    wgetch(stdscr)?;
 
     delwin(stdscr)?;
+
     endwin()
 }

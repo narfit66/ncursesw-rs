@@ -57,7 +57,7 @@ impl BitXor for ItemOptions {
 impl BitOr<ItemOption> for ItemOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: ItemOption) -> Self::Output {
+    fn bitor(self, rhs: ItemOption) -> Self::Output {
         match rhs {
             ItemOption::Selectable => self.set_selectable(true)
         }
@@ -68,7 +68,7 @@ impl BitOr<ItemOption> for ItemOptions {
 impl BitXor<ItemOption> for ItemOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: ItemOption) -> Self::Output {
+    fn bitxor(self, rhs: ItemOption) -> Self::Output {
         match rhs {
             ItemOption::Selectable => self.set_selectable(false)
         }

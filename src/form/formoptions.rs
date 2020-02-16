@@ -60,7 +60,7 @@ impl BitXor for FormOptions {
 impl BitOr<FormOption> for FormOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: FormOption) -> Self::Output {
+    fn bitor(self, rhs: FormOption) -> Self::Output {
         match rhs {
             FormOption::NewlineOverload => self.set_newline_overload(true),
             FormOption::BackspaceOverload => self.set_backspace_overload(true)
@@ -72,7 +72,7 @@ impl BitOr<FormOption> for FormOptions {
 impl BitXor<FormOption> for FormOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: FormOption) -> Self::Output {
+    fn bitxor(self, rhs: FormOption) -> Self::Output {
         match rhs {
             FormOption::NewlineOverload => self.set_newline_overload(false),
             FormOption::BackspaceOverload => self.set_backspace_overload(false)

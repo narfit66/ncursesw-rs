@@ -20,26 +20,25 @@
     IN THE SOFTWARE.
 */
 
+/// A collection of attributes and color pair.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttributesColorPair {
     attributes: Attributes,
     color_pair: ColorPair
 }
 
-macro_rules! define_attributescolorpairtype {
-    ($type: ty) => {
-        impl AttributesColorPairType<Attributes, ColorPair, $type> for AttributesColorPair {
-            fn new(attributes: Attributes, color_pair: ColorPair) -> Self {
-                Self { attributes, color_pair: color_pair }
-            }
+impl AttributesColorPair {
+    pub fn new(attributes: Attributes, color_pair: ColorPair) -> Self {
+        assert!(attributes.screen() == color_pair.screen());
 
-            fn attributes(&self) -> Attributes {
-                self.attributes
-            }
+        Self { attributes, color_pair: color_pair }
+    }
 
-            fn color_pair(&self) -> ColorPair {
-                self.color_pair.to_owned()
-            }
-        }
+    pub fn attributes(&self) -> Attributes {
+        self.attributes
+    }
+
+    pub fn color_pair(&self) -> ColorPair {
+        self.color_pair.to_owned()
     }
 }

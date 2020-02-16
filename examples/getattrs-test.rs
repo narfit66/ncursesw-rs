@@ -1,7 +1,7 @@
 /*
-    examples/COLORS-test.rs
+    examples/getattrs-test.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,11 +20,9 @@
     IN THE SOFTWARE.
 */
 
-#![allow(non_snake_case)]
-
 extern crate ncursesw;
 
-use ncursesw::*;
+use ncursesw::{*, normal::*};
 
 fn main() {
     if let Err(source) = main_routine() {
@@ -38,14 +36,37 @@ fn main_routine() -> Result<(), NCurseswError> {
     if has_colors() {
         start_color()?;
 
-        addstr(&format!("terminal supports {} colors", COLORS()))?;
+        use_default_colors()?;
+
+        let yellow = Color::new(ColorPalette::Yellow);
+        let blue = Color::new(ColorPalette::Blue);
+
+        let color_pair0 = ColorPair::default();
+        let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
+
+        let attrs0 = Attribute::Normal | color_pair0;
+        let attrs1 = Attribute::Bold | color_pair1;
+
+        wattrset(stdscr, attrs1)?;
+        waddstr(stdscr, "Test string printed with attr1 and color_pair1")?;
+
+        let retrived_attrs = getattrs(stdscr);
+
+        wattrset(stdscr, attrs0)?;
+
+        waddstr(stdscr, "\n\nNormal attributes and color pair of `attrs1`...\n\n")?;
+        waddstr(stdscr, &format!("retrived_attrs={:?}\n", retrived_attrs))?;
+        waddstr(stdscr, &format!("retrived_attrs.is_normal={}\n", retrived_attrs.is_normal()))?;
+        waddstr(stdscr, &format!("retrived_attrs.is_bold={}\n", retrived_attrs.is_bold()))?;
+        waddstr(stdscr, &format!("retrived_attrs.color_pair={:?}", retrived_attrs.color_pair()))?;
     } else {
-        addstr("terminal has no color support!!!")?;
+        waddstr(stdscr, "terminal has no color support!!!")?;
     }
 
-    addstr("\n\nhit <return> to continue ")?;
-    getch()?;
+    waddstr(stdscr, "\n\nhit <return> to continue ")?;
+    wgetch(stdscr)?;
 
     delwin(stdscr)?;
+
     endwin()
 }

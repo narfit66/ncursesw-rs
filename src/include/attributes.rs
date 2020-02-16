@@ -20,39 +20,29 @@
     IN THE SOFTWARE.
 */
 
-use std::ops::{BitOr, BitXor};
+use std::{fmt, ops::{BitOr, BitXor}};
 
 use crate::{
     gen::AttributesType,
-    shims::{
-        ncurses::{SCREEN, attr_t},
-        constants::{
-            A_NORMAL, A_CHARTEXT, A_STANDOUT, A_UNDERLINE,
-            A_REVERSE, A_BLINK, A_DIM, A_BOLD, A_ALTCHARSET,
-            A_INVIS, A_PROTECT, A_HORIZONTAL, A_LEFT, A_LOW,
-            A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC
-        }
-    }
+    shims::{ncurses::{SCREEN, attr_t}, constants}
 };
 
 macro_rules! attributes_getter {
     ($func: ident, $attr: ident) => {
         pub fn $func(&self) -> bool {
-            (self.attrs & $attr) > 0
+            (self.raw & constants::$attr) > 0
         }
     };
 }
 
 macro_rules! attributes_setter {
     ($func: ident, $attr: ident) => {
-        pub fn $func(&mut self, enabled: bool) -> Self {
-            if enabled {
-                self.attrs |= $attr;
+        pub fn $func(&self, enabled: bool) -> Self {
+            Self::_from(self.screen, if enabled {
+                self.raw | constants::$attr
             } else {
-                self.attrs ^= $attr;
-            }
-
-            Self::_from(self.screen, self.attrs)
+                self.raw ^ constants::$attr
+            })
         }
     };
 }
@@ -65,24 +55,24 @@ macro_rules! impl_attributes_type {
             }
 
             fn as_attr_t(&self) -> attr_t {
-                self.attrs
+                self.raw
             }
         }
     };
 }
 
 /// Attributes.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Attributes {
     screen: Option<SCREEN>,
-    attrs:  attr_t
+    raw:    attr_t
 }
 
 impl Attributes {
-    pub(in crate) fn _from(screen: Option<SCREEN>, attrs: attr_t) -> Self {
+    pub(in crate) fn _from(screen: Option<SCREEN>, raw: attr_t) -> Self {
         assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Attributes::_from() : screen.is_null()");
 
-        Self { screen, attrs }
+        Self { screen, raw }
     }
 }
 
@@ -99,13 +89,11 @@ impl Attributes {
     }
 
     pub fn is_normal(&self) -> bool {
-        self.attrs == A_NORMAL
+        self.raw == constants::A_NORMAL
     }
 
-    pub fn set_normal(&mut self) -> Self {
-        self.attrs = A_NORMAL;
-
-        Self::_from(self.screen, self.attrs)
+    pub fn set_normal(&self) -> Self {
+        Self::_from(self.screen, constants::A_NORMAL)
     }
 
     attributes_getter!(is_char_text, A_CHARTEXT);
@@ -167,7 +155,7 @@ impl BitOr for Attributes {
     fn bitor(self, rhs: Self) -> Self::Output {
         assert!(self.screen == rhs.screen);
 
-        Self::_from(self.screen, self.attrs | rhs.attrs)
+        Self::_from(self.screen, self.raw | rhs.raw)
     }
 }
 
@@ -178,7 +166,7 @@ impl BitXor for Attributes {
     fn bitxor(self, rhs: Self) -> Self::Output {
         assert!(self.screen == rhs.screen);
 
-        Self::_from(self.screen, self.attrs ^ rhs.attrs)
+        Self::_from(self.screen, self.raw ^ rhs.raw)
     }
 }
 
@@ -186,7 +174,7 @@ impl BitXor for Attributes {
 impl BitOr<Attribute> for Attributes {
     type Output = Self;
 
-    fn bitor(mut self, rhs: Attribute) -> Self::Output {
+    fn bitor(self, rhs: Attribute) -> Self::Output {
         match rhs {
             Attribute::Normal             => self.set_normal(),
             Attribute::CharText           => self.set_char_text(true),
@@ -214,7 +202,7 @@ impl BitOr<Attribute> for Attributes {
 impl BitXor<Attribute> for Attributes {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: Attribute) -> Self::Output {
+    fn bitxor(self, rhs: Attribute) -> Self::Output {
         match rhs {
             Attribute::Normal             => self.set_normal(),
             Attribute::CharText           => self.set_char_text(false),
@@ -240,7 +228,7 @@ impl BitXor<Attribute> for Attributes {
 
 impl Default for Attributes {
     fn default() -> Self {
-        Self::_from(None, A_NORMAL)
+        Self::_from(None, constants::A_NORMAL)
     }
 }
 
@@ -252,6 +240,12 @@ impl From<Attribute> for Attributes {
 
 impl Into<attr_t> for Attributes {
     fn into(self) -> attr_t {
-        self.attrs
+        self.raw
+    }
+}
+
+impl fmt::Debug for Attributes {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Attributes {{ screen: {:?}, raw: 0b{:032b} }}", self.screen, self.raw)
     }
 }

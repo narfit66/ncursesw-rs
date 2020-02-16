@@ -75,7 +75,7 @@ impl BitXor for MenuOptions {
 impl BitOr<MenuOption> for MenuOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: MenuOption) -> Self::Output {
+    fn bitor(self, rhs: MenuOption) -> Self::Output {
         match rhs {
             MenuOption::OneValue        => self.set_one_value(true),
             MenuOption::ShowDescription => self.set_show_description(true),
@@ -92,7 +92,7 @@ impl BitOr<MenuOption> for MenuOptions {
 impl BitXor<MenuOption> for MenuOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: MenuOption) -> Self::Output {
+    fn bitxor(self, rhs: MenuOption) -> Self::Output {
         match rhs {
             MenuOption::OneValue        => self.set_one_value(false),
             MenuOption::ShowDescription => self.set_show_description(false),

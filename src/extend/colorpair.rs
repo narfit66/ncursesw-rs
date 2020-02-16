@@ -48,7 +48,7 @@ impl ColorPair {
     pub(in crate) fn _from(screen: Option<SCREEN>, number: i32) -> Self {
         assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Color::_from() : screen.is_null()");
 
-        set_ncurses_colortype(NCursesColorType::Extended);
+        set_ncurses_colortype(NCursesColorType::Extend);
 
         Self { screen, number }
     }

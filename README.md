@@ -19,6 +19,8 @@ At the moment this crate has only been tested on 64-bit Linux (Linux Mint 19.1) 
 
 ## Inclusion
 
+I whould recommend using version `0.6.0` and above of this crate as the API has pretty much stabilized at this point.
+
 ```
 [dependencies]
 ncursesw = "0.6"

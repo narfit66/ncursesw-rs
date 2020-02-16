@@ -156,8 +156,7 @@ fn chtype_char_get_attributes() {
     let ch = ChtypeChar::new(AsciiChar::new('s'));
     let mut attrs = Attributes::default();
 
-    attrs.set_bold(true);
-    attrs.set_dim(true);
+    attrs = attrs.set_bold(true).set_dim(true);
 
     let c = ch | attrs;
 
