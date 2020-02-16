@@ -37,7 +37,7 @@ impl_attributes_type!(short_t);
 impl Attributes {
     /// Return the `ColorPair` associated with the `Attributes`.
     pub fn color_pair(&self) -> ColorPair {
-        ColorPair::_from(self.screen, PAIR_NUMBER(self.attrs))
+        ColorPair::_from(self.screen, PAIR_NUMBER(self.raw))
     }
 }
 
@@ -51,8 +51,8 @@ impl BitOr<ColorPair> for Attributes {
     fn bitor(mut self, rhs: ColorPair) -> Self::Output {
         assert!(self.screen == rhs.screen());
 
-        self.attrs ^= COLOR_PAIR(i32::from(self.color_pair().number()));
-        self.attrs |= COLOR_PAIR(i32::from(rhs.number()));
+        self.raw ^= COLOR_PAIR(i32::from(self.color_pair().number()));
+        self.raw |= COLOR_PAIR(i32::from(rhs.number()));
 
         self
     }
@@ -65,7 +65,7 @@ impl BitXor<ColorPair> for Attributes {
     fn bitxor(mut self, rhs: ColorPair) -> Self::Output {
         assert!(self.screen == rhs.screen());
 
-        self.attrs ^= COLOR_PAIR(i32::from(rhs.number()));
+        self.raw ^= COLOR_PAIR(i32::from(rhs.number()));
 
         self
     }
@@ -73,6 +73,6 @@ impl BitXor<ColorPair> for Attributes {
 
 impl Into<i32> for Attributes {
     fn into(self) -> i32 {
-        self.attrs as i32
+        self.raw as i32
     }
 }

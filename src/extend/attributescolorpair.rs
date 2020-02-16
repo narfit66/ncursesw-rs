@@ -23,5 +23,3 @@
 use crate::{gen::*, extend::*};
 
 include!("../include/attributescolorpair.rs");
-
-define_attributescolorpairtype!(i32);

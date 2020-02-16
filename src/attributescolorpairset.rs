@@ -28,5 +28,25 @@ pub enum AttributesColorPairSet {
     /// `normal` attributes and color pair.
     Normal(normal::AttributesColorPair),
     /// extended attributes and color pair.
-    Extended(extend::AttributesColorPair)
+    Extend(extend::AttributesColorPair)
+}
+
+impl AttributesColorPairSet {
+    /// Unwrap `self` as a `normal::AttributesColorPair` or `panic`.
+    pub fn unwrap_as_normal(&self) -> normal::AttributesColorPair {
+        if let AttributesColorPairSet::Normal(attributes_colorpair) = *self {
+            attributes_colorpair
+        } else {
+            panic!("failed to unwrap AttributesColorPairSet::Normal()!!!")
+        }
+    }
+
+    /// Unwrap `self` as a `extend::AttributesColorPair` or `panic`.
+    pub fn unwrap_as_extend(&self) -> extend::AttributesColorPair {
+        if let AttributesColorPairSet::Extend(attributes_colorpair) = *self {
+            attributes_colorpair
+        } else {
+            panic!("failed to unwrap AttributesColorPairSet::Extended()!!!")
+        }
+    }
 }

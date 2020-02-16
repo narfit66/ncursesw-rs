@@ -34,6 +34,7 @@ use crate::{
     }
 };
 
+/// A terminal color.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Color {
     screen:        Option<SCREEN>,
@@ -44,7 +45,7 @@ impl Color {
     pub(in crate) fn _from(screen: Option<SCREEN>, color_palette: ColorPalette) -> Self {
         assert!(screen.map_or_else(|| true, |screen| !screen.is_null()), "Color::_from() : screen.is_null()");
 
-        set_ncurses_colortype(NCursesColorType::Extended);
+        set_ncurses_colortype(NCursesColorType::Extend);
 
         Self { screen, color_palette }
     }

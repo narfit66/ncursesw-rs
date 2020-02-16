@@ -65,14 +65,12 @@ macro_rules! option_getter {
 
 macro_rules! option_setter {
     ($func: ident, $attr: ident) => {
-        pub fn $func(&mut self, enabled: bool) -> Self {
-            if enabled {
-                self.raw |= constants::$attr;
+        pub fn $func(&self, enabled: bool) -> Self {
+            Self { raw: if enabled {
+                self.raw | constants::$attr
             } else {
-                self.raw ^= constants::$attr;
-            }
-
-            Self { raw: self.raw }
+                self.raw ^ constants::$attr
+            }}
         }
     };
 }

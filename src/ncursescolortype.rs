@@ -45,14 +45,14 @@ pub enum NCursesColorType {
     /// Normal (Ansi) colors, upto 16 colors.
     Normal,
     /// Extended colors, upto 256 colors.
-    Extended
+    Extend
 }
 
 impl Display for NCursesColorType {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "{}", match self {
-            NCursesColorType::Normal   => "Normal",
-            NCursesColorType::Extended => "Extended"
+            NCursesColorType::Normal => "Normal",
+            NCursesColorType::Extend => "Extend"
         })
     }
 }
@@ -61,7 +61,7 @@ impl Display for NCursesColorType {
 /// ColorType::Normal until a ColorPair structure is generated.
 pub fn ncurses_colortype() -> NCursesColorType {
     if EXTENDED_COLORS.load(Ordering::SeqCst) {
-        NCursesColorType::Extended
+        NCursesColorType::Extend
     } else {
         NCursesColorType::Normal
     }
@@ -82,8 +82,8 @@ pub(in crate) fn set_ncurses_colortype(colortype: NCursesColorType) {
             EXTENDED_COLORS_ALREADY_SET.store(true, Ordering::SeqCst);
 
             EXTENDED_COLORS.store(match colortype {
-                    NCursesColorType::Normal   => false,
-                    NCursesColorType::Extended => true
+                    NCursesColorType::Normal => false,
+                    NCursesColorType::Extend => true
                 },
                 Ordering::SeqCst
             );

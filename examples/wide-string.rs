@@ -24,15 +24,11 @@ extern crate gettextrs;
 extern crate ncursesw;
 
 use gettextrs::*;
-
-use ncursesw::{
-    initscr, endwin, addwstr, refresh, getch, WideString, NCurseswError
-};
+use ncursesw::*;
 
 pub fn main() {
-    if let Err(e) = main_routine() {
-        let _ = endwin();
-        println!("{}", e.to_string());
+    if let Err(source) = main_routine() {
+        println!("{}", source.to_string());
     }
 }
 
@@ -54,7 +50,5 @@ pub fn main_routine() -> Result<(), NCurseswError> {
 
     getch()?;
 
-    endwin()?;
-
-    Ok(())
+    endwin()
 }

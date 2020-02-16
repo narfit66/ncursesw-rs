@@ -1,5 +1,5 @@
 /*
-    examples/COLOR_PAIR-test.rs
+    examples/colorfull-normal.rs
 
     Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
@@ -20,12 +20,8 @@
     IN THE SOFTWARE.
 */
 
-#![allow(non_snake_case)]
-#![allow(deprecated)]
-
 extern crate ncursesw;
 
-use std::str::FromStr;
 use ncursesw::{*, normal::*};
 
 fn main() {
@@ -35,41 +31,61 @@ fn main() {
 }
 
 fn main_routine() -> Result<(), NCurseswError> {
-    let stdscr = initscr()?;
+    initscr()?;
 
     if has_colors() {
         start_color()?;
 
-        let yellow = Color::new(ColorPalette::from_str("yellow")?);
-        let blue = Color::new(ColorPalette::from_str("blue")?);
-        let green = Color::new(ColorPalette::from_str("blue")?);
- 
-        let color_pair0 = ColorPair::default();
-        let color_pair1 = ColorPair::new(1, Colors::new(yellow, blue))?;
-        let color_pair2 = ColorPair::new(2, Colors::new(yellow, green))?;
-        let color_pair3 = ColorPair::new(3, Colors::new(blue, yellow))?;
-        let color_pair4 = ColorPair::new(4, Colors::new(blue, green))?;
-        let color_pair5 = ColorPair::new(5, Colors::new(green, yellow))?;
-        let color_pair6 = ColorPair::new(6, Colors::new(green, blue))?;
+        let red = Color::new(ColorPalette::Red);
+        let black = Color::new(ColorPalette::Black);
+        let yellow = Color::new(ColorPalette::Yellow);
 
-        addstr(&color_pair_info(color_pair0))?;
-        addstr(&color_pair_info(color_pair1))?;
-        addstr(&color_pair_info(color_pair2))?;
-        addstr(&color_pair_info(color_pair3))?;
-        addstr(&color_pair_info(color_pair4))?;
-        addstr(&color_pair_info(color_pair5))?;
-        addstr(&color_pair_info(color_pair6))?;
+        let colors1 = Colors::new(red, black);
+        let colors2 = Colors::new(yellow, black);
+
+        let color_pair0 = ColorPair::default();
+        let color_pair1 = ColorPair::new(1, colors1)?;
+        let color_pair2 = ColorPair::new(2, colors2)?;
+
+        let mut attrs = Attribute::Normal | color_pair0;
+
+        attr_set(attrs, color_pair0)?;
+        addstr("Using modern attribute setting...\n\n")?;
+
+        attr_set(attrs, color_pair1)?;
+        addstr("I am Mr. Red!\n")?;
+        attr_set(attrs, color_pair2)?;
+        addstr("I am Mr. Yellow!\n")?;
+        attrs = attrs.set_bold(true);
+        attr_set(attrs, color_pair1)?;
+        addstr("I'm feeling bold!\n")?;
+        attr_set(attrs, color_pair2)?;
+        addstr("Me too!\n")?;
+        refresh()?;
+
+        attrs = Attribute::Normal | color_pair0;
+        attrset(attrs)?;
+        addstr("\nUsing legacy attribute setting...\n\n")?;
+
+        attrs = attrs | color_pair1;
+        attron(attrs)?;
+        addstr("I am Mr. Red!\n")?;
+        attrs = attrs | color_pair2;
+        attron(attrs)?;
+        addstr("I am Mr. Yellow!\n")?;
+        attrs = attrs.set_bold(true) | color_pair1;
+        attron(attrs)?;
+        addstr("I'm feeling bold!\n")?;
+        attrs = attrs | color_pair2;
+        attron(attrs)?;
+        addstr("Me too!\n")?;
     } else {
         addstr("terminal has no color support!!!")?;
     }
 
-    addstr("\n\nhit <return> to continue ")?;
+    refresh()?;
+
     getch()?;
 
-    delwin(stdscr)?;
     endwin()
-}
-
-fn color_pair_info(color_pair: ColorPair) -> String {
-    format!("color pair {} : attribute 0b{:032b}\n", color_pair.number(), COLOR_PAIR(i32::from(color_pair.number())))
 }
