@@ -77,6 +77,14 @@ impl Attributes {
 }
 
 impl Attributes {
+    pub fn new(raw: attr_t) -> Self {
+        Self::_from(None, raw)
+    }
+
+    pub fn new_sp(screen: SCREEN, raw: attr_t) -> Self {
+        Self::_from(Some(screen), raw)
+    }
+
     /// Set the screen pointer of the `Attributes`.
     ///
     /// Use with caution!!! This function only need's to be used if using the screen type
