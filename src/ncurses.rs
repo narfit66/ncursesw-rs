@@ -1163,7 +1163,7 @@ pub fn getstr() -> result!(String) {
 }
 
 /// Return the current coordinates of the virtual screen cursor.
-/// If leaveok is currently `true`, then return `None`.
+/// If `leaveok()` is currently `true`, then return `None`.
 pub fn getsyx() -> result!(Option<Origin>) {
     if is_leaveok(newscr()) {
         Ok(None)
@@ -2966,8 +2966,11 @@ pub fn newterm<O, I>(term: Option<&str>, output: O, input: I) -> result!(SCREEN)
           I: AsRawFd + Read
 {
     unsafe {
-        ncurses::newterm(option_str_as_option_slice(term)?, fdopen(output, "wb+")?, fdopen(input, "rb+")?)
-            .ok_or(ncurses_function_error!("newterm"))
+        ncurses::newterm(
+            option_str_as_option_slice(term)?,
+            fdopen(output, "wb+")?,
+            fdopen(input, "rb+")?
+        ).ok_or(ncurses_function_error!("newterm"))
     }
 }
 
@@ -3425,23 +3428,19 @@ pub fn setscrreg(region: Region) -> result!(()) {
     }
 }
 
-/// Set the virtual screen cursor to `origin`. If y and x are both -1,
-/// then leaveok is set `true`.
-pub fn setsyx(origin: Origin) -> result!(()) {
-    if origin == (Origin { y: -1, x: -1 }) {
-        leaveok(newscr(), true)
-    } else {
+/// Set the virtual screen cursor to `origin`. If `None` then `leaveok()` is set `true`.
+pub fn setsyx(origin: Option<Origin>) -> result!(()) {
+    if let Some(origin) = origin {
         leaveok(newscr(), false)?;
         wmove(newscr(), origin)
+    } else {
+        leaveok(newscr(), true)
     }
 }
 
 /// Retrieve attributes of soft label.
-// convert into the attributes type of your choice with
-//     normal::Attributes::from(slk_attr()) or
-//     extend::Attributes::from(slk_attr())
-pub fn slk_attr() -> attr_t {
-    ncurses::slk_attr()
+pub fn slk_attr() -> normal::Attributes {
+    normal::Attributes::_from(None, ncurses::slk_attr())
 }
 
 /// Turn off soft label attributes, without affecting other attributes.
@@ -5286,8 +5285,12 @@ pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: O, input: I)
           I: AsRawFd + Read
 {
     unsafe {
-        ncurses::newterm_sp(screen, option_str_as_option_slice(term)?, fdopen(output, "wb+")?, fdopen(input, "rb+")?)
-            .ok_or(ncurses_function_error!("newterm_sp"))
+        ncurses::newterm_sp(
+            screen,
+            option_str_as_option_slice(term)?,
+            fdopen(output, "wb+")?,
+            fdopen(input, "rb+")?
+        ).ok_or(ncurses_function_error!("newterm_sp"))
     }
 }
 
@@ -5525,8 +5528,8 @@ pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) 
 }
 
 /// Screen function of `slk_attr()`.
-pub fn slk_attr_sp(screen: SCREEN) -> attr_t {
-    unsafe { ncurses::slk_attr_sp(screen) }
+pub fn slk_attr_sp(screen: SCREEN) -> normal::Attributes {
+    normal::Attributes::_from(Some(screen), unsafe { ncurses::slk_attr_sp(screen) })
 }
 
 /// Screen function of `slk_clear()`.
