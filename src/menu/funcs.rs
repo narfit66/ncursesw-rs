@@ -396,11 +396,11 @@ pub fn new_item<T>(name: T, description: T) -> menu_result!(ITEM)
 
 /// Creates a new menu connected to a specified vector of menu item.
 ///
-/// When `new_menu()` is called make sure that the memory for the item_handles
+/// When `new_menu()` is called make sure that the memory for the `item_handles`
 /// is contiguous and does not go out of scope until after `free_menu()` has
 /// been called otherwise unpredicable results may occur, this is because the
-/// underlying ncurses menu functions use this memory directly.
-/// See ncursesw-win-rs's Menu::new() <https://github.com/narfit66/ncursesw-win-rs/blob/master/src/menu/menu.rs>
+/// underlying NCurses menu functions use this memory directly.
+/// See ncursesw-win-rs's `Menu::new()` <https://github.com/narfit66/ncursesw-win-rs/blob/master/src/menu/menu.rs>
 /// as an example of how the `nmenu::new_menu()` function can be called by
 /// allocating and keeping the memory required but bypasses this function
 /// and calling `nmenu::new_menu()` directly (although you could also call

@@ -481,6 +481,17 @@ pub fn new_fieldtype(
 
 /// Creates a new form connected to specified fields as a vector (the vector
 /// must point to an area of contiguous memory representing the fields in order).
+///
+/// When `new_form()` is called make sure that the memory for the `fields`
+/// is contiguous and does not go out of scope until after `free_form()` has
+/// been called otherwise unpredicable results may occur, this is because the
+/// underlying NCurses form functions use this memory directly.
+/// See ncursesw-win-rs's `Form::new()` <https://github.com/narfit66/ncursesw-win-rs/blob/master/src/form/form.rs>
+/// as an example of how the `nform::new_form()` function can be called by
+/// allocating and keeping the memory required but bypasses this function
+/// and calling `nform::new_form()` directly (although you could also call
+/// this function directly as long as the underlying memory is contiguous
+/// and does not go out of scope).
 pub fn new_form(fields: &mut Vec<FIELD>) -> form_result!(FORM) {
     fields.push(ptr::null_mut());
     fields.shrink_to_fit();

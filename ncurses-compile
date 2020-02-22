@@ -39,6 +39,7 @@ rc=$?
 ./configure --prefix=$lib_prefix_dir \
             --enable-pc-files \
             --with-shared \
+            --enable-sp-funcs \
             --enable-widec \
             --enable-ext-colors \
             --enable-ext-mouse \

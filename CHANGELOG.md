@@ -7,6 +7,7 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
 - Changed signature of `setsyx(origin: Origin) -> Result<(), NCurseswError>` to `setsyx(origin: Option<Origin>) -> Result<(), NCurseswError>`. [BC]
 - Changed signature of `intrflush()` and `intrflush_sp()` to ignore `handle/window` parameter as this is ignored in the NCurses library. [BC]
+- Removed `SoftLabelType::FourFourIndex` enum variant and added `SoftLabelType::{FourFourFour, FourFourFourIndex}` enum variants. [BC]
 - Changed `slk_attr()` to return `normal::Attributes` instead of `attr_t`. [BC]
 - `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
 - Removed `attr_get_sp()`, `getcchar_sp()` and `wattr_get_sp()` which where non-NCurses function and specific to this crate. [BC]
@@ -16,7 +17,8 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Removed `AttributesGeneric` and `AttributesColorPairType` traits. [BC]
 - Changed enum variant `NCursesColorType::Extended` to `NCursesColorType::Extend`. [BC]
 - Changed enum variant `AttributesColorPairSet::Exteneded` to `AttributesColorPairSet::Extend`. [BC]
-- Rewrite of `AttributesType` trait to have prototypes of `fn screen(&self) -> Option<SCREEN>` and `fn as_attr_t(&self) -> attr_t`. [BC]
+- Added `AttributesColorPairSet::{unwrap_as_normal, unwrap_as_extend}` methods to unwrap as specific `AttributesColorPairSet` enum variant or panic.
+- Rewrite of `AttributesType` trait to only have prototypes of `fn screen(&self) -> Option<SCREEN>` and `fn as_attr_t(&self) -> attr_t`. [BC]
 - Changed `Attributes` set type methods to return `Self` and be non-mutating so they can be chained together i.e. `attrs = attrs.set_bold(true).set_blink(true);` as well as `attrs.set_bold(true);`. [BC]
 - Changed `form::FormOptions` set type methods to return `Self` and be non-mutating so they can be chained together i.e. `attrs = attrs.set_newline_overload(true).set_backspace_overload(true);` as well as `attrs.set_newline_overload(true);`. [BC]
 - Changed `form::FieldOptions` set type methods to return `Self` and be non-mutating so they can be chained together i.e. `attrs = attrs.set_edit(true).set_auto_skip(true);` as well as `attrs.set_edit(true);`. [BC]
