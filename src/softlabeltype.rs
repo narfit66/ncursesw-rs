@@ -28,15 +28,18 @@ pub enum SoftLabelType {
     /// A four-four layout
     FourFour,
     /// A four-four layout with an index
-    FourFourIndex
+    FourFourFour,
+    /// A four-four layout with an index
+    FourFourFourIndex
 }
 
 impl SoftLabelType {
-    pub(in crate) fn value(self) -> i32 {
+    pub(in crate) fn value(&self) -> i32 {
         match self {
-            SoftLabelType::ThreeTwoThree => 0,
-            SoftLabelType::FourFour      => 1,
-            SoftLabelType::FourFourIndex => 2
+            SoftLabelType::ThreeTwoThree     => 0,
+            SoftLabelType::FourFour          => 1,
+            SoftLabelType::FourFourFour      => 2,
+            SoftLabelType::FourFourFourIndex => 3
         }
     }
 }

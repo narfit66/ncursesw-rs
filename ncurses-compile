@@ -39,6 +39,7 @@ rc=$?
 ./configure --prefix=/usr \
             --enable-pc-files \
             --with-shared \
+            --enable-sp-funcs \
             --enable-widec \
             --enable-ext-colors \
             --enable-ext-mouse \
