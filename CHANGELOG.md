@@ -7,9 +7,15 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
 - Changed signature of `setsyx(origin: Origin) -> Result<(), NCurseswError>` to `setsyx(origin: Option<Origin>) -> Result<(), NCurseswError>`. [BC]
 - Changed signature of `intrflush()` and `intrflush_sp()` to ignore `handle/window` parameter as this is ignored in the NCurses library. [BC]
-- Removed `SoftLabelType::FourFourIndex` enum variant and added `SoftLabelType::{FourFourFour, FourFourFourIndex}` enum variants. [BC]
-- Changed `slk_attr()` to return `normal::Attributes` instead of `attr_t`. [BC]
 - `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
+- Changed `shims::ncurses::{newterm,newterm_sp}` `ty` parameters from `Option<&[i8]>` to `*const i8`. [BC]
+- Changed `shims::ncurses::{define_key,define_key_sp}` `definition` parameters from `Option<&[i8]>` to `*const i8`. [BC]
+- Removed `SoftLabelType::FourFourIndex` enum variant and added `SoftLabelType::{FourFourFour, FourFourFourIndex}` enum variants. [BC]
+- Added `SoftLabelType::{min_label,max_label,max_label_len}` methods.
+- Changed `slk_set()` and `slk_set_sp()` `label` parameter from `&str` to `Option<&str>`. [BC]
+- Changed `shims::ncurses::{slk_set,slk_set_sp}` `label` parameter from `&[i8]` to `*const i8`. [BC]
+- Changed `slk_label()` and `slk_label_sp()` to return `Option<String>` instead of `Result<String, NCurseswError>`. [BC]
+- Changed `slk_attr()` and `slk_attr_sp()` to return `normal::Attributes` instead of `attr_t`. [BC]
 - Removed `attr_get_sp()`, `getcchar_sp()` and `wattr_get_sp()` which where non-NCurses function and specific to this crate. [BC]
 - Added `fn screen(&self) -> Option<SCREEN>` to `ColorsType` trait. [BC]
 - Added `fn screen(&self) -> Option<SCREEN>` to `ColorPairType` trait. [BC]

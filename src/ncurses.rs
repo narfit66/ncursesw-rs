@@ -599,7 +599,7 @@ pub fn def_shell_mode() -> result!(()) {
 /// is negative or zero, any existing string for the given definition
 /// is removed.
 pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key(option_str_as_ptr(definition)?, KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key(option_str_to_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key", rc))
     }
@@ -2967,7 +2967,7 @@ pub fn newterm<O, I>(term: Option<&str>, output: O, input: I) -> result!(SCREEN)
 {
     unsafe {
         ncurses::newterm(
-            option_str_as_option_slice(term)?,
+            option_str_to_ptr!(term),
             fdopen(output, "wb+")?,
             fdopen(input, "rb+")?
         ).ok_or(ncurses_function_error!("newterm"))
@@ -3531,8 +3531,8 @@ pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
 
 /// Returns the current label for label number `labnum`, with leading and
 /// trailing blanks stripped.
-pub fn slk_label(labnum: i32) -> result!(String) {
-    ncurses::slk_label(labnum).ok_or(ncurses_function_error!("slk_label"))
+pub fn slk_label(labnum: i32) -> Option<String> {
+    ncurses::slk_label(labnum)
 }
 
 /// Mark for refresh but wait. This function updates the data structure representing
@@ -3565,14 +3565,14 @@ pub fn slk_restore() -> result!(()) {
 /// The `slk_set()` routine sets a soft label.
 ///
 /// - labnum: is the label number, from 1 to 8 (12 if `slk_init()` was called
-///           with `SoftLabelType::{FourFour,FourFourIndex}`);
+///           with `SoftLabelType::{FourFourFour,FourFourFourIndex}`);
 /// - label:  is be the string to put on the label, up to eight (five if
 ///           `slk_init() was called with `SoftLabelType::{FourFour,FourFourIndex}`)
 ///           characters in length.
 /// - fmt:    indicating whether the label is to be left-justified, centered
 ///           or right-justified.
-pub fn slk_set(labnum: i32, label: &str, fmt: Justification) -> result!(()) {
-    match ncurses::slk_set(labnum, unsafe { c_str_with_nul!(label) }, fmt.value()) {
+pub fn slk_set(labnum: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_set(labnum, option_str_to_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
@@ -4936,7 +4936,7 @@ pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
 
 /// Screen function of `define_key()`.
 pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key_sp(screen, option_str_as_ptr(definition)?, KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key_sp(screen, option_str_to_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
     }
@@ -5287,7 +5287,7 @@ pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: O, input: I)
     unsafe {
         ncurses::newterm_sp(
             screen,
-            option_str_as_option_slice(term)?,
+            option_str_to_ptr!(term),
             fdopen(output, "wb+")?,
             fdopen(input, "rb+")?
         ).ok_or(ncurses_function_error!("newterm_sp"))
@@ -5559,8 +5559,8 @@ pub fn slk_init_sp(screen: SCREEN, fmt: SoftLabelType) -> result!(()) {
 }
 
 /// Screen function of `slk_label()`.
-pub fn slk_label_sp(screen: SCREEN, number: i32) -> result!(String) {
-    unsafe { ncurses::slk_label_sp(screen, number).ok_or(ncurses_function_error!("slk_label_sp")) }
+pub fn slk_label_sp(screen: SCREEN, labnum: i32) -> Option<String> {
+    unsafe { ncurses::slk_label_sp(screen, labnum) }
 }
 
 /// Screen function of `slk_noutrefresh()`.
@@ -5588,8 +5588,8 @@ pub fn slk_restore_sp(screen: SCREEN) -> result!(()) {
 }
 
 /// Screen function of `slk_set()`.
-pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: &str, fmt: Justification) -> result!(()) {
-    match unsafe { ncurses::slk_set_sp(screen, label_number, c_str_with_nul!(label), fmt.value()) } {
+pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_set_sp(screen, label_number, option_str_to_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set_sp", rc))
     }
@@ -5717,20 +5717,4 @@ fn path_as_slice(path: &Path) -> result!(&[i8]) {
     let s = fqname.as_str();
 
     Ok(unsafe { c_str_with_nul!(s) })
-}
-
-// convert a optional &str to a pointer of type i8.
-fn option_str_as_ptr(str: Option<&str>) -> result!(*mut i8) {
-    Ok(match str {
-        Some(str) => unsafe { c_str_with_nul!(str).as_ptr() as *mut i8 },
-        None      => ptr::null_mut()
-    })
-}
-
-// convert a optional &str to a optional slice of type i8.
-fn option_str_as_option_slice(str: Option<&str>) -> result!(Option<&[i8]>) {
-    Ok(match str {
-        Some(str) => Some(unsafe { c_str_with_nul!(str) }),
-        None      => None
-    })
 }

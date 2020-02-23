@@ -42,4 +42,27 @@ impl SoftLabelType {
             SoftLabelType::FourFourFourIndex => 3
         }
     }
+
+    /// Returns the minimum label number.
+    pub fn min_label(&self) -> i32 {
+        1
+    }
+
+    /// Returns the maximum label number.
+    pub fn max_label(&self) -> i32 {
+        if *self == SoftLabelType::ThreeTwoThree || *self == SoftLabelType::FourFour {
+            8
+        } else {
+            12
+        }
+    }
+
+    /// Returns the maximum label length.
+    pub fn max_label_len(&self) -> i32 {
+        if *self == SoftLabelType::ThreeTwoThree || *self == SoftLabelType::FourFour {
+            8
+        } else {
+            5
+        }
+    }
 }
