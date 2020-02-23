@@ -422,7 +422,7 @@ pub fn def_shell_mode() -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/define_key.3x.html>
-pub unsafe fn define_key(definition: *mut i8, keycode: i32) -> i32 {
+pub unsafe fn define_key(definition: *const i8, keycode: i32) -> i32 {
     bindings::define_key(definition, keycode)
 }
 
@@ -1894,11 +1894,11 @@ pub unsafe fn newpad(lines: i32, cols: i32) -> Option<WINDOW> {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
-pub unsafe fn newterm(ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
+pub unsafe fn newterm(ty: *const i8, outfd: FILE, infd: FILE) -> Option<SCREEN> {
     assert!(!outfd.is_null(), "{}newterm() : outfd.is_null()", MODULE_PATH);
     assert!(!infd.is_null(), "{}newterm() : infd.is_null()", MODULE_PATH);
 
-    bindings::newterm(ty.map_or_else(|| ptr::null(), |term| term.as_ptr()), outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
+    bindings::newterm(ty, outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_window.3x.html>
@@ -2283,11 +2283,11 @@ pub fn slk_restore() -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
-pub fn slk_set(n: i32, label: &[i8], fmt: i32) -> i32 {
+pub unsafe fn slk_set(n: i32, label: *const i8, fmt: i32) -> i32 {
     assert!(n >= 1 && n <= 12, "{}slk_set() : n = {}", MODULE_PATH, n);
     assert!(fmt >= 0 && fmt <= 2, "{}slk_set() : fmt = {}", MODULE_PATH, fmt);
 
-    unsafe { bindings::slk_set(n, label.as_ptr(), fmt) }
+    bindings::slk_set(n, label, fmt)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
@@ -3251,7 +3251,7 @@ pub unsafe fn curs_set_sp(sp: SCREEN, visibility: i32) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
-pub unsafe fn define_key_sp(sp: SCREEN, definition: *mut i8, keycode: i32) -> i32 {
+pub unsafe fn define_key_sp(sp: SCREEN, definition: *const i8, keycode: i32) -> i32 {
     assert!(!sp.is_null(), "{}define_key_sp() : sp.is_null()", MODULE_PATH);
 
     bindings::define_key_sp(sp, definition, keycode)
@@ -3579,12 +3579,12 @@ pub unsafe fn new_prescr() -> Option<SCREEN> {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
-pub unsafe fn newterm_sp(sp: SCREEN, ty: Option<&[i8]>, outfd: FILE, infd: FILE) -> Option<SCREEN> {
+pub unsafe fn newterm_sp(sp: SCREEN, ty: *const i8, outfd: FILE, infd: FILE) -> Option<SCREEN> {
     assert!(!sp.is_null(), "{}newterm_sp() : sp.is_null()", MODULE_PATH);
     assert!(!outfd.is_null(), "{}newterm_sp() : outfd.is_null()", MODULE_PATH);
     assert!(!infd.is_null(), "{}newterm_sp() : infd.is_null()", MODULE_PATH);
 
-    bindings::newterm_sp(sp, ty.map_or_else(|| ptr::null(), |term| term.as_ptr()), outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
+    bindings::newterm_sp(sp, ty, outfd, infd).as_mut().map(|ptr| ptr as SCREEN)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
@@ -3862,12 +3862,12 @@ pub unsafe fn slk_restore_sp(sp: SCREEN) -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
-pub unsafe fn slk_set_sp(sp: SCREEN, n: i32, label: &[i8], fmt: i32) -> i32 {
+pub unsafe fn slk_set_sp(sp: SCREEN, n: i32, label: *const i8, fmt: i32) -> i32 {
     assert!(!sp.is_null(), "{}slk_set_sp() : sp.is_null()", MODULE_PATH);
     assert!(n >= 1 && n <= 12, "{}slk_set_sp() : n = {}", MODULE_PATH, n);
     assert!(fmt >= 0 && fmt <= 2, "{}slk_set_sp() : fmt = {}", MODULE_PATH, fmt);
 
-    bindings::slk_set_sp(sp, n, label.as_ptr(), fmt)
+    bindings::slk_set_sp(sp, n, label, fmt)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
