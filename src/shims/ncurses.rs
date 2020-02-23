@@ -26,7 +26,7 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::missing_safety_doc)]
 
-use std::{char, ptr};
+use std::{char, ptr, env};
 
 use crate::{
     cstring::*,
@@ -1895,6 +1895,7 @@ pub unsafe fn newpad(lines: i32, cols: i32) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_initscr.3x.html>
 pub unsafe fn newterm(ty: *const i8, outfd: FILE, infd: FILE) -> Option<SCREEN> {
+    assert!(is_term_set(ty), "{}newterm() : $TERM is undefined!!!", MODULE_PATH);
     assert!(!outfd.is_null(), "{}newterm() : outfd.is_null()", MODULE_PATH);
     assert!(!infd.is_null(), "{}newterm() : infd.is_null()", MODULE_PATH);
 
@@ -3581,6 +3582,7 @@ pub unsafe fn new_prescr() -> Option<SCREEN> {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn newterm_sp(sp: SCREEN, ty: *const i8, outfd: FILE, infd: FILE) -> Option<SCREEN> {
     assert!(!sp.is_null(), "{}newterm_sp() : sp.is_null()", MODULE_PATH);
+    assert!(is_term_set(ty), "{}newterm_sp() : $TERM is undefined!!!", MODULE_PATH);
     assert!(!outfd.is_null(), "{}newterm_sp() : outfd.is_null()", MODULE_PATH);
     assert!(!infd.is_null(), "{}newterm_sp() : infd.is_null()", MODULE_PATH);
 
@@ -3987,4 +3989,12 @@ pub unsafe fn wunctrl_sp(sp: SCREEN, ch: *mut cchar_t) -> Option<*mut wchar_t> {
     assert!(!ch.is_null(), "{}wunctrl_sp() : ch.is_null()", MODULE_PATH);
 
     bindings::wunctrl_sp(sp, ch).as_mut().map(|ptr| ptr as *mut wchar_t)
+}
+
+// private functions
+
+// Used by `newterm()` and `newterm_sp()` to check if the `ty` parameter is null
+// and the environment variable `$TERM` is defined.
+fn is_term_set(ty: *const i8) -> bool {
+    ty.is_null() && env::var("TERM").unwrap_or_else(|_| "".to_string()) != ""
 }
