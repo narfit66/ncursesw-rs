@@ -3996,5 +3996,5 @@ pub unsafe fn wunctrl_sp(sp: SCREEN, ch: *mut cchar_t) -> Option<*mut wchar_t> {
 // Used by `newterm()` and `newterm_sp()` to check if the `ty` parameter is null
 // and the environment variable `$TERM` is defined.
 fn is_term_set(ty: *const i8) -> bool {
-    ty.is_null() && env::var("TERM").unwrap_or_else(|_| "".to_string()) != ""
+    !ty.is_null() || (ty.is_null() && env::var("TERM").unwrap_or_else(|_| "".to_string()) != "")
 }
