@@ -22,7 +22,7 @@ is-it-maintained-open-issues = { repository = "narfit66/ncursesw-rs" }
 [dependencies]
 libc = "0.2"
 errno = "0.2"
-custom_error = "1.7"
+thiserror = "1.0"
 ascii = "1.0"
 semver = "0.9"
 lazy_static = "1.4"
