@@ -21,35 +21,53 @@
 */
 
 use std::{num, char, ffi, convert};
+
 use errno::Errno;
+use thiserror::Error;
+
 use crate::{
     COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
     menu::NCurseswMenuError, form::NCurseswFormError
 };
 
-custom_error::custom_error! {
 /// NCursesw Errors/Events.
-#[derive(PartialEq, Eq)]
-pub NCurseswError
-    LibraryError { func: String, rc: i32 } = "ncurses::{func}(), rc={rc}",
-    InterruptedCall = "interrupted system call (EINTR)",
-    KeyResize = "KEY_RESIZE",
-    KeyEvent = "KEY_EVENT",
-    ColorParseError { color: String } = "'{color}' is not a known color",
-    ColorLimit = @{ format!("Terminal only supports a maximum of {} colors", COLORS()) },
-    ColorPairLimit = @{ format!("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS()) },
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum NCurseswError {
+    #[error("ncurses::{func}(), rc={rc}")]
+    LibraryError { func: String, rc: i32 },
+    #[error("interrupted system call (EINTR)")]
+    InterruptedCall,
+    #[error("KEY_RESIZE")]
+    KeyResize,
+    #[error("KEY_EVENT")]
+    KeyEvent,
+    #[error("'{color}' is not a known color")]
+    ColorParseError { color: String },
+    #[error("Terminal only supports a maximum of {} colors", COLORS())]
+    ColorLimit,
+    #[error("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS())]
+    ColorPairLimit,
 
-    IntError { source: num::TryFromIntError } = "{source}",
-    CharError { source: char::CharTryFromError } = "{source}",
-    NulError { source: ffi::NulError } = "{source}",
-    Infallible { source: convert::Infallible } = "{source}",
+    #[error("{source}")]
+    IntError { #[from] source: num::TryFromIntError },
+    #[error("{source}")]
+    CharError { #[from] source: char::CharTryFromError },
+    #[error("{source}")]
+    NulError { #[from] source: ffi::NulError },
+    #[error("{source}")]
+    Infallible { #[from] source: convert::Infallible },
 
     // Error types for internal module errors.
 
-    PanelsError { source: NCurseswPanelsError } = "{source}",
-    MouseError { source: NCurseswMouseError } = "{source}",
-    MenuError { source: NCurseswMenuError } = "{source}",
-    FormError { source: NCurseswFormError } = "{source}",
+    #[error("{source}")]
+    PanelsError { #[from] source: NCurseswPanelsError },
+    #[error("{source}")]
+    MouseError { #[from] source: NCurseswMouseError },
+    #[error("{source}")]
+    MenuError { #[from] source: NCurseswMenuError },
+    #[error("{source}")]
+    FormError { #[from] source: NCurseswFormError },
 
-    OSError { func: String, errno: Errno} = @{ format!("{}() : {} (#{})", func, errno, errno.0) }
+    #[error("{}() : {} (#{})", func, errno, errno.0)]
+    OSError { func: String, errno: Errno}
 }
