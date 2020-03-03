@@ -27,7 +27,7 @@ use thiserror::Error;
 /// NCursesw mouse errors.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NCurseswMouseError {
-    #[error("nmouse::{func}() (#{rc})")]
+    #[error("nmouse::{func}(), rc={rc} ({} #{})", errno::errno(), errno::errno().0)]
     LibraryError { func: String, rc: i32 },
     #[error("{source}")]
     IntError { #[from] source: num::TryFromIntError }
