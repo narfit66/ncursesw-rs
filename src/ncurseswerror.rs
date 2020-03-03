@@ -33,7 +33,7 @@ use crate::{
 /// NCursesw Errors/Events.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NCurseswError {
-    #[error("ncurses::{func}(), rc={rc}")]
+    #[error("ncurses::{func}(), rc={rc} ({} #{})", errno::errno(), errno::errno().0)]
     LibraryError { func: String, rc: i32 },
     #[error("interrupted system call (EINTR)")]
     InterruptedCall,

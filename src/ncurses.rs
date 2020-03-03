@@ -27,7 +27,7 @@
 use libc::{c_void, EINTR};
 use std::{
     convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
-    path::Path, os::unix::io::AsRawFd, io::{Write, Read}
+    ffi::CString, path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
 
 use crate::{
@@ -1176,7 +1176,7 @@ pub fn getsyx() -> result!(Option<Origin>) {
 /// The routine then creates and initializes a new window using that data,
 /// returning the new window object.
 pub fn getwin<I: AsRawFd + Read>(file: I) -> result!(WINDOW) {
-    unsafe { ncurses::getwin(fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin")) }
+    unsafe { ncurses::getwin(fdopen(file, "rb")?).ok_or(ncurses_function_error!("getwin")) }
 }
 
 /// Used for half-delay mode, which is similar to cbreak mode in that characters
@@ -3175,7 +3175,7 @@ pub fn putp(_str: &str) -> i32 {
 /// Write all data associated with the window into the provided file.
 /// This information can be later retrieved using the `getwin()` function.
 pub fn putwin<O: AsRawFd + Write>(handle: WINDOW, file: O) -> result!(()) {
-    match unsafe { ncurses::putwin(handle, fdopen(file, "wb+")?) } {
+    match unsafe { ncurses::putwin(handle, fdopen(file, "wb")?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("putwin", rc))
     }
@@ -3299,8 +3299,10 @@ pub fn savetty() -> result!(()) {
 
 /// The `scr_dump()` routine dumps the current contents of the virtual screen
 /// to the file filename.
-pub fn scr_dump(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_dump(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_dump<P: AsRef<Path>>(path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_dump() path failed!!!"))?.into_bytes_with_nul();
+
+    match ncurses::scr_dump(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_dump", rc))
     }
@@ -3311,8 +3313,10 @@ pub fn scr_dump(filename: &Path) -> result!(()) {
 /// on its screen. If the data is determined to be valid, curses bases its next
 /// update of the screen on this information rather than clearing the screen
 /// and starting from scratch.
-pub fn scr_init(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_init(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_init<P: AsRef<Path>>(path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_init() path failed!!!"))?.into_bytes_with_nul();
+
+    match ncurses::scr_init(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init", rc))
     }
@@ -3322,8 +3326,10 @@ pub fn scr_init(filename: &Path) -> result!(()) {
 /// filename, which must have been written using `scr_dump()`. The next call
 /// to `doupdate()` restores the physical screen to the way it looked in the
 /// dump file.
-pub fn scr_restore(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_restore(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_restore<P: AsRef<Path>>(path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_restore() path failed!!!"))?.into_bytes_with_nul();
+
+    match ncurses::scr_restore(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore", rc))
     }
@@ -3333,8 +3339,10 @@ pub fn scr_restore(filename: &Path) -> result!(()) {
 /// It tells the program that the information in filename is what is currently
 /// on the screen, and also what the program wants on the screen. This can be
 /// thought of as a screen inheritance function.
-pub fn scr_set(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_set(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_set<P: AsRef<Path>>(path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_set() path failed!!!"))?.into_bytes_with_nul();
+
+    match ncurses::scr_set(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set", rc))
     }
@@ -5079,7 +5087,7 @@ pub fn get_escdelay_sp(screen: SCREEN) -> result!(time::Duration) {
 
 /// Screen function of `getwin()`.
 pub fn getwin_sp<I: AsRawFd + Read>(screen: SCREEN, file: I) -> result!(WINDOW) {
-    unsafe { ncurses::getwin_sp(screen, fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin_sp")) }
+    unsafe { ncurses::getwin_sp(screen, fdopen(file, "rb")?).ok_or(ncurses_function_error!("getwin_sp")) }
 }
 
 /// Screen function of `halfdelay()`.
@@ -5441,24 +5449,30 @@ pub fn savetty_sp(screen: SCREEN) -> result!(()) {
 }
 
 /// Screen function of `scr_init()`.
-pub fn scr_init_sp(screen: SCREEN, filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_init_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_init_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_init_sp() path failed!!!"))?.into_bytes_with_nul();
+
+    match unsafe { ncurses::scr_init_sp(screen, &*(fname.as_slice() as *const [u8] as *const [i8])) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init_sp", rc))
     }
 }
 
 /// Screen function of `scr_restore()`.
-pub fn scr_restore_sp(screen: SCREEN, filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_restore_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_restore_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_restore_sp() path failed!!!"))?.into_bytes_with_nul();
+
+    match unsafe { ncurses::scr_restore_sp(screen, &*(fname.as_slice() as *const [u8] as *const [i8])) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore_sp", rc))
     }
 }
 
 /// Screen function of `scr_set()`.
-pub fn scr_set_sp(screen: SCREEN, filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_set_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_set_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
+    let fname = CString::new(*&path.as_ref().to_str().expect("scr_set_sp() path failed!!!"))?.into_bytes_with_nul();
+
+    match unsafe { ncurses::scr_set_sp(screen, &*(fname.as_slice() as *const [u8] as *const [i8])) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set_sp", rc))
     }
@@ -5709,12 +5723,4 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
 // get a file stream from a file descriptor.
 fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
     unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(ncurses_os_error!("fdopen")) }
-}
-
-// obtain a slice from a path.
-fn path_as_slice(path: &Path) -> result!(&[i8]) {
-    let fqname = format!("{}", path.display());
-    let s = fqname.as_str();
-
-    Ok(unsafe { c_str_with_nul!(s) })
 }

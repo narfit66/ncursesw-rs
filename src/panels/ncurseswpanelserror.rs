@@ -25,6 +25,6 @@ use thiserror::Error;
 /// NCursesw panels errors.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NCurseswPanelsError {
-    #[error("npanels::{func}() (#{rc})")]
+    #[error("npanels::{func}(), rc={rc} ({} #{})", errno::errno(), errno::errno().0)]
     LibraryError { func: String, rc: i32 }
 }
