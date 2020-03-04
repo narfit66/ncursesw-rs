@@ -26,6 +26,6 @@ use std::os::unix::io::AsRawFd;
 
 use crate::shims::{ncurses::FILE, bindings};
 
-pub(in crate) unsafe fn fdopen<FD: AsRawFd>(file: FD, mode: &[i8]) -> Option<FILE> {
+pub(in crate) unsafe fn fdopen<FD: AsRawFd>(file: &FD, mode: &[i8]) -> Option<FILE> {
     bindings::fdopen(file.as_raw_fd(), mode.as_ptr()).as_mut().map(|ptr| ptr as FILE)
 }
