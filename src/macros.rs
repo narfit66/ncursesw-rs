@@ -51,8 +51,8 @@ macro_rules! wrap_const { ($name: ident : $type: ty) => { pub const $name: $type
 macro_rules! c_str_with_nul { ($name: ident) => { &*($name.to_c_str()?.as_bytes_with_nul() as *const [u8] as *const [i8]) } }
 macro_rules! raw_with_nul_as_slice { ($name: ident) => { $name.clone().raw_with_nul().as_slice() } }
 
-macro_rules! ptr_to_string { ($ptr: ident) => { std::str::from_utf8_unchecked(CStr::from_ptr($ptr).to_bytes()).to_owned() } }
-macro_rules! option_str_to_ptr { ($name: ident) => { $name.map_or_else(|| ptr::null(), |name| name.as_ptr()) as *const i8 } }
+macro_rules! ptr_as_string { ($ptr: ident) => { std::str::from_utf8_unchecked(CStr::from_ptr($ptr).to_bytes()).to_owned() } }
+macro_rules! option_str_as_ptr { ($name: ident) => { $name.map_or_else(|| ptr::null(), |name| name.as_ptr()) as *const i8 } }
 
 macro_rules! return_mut_ptr { ($ptr: ident) => { $ptr.unwrap_or(std::ptr::null_mut()) } }
 
