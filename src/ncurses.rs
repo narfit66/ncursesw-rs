@@ -214,7 +214,7 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
 /// The following are equivalent:
 /// ```text
 /// use_default_colors()?;
-/// assume_default_colors(Colors::new(Color::new(ColorPalette::default()), Color::new(ColorPalette::default())))?;
+/// assume_default_colors(Colors::default())?;
 /// ```
 pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
     where S: ColorsType<C, T>,

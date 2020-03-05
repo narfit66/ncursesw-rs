@@ -35,10 +35,10 @@ fn main() {
 }
 
 fn main_routine() -> result!(()) {
-    let term = &env::var("TERM").unwrap_or_else(|_| panic!("$TERM is undefined!!!"));
+    let term = &env::var("TERM").expect("$TERM is undefined!!!");
 
     // create a screen using stdout and stdin for output and input.
-    let screen = newterm(Some(term), io::stdout(), io::stdin())?;
+    let screen = newterm(Some(term), &io::stdout().lock(), &io::stdin().lock())?;
 
     // make the screens cursor invisible.
     curs_set_sp(screen, CursorType::Invisible)?;
@@ -46,7 +46,7 @@ fn main_routine() -> result!(()) {
     noecho_sp(screen)?;
 
     // create a window on our screen.
-    let window = newwin_sp(screen, Size { columns: 0, lines: 0 }, Origin { y: 0, x: 0 })?;
+    let window = newwin_sp(screen, Size::default(), Origin::default())?;
 
     // extract the box drawing characters for the box drawing type.
     let left_side   = ChtypeChar::from_chtype(ACS_VLINE());
