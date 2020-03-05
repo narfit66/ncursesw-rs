@@ -71,7 +71,7 @@ pub unsafe fn item_count(menu: MENU) -> i32 {
 pub unsafe fn item_description(item: ITEM) -> Option<String> {
     assert!(!item.is_null(), "{}item_description() : item.is_null()", MODULE_PATH);
 
-    (bindings::item_description(item) as *mut i8).as_mut().map(|ptr| ptr_to_string!(ptr))
+    (bindings::item_description(item) as *mut i8).as_mut().map(|ptr| ptr_as_string!(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_current.3x.html>
@@ -92,7 +92,7 @@ pub unsafe fn item_init(menu: Option<MENU>) -> Option<Menu_Hook> {
 pub unsafe fn item_name(item: ITEM) -> Option<String> {
     assert!(!item.is_null(), "{}item_name() : item.is_null()", MODULE_PATH);
 
-    (bindings::item_name(item) as *mut i8).as_mut().map(|ptr| ptr_to_string!(ptr))
+    (bindings::item_name(item) as *mut i8).as_mut().map(|ptr| ptr_as_string!(ptr))
 }
 
 /// <https://invisible-island.net/ncurses/man/mitem_opts.3x.html>

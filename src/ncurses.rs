@@ -27,7 +27,7 @@
 use libc::{c_void, EINTR};
 use std::{
     convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
-    ffi::CString, path::Path, os::unix::io::AsRawFd, io::{Write, Read}
+    ffi, path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
 
 use crate::{
@@ -43,6 +43,8 @@ use crate::{
     ncurseswerror::*, region::*, size::*, softlabeltype::*,
     shims::{funcs, ncurses, bindings}
 };
+
+macro_rules! path_as_slice { ($name: ident) => { &*(path_as_vec($name)?.as_slice() as *const [u8] as *const [i8]) } }
 
 static MODULE_PATH: &str = "ncursesw::ncurses::";
 
@@ -599,7 +601,7 @@ pub fn def_shell_mode() -> result!(()) {
 /// is negative or zero, any existing string for the given definition
 /// is removed.
 pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key(option_str_to_ptr!(definition), KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key(option_str_as_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key", rc))
     }
@@ -2967,7 +2969,7 @@ pub fn newterm<O, I>(term: Option<&str>, output: &O, input: &I) -> result!(SCREE
 {
     unsafe {
         ncurses::newterm(
-            option_str_to_ptr!(term),
+            option_str_as_ptr!(term),
             fdopen(output, "wb+")?,
             fdopen(input, "rb+")?
         ).ok_or(ncurses_function_error!("newterm"))
@@ -3300,9 +3302,7 @@ pub fn savetty() -> result!(()) {
 /// The `scr_dump()` routine dumps the current contents of the virtual screen
 /// to the file specificed by `path`.
 pub fn scr_dump<P: AsRef<Path>>(path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_dump() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match ncurses::scr_dump(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
+    match unsafe { ncurses::scr_dump(path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_dump", rc))
     }
@@ -3314,9 +3314,7 @@ pub fn scr_dump<P: AsRef<Path>>(path: P) -> result!(()) {
 /// update of the screen on this information rather than clearing the screen
 /// and starting from scratch.
 pub fn scr_init<P: AsRef<Path>>(path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_init() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match ncurses::scr_init(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
+    match unsafe { ncurses::scr_init(path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init", rc))
     }
@@ -3327,9 +3325,7 @@ pub fn scr_init<P: AsRef<Path>>(path: P) -> result!(()) {
 /// to `doupdate()` restores the physical screen to the way it looked in the
 /// dump file.
 pub fn scr_restore<P: AsRef<Path>>(path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_restore() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match ncurses::scr_restore(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
+    match unsafe { ncurses::scr_restore(path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore", rc))
     }
@@ -3340,9 +3336,7 @@ pub fn scr_restore<P: AsRef<Path>>(path: P) -> result!(()) {
 /// on the screen, and also what the program wants on the screen. This can be
 /// thought of as a screen inheritance function.
 pub fn scr_set<P: AsRef<Path>>(path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_set() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match ncurses::scr_set(unsafe { &*(fname.as_slice() as *const [u8] as *const [i8]) }) {
+    match unsafe { ncurses::scr_set(path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set", rc))
     }
@@ -3580,7 +3574,7 @@ pub fn slk_restore() -> result!(()) {
 /// - fmt:    indicating whether the label is to be left-justified, centered
 ///           or right-justified.
 pub fn slk_set(labnum: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
-    match unsafe { ncurses::slk_set(labnum, option_str_to_ptr!(label), fmt.value()) } {
+    match unsafe { ncurses::slk_set(labnum, option_str_as_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
@@ -4944,7 +4938,7 @@ pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
 
 /// Screen function of `define_key()`.
 pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key_sp(screen, option_str_to_ptr!(definition), KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key_sp(screen, option_str_as_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
     }
@@ -5295,7 +5289,7 @@ pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: &O, input: &
     unsafe {
         ncurses::newterm_sp(
             screen,
-            option_str_to_ptr!(term),
+            option_str_as_ptr!(term),
             fdopen(output, "wb+")?,
             fdopen(input, "rb+")?
         ).ok_or(ncurses_function_error!("newterm_sp"))
@@ -5450,9 +5444,7 @@ pub fn savetty_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `scr_init()`.
 pub fn scr_init_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_init_sp() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match unsafe { ncurses::scr_init_sp(screen, &*(fname.as_slice() as *const [u8] as *const [i8])) } {
+    match unsafe { ncurses::scr_init_sp(screen, path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init_sp", rc))
     }
@@ -5460,9 +5452,7 @@ pub fn scr_init_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
 
 /// Screen function of `scr_restore()`.
 pub fn scr_restore_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_restore_sp() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match unsafe { ncurses::scr_restore_sp(screen, &*(fname.as_slice() as *const [u8] as *const [i8])) } {
+    match unsafe { ncurses::scr_restore_sp(screen, path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore_sp", rc))
     }
@@ -5470,9 +5460,7 @@ pub fn scr_restore_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
 
 /// Screen function of `scr_set()`.
 pub fn scr_set_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
-    let fname = CString::new(*&path.as_ref().to_str().expect("scr_set_sp() : path is invalid!!!"))?.into_bytes_with_nul();
-
-    match unsafe { ncurses::scr_set_sp(screen, &*(fname.as_slice() as *const [u8] as *const [i8])) } {
+    match unsafe { ncurses::scr_set_sp(screen, path_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set_sp", rc))
     }
@@ -5603,7 +5591,7 @@ pub fn slk_restore_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `slk_set()`.
 pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
-    match unsafe { ncurses::slk_set_sp(screen, label_number, option_str_to_ptr!(label), fmt.value()) } {
+    match unsafe { ncurses::slk_set_sp(screen, label_number, option_str_as_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set_sp", rc))
     }
@@ -5723,4 +5711,8 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
 // get a file stream from a file descriptor.
 fn fdopen<FD: AsRawFd>(file: &FD, mode: &str) -> result!(ncurses::FILE) {
     unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(ncurses_os_error!("fdopen")) }
+}
+
+fn path_as_vec<P: AsRef<Path>>(path: P) -> result!(Vec<u8>) {
+    Ok(ffi::CString::new(path.as_ref().to_str().expect("path is invalid!!!"))?.into_bytes_with_nul())
 }
