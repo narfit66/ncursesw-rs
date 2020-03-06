@@ -12,6 +12,9 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
 - Changed `shims::ncurses::{newterm,newterm_sp}` `ty` parameters from `Option<&[i8]>` to `*const i8`. [BC]
 - Changed `shims::ncurses::{define_key,define_key_sp}` `definition` parameters from `Option<&[i8]>` to `*const i8`. [BC]
+- Changed signature of `tigetflag(capname: &str) -> i32` to `tigetflag(capname: &str) -> Result<bool, NCurseswError>` and implement function. [BC]
+- Changed signature of `tigetnum(capname: &str) -> i32` to `tigetnum(capname: &str) -> Result<Option<i32>, NCurseswError>` and implement function. [BC]
+- Changed signature of `tigetstr(capname: &str) -> String` to `tigetstr(capname: &str) -> Result<Option<String>, NCurseswError>` and implement function. [BC]
 - Removed `SoftLabelType::FourFourIndex` enum variant and added `SoftLabelType::{FourFourFour, FourFourFourIndex}` enum variants. [BC]
 - Added `SoftLabelType::{min_label,max_label,max_label_len}` methods.
 - Changed `slk_set()` and `slk_set_sp()` `label` parameter from `&str` to `Option<&str>`. [BC]

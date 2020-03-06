@@ -24,12 +24,11 @@
 #![allow(non_snake_case)]
 #![allow(clippy::too_many_arguments)]
 
-use libc::{c_void, EINTR};
 use std::{
     convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
     ffi, path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
-
+use libc::{c_void, EINTR};
 use crate::{
     constants::{
         ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
@@ -44,7 +43,8 @@ use crate::{
     shims::{funcs, ncurses, bindings}
 };
 
-macro_rules! path_as_slice { ($name: ident) => { &*(path_as_vec($name)?.as_slice() as *const [u8] as *const [i8]) } }
+macro_rules! path_to_cstring_as_slice { ($name: ident) => { &*(path_to_cstring_as_vec($name)?.as_slice() as *const [u8] as *const [i8]) } }
+macro_rules! str_to_cstring_as_slice { ($name: ident) => { &*(str_to_cstring_as_vec($name)?.as_slice() as *const [u8] as *const [i8]) } }
 
 static MODULE_PATH: &str = "ncursesw::ncurses::";
 
@@ -2925,9 +2925,7 @@ pub fn mvwvline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i3
 #[deprecated(since = "0.3.2", note = "ncurses library call superseeded by native rust call. Use std::thread::sleep(dur: std::time::Duration) instead")]
 /// Sleep for ms milliseconds.
 pub fn napms(ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    match ncurses::napms(ms) {
+    match ncurses::napms(i32::try_from(ms.as_millis())?) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("napms", rc))
     }
@@ -3302,7 +3300,7 @@ pub fn savetty() -> result!(()) {
 /// The `scr_dump()` routine dumps the current contents of the virtual screen
 /// to the file specificed by `path`.
 pub fn scr_dump<P: AsRef<Path>>(path: P) -> result!(()) {
-    match unsafe { ncurses::scr_dump(path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_dump(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_dump", rc))
     }
@@ -3314,7 +3312,7 @@ pub fn scr_dump<P: AsRef<Path>>(path: P) -> result!(()) {
 /// update of the screen on this information rather than clearing the screen
 /// and starting from scratch.
 pub fn scr_init<P: AsRef<Path>>(path: P) -> result!(()) {
-    match unsafe { ncurses::scr_init(path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_init(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init", rc))
     }
@@ -3325,7 +3323,7 @@ pub fn scr_init<P: AsRef<Path>>(path: P) -> result!(()) {
 /// to `doupdate()` restores the physical screen to the way it looked in the
 /// dump file.
 pub fn scr_restore<P: AsRef<Path>>(path: P) -> result!(()) {
-    match unsafe { ncurses::scr_restore(path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_restore(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore", rc))
     }
@@ -3336,7 +3334,7 @@ pub fn scr_restore<P: AsRef<Path>>(path: P) -> result!(()) {
 /// on the screen, and also what the program wants on the screen. This can be
 /// thought of as a screen inheritance function.
 pub fn scr_set<P: AsRef<Path>>(path: P) -> result!(()) {
-    match unsafe { ncurses::scr_set(path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_set(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set", rc))
     }
@@ -3676,43 +3674,38 @@ pub fn termname() -> result!(String) {
     ncurses::termname().ok_or(ncurses_function_error!("termname"))
 }
 
-/// At present this function is unimplemented.
-///
 /// Return the value of the Boolean capability corresponding to the terminfo
-/// capability name capname as an integer. Return the value -1 if capname is
-/// not a Boolean capability, or 0 if it is canceled or absent from the
-/// terminal description.
-pub fn tigetflag(_capname: &str) -> i32 {
-    unimplemented!();
+/// capability name capname as an `bool`.
+pub fn tigetflag(capname: &str) -> result!(bool) {
+    match unsafe { ncurses::tigetnum(str_to_cstring_as_slice!(capname)) } {
+        -1 => Err(NCurseswError::InvalidCapability),
+        0  => Ok(false),
+        _  => Ok(true)
+    }
 }
 
-/// At present this function is unimplemented.
-///
 /// Return the value of the numeric capability corresponding to the terminfo
-/// capability name capname as an integer. Return the value -2 if capname is
-/// not a numeric capability, or -1 if it is canceled or absent from the
-/// terminal description.
-pub fn tigetnum(_capname: &str) -> i32 {
-    unimplemented!();
+/// capability name capname as an integer or `None` if it is canceled or
+/// absent from the terminal description.
+pub fn tigetnum(capname: &str) -> result!(Option<i32>) {
+    match unsafe { ncurses::tigetnum(str_to_cstring_as_slice!(capname)) } {
+        -2 => Err(NCurseswError::InvalidCapability),
+        -1 => Ok(None),
+        rc => Ok(Some(rc))
+    }
 }
 
-/// At present this function is unimplemented.
-///
 /// Return the value of the string capability corresponding to the terminfo
 /// capability name capname as a bytes object. Return None if capname is not
 /// a terminfo “string capability”, or is canceled or absent from the terminal
 /// description.
-pub fn tigetstr(_capname: &str) -> String {
-    unimplemented!();
+pub fn tigetstr(capname: &str) -> result!(Option<String>) {
+    Ok(unsafe { ncurses::tigetstr(str_to_cstring_as_slice!(capname)) })
 }
 
 /// Set blocking or non-blocking read behavior for the window.
 pub fn timeout(ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    ncurses::timeout(ms);
-
-    Ok(())
+    Ok(ncurses::timeout(i32::try_from(ms.as_millis())?))
 }
 
 /// Pretend that `count` lines have been changed, beginning with line `start`.
@@ -4824,11 +4817,7 @@ pub fn wsyncup(handle: WINDOW) {
 
 /// Set blocking or non-blocking read behavior for the window.
 pub fn wtimeout(handle: WINDOW, ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    unsafe { ncurses::wtimeout(handle, ms) };
-
-    Ok(())
+    Ok(unsafe { ncurses::wtimeout(handle, i32::try_from(ms.as_millis())?) })
 }
 
 /// The `wtouchln()` routine makes `n` lines in the window, starting at `line`,
@@ -5258,9 +5247,7 @@ pub fn mvcur_sp(screen: SCREEN, old: Origin, new: Origin) -> result!(()) {
 #[deprecated(since = "0.5.0", note = "ncurses library call superseeded by native rust call. Use std::thread::sleep(dur: std::time::Duration) instead")]
 /// Screen function of `namps()`.
 pub fn napms_sp(screen: SCREEN, ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    match unsafe { ncurses::napms_sp(screen, ms) } {
+    match unsafe { ncurses::napms_sp(screen, i32::try_from(ms.as_millis())?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("napms_sp", rc))
     }
@@ -5444,7 +5431,7 @@ pub fn savetty_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `scr_init()`.
 pub fn scr_init_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
-    match unsafe { ncurses::scr_init_sp(screen, path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_init_sp(screen, path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init_sp", rc))
     }
@@ -5452,7 +5439,7 @@ pub fn scr_init_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
 
 /// Screen function of `scr_restore()`.
 pub fn scr_restore_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
-    match unsafe { ncurses::scr_restore_sp(screen, path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_restore_sp(screen, path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore_sp", rc))
     }
@@ -5460,7 +5447,7 @@ pub fn scr_restore_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
 
 /// Screen function of `scr_set()`.
 pub fn scr_set_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
-    match unsafe { ncurses::scr_set_sp(screen, path_as_slice!(path)) } {
+    match unsafe { ncurses::scr_set_sp(screen, path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set_sp", rc))
     }
@@ -5713,6 +5700,10 @@ fn fdopen<FD: AsRawFd>(file: &FD, mode: &str) -> result!(ncurses::FILE) {
     unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(ncurses_os_error!("fdopen")) }
 }
 
-fn path_as_vec<P: AsRef<Path>>(path: P) -> result!(Vec<u8>) {
-    Ok(ffi::CString::new(path.as_ref().to_str().expect("path is invalid!!!"))?.into_bytes_with_nul())
+fn path_to_cstring_as_vec<P: AsRef<Path>>(path: P) -> result!(Vec<u8>) {
+    str_to_cstring_as_vec(path.as_ref().to_str().expect("path is invalid!!!"))
+}
+
+fn str_to_cstring_as_vec(str: &str) -> result!(Vec<u8>) {
+    Ok(ffi::CString::new(str)?.into_bytes_with_nul())
 }
