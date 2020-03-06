@@ -47,6 +47,8 @@ pub enum NCurseswError {
     ColorLimit,
     #[error("Terminal only supports a maximum of {} color pairs", COLOR_PAIRS())]
     ColorPairLimit,
+    #[error("Invalid capability")]
+    InvalidCapability,
 
     #[error("{source}")]
     IntError { #[from] source: num::TryFromIntError },
