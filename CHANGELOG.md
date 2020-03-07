@@ -6,8 +6,8 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Upgraded source code to rust 2018 edition.
 - Now uses `thiserror` crate instead of `custom_error` crate to create `Error` types.
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
-- Changed signatures of `newterm`, `newterm_sp`, `putwin`, `getwin` and `getwin_sp` to accept `I` and `O` parameters by reference. [BC]
 - Changed signature of `setsyx(origin: Origin) -> Result<(), NCurseswError>` to `setsyx(origin: Option<Origin>) -> Result<(), NCurseswError>`. [BC]
+- Changed signatures of `newterm`, `newterm_sp`, `putwin`, `getwin` and `getwin_sp` to accept `I` and `O` parameters by reference. [BC]
 - Changed signature of `intrflush()` and `intrflush_sp()` to ignore `handle/window` parameter as this is ignored in the NCurses library. [BC]
 - `shims::ncurses::intrflush_sp()` nolonger does an assertion on a null `win` parameter as NCurses documentation indicates that parameter is not required.
 - Changed `shims::ncurses::{newterm,newterm_sp}` `ty` parameters from `Option<&[i8]>` to `*const i8`. [BC]
