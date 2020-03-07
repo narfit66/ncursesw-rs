@@ -3677,7 +3677,7 @@ pub fn termname() -> result!(String) {
 /// Return the value of the Boolean capability corresponding to the terminfo
 /// capability name capname as an `bool`.
 pub fn tigetflag(capname: &str) -> result!(bool) {
-    match unsafe { ncurses::tigetnum(str_to_cstring_as_slice!(capname)) } {
+    match unsafe { ncurses::tigetflag(str_to_cstring_as_slice!(capname)) } {
         -1 => Err(NCurseswError::InvalidCapability),
         0  => Ok(false),
         _  => Ok(true)
