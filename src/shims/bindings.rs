@@ -25,7 +25,7 @@
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
 #![allow(clippy::unreadable_literal)]
-#![allow(clippy::redundant_static_lifetimes)]
+#![allow(clippy::const_static_lifetime)]
 
 use std::os::raw::{c_short, c_int};
 

@@ -21,7 +21,6 @@
 */
 
 use std::str::FromStr;
-
 use crate::{
     NCurseswError, COLORS,
     shims::constants::{

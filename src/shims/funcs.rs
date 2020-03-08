@@ -20,10 +20,7 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::missing_safety_doc)]
-
 use std::os::unix::io::AsRawFd;
-
 use crate::shims::{ncurses::FILE, bindings};
 
 pub(in crate) unsafe fn fdopen<FD: AsRawFd>(file: &FD, mode: &[i8]) -> Option<FILE> {

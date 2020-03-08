@@ -24,10 +24,8 @@
 #![allow(non_snake_case)]
 #![warn(missing_debug_implementations)]
 #![allow(clippy::too_many_arguments)]
-#![allow(clippy::missing_safety_doc)]
 
 use std::{char, ptr, env};
-
 use crate::{
     cstring::*,
     shims::{

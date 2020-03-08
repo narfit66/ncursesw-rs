@@ -22,12 +22,10 @@
 
 #![allow(clippy::crosspointer_transmute)]
 #![allow(non_camel_case_types)]
-#![allow(clippy::missing_safety_doc)]
 
 // See <https://invisible-island.net/ncurses/man/menu.3x.html> for documentation.
 
 use std::{mem, slice, ffi::CStr};
-
 use crate::{
     shims::{bindings, bindings::{Menu_Hook, chtype}, ncurses::{SCREEN, WINDOW}},
     cstring::FromCStr

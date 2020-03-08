@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-/// A collection of attributes and color pair.
+/// A pair of `Attributes` and `ColorPair`.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttributesColorPair {
     attributes: Attributes,
@@ -29,16 +29,18 @@ pub struct AttributesColorPair {
 
 impl AttributesColorPair {
     pub fn new(attributes: Attributes, color_pair: ColorPair) -> Self {
-        assert!(attributes.screen() == color_pair.screen());
+        assert!(attributes.screen() == color_pair.screen(), "AttributesColorPair::new() : attributes.screen() != color_pair.screen()");
 
         Self { attributes, color_pair: color_pair }
     }
 
+    /// Return the attribute of the pair.
     pub fn attributes(&self) -> Attributes {
         self.attributes
     }
 
+    /// Return the color pair of the pair.
     pub fn color_pair(&self) -> ColorPair {
-        self.color_pair.to_owned()
+        self.color_pair
     }
 }

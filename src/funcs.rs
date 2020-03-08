@@ -21,7 +21,6 @@
 */
 
 use semver::Version;
-
 use crate::shims::bindings;
 
 /// Return the semantic version of the NCurses library.
