@@ -26,18 +26,30 @@ use crate::shims::constants::{
     A_RIGHT, A_TOP, A_VERTICAL, A_ITALIC
 };
 
+/// Terminal Attribute.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Attribute {
+    /// Normal display (no highlight).
     Normal,
+    /// Bit-mask to extract a character.
     CharText,
+    /// Best highlighting mode of the terminal.
     Standout,
+    /// Underlining.
     Underline,
+    /// Reverse video.
     Reverse,
+    /// Blinking.
     Blink,
+    /// Half bright.
     Dim,
+    /// Extra bright or bold.
     Bold,
+    /// Alternate character set.
     AlternativeCharSet,
+    /// Invisible or blank mode.
     Invisible,
+    /// Protected mode.
     Protected,
     Horizontal,
     Left,
@@ -45,6 +57,7 @@ pub enum Attribute {
     Right,
     Top,
     Vertical,
+    /// Italics.
     Italic
 }
 

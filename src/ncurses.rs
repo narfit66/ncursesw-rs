@@ -23,6 +23,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(clippy::too_many_arguments)]
+#![allow(clippy::unit_arg)]
 
 use std::{
     convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
@@ -4871,7 +4872,7 @@ pub fn assume_default_colors_sp<S, C, T>(screen: SCREEN, colors: S) -> result!((
           C: ColorType<T>,
           T: ColorAttributeTypes
 {
-    assert!(screen == colors.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == colors.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::assume_default_colors_sp(screen, colors.foreground().number(), colors.background().number()) } {
         OK => Ok(()),
@@ -5039,7 +5040,7 @@ pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
           i32: From<T>,
           T:   ColorAttributeTypes
 {
-    assert!(screen == color_pair.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::free_pair_sp(screen, i32::from(color_pair.number())) } {
         OK => Ok(()),
@@ -5473,7 +5474,7 @@ pub fn set_tabsize_sp(screen: SCREEN, size: i32) -> result!(()) {
 
 /// Screen function of `slk_attroff()`.
 pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
-    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::slk_attroff_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -5483,7 +5484,7 @@ pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) 
 
 /// Screen function of `slk_attron()`.
 pub fn slk_attron_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
-    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::slk_attron_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -5497,8 +5498,8 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
           P: ColorPairType<T>,
           T: ColorAttributeTypes
 {
-    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
-    assert!(screen == color_pair.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::slk_attr_set_sp(screen, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         OK => Ok(()),
@@ -5508,7 +5509,7 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
 
 /// Screen function of `slk_attrset()`.
 pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
-    assert!(screen == attrs.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::slk_attrset_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -5531,7 +5532,7 @@ pub fn slk_clear_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `slk_color()`.
 pub fn slk_color_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(()) {
-    assert!(screen == color_pair.screen().map_or_else(|| ptr::null_mut(), |screen| screen));
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()));
 
     match unsafe { ncurses::slk_color_sp(screen, color_pair.number()) } {
         OK => Ok(()),

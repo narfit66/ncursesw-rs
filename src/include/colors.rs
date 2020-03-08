@@ -35,13 +35,14 @@ macro_rules! define_colors {
         impl Colors {
             /// Create a new instance of foreground and background colors.
             pub fn new(foreground: Color, background: Color) -> Self {
-                assert!(foreground.screen() == background.screen());
+                assert!(foreground.screen() == background.screen(), "Colors::new() : foreground.screen() != background.screen()");
 
                 Self { screen: foreground.screen(), foreground, background }
             }
         }
 
         impl ColorsType<Color, $type> for Colors {
+            /// Return the associated screen.
             fn screen(&self) -> Option<SCREEN> {
                 self.screen
             }

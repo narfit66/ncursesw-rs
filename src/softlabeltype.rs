@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::trivially_copy_pass_by_ref)]
+
 /// The soft-label layout type
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SoftLabelType {

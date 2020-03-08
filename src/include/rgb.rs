@@ -22,7 +22,7 @@
 
 macro_rules! define_rgb {
     ($type: ty) => {
-        /// The (R)ed (G)reen (B)lue content of a color.
+        /// The (R)ed, (G)reen and (B)lue content of a color.
         #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
         pub struct RGB {
             red:   $type,
@@ -31,8 +31,12 @@ macro_rules! define_rgb {
         }
 
         impl RGB {
-            /// Create a new instance.
+            /// Create a new rgb instance.
             pub fn new(red: $type, green: $type, blue: $type) -> Self {
+                assert!(red >= 0 && red <= 1000);
+                assert!(green >= 0 && green <= 1000);
+                assert!(blue >= 0 && blue <= 1000);
+
                 Self { red, green, blue }
             }
 

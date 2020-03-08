@@ -21,7 +21,6 @@
 */
 
 use std::{fmt, ops::{BitOr, BitXor}};
-
 use crate::{
     gen::AttributesType,
     shims::{ncurses::{SCREEN, attr_t}, constants}
@@ -61,7 +60,7 @@ macro_rules! impl_attributes_type {
     };
 }
 
-/// Attributes.
+/// Termianl Attributes.
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Attributes {
     screen: Option<SCREEN>,
@@ -161,7 +160,7 @@ impl BitOr for Attributes {
     type Output = Self;
 
     fn bitor(self, rhs: Self) -> Self::Output {
-        assert!(self.screen == rhs.screen);
+        assert!(self.screen == rhs.screen, "Attributes::bitor() : self.screen != rhs.screen");
 
         Self::_from(self.screen, self.raw | rhs.raw)
     }
@@ -172,7 +171,7 @@ impl BitXor for Attributes {
     type Output = Self;
 
     fn bitxor(self, rhs: Self) -> Self::Output {
-        assert!(self.screen == rhs.screen);
+        assert!(self.screen == rhs.screen, "Attributes::bitxor() : self.screen != rhs.screen");
 
         Self::_from(self.screen, self.raw ^ rhs.raw)
     }

@@ -20,12 +20,9 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::missing_safety_doc)]
-
 // See <https://invisible-island.net/ncurses/man/form.3x.html>
 
 use std::{mem, slice, ptr};
-
 use crate::{
     shims::{
         bindings,

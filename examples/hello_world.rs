@@ -1,7 +1,7 @@
 /*
-    src/cursortype.rs
+    examples/hello_world.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,39 +20,28 @@
     IN THE SOFTWARE.
 */
 
-/// Cursor type.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum CursorType {
-    /// Makes the cursor invisible. Supported on most terminals.
-    Invisible,
-    /// Makes the cursor visible.
-    Visible,
-    /// Makes the cursor "highly" visible in some way. Not supported on all terminals.
-    VeryVisible
-}
+extern crate ncursesw;
 
-impl CursorType {
-    pub(in crate) fn new(cursor: i32) -> Option<Self> {
-        match cursor {
-            0 => Some(CursorType::Invisible),
-            1 => Some(CursorType::Visible),
-            2 => Some(CursorType::VeryVisible),
-            _ => None
-        }
-    }
+use std::convert::TryFrom;
+use ncursesw::*;
 
-    pub(in crate) fn value(self) -> i32 {
-        match self {
-            CursorType::Invisible   => 0,
-            CursorType::Visible     => 1,
-            CursorType::VeryVisible => 2
-        }
+fn main() {
+    if let Err(source) = menu_routine() {
+        eprintln!("error: {}", source);
     }
 }
 
-impl Default for CursorType {
-    /// The default cursor type
-    fn default() -> Self {
-        CursorType::Visible
-    }
+fn menu_routine() -> Result<(), NCurseswError> {
+    let hello_world = "Hello World!!!";
+
+    // initialize ncurses.
+    initscr()?;
+    // print "hello world!!!"
+    mvaddstr(Origin { y: LINES() / 2, x: (COLS() / 2) - i32::try_from(hello_world.len())? }, hello_world)?;
+    // print it on to the real screen.
+    refresh()?;
+    //wait for user input
+    getch()?;
+    // end ncurses.
+    endwin()
 }

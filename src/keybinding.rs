@@ -21,7 +21,6 @@
 */
 
 use std::convert::{From, TryFrom, Into};
-
 use crate::{NCurseswError, shims::{constants::*, ncurses::wint_t}};
 
 /// Keys returned by NCurses `getch()` and `get_wch()` families of functions.
