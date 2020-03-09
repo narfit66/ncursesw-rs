@@ -37,7 +37,7 @@ fn menu_routine() -> Result<(), NCurseswError> {
     // initialize ncurses.
     initscr()?;
     // print "hello world!!!"
-    mvaddstr(Origin { y: LINES() / 2, x: (COLS() / 2) - i32::try_from(hello_world.len())? }, hello_world)?;
+    mvaddstr(Origin { y: LINES() / 2, x: (COLS() / 2) - (i32::try_from(hello_world.len())? / 2) }, hello_world)?;
     // print it on to the real screen.
     refresh()?;
     //wait for user input
