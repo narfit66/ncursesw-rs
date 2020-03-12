@@ -24,7 +24,6 @@
 #![allow(deprecated)]
 
 use std::{ptr, convert::TryFrom, ops::BitOr};
-
 use crate::{
     gen::{
         ColorType, ColorsType, ColorPairType, ColorPairGeneric,

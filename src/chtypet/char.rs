@@ -22,7 +22,6 @@
 
 use std::ops::{BitOr, BitXor};
 use ascii::AsciiChar;
-
 use crate::{
     gen::*,
     normal::{Attribute, Attributes},
@@ -154,13 +153,14 @@ fn chtype_char_test() {
 #[test]
 fn chtype_char_get_attributes() {
     let ch = ChtypeChar::new(AsciiChar::new('s'));
-    let mut attrs = Attributes::default();
-
-    attrs = attrs.set_bold(true).set_dim(true);
+    let attrs = Attributes::default().set_bold(true).set_dim(true);
 
     let c = ch | attrs;
 
+    assert_eq!(c.as_char(), 's');
     assert_eq!(c.get_attributes(), attrs);
+    assert_eq!(c.get_attributes().is_normal(), false);
     assert_eq!(c.get_attributes().is_bold(), true);
-    assert_eq!(attrs.is_bold(), true);
+    assert_eq!(c.get_attributes().is_dim(), true);
+    assert_eq!(c.get_attributes().is_underline(), false);
 }

@@ -21,7 +21,6 @@
 */
 
 use std::ops::{BitOr, BitXor};
-
 use crate::{form::FormOption, shims::constants};
 
 /// Form options.

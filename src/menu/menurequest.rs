@@ -21,7 +21,6 @@
 */
 
 use std::convert::TryFrom;
-
 use crate::{shims::constants, menu::NCurseswMenuError};
 
 /// Menu request.

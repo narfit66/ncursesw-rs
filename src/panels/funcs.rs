@@ -21,8 +21,8 @@
 */
 
 use crate::{
-    origin::Origin,
-    shims::{ncurses, npanels, constants::{OK, ERR}},
+    Origin,
+    shims::{ncurses, npanels, constants::OK},
     panels::{NCurseswPanelsError, PanelUserPtr}
 };
 

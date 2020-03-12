@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, TryFrom, Into};
+use std::convert::TryFrom;
 use crate::{NCurseswError, shims::{constants::*, ncurses::wint_t}};
 
 /// Keys returned by NCurses `getch()` and `get_wch()` families of functions.
@@ -224,8 +224,6 @@ impl TryFrom<wint_t> for KeyBinding {
 
 impl From<i32> for KeyBinding {
     fn from(key: i32) -> Self {
-        assert!(key >= KEY_MIN && key <= KEY_MAX);
-
         match key {
             KEY_BREAK        => KeyBinding::Break,
             KEY_SRESET       => KeyBinding::SoftReset,
@@ -423,11 +421,7 @@ impl Into<i32> for KeyBinding {
             KeyBinding::MouseEvent            => KEY_MOUSE,
             KeyBinding::ResizeEvent           => KEY_RESIZE,
             KeyBinding::Event                 => KEY_EVENT,
-            KeyBinding::Unknown(key)          => {
-                assert!(key > KEY_EVENT && key <= KEY_MAX);
-
-                key
-            }
+            KeyBinding::Unknown(key)          => key
         }
     }
 }

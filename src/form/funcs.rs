@@ -21,9 +21,7 @@
 */
 
 use std::{ptr, convert::TryFrom};
-
 use errno::errno;
-
 use crate::{
     normal,
     Origin, Size, WideChar,

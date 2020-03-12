@@ -21,7 +21,6 @@
 */
 
 use std::ops::BitOr;
-
 use crate::{
     ColorPairType, AttributesType, normal::{Attributes, ColorPair},
     shims::ncurses::attr_t

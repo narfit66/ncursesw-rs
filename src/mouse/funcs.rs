@@ -23,11 +23,10 @@
 #![allow(non_camel_case_types)]
 
 use std::{time, convert::TryFrom};
-
 use crate::{
+    Origin,
     mouse::{NCurseswMouseError, OriginResult, constants::NCURSES_MOUSE_VERSION},
-    origin::Origin,
-    shims::{ncurses, nmouse, bindings, constants::{OK, ERR}}
+    shims::{ncurses, nmouse, bindings, constants::OK}
 };
 
 type WINDOW = ncurses::WINDOW;

@@ -21,10 +21,8 @@
 */
 
 use std::{num, char, ffi, convert};
-
-use errno::Errno;
+use errno::{errno, Errno};
 use thiserror::Error;
-
 use crate::{
     COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
     menu::NCurseswMenuError, form::NCurseswFormError
@@ -33,8 +31,8 @@ use crate::{
 /// NCursesw Errors/Events.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NCurseswError {
-    #[error("ncurses::{func}(), rc={rc} ({} #{})", errno::errno(), errno::errno().0)]
-    LibraryError { func: String, rc: i32 },
+    #[error("ncurses::{func}(){}{}", rc_error(*rc), os_level_error())]
+    LibraryError { func: String, rc: Option<i32> },
     #[error("interrupted system call (EINTR)")]
     InterruptedCall,
     #[error("KEY_RESIZE")]
@@ -72,4 +70,16 @@ pub enum NCurseswError {
 
     #[error("{}() : {} (#{})", func, errno, errno.0)]
     OSError { func: String, errno: Errno}
+}
+
+pub(in crate) fn rc_error(rc: Option<i32>) -> String {
+    rc.map_or_else(|| String::new(), |rc| format!(", rc={}", rc))
+}
+
+pub(in crate) fn os_level_error() -> String {
+    if errno().0 == 0 {
+        String::new()
+    } else {
+        format!(", os_level={} ({})", errno().0, errno())
+    }
 }

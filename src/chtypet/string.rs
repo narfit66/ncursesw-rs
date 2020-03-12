@@ -20,10 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
-
+use std::ops::{BitOr, BitXor};
 use ascii::AsciiString;
-
 use crate::{
     gen::*,
     chtypet::ChtypeChar,
@@ -83,10 +81,7 @@ impl ChtypeString {
     }
 
     pub fn pop(&mut self) -> Option<ChtypeChar> {
-        match self.raw.pop() {
-            None    => None,
-            Some(c) => Some(ChtypeChar::from(c))
-        }
+        self.raw.pop().map(|c| ChtypeChar::from(c))
     }
 
     pub fn remove(&mut self, idx: usize) -> ChtypeChar {
@@ -167,6 +162,7 @@ impl Into<Vec<chtype>> for ChtypeString {
 impl RawWithNul<Vec<chtype>> for ChtypeString {
     fn raw_with_nul(self) -> Vec<chtype> {
         let mut vec_of_chtype: Vec<chtype> = Self::into(self);
+
         vec_of_chtype.push(0x00);
 
         vec_of_chtype

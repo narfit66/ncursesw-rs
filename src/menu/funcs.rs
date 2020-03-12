@@ -21,9 +21,7 @@
 */
 
 use std::{ptr, ffi::CString, convert::TryFrom};
-
 use errno::errno;
-
 use crate::{
     normal,
     cstring::*,

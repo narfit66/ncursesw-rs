@@ -1670,27 +1670,29 @@ pub fn isendwin() -> bool {
     ncurses::isendwin()
 }
 
-/// Permits an application to determine if a string is currently bound
-/// to any `KeyBindind`.
-pub fn key_defined(definition: &str) -> result!(KeyBinding) {
-    let c = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
+/// Permits an application to determine if a string represented
+/// as individual bytes is currently bound to any `KeyBindind`.
+pub fn key_defined(definition: &str) -> result!(Option<KeyBinding>) {
+    let rc = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
 
-    if c.is_negative() {
-        Err(ncurses_function_error_with_rc!("key_defined", c))
+    if rc.is_negative() {
+        Err(ncurses_function_error_with_rc!("key_defined", rc))
+    } else if rc == 0 {
+        Ok(None)
     } else {
-        Ok(KeyBinding::from(c))
+        Ok(Some(KeyBinding::from(rc)))
     }
 }
 
 /// Returns a string corresponding to a given `KeyBinding`.
-pub fn key_name(w: KeyBinding) -> result!(String) {
-    ncurses::key_name(KeyBinding::into(w)).ok_or(ncurses_function_error!("key_name"))
+pub fn key_name(wch: WideChar) -> Option<String> {
+    ncurses::key_name(WideChar::into(wch))
 }
 
 /// Permits an application to determine the string which is defined
 /// in the terminfo for specific keycodes.
-pub fn keybound(keycode: KeyBinding, count: i32) -> result!(String) {
-    ncurses::keybound(KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound"))
+pub fn keybound(keycode: KeyBinding, count: i32) -> Option<String> {
+    ncurses::keybound(KeyBinding::into(keycode), count)
 }
 
 /// Return the name of the key binding c. The name of a key generating
@@ -3588,11 +3590,11 @@ pub fn slk_touch() -> result!(()) {
     }
 }
 
-/// The wide character version of the `slk_set()` routine.
-pub fn slk_wset(labnum: i32, label: &WideString, fmt: Justification) -> result!(()) {
-    match ncurses::slk_wset(labnum, raw_with_nul_as_slice!(label), fmt.value()) {
+/// The wide string version of the `slk_set()` routine.
+pub fn slk_wset(labnum: i32, label: Option<&WideString>, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_wset(labnum, option_widestr_as_ptr(label), fmt.value()) } {
         OK => Ok(()),
-        rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
+        rc => Err(ncurses_function_error_with_rc!("slk_wset", rc))
     }
 }
 
@@ -5707,4 +5709,9 @@ fn path_to_cstring_as_vec<P: AsRef<Path>>(path: P) -> result!(Vec<u8>) {
 
 fn str_to_cstring_as_vec(str: &str) -> result!(Vec<u8>) {
     Ok(ffi::CString::new(str)?.into_bytes_with_nul())
+}
+
+fn option_widestr_as_ptr(wstr: Option<&WideString>) -> *const wchar_t {
+    // mbstowcs
+    wstr.map_or_else(ptr::null, |name| raw_with_nul_as_slice!(name).as_ptr())
 }

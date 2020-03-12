@@ -24,7 +24,6 @@
 #![allow(deprecated)]
 
 use std::ptr;
-
 use crate::{
     shims::{ncurses, ncurses::SCREEN},
     extend::{Colors, Color},
