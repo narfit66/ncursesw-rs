@@ -21,13 +21,12 @@
 */
 
 use std::{
-    convert::{TryFrom, From, TryInto, Into},
+    convert::{TryFrom, TryInto},
     char::{
         CharTryFromError, EscapeUnicode, EscapeDebug,
         EscapeDefault, ToLowercase, ToUppercase
     }
 };
-
 use crate::{
     ncurseswerror::NCurseswError,
     shims::{
@@ -300,9 +299,7 @@ impl WideChar {
     }
 
     pub fn as_char(self) -> result!(char) {
-        let ch = char::try_from(self.raw)?;
-
-        Ok(ch)
+        Ok(char::try_from(self.raw)?)
     }
 }
 

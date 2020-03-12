@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::Into, ops::BitOr};
-
+use std::ops::BitOr;
 use crate::{extend::Attributes, shims::ncurses::attr_t};
 
 include!("../include/attribute.rs");

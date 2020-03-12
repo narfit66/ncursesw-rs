@@ -21,10 +21,11 @@
 */
 
 use thiserror::Error;
+use crate::ncurseswerror::{rc_error, os_level_error};
 
 /// NCursesw panels errors.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NCurseswPanelsError {
-    #[error("npanels::{func}(), rc={rc} ({} #{})", errno::errno(), errno::errno().0)]
-    LibraryError { func: String, rc: i32 }
+    #[error("npanels::{func}(){}{}", rc_error(*rc), os_level_error())]
+    LibraryError { func: String, rc: Option<i32> }
 }

@@ -21,7 +21,6 @@
 */
 
 use std::ops::{BitOr, BitXor};
-
 use crate::{menu::ItemOption, shims::constants};
 
 /// Menu item options.

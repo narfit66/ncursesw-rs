@@ -28,15 +28,15 @@ macro_rules! mouse_result { ($type: ty) => { Result<$type, NCurseswMouseError> }
 macro_rules! menu_result { ($type: ty) => { Result<$type, NCurseswMenuError> } }
 macro_rules! form_result { ($type: ty) => { Result<$type, NCurseswFormError> } }
 
-macro_rules! ncurses_function_error { ($func: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: ERR } } }
-macro_rules! ncurses_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: $rc } } }
+macro_rules! ncurses_function_error { ($func: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: None } } }
+macro_rules! ncurses_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswError::LibraryError { func: String::from($func), rc: Some($rc) } } }
 macro_rules! ncurses_os_error { ($func: expr) => { NCurseswError::OSError { func: String::from($func), errno: errno::errno() } } }
 
-macro_rules! panels_function_error { ($func: expr) => { NCurseswPanelsError::LibraryError { func: String::from($func), rc: ERR } } }
-macro_rules! panels_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswPanelsError::LibraryError { func: String::from($func), rc: $rc } } }
+macro_rules! panels_function_error { ($func: expr) => { NCurseswPanelsError::LibraryError { func: String::from($func), rc: None } } }
+macro_rules! panels_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswPanelsError::LibraryError { func: String::from($func), rc: Some($rc) } } }
 
-macro_rules! mouse_function_error { ($func: expr) => { NCurseswMouseError::LibraryError { func: String::from($func), rc: ERR } } }
-macro_rules! mouse_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswMouseError::LibraryError { func: String::from($func), rc: $rc } } }
+macro_rules! mouse_function_error { ($func: expr) => { NCurseswMouseError::LibraryError { func: String::from($func), rc: None } } }
+macro_rules! mouse_function_error_with_rc { ($func: expr, $rc: expr) => { NCurseswMouseError::LibraryError { func: String::from($func), rc: Some($rc) } } }
 
 macro_rules! menu_function_error { ($func: expr) => { ncursesw_menu_error_system_error($func) } }
 macro_rules! menu_function_error_with_rc { ($func: expr, $rc: expr) => { ncursesw_menu_error_from_rc($func, $rc) } }

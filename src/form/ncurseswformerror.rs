@@ -21,10 +21,8 @@
 */
 
 use std::{num, ffi, convert};
-
 use errno::{Errno, errno};
 use thiserror::Error;
-
 use crate::shims::constants;
 
 /// NCursesw form errors.

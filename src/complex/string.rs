@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, TryInto, Into};
-
+use std::convert::TryInto;
 use crate::{
     gen::{AttributesType, ColorPairType, ColorAttributeTypes, RawWithNul},
     complex::ComplexChar,
@@ -113,10 +112,7 @@ impl ComplexString {
     }
 
     pub fn pop(&mut self) -> Option<ComplexChar> {
-        match self.raw.pop() {
-            None    => None,
-            Some(c) => Some(ComplexChar::from(c))
-        }
+        self.raw.pop().map(|c| ComplexChar::from(c))
     }
 
     pub fn remove(&mut self, idx: usize) -> ComplexChar {
@@ -173,6 +169,7 @@ impl Into<Vec<cchar_t>> for ComplexString {
 impl RawWithNul<Vec<cchar_t>> for ComplexString {
     fn raw_with_nul(self) -> Vec<cchar_t> {
         let mut raw = self.raw;
+
         raw.push(unsafe { std::mem::zeroed() });
 
         raw.to_owned()

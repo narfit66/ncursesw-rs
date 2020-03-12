@@ -22,8 +22,6 @@
 
 #![allow(clippy::should_implement_trait)]
 
-use std::convert::{From, Into};
-
 use crate::{gen::*, shims::ncurses::wchar_t, wide::WideChar};
 
 /// Wide character string (UTF-8).
@@ -78,10 +76,7 @@ impl WideString {
     }
 
     pub fn pop(&mut self) -> Option<WideChar> {
-        match self.raw.pop() {
-            None    => None,
-            Some(c) => Some(WideChar::from(c))
-        }
+        self.raw.pop().map(|c| WideChar::from(c))
     }
 
     pub fn remove(&mut self, idx: usize) -> WideChar {
@@ -132,6 +127,7 @@ impl Into<Vec<wchar_t>> for WideString {
 impl RawWithNul<Vec<wchar_t>> for WideString {
     fn raw_with_nul(self) -> Vec<wchar_t> {
         let mut raw: Vec<wchar_t> = Self::into(self);
+
         raw.push(0x00);
 
         raw

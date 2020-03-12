@@ -21,14 +21,14 @@
 */
 
 use std::num;
-
 use thiserror::Error;
+use crate::ncurseswerror::{rc_error, os_level_error};
 
 /// NCursesw mouse errors.
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NCurseswMouseError {
-    #[error("nmouse::{func}(), rc={rc} ({} #{})", errno::errno(), errno::errno().0)]
-    LibraryError { func: String, rc: i32 },
+    #[error("nmouse::{func}(){}{}", rc_error(*rc), os_level_error())]
+    LibraryError { func: String, rc: Option<i32> },
     #[error("{source}")]
     IntError { #[from] source: num::TryFromIntError }
 }

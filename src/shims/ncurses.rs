@@ -2295,11 +2295,11 @@ pub fn slk_touch() -> i32 {
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
-pub fn slk_wset(n: i32, label: &[wchar_t], fmt: i32) -> i32 {
+pub unsafe fn slk_wset(n: i32, label: *const wchar_t, fmt: i32) -> i32 {
     assert!(n >= 1 && n <= 12, "{}slk_wset() : n = {}", MODULE_PATH, n);
     assert!(fmt >= 0 && fmt <= 2, "{}slk_wset() : fmt = {}", MODULE_PATH, fmt);
 
-    unsafe { bindings::slk_wset(n, label.as_ptr(), fmt) }
+    bindings::slk_wset(n, label, fmt)
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_attr.3x.html>

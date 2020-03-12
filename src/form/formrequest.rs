@@ -21,7 +21,6 @@
 */
 
 use std::convert::TryFrom;
-
 use crate::{shims::constants, form::NCurseswFormError};
 
 /// Form request.

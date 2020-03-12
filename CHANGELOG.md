@@ -19,8 +19,11 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Added `SoftLabelType::{min_label,max_label,max_label_len}` methods.
 - Changed `slk_set()` and `slk_set_sp()` `label` parameter from `&str` to `Option<&str>`. [BC]
 - Changed `shims::ncurses::{slk_set,slk_set_sp}` `label` parameter from `&[i8]` to `*const i8`. [BC]
+- Changed `slk_wset()` `label` parameter from `&WideString` to `Option<&WideString>`. [BC]
+- Changed `shims::ncurses::slk_wset()` `label` parameter from `&[wchar_t]` to `*const wchar_t`. [BC]
 - Changed `slk_label()` and `slk_label_sp()` to return `Option<String>` instead of `Result<String, NCurseswError>`. [BC]
 - Changed `slk_attr()` and `slk_attr_sp()` to return `normal::Attributes` instead of `attr_t`. [BC]
+- Changed `NCurseswError::LibraryError`, `NCurseswPanelsError::LibraryError` and `NCurseswMouseError::LibraryError` parameter `rc` from `i32` to `Option<i32>` to cater for NCurses library functions that fail but return a null pointer instead of an error code.
 - Removed `attr_get_sp()`, `getcchar_sp()` and `wattr_get_sp()` which where non-NCurses function and specific to this crate. [BC]
 - Added `fn screen(&self) -> Option<SCREEN>` to `ColorsType` trait. [BC]
 - Added `fn screen(&self) -> Option<SCREEN>` to `ColorPairType` trait. [BC]

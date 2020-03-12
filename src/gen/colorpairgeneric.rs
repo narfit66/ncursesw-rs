@@ -21,7 +21,6 @@
 */
 
 use std::ptr;
-
 use crate::{ColorAttributeTypes, shims::ncurses::short_t};
 
 /// Color pair generic methods.

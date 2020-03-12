@@ -21,7 +21,6 @@
 */
 
 use std::hash::{Hash, Hasher};
-
 use crate::shims::bindings::cchar_t;
 
 impl PartialEq for cchar_t {
