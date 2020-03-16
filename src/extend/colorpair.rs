@@ -20,16 +20,15 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
 use std::ptr;
 use crate::{
+    NCurseswError,
+    gen::{ColorPairType, ColorPairGeneric, ColorPairColors, ColorType, ColorsType},
+    ncursescolortype::{set_ncurses_colortype, NCursesColorType},
     shims::{ncurses, ncurses::SCREEN},
     extend::{Colors, Color},
-    gen::{ColorPairType, ColorPairGeneric, ColorPairColors, ColorType, ColorsType},
-    ncursescolortype::*,
-    ncurseswerror::NCurseswError,
     ncurses::{
         init_extended_pair, extended_pair_content,
         init_extended_pair_sp, extended_pair_content_sp
@@ -80,7 +79,10 @@ impl ColorPair {
 
 impl ColorPairColors<Colors, Color, i32> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        self.screen.map_or_else(|| extended_pair_content(self.number), |screen| extended_pair_content_sp(screen, self.number))
+        match self.screen {
+            None         => extended_pair_content(self.number),
+            Some(screen) => extended_pair_content_sp(screen, self.number)
+        }
     }
 }
 

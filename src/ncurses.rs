@@ -5187,18 +5187,20 @@ pub fn is_term_resized_sp(screen: SCREEN, size: Size) -> bool {
 }
 
 /// Screen function of `keybound()`.
-pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> result!(String) {
-    unsafe { ncurses::keybound_sp(screen, KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound_sp")) }
+pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> Option<String> {
+    unsafe { ncurses::keybound_sp(screen, KeyBinding::into(keycode), count) }
 }
 
 /// Screen function of `key_defined()`.
-pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(KeyBinding) {
-    let c = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
+pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(Option<KeyBinding>) {
+    let rc = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
 
-    if c.is_negative() {
-        Err(ncurses_function_error_with_rc!("key_defined_sp", c))
+    if rc.is_negative() {
+        Err(ncurses_function_error_with_rc!("key_defined_sp", rc))
+    } else if rc == 0 {
+        Ok(None)
     } else {
-        Ok(KeyBinding::from(c))
+        Ok(Some(KeyBinding::from(rc)))
     }
 }
 

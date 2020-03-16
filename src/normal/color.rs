@@ -25,12 +25,10 @@
 use crate::{
     NCurseswError,
     gen::ColorType,
-    ncursescolortype::*,
-    normal::{ColorPalette, RGB},
+    ncursescolortype::{set_ncurses_colortype, NCursesColorType},
     shims::ncurses::{short_t, SCREEN},
-    ncurses::{
-        init_color, color_content, init_color_sp, color_content_sp
-    }
+    normal::{ColorPalette, RGB},
+    ncurses::{init_color, color_content, init_color_sp, color_content_sp}
 };
 
 /// A terminal color.
@@ -68,11 +66,17 @@ impl Color {
     }
 
     pub fn set_rgb(&self, rgb: RGB) -> result!(()) {
-        self.screen.map_or_else(|| init_color(self.color_palette.number(), rgb), |screen| init_color_sp(screen, self.color_palette.number(), rgb))
+        match self.screen {
+            None         => init_color(self.color_palette.number(), rgb),
+            Some(screen) => init_color_sp(screen, self.color_palette.number(), rgb)
+        }
     }
 
     pub fn rgb(&self) -> result!(RGB) {
-        self.screen.map_or_else(|| color_content(self.color_palette.number()), |screen| color_content_sp(screen, self.color_palette.number()))
+        match self.screen {
+            None         => color_content(self.color_palette.number()),
+            Some(screen) => color_content_sp(screen, self.color_palette.number())
+        }
     }
 }
 

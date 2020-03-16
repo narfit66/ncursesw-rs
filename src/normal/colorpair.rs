@@ -20,23 +20,21 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
 
 use std::{ptr, convert::TryFrom, ops::BitOr};
 use crate::{
+    NCurseswError,
     gen::{
         ColorType, ColorsType, ColorPairType, ColorPairGeneric,
         ColorPairColors, AttributesType
     },
-    normal::{Attribute, Attributes, Colors, Color},
-    ncursescolortype::*,
-    ncurseswerror::NCurseswError,
+    ncursescolortype::{set_ncurses_colortype, NCursesColorType},
     shims::{ncurses, ncurses::{SCREEN, attr_t, short_t}},
+    normal::{Attribute, Attributes, Colors, Color},
     ncurses::{
         COLOR_PAIR, PAIR_NUMBER,
-        init_pair, pair_content,
-        init_pair_sp, pair_content_sp
+        init_pair, pair_content, init_pair_sp, pair_content_sp
     }
 };
 
@@ -88,7 +86,10 @@ impl ColorPair {
 
 impl ColorPairColors<Colors, Color, short_t> for ColorPair {
     fn colors(&self) -> result!(Colors) {
-        self.screen.map_or_else(|| pair_content(self.number), |screen| pair_content_sp(screen, self.number))
+        match self.screen {
+            None         => pair_content(self.number),
+            Some(screen) => pair_content_sp(screen, self.number)
+        }
     }
 }
 
