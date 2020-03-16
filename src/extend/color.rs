@@ -25,9 +25,9 @@
 use crate::{
     NCurseswError,
     gen::ColorType,
-    ncursescolortype::*,
-    extend::{ColorPalette, RGB},
+    ncursescolortype::{set_ncurses_colortype, NCursesColorType},
     shims::ncurses::SCREEN,
+    extend::{ColorPalette, RGB},
     ncurses::{
         init_extended_color, extended_color_content,
         init_extended_color_sp, extended_color_content_sp
@@ -69,11 +69,17 @@ impl Color {
     }
 
     pub fn set_rgb(&self, rgb: RGB) -> result!(()) {
-        self.screen.map_or_else(|| init_extended_color(self.color_palette.number(), rgb), |screen| init_extended_color_sp(screen, self.color_palette.number(), rgb))
+        match self.screen {
+            None         => init_extended_color(self.color_palette.number(), rgb),
+            Some(screen) => init_extended_color_sp(screen, self.color_palette.number(), rgb)
+        }
     }
 
     pub fn rgb(&self) -> result!(RGB) {
-        self.screen.map_or_else(|| extended_color_content(self.color_palette.number()), |screen| extended_color_content_sp(screen, self.color_palette.number()))
+        match self.screen {
+            None         => extended_color_content(self.color_palette.number()),
+            Some(screen) => extended_color_content_sp(screen, self.color_palette.number())
+        }
     }
 }
 
