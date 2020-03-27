@@ -1389,7 +1389,7 @@ pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(()) {
 #[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() or shims::ncurses::init_extended_pair() instead")]
 /// The extended color version of the `init_pair()` routine.
 pub fn init_extended_pair(color_pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if color_pair >= COLOR_PAIRS() {
+    if color_pair < 1 || color_pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -1409,7 +1409,7 @@ pub fn init_extended_pair(color_pair: i32, colors: extend::Colors) -> result!(ex
 /// If the color-pair was previously initialized, the screen is refreshed and
 /// all occurrences of that color-pair are changed to the new definition.
 pub fn init_pair(color_pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(color_pair) >= COLOR_PAIRS() {
+    if color_pair < 1 || i32::from(color_pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -4874,7 +4874,7 @@ pub fn assume_default_colors_sp<S, C, T>(screen: SCREEN, colors: S) -> result!((
           C: ColorType<T>,
           T: ColorAttributeTypes
 {
-    assert!(screen == colors.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == colors.screen().unwrap_or(ptr::null_mut()), "assume_default_colors_sp() : screen != colors.screen()");
 
     match unsafe { ncurses::assume_default_colors_sp(screen, colors.foreground().number(), colors.background().number()) } {
         OK => Ok(()),
@@ -5042,7 +5042,7 @@ pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
           i32: From<T>,
           T:   ColorAttributeTypes
 {
-    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()), "free_pair_sp() : screen != color_pair.screen()");
 
     match unsafe { ncurses::free_pair_sp(screen, i32::from(color_pair.number())) } {
         OK => Ok(()),
@@ -5141,7 +5141,7 @@ pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RG
 #[deprecated(since = "0.5.0", note = "Use extend::ColorPair::new_sp() or shims::ncurses::init_extended_pair_sp() instead")]
 /// Screen function of `init_extended_pair()`.
 pub fn init_extended_pair_sp(screen: SCREEN, color_pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if color_pair >= COLOR_PAIRS() {
+    if color_pair < 1 || color_pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -5156,7 +5156,7 @@ pub fn init_extended_pair_sp(screen: SCREEN, color_pair: i32, colors: extend::Co
 #[deprecated(since = "0.5.0", note = "Use normal::ColorPair::new_sp() or shims::ncurses::init_pair_sp() instead")]
 /// Screen function of `init_pair()`.
 pub fn init_pair_sp(screen: SCREEN, color_pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(color_pair) >= COLOR_PAIRS() {
+    if color_pair < 1 || i32::from(color_pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
@@ -5478,7 +5478,7 @@ pub fn set_tabsize_sp(screen: SCREEN, size: i32) -> result!(()) {
 
 /// Screen function of `slk_attroff()`.
 pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
-    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attroff_sp() : screen != color_pair.screen()");
 
     match unsafe { ncurses::slk_attroff_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -5488,7 +5488,7 @@ pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) 
 
 /// Screen function of `slk_attron()`.
 pub fn slk_attron_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
-    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attron_sp() : screen != color_pair.screen()");
 
     match unsafe { ncurses::slk_attron_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -5502,8 +5502,8 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
           P: ColorPairType<T>,
           T: ColorAttributeTypes
 {
-    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
-    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attr_set_sp() : screen != attrs.screen()");
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()), "slk_attr_set_sp() : screen != color_pair.screen()");
 
     match unsafe { ncurses::slk_attr_set_sp(screen, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         OK => Ok(()),
@@ -5513,7 +5513,7 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
 
 /// Screen function of `slk_attrset()`.
 pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
-    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attrset_sp() : screen != attrs.screen()");
 
     match unsafe { ncurses::slk_attrset_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
@@ -5536,7 +5536,7 @@ pub fn slk_clear_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `slk_color()`.
 pub fn slk_color_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(()) {
-    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()));
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()), "slk_color_sp() : screen != color_pair.screen()");
 
     match unsafe { ncurses::slk_color_sp(screen, color_pair.number()) } {
         OK => Ok(()),
