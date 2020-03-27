@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+use crate::shims::ncurses::SCREEN;
+
 /// A pair of `Attributes` and `ColorPair`.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttributesColorPair {
@@ -31,7 +33,12 @@ impl AttributesColorPair {
     pub fn new(attributes: Attributes, color_pair: ColorPair) -> Self {
         assert!(attributes.screen() == color_pair.screen(), "AttributesColorPair::new() : attributes.screen() != color_pair.screen()");
 
-        Self { attributes, color_pair: color_pair }
+        Self { attributes, color_pair }
+    }
+
+    /// Return the screen of the pair.
+    pub fn screen(&self) -> Option<SCREEN> {
+        self.attributes.screen()
     }
 
     /// Return the attribute of the pair.

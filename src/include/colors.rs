@@ -22,12 +22,11 @@
 
 macro_rules! define_colors {
     ($type: ty) => {
-        use crate::SCREEN;
+        use crate::shims::ncurses::SCREEN;
 
         /// Foreground and background colors.
         #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
         pub struct Colors {
-            screen:     Option<SCREEN>,
             foreground: Color,
             background: Color
         }
@@ -37,14 +36,14 @@ macro_rules! define_colors {
             pub fn new(foreground: Color, background: Color) -> Self {
                 assert!(foreground.screen() == background.screen(), "Colors::new() : foreground.screen() != background.screen()");
 
-                Self { screen: foreground.screen(), foreground, background }
+                Self { foreground, background }
             }
         }
 
         impl ColorsType<Color, $type> for Colors {
             /// Return the associated screen.
             fn screen(&self) -> Option<SCREEN> {
-                self.screen
+                self.foreground.screen()
             }
 
             /// Returns the foreground color.

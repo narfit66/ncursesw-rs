@@ -21,10 +21,7 @@
 */
 
 use std::{fmt, ops::{BitOr, BitXor}};
-use crate::{
-    gen::AttributesType,
-    shims::{ncurses::{SCREEN, attr_t}, constants}
-};
+use crate::{gen::AttributesType, shims::{ncurses::{SCREEN, attr_t}, constants}};
 
 macro_rules! attributes_getter {
     ($func: ident, $attr: ident) => {

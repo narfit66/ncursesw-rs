@@ -23,7 +23,7 @@
 macro_rules! define_rgb {
     ($type: ty) => {
         /// The (R)ed, (G)reen and (B)lue content of a color.
-        #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+        #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
         pub struct RGB {
             red:   $type,
             green: $type,
