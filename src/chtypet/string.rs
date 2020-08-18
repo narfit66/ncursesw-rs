@@ -160,7 +160,7 @@ impl<'a> From<&'a [chtype]> for ChtypeString {
 
 impl Into<Vec<chtype>> for ChtypeString {
     fn into(self) -> Vec<chtype> {
-        self.raw.clone()
+        self.raw
     }
 }
 

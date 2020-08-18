@@ -125,7 +125,7 @@ impl<'a> From<&'a [wchar_t]> for WideString {
 
 impl Into<Vec<wchar_t>> for WideString {
     fn into(self) -> Vec<wchar_t> {
-        self.raw.clone()
+        self.raw
     }
 }
 
