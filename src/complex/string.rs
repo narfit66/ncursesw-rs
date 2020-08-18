@@ -166,7 +166,7 @@ impl<'a> From<&'a [cchar_t]> for ComplexString {
 
 impl Into<Vec<cchar_t>> for ComplexString {
     fn into(self) -> Vec<cchar_t> {
-        self.raw.to_owned()
+        self.raw
     }
 }
 
@@ -175,6 +175,6 @@ impl RawWithNul<Vec<cchar_t>> for ComplexString {
         let mut raw = self.raw;
         raw.push(unsafe { std::mem::zeroed() });
 
-        raw.to_owned()
+        raw
     }
 }
