@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-#    ncurses-compile
+#    ncurses-pc-install
 #
-#    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
+#    Copyright (c) 2020, 2021 Stephen Whittle  All rights reserved.
 #
 #    Permission is hereby granted, free of charge, to any person obtaining a copy
 #    of this software and associated documentation files (the "Software"),
@@ -31,34 +31,28 @@ package="ncurses"
 
 source ".$package"
 
-pushd "$install_dir/$package-$archive_version"
-rc=$?
+pkgconfig_dir="$lib_prefix_dir/lib/pkgconfig"
 
-[[ $rc -ne 0 ]] && exit $rc
+if [[ ! -d "$pkgconfig_dir" ]] ; then
+    printf "directory '%s' not found\n" "$pkgconfig" >&2
 
-./configure --prefix=$lib_prefix_dir \
-            --enable-pc-files \
-            --with-shared \
-            --enable-widec \
-            --enable-ext-colors \
-            --enable-ext-mouse \
-            --enable-ext-putwin \
-            CPPFLAGS="-P"
-rc=$?
+    exit 2
+fi
 
-[[ $rc -ne 0 ]] && exit $rc
+for pc_file in $(find "$install_dir/$package-$archive_version" \
+                      -name "*.pc" \
+		      -print)
+do
+    printf "copying '%s' -> '%s/%s'\n" "$pc_file" "$pkgconfig_dir" "$(basename "$pc_file")" >&1
 
-make
-rc=$?
+    cp -p "$pc_file" "$pkgconfig_dir"
+    rc=$?
 
-[[ $rc -ne 0 ]] && exit $rc
+    if [[ $rc -ne 0 ]] ; then
+        printf "failed to copy '%s' into '%s'\n" "$pc_file" "$pkgconfig_dir" >&2
 
-make install
-rc=$?
+        exit 3
+    fi
+done
 
-[[ $rc -ne 0 ]] && exit $rc
-
-ldconfig
-rc=$?
-
-exit $rc
+exit 0
