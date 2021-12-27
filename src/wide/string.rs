@@ -1,7 +1,7 @@
 /*
     src/wide/string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -76,7 +76,7 @@ impl WideString {
     }
 
     pub fn pop(&mut self) -> Option<WideChar> {
-        self.raw.pop().map(|c| WideChar::from(c))
+        self.raw.pop().map(WideChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> WideChar {
@@ -120,7 +120,7 @@ impl<'a> From<&'a [wchar_t]> for WideString {
 
 impl Into<Vec<wchar_t>> for WideString {
     fn into(self) -> Vec<wchar_t> {
-        self.raw.clone()
+        self.raw
     }
 }
 

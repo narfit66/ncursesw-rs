@@ -1,7 +1,7 @@
 /*
     src/include/rgb.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -33,9 +33,9 @@ macro_rules! define_rgb {
         impl RGB {
             /// Create a new rgb instance.
             pub fn new(red: $type, green: $type, blue: $type) -> Self {
-                assert!(red >= 0 && red <= 1000);
-                assert!(green >= 0 && green <= 1000);
-                assert!(blue >= 0 && blue <= 1000);
+                assert!((0..=1000).contains(&red));
+                assert!((0..=1000).contains(&green));
+                assert!((0..=1000).contains(&blue));
 
                 Self { red, green, blue }
             }

@@ -1,7 +1,7 @@
 /*
     src/shims/nform/nform.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -470,7 +470,7 @@ pub unsafe fn set_field_init(form: Option<FORM>, func: Form_Hook) -> i32 {
 /// <https://invisible-island.net/ncurses/man/form_field_just.3x.html>
 pub unsafe fn set_field_just(field: Option<FIELD>, justification: i32) -> i32 {
     assert!(field.map_or_else(|| true, |field| !field.is_null()), "{}set_field_just() : field.is_null()", MODULE_PATH);
-    assert!(justification >= 0 && justification <= 3, "{}set_field_just() : justification = {}", MODULE_PATH, justification);
+    assert!((0..=3).contains(&justification), "{}set_field_just() : justification = {}", MODULE_PATH, justification);
 
     bindings::set_field_just(return_mut_ptr!(field), justification)
 }

@@ -1,7 +1,7 @@
 /*
     src/complex/string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -112,7 +112,7 @@ impl ComplexString {
     }
 
     pub fn pop(&mut self) -> Option<ComplexChar> {
-        self.raw.pop().map(|c| ComplexChar::from(c))
+        self.raw.pop().map(ComplexChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> ComplexChar {
@@ -162,7 +162,7 @@ impl<'a> From<&'a [cchar_t]> for ComplexString {
 
 impl Into<Vec<cchar_t>> for ComplexString {
     fn into(self) -> Vec<cchar_t> {
-        self.raw.to_owned()
+        self.raw
     }
 }
 

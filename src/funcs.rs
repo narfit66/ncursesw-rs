@@ -1,7 +1,7 @@
 /*
     src/funcs.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use semver::Version;
+use semver::{Version, Prerelease, BuildMetadata};
 use crate::shims::bindings;
 
 /// Return the semantic version of the NCurses library.
@@ -29,7 +29,7 @@ pub fn ncurses_version() -> Version {
         major: u64::from(bindings::NCURSES_VERSION_MAJOR),
         minor: u64::from(bindings::NCURSES_VERSION_MINOR),
         patch: u64::from(bindings::NCURSES_VERSION_PATCH),
-        pre:   vec!(),
-        build: vec!()
+        pre:   Prerelease::EMPTY,
+        build: BuildMetadata::EMPTY
     }
 }
