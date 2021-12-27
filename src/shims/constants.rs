@@ -220,7 +220,7 @@ wrap_const!(KEY_MAX: i32);                 // Maximum key value is 0633
 
 // Attributes.
 wrap_const!(A_NORMAL: attr_t);
-pub const A_ATTRIBUTES: attr_t = ((!0 as attr_t) << 8);
+pub const A_ATTRIBUTES: attr_t = (!0 as attr_t) << 8;
 //wrap_const!(A_ATTRIBUTES: attr_t);
 wrap_const!(A_CHARTEXT: attr_t);
 wrap_const!(A_COLOR: attr_t);
@@ -239,7 +239,7 @@ wrap_const!(A_LOW: attr_t);
 wrap_const!(A_RIGHT: attr_t);
 wrap_const!(A_TOP: attr_t);
 wrap_const!(A_VERTICAL: attr_t);
-pub const A_ITALIC: attr_t = ((1 as attr_t) << 31);
+pub const A_ITALIC: attr_t = (1 as attr_t) << 31;
 //wrap_const!(A_ITALIC: attr_t);
 
 // Menu/Form Errors.
