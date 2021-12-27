@@ -73,7 +73,7 @@ pub enum NCurseswError {
 }
 
 pub(in crate) fn rc_error(rc: Option<i32>) -> String {
-    rc.map_or_else(|| String::new(), |rc| format!(", rc={}", rc))
+    rc.map_or_else(String::new, |rc| format!(", rc={}", rc))
 }
 
 pub(in crate) fn os_level_error() -> String {

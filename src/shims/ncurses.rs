@@ -1,7 +1,7 @@
 /*
     src/shims/ncurses.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -399,7 +399,7 @@ pub unsafe fn copywin(
 
 /// <https://invisible-island.net/ncurses/man/curs_kernel.3x.html>
 pub fn curs_set(visibility: i32) -> i32 {
-    assert!(visibility >= 0 && visibility <= 2, "{}curs_set() : visibility = {}", MODULE_PATH, visibility);
+    assert!((0..=2).contains(&visibility), "{}curs_set() : visibility = {}", MODULE_PATH, visibility);
 
     unsafe { bindings::curs_set(visibility) }
 }
@@ -714,7 +714,7 @@ pub unsafe fn getwin(filep: FILE) -> Option<WINDOW> {
 
 /// <https://invisible-island.net/ncurses/man/curs_inopts.3x.html>
 pub fn halfdelay(tenths: i32) -> i32 {
-    assert!(tenths >= 1 && tenths <= 255, "{}halfdelay() : tenths = {}", MODULE_PATH, tenths);
+    assert!((1..=255).contains(&tenths), "{}halfdelay() : tenths = {}", MODULE_PATH, tenths);
 
     unsafe { bindings::halfdelay(tenths) }
 }
@@ -736,7 +736,7 @@ pub fn has_il() -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_getch.3x.html>
 pub fn has_key(ch: i32) -> i32 {
-    assert!(ch >= KEY_MIN && ch <= KEY_MAX, "{}has_key() : ch = {}", MODULE_PATH, ch);
+    assert!((KEY_MIN..=KEY_MAX).contains(&ch), "{}has_key() : ch = {}", MODULE_PATH, ch);
 
     unsafe { bindings::has_key(ch) }
 }
@@ -821,9 +821,9 @@ pub unsafe fn inchstr(chstr: *mut chtype) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn init_color(color: short_t, r: short_t, g: short_t, b: short_t) -> i32 {
     assert!(i32::from(color) > COLOR_WHITE, "{}init_color() : color = {}", MODULE_PATH, color);
-    assert!(r >= 0 && r <= 1000, "{}init_color() : r = {}", MODULE_PATH, r);
-    assert!(g >= 0 && g <= 1000, "{}init_color() : r = {}", MODULE_PATH, g);
-    assert!(b >= 0 && b <= 1000, "{}init_color() : r = {}", MODULE_PATH, b);
+    assert!((0..=1000).contains(&r), "{}init_color() : r = {}", MODULE_PATH, r);
+    assert!((0..=1000).contains(&g), "{}init_color() : g = {}", MODULE_PATH, g);
+    assert!((0..=1000).contains(&b), "{}init_color() : b = {}", MODULE_PATH, b);
 
     unsafe { bindings::init_color(color, r, g, b) }
 }
@@ -831,6 +831,9 @@ pub fn init_color(color: short_t, r: short_t, g: short_t, b: short_t) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_color.3x.html>
 pub fn init_extended_color(color: i32, r: i32, g: i32, b: i32) -> i32 {
     assert!(color > COLOR_WHITE, "{}init_extended_color() : color = {}", MODULE_PATH, color);
+    assert!((0..=32767).contains(&r), "{}init_color() : r = {}", MODULE_PATH, r);
+    assert!((0..=32767).contains(&g), "{}init_color() : g = {}", MODULE_PATH, g);
+    assert!((0..=32767).contains(&b), "{}init_color() : b = {}", MODULE_PATH, b);
 
     unsafe { bindings::init_extended_color(color, r, g, b) }
 }
@@ -2254,14 +2257,14 @@ pub fn slk_color(pair: short_t) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_init(fmt: i32) -> i32 {
-    assert!(fmt >= 0 && fmt <= 3, "{}slk_init() : fmt = {}", MODULE_PATH, fmt);
+    assert!((0..=3).contains(&fmt), "{}slk_init() : fmt = {}", MODULE_PATH, fmt);
 
     unsafe { bindings::slk_init(fmt) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub fn slk_label(n: i32) -> Option<String> {
-    assert!(n >= 1 && n <= 12, "{}slk_label() : n = {}", MODULE_PATH, n);
+    assert!((1..=12).contains(&n), "{}slk_label() : n = {}", MODULE_PATH, n);
 
     unsafe { (bindings::slk_label(n) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
@@ -2283,8 +2286,8 @@ pub fn slk_restore() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub unsafe fn slk_set(n: i32, label: *const i8, fmt: i32) -> i32 {
-    assert!(n >= 1 && n <= 12, "{}slk_set() : n = {}", MODULE_PATH, n);
-    assert!(fmt >= 0 && fmt <= 2, "{}slk_set() : fmt = {}", MODULE_PATH, fmt);
+    assert!((1..=12).contains(&n), "{}slk_set() : n = {}", MODULE_PATH, n);
+    assert!((0..=2).contains(&fmt), "{}slk_set() : fmt = {}", MODULE_PATH, fmt);
 
     bindings::slk_set(n, label, fmt)
 }
@@ -2296,8 +2299,8 @@ pub fn slk_touch() -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/curs_slk.3x.html>
 pub unsafe fn slk_wset(n: i32, label: *const wchar_t, fmt: i32) -> i32 {
-    assert!(n >= 1 && n <= 12, "{}slk_wset() : n = {}", MODULE_PATH, n);
-    assert!(fmt >= 0 && fmt <= 2, "{}slk_wset() : fmt = {}", MODULE_PATH, fmt);
+    assert!((1..=12).contains(&n), "{}slk_wset() : n = {}", MODULE_PATH, n);
+    assert!((0..=2).contains(&fmt), "{}slk_wset() : fmt = {}", MODULE_PATH, fmt);
 
     bindings::slk_wset(n, label, fmt)
 }
@@ -2453,7 +2456,7 @@ pub fn use_extended_names(enable: bool) -> i32 {
 
 /// <https://invisible-island.net/ncurses/man/legacy_coding.3x.html>
 pub fn use_legacy_coding(level: i32) -> i32 {
-    assert!(level >= 0 && level <= 2, "{}use_legacy_coding() : level = {}", MODULE_PATH, level);
+    assert!((0..=2).contains(&level), "{}use_legacy_coding() : level = {}", MODULE_PATH, level);
 
     unsafe { bindings::use_legacy_coding(level) }
 }
@@ -3244,7 +3247,7 @@ pub unsafe fn color_content_sp(sp: SCREEN, color: short_t, r: *mut short_t, g: *
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn curs_set_sp(sp: SCREEN, visibility: i32) -> i32 {
     assert!(!sp.is_null(), "{}curs_set_sp() : sp.is_null()", MODULE_PATH);
-    assert!(visibility >= 0 && visibility <= 2, "{}curs_set_sp() : visibility = {}", MODULE_PATH, visibility);
+    assert!((0..=2).contains(&visibility), "{}curs_set_sp() : visibility = {}", MODULE_PATH, visibility);
 
     bindings::curs_set_sp(sp, visibility)
 }
@@ -3391,7 +3394,7 @@ pub unsafe fn getwin_sp(sp: SCREEN, filep: FILE) -> Option<WINDOW> {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn halfdelay_sp(sp: SCREEN, tenths: i32) -> i32 {
     assert!(!sp.is_null(), "{}halfdelay_sp() : sp.is_null()", MODULE_PATH);
-    assert!(tenths >= 1 && tenths <= 255, "{}halfdelay_sp() : tenths = {}", MODULE_PATH, tenths);
+    assert!((1..=255).contains(&tenths), "{}halfdelay_sp() : tenths = {}", MODULE_PATH, tenths);
 
     bindings::halfdelay_sp(sp, tenths)
 }
@@ -3420,7 +3423,7 @@ pub unsafe fn has_il_sp(sp: SCREEN) -> bool {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn has_key_sp(sp: SCREEN, ch: i32) -> i32 {
     assert!(!sp.is_null(), "{}has_key_sp() : sp.is_null()", MODULE_PATH);
-    assert!(ch >= KEY_MIN && ch <= KEY_MAX, "{}has_key_sp() : ch = {}", MODULE_PATH, ch);
+    assert!((KEY_MIN..=KEY_MAX).contains(&ch), "{}has_key_sp() : ch = {}", MODULE_PATH, ch);
 
     bindings::has_key_sp(sp, ch)
 }
@@ -3429,9 +3432,9 @@ pub unsafe fn has_key_sp(sp: SCREEN, ch: i32) -> i32 {
 pub unsafe fn init_color_sp(sp: SCREEN, color: short_t, r: short_t, g: short_t, b: short_t) -> i32 {
     assert!(!sp.is_null(), "{}init_color_sp() : sp.is_null()", MODULE_PATH);
     assert!(i32::from(color) > COLOR_WHITE, "{}init_color_sp() : color = {}", MODULE_PATH, color);
-    assert!(r >= 0 && r <= 1000, "{}init_color_sp() : r = {}", MODULE_PATH, r);
-    assert!(g >= 0 && g <= 1000, "{}init_color_sp() : r = {}", MODULE_PATH, g);
-    assert!(b >= 0 && b <= 1000, "{}init_color_sp() : r = {}", MODULE_PATH, b);
+    assert!((0..=1000).contains(&r), "{}init_color_sp() : r = {}", MODULE_PATH, r);
+    assert!((0..=1000).contains(&g), "{}init_color_sp() : g = {}", MODULE_PATH, g);
+    assert!((0..=1000).contains(&b), "{}init_color_sp() : b = {}", MODULE_PATH, b);
 
     bindings::init_color_sp(sp, color, r, g, b)
 }
@@ -3440,6 +3443,9 @@ pub unsafe fn init_color_sp(sp: SCREEN, color: short_t, r: short_t, g: short_t, 
 pub unsafe fn init_extended_color_sp(sp: SCREEN, color: i32, r: i32, g: i32, b: i32) -> i32 {
     assert!(!sp.is_null(), "{}init_extended_color_sp() : sp.is_null()", MODULE_PATH);
     assert!(color > COLOR_WHITE, "{}init_extended_color_sp() : color = {}", MODULE_PATH, color);
+    assert!((0..=32767).contains(&r), "{}init_color_sp() : r = {}", MODULE_PATH, r);
+    assert!((0..=32767).contains(&g), "{}init_color_sp() : g = {}", MODULE_PATH, g);
+    assert!((0..=32767).contains(&b), "{}init_color_sp() : b = {}", MODULE_PATH, b);
 
     bindings::init_extended_color_sp(sp, color, r, g, b)
 }
@@ -3827,7 +3833,7 @@ pub unsafe fn slk_color_sp(sp: SCREEN, pair: short_t) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn slk_init_sp(sp: SCREEN, fmt: i32) -> i32 {
     assert!(!sp.is_null(), "{}slk_init_sp() : sp.is_null()", MODULE_PATH);
-    assert!(fmt >= 0 && fmt <= 3, "{}slk_init_sp() : fmt = {}", MODULE_PATH, fmt);
+    assert!((0..=3).contains(&fmt), "{}slk_init_sp() : fmt = {}", MODULE_PATH, fmt);
 
     bindings::slk_init_sp(sp, fmt)
 }
@@ -3835,7 +3841,7 @@ pub unsafe fn slk_init_sp(sp: SCREEN, fmt: i32) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn slk_label_sp(sp: SCREEN, n: i32) -> Option<String> {
     assert!(!sp.is_null(), "{}slk_label_sp() : sp.is_null()", MODULE_PATH);
-    assert!(n >= 1 && n <= 12, "{}slk_label_sp() : n = {}", MODULE_PATH, n);
+    assert!((1..=12).contains(&n), "{}slk_label_sp() : n = {}", MODULE_PATH, n);
 
     (bindings::slk_label_sp(sp, n) as *mut i8).as_mut().map(|ptr| FromCStr::from_c_str(ptr))
 }
@@ -3864,8 +3870,8 @@ pub unsafe fn slk_restore_sp(sp: SCREEN) -> i32 {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn slk_set_sp(sp: SCREEN, n: i32, label: *const i8, fmt: i32) -> i32 {
     assert!(!sp.is_null(), "{}slk_set_sp() : sp.is_null()", MODULE_PATH);
-    assert!(n >= 1 && n <= 12, "{}slk_set_sp() : n = {}", MODULE_PATH, n);
-    assert!(fmt >= 0 && fmt <= 2, "{}slk_set_sp() : fmt = {}", MODULE_PATH, fmt);
+    assert!((1..=12).contains(&n), "{}slk_set_sp() : n = {}", MODULE_PATH, n);
+    assert!((0..=2).contains(&fmt), "{}slk_set_sp() : fmt = {}", MODULE_PATH, fmt);
 
     bindings::slk_set_sp(sp, n, label, fmt)
 }
@@ -3958,7 +3964,7 @@ pub unsafe fn use_tioctl_sp(sp: SCREEN, bf: bool) {
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn use_legacy_coding_sp(sp: SCREEN, level: i32) -> i32 {
     assert!(!sp.is_null(), "{}use_legacy_coding_sp() : sp.is_null()", MODULE_PATH);
-    assert!(level >= 0 && level <= 2, "{}use_legacy_coding_sp() : level = {}", MODULE_PATH, level);
+    assert!((0..=2).contains(&level), "{}use_legacy_coding_sp() : level = {}", MODULE_PATH, level);
 
     bindings::use_legacy_coding_sp(sp, level)
 }

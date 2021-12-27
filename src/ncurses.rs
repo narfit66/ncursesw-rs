@@ -1,7 +1,7 @@
 /*
     src/ncurses.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -762,10 +762,8 @@ pub fn extended_pair_content(color_pair: i32) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    let color_palette = |color_number: i32| extend::ColorPalette::_from(color_number);
-
     match unsafe { ncurses::extended_pair_content(color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(extend::Colors::new(extend::Color::_from(None, color_palette(fg[0])), extend::Color::_from(None, color_palette(bg[0])))),
+        OK => Ok(extend::Colors::new(extend::Color::_from(None, extend::ColorPalette::_from(fg[0])), extend::Color::_from(None, extend::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("extended_pair_content", rc))
     }
 }
@@ -999,7 +997,7 @@ pub fn getch() -> result!(CharacterResult<char>) {
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -1996,7 +1994,7 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -2569,7 +2567,7 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -3097,10 +3095,8 @@ pub fn pair_content(color_pair: short_t) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    let color_palette = |color_number: short_t| normal::ColorPalette::_from(color_number);
-
     match unsafe { ncurses::pair_content(color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(normal::Colors::new(normal::Color::_from(None, color_palette(fg[0])), normal::Color::_from(None, color_palette(bg[0])))),
+        OK => Ok(normal::Colors::new(normal::Color::_from(None, normal::ColorPalette::_from(fg[0])), normal::Color::_from(None, normal::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("pair_content", rc))
     }
 }
@@ -4372,7 +4368,7 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -5014,10 +5010,8 @@ pub fn extended_pair_content_sp(screen: SCREEN, color_pair: i32) -> result!(exte
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    let color_palette = |color_number: i32| extend::ColorPalette::_from(color_number);
-
     match unsafe { ncurses::extended_pair_content_sp(screen, color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(extend::Colors::new(extend::Color::_from(Some(screen), color_palette(fg[0])), extend::Color::_from(Some(screen), color_palette(bg[0])))),
+        OK => Ok(extend::Colors::new(extend::Color::_from(Some(screen), extend::ColorPalette::_from(fg[0])), extend::Color::_from(Some(screen), extend::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("extended_pair_content_sp", rc))
     }
 }
@@ -5349,10 +5343,8 @@ pub fn pair_content_sp(screen: SCREEN, color_pair: short_t) -> result!(normal::C
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    let color_palette = |color_number: short_t| normal::ColorPalette::_from(color_number);
-
     match unsafe { ncurses::pair_content_sp(screen, color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(normal::Colors::new(normal::Color::_from(Some(screen), color_palette(fg[0])), normal::Color::_from(Some(screen), color_palette(bg[0])))),
+        OK => Ok(normal::Colors::new(normal::Color::_from(Some(screen), normal::ColorPalette::_from(fg[0])), normal::Color::_from(Some(screen), normal::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("pair_content_sp", rc))
     }
 }

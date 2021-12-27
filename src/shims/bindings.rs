@@ -1,7 +1,7 @@
 /*
     src/shims/bindings.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -25,7 +25,7 @@
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
 #![allow(clippy::unreadable_literal)]
-#![allow(clippy::const_static_lifetime)]
+#![allow(clippy::redundant_static_lifetimes)]
 
 use std::os::raw::{c_short, c_int};
 

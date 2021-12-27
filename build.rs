@@ -1,7 +1,7 @@
 /*
     build.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -77,12 +77,12 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")                    // 'C' header file
         // NCurses core functions
-        .blacklist_function("getcchar")         // blacklisted to implement our own function
-        .blacklist_function("ripoffline")       // blacklisted to implement our own function
-        .blacklist_function("ripoffline_sp")    // blacklisted to implement our own function
+        .blocklist_function("getcchar")         // blacklisted to implement our own function
+        .blocklist_function("ripoffline")       // blacklisted to implement our own function
+        .blocklist_function("ripoffline_sp")    // blacklisted to implement our own function
         // NCurses menu types.
-        .blacklist_type("ITEM")                 // blacklisted to implement our own type
-        .blacklist_type("MENU")                 // blacklisted to implement our own type
+        .blocklist_type("ITEM")                 // blacklisted to implement our own type
+        .blocklist_type("MENU")                 // blacklisted to implement our own type
         //
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding
