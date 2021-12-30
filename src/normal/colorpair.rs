@@ -24,13 +24,13 @@
 
 use std::{ptr, ops::BitOr};
 use crate::{
-    NCurseswError,
+    SCREEN, NCurseswError,
     gen::{
         ColorsType, ColorPairType, ColorPairGeneric,
         ColorPairColors, AttributesType
     },
     ncursescolortype::{set_ncurses_colortype, NCursesColorType},
-    shims::ncurses::{SCREEN, attr_t, short_t},
+    shims::ncurses::{attr_t, short_t},
     normal::{Attribute, Attributes, Colors, Color},
     ncurses::{
         COLOR_PAIR, PAIR_NUMBER,
@@ -68,14 +68,14 @@ impl ColorPair {
         init_pair_sp(screen, pair, colors)
     }
 
-    /// Set the screen pointer of the `ColorPair`.
+    /// Set the screen of the `ColorPair`.
     ///
     /// Use with caution!!! This function only need's to be used if using the screen type
     /// functions and is provided to allow the alignment of the screen pointer with the
     /// screen that the `ColorPair` are for as this crate will apply a screen of `None`
-    /// by default when retriving `ColorPair` from functions such as `attr_get()` and
+    /// by default when retriving `Attributes` from functions such as `attr_get()` and
     /// `wattr_get()`.
-    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+    pub unsafe fn set_screen(&mut self, screen: Option<SCREEN>) {
         self.screen = screen
     }
 
