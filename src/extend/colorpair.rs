@@ -65,14 +65,14 @@ impl ColorPair {
         init_extended_pair_sp(screen, pair, colors)
     }
 
-    /// Set the screen pointer of the `ColorPair`.
+    /// Set the screen of the `ColorPair`.
     ///
     /// Use with caution!!! This function only need's to be used if using the screen type
     /// functions and is provided to allow the alignment of the screen pointer with the
     /// screen that the `ColorPair` are for as this crate will apply a screen of `None`
     /// by default when retriving `Attributes` from functions such as `attr_get()` and
     /// `wattr_get()`.
-    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+    pub unsafe fn set_screen(&mut self, screen: Option<SCREEN>) {
         self.screen = screen
     }
 }

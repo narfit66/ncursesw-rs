@@ -22,9 +22,9 @@
 
 use std::ptr;
 use crate::{
-    NCurseswError,
+    SCREEN, NCurseswError,
     gen::{ColorType, ColorsType},
-    shims::{ncurses, ncurses::SCREEN},
+    shims::ncurses,
     extend::{ColorPair, Colors}
 };
 

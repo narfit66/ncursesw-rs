@@ -1,7 +1,7 @@
 /*
     src/include/attributescolorpair.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use crate::shims::ncurses::SCREEN;
-
 /// A pair of `Attributes` and `ColorPair`.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttributesColorPair {
@@ -34,11 +32,6 @@ impl AttributesColorPair {
         assert!(attributes.screen() == color_pair.screen(), "AttributesColorPair::new() : attributes.screen() != color_pair.screen()");
 
         Self { attributes, color_pair }
-    }
-
-    /// Return the screen of the pair.
-    pub fn screen(&self) -> Option<SCREEN> {
-        self.attributes.screen()
     }
 
     /// Return the attribute of the pair.

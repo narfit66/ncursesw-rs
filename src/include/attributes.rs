@@ -1,7 +1,7 @@
 /*
     src/include/attributes.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -88,7 +88,7 @@ impl Attributes {
     /// screen that the `Attributes` are for as this crate will apply a screen of `None`
     /// by default when retriving `Attributes` from functions such as `attr_get()` and
     /// `wattr_get()`.
-    pub fn set_screen(&mut self, screen: Option<SCREEN>) {
+    pub unsafe fn set_screen(&mut self, screen: Option<SCREEN>) {
         self.screen = screen
     }
 

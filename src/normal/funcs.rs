@@ -22,9 +22,9 @@
 
 use std::{ptr, convert::TryFrom};
 use crate::{
-    NCurseswError,
+    SCREEN, NCurseswError,
     gen::{ColorType, ColorsType},
-    shims::{ncurses, ncurses::{SCREEN, short_t}},
+    shims::{ncurses, ncurses::short_t},
     normal::{ColorPair, Colors}
 };
 

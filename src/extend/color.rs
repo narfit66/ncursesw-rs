@@ -1,7 +1,7 @@
 /*
     src/extend/color.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -58,6 +58,17 @@ impl Color {
 
     pub fn new_sp(screen: SCREEN, color_palette: ColorPalette) -> Self {
         Self::_from(Some(screen), color_palette)
+    }
+
+    /// Set the screen of the `Color`.
+    ///
+    /// Use with caution!!! This function only need's to be used if using the screen type
+    /// functions and is provided to allow the alignment of the screen pointer with the
+    /// screen that the `ColorPair` are for as this crate will apply a screen of `None`
+    /// by default when retriving `Attributes` from functions such as `attr_get()` and
+    /// `wattr_get()`.
+    pub unsafe fn set_screen(&mut self, screen: Option<SCREEN>) {
+        self.screen = screen
     }
 
     pub fn screen(&self) -> Option<SCREEN> {
