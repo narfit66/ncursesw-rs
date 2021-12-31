@@ -83,7 +83,7 @@ pub fn stdscr() -> WINDOW {
 }
 
 pub fn ttytype() -> result!(String) {
-    unsafe { ncurses::ttytype().ok_or(ncurses_function_error!("ttytype")) }
+    ncurses::ttytype().ok_or(ncurses_function_error!("ttytype"))
 }
 
 /// Return the number of colors available.
