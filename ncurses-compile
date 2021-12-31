@@ -2,7 +2,7 @@
 #
 #    ncurses-compile
 #
-#    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+#    Copyright (c) 2019, 2021 Stephen Whittle  All rights reserved.
 #
 #    Permission is hereby granted, free of charge, to any person obtaining a copy
 #    of this software and associated documentation files (the "Software"),
@@ -31,12 +31,12 @@ package="ncurses"
 
 source ".$package"
 
-cd "$install_dir-$archive_version"
+pushd "$install_dir/$package-$archive_version"
 rc=$?
 
 [[ $rc -ne 0 ]] && exit $rc
 
-./configure --prefix=/usr \
+./configure --prefix=/usr/local \
             --enable-pc-files \
             --with-shared \
             --enable-sp-funcs \
