@@ -60,6 +60,8 @@ impl Color {
         Self::_from(Some(screen), color_palette)
     }
 
+    /// # Safety
+    ///
     /// Set the screen of the `Color`.
     ///
     /// Use with caution!!! This function only need's to be used if using the screen type

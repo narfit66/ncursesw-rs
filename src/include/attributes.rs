@@ -81,6 +81,8 @@ impl Attributes {
         Self::_from(Some(screen), raw)
     }
 
+    /// # Safety
+    ///
     /// Set the screen pointer of the `Attributes`.
     ///
     /// Use with caution!!! This function only need's to be used if using the screen type
