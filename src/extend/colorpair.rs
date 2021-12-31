@@ -65,6 +65,8 @@ impl ColorPair {
         init_extended_pair_sp(screen, pair, colors)
     }
 
+    /// # Safety
+    ///
     /// Set the screen of the `ColorPair`.
     ///
     /// Use with caution!!! This function only need's to be used if using the screen type
