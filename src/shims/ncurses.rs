@@ -83,8 +83,8 @@ pub unsafe fn stdscr() -> WINDOW {
     wrapped::stdscr
 }
 
-pub unsafe fn ttytype() -> Option<String> {
-    wrapped::ttytype.as_mut().map(|ptr| FromCStr::from_c_str(ptr))
+pub fn ttytype() -> Option<String> {
+    unsafe { wrapped::ttytype.as_mut().map(|ptr| FromCStr::from_c_str(ptr)) }
 }
 
 /// <https://invisible-island.net/ncurses/man/curs_variables.3x.html>
