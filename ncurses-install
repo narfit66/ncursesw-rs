@@ -36,11 +36,10 @@ rc=$?
 
 [[ $rc -ne 0 ]] && exit $rc
 
-apt install --yes wget \
-                  pkg-config \
-                  build-essential \
-                  llvm \
-                  clang
+apt install --yes \
+            wget \
+            pkg-config \
+            build-essential
 rc=$?
 
 [[ $rc -ne 0 ]] && exit $rc
