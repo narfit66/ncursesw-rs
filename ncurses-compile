@@ -2,11 +2,7 @@
 #
 #    ncurses-compile
 #
-<<<<<<< HEAD
 #    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
-=======
-#    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
->>>>>>> minor changes to ncurses install script
 #
 #    Permission is hereby granted, free of charge, to any person obtaining a copy
 #    of this software and associated documentation files (the "Software"),
