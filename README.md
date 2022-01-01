@@ -1,13 +1,13 @@
 ncursesw [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw) [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/narfit66/ncursesw-rs/blob/master/LICENSE) ![Lines of Code](https://tokei.rs/b1/github/narfit66/ncursesw-rs?category=code)
 ========
 
-This is a **fat** wrapper around the [NCurses TUI library](https://github.com/mirror/ncurses), it's purpose is too make the native library functionally safe to use, however please be aware that there are a number of functions within the native library that under certian circumstances can cause undefined behaviour, these functions have been implemented and can be called but have been marked as *depreciated* with appropriate notes.
+This is a **fat** wrapper around the [NCurses TUI library](https://github.com/mirror/ncurses), it's purpose is too make the native library functionally safe to use, however please be aware that there are a number of functions within the native library that under certain circumstances can cause undefined behaviour, these functions have been implemented and can be called but have been marked as *deprecated* with appropriate notes.
 
 This crate supports NCurses ABI 6.1 and above.
 
 There are actually three layers of NCurses functions exposed within this library, the raw `extern "C"` functions that are generated with [bindgen](https://crates.io/crates/bindgen) which are available in `ncursesw::shims::bindings`.
 
-A layer above this which are mainly `unsafe` but protect the calling code to a certian degree with assetions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are on the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}` and you can consider this layer as the equivalent of a `-sys` crate for the NCurses library.
+A layer above this which are mainly `unsafe` but protect the calling code to a certain degree with assertions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are on the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}` and you can consider this layer as the equivalent of a `-sys` crate for the NCurses library.
 
 Last but not least there are the safe (within the limits of NCurses itself) functions in `ncursesw` and `ncursesw::{panels, mouse, menu, form}` which retain there original NCurses names but have been rustified.
 
@@ -35,7 +35,7 @@ ncursesw = { git = "https://github.com/narfit66/ncursesw-rs" }
 
 As noted above this crate has *only* been tested on Debian based x86_64 Linux.
 
-You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install NCurses into `/usr/lib` with wide character and extended color support.
+You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install NCurses into `/usr/local/lib` with wide character and extended color support.
 
 To downland, compile and install the NCurses library.
 
