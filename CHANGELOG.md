@@ -3,7 +3,7 @@
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
 ## [0.6.0] - ????.??.??
-- Upgraded source code to rust 2018 edition.
+- Upgraded source code to rust 2021 edition.
 - Now uses `thiserror` crate instead of `custom_error` crate to create `Error` types.
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
 - Changed signature of `setsyx(origin: Origin) -> Result<(), NCurseswError>` to `setsyx(origin: Option<Origin>) -> Result<(), NCurseswError>`. [BC]
