@@ -20,12 +20,11 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
-
+use std::ops::{BitOr, BitXor};
 use crate::{form::FormOption, shims::constants};
 
 /// Form options.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct FormOptions {
     raw: i32
 }
@@ -36,12 +35,6 @@ impl FormOptions {
 
     option_getter!(is_backspace_overload, O_BS_OVERLOAD);
     option_setter!(set_backspace_overload, O_BS_OVERLOAD);
-}
-
-impl Default for FormOptions {
-    fn default() -> Self {
-        Self { raw: 0 }
-    }
 }
 
 /// Implement the | operator for adding FormOption to FormOptions
@@ -66,13 +59,11 @@ impl BitXor for FormOptions {
 impl BitOr<FormOption> for FormOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: FormOption) -> Self::Output {
+    fn bitor(self, rhs: FormOption) -> Self::Output {
         match rhs {
             FormOption::NewlineOverload => self.set_newline_overload(true),
             FormOption::BackspaceOverload => self.set_backspace_overload(true)
         }
-
-        self
     }
 }
 
@@ -80,13 +71,11 @@ impl BitOr<FormOption> for FormOptions {
 impl BitXor<FormOption> for FormOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: FormOption) -> Self::Output {
+    fn bitxor(self, rhs: FormOption) -> Self::Output {
         match rhs {
             FormOption::NewlineOverload => self.set_newline_overload(false),
             FormOption::BackspaceOverload => self.set_backspace_overload(false)
         }
-
-        self
     }
 }
 

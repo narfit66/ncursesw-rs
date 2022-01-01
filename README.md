@@ -1,13 +1,13 @@
 ncursesw [![Crates.io](https://img.shields.io/crates/v/ncursesw.svg)](https://crates.io/crates/ncursesw) [![Build Status](https://travis-ci.com/narfit66/ncursesw-rs.svg?branch=master)](https://travis-ci.com/narfit66/ncursesw-rs) [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/narfit66/ncursesw-rs/blob/master/LICENSE) ![Lines of Code](https://tokei.rs/b1/github/narfit66/ncursesw-rs?category=code)
 ========
 
-This is a **fat** wrapper around the [NCurses TUI library](https://github.com/mirror/ncurses), it's purpose is too make the library functionally safe to use, please be aware that there are a number of functions within the native library that are inheritenly unsafe and under certian circumstances can cause undefined behaviour, these functions have been implemented and can be called but have been marked as *depreciated* with appropriate notes.
+This is a **fat** wrapper around the [NCurses TUI library](https://github.com/mirror/ncurses), it's purpose is too make the native library functionally safe to use, however please be aware that there are a number of functions within the native library that under certain circumstances can cause undefined behaviour, these functions have been implemented and can be called but have been marked as *deprecated* with appropriate notes.
 
 This crate supports NCurses ABI 6.1 and above.
 
-There are actually three layers of NCurses functions exposed within this library, the raw `extern "C"` functions that are generated with `bindgen` which are available in `ncursesw::shims::bindings`.
+There are actually three layers of NCurses functions exposed within this library, the raw `extern "C"` functions that are generated with [bindgen](https://crates.io/crates/bindgen) which are available in `ncursesw::shims::bindings`.
 
-A layer above this which are mainly `unsafe` but protect the calling code to a certian degree with assetions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are on the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}` and you can consider this layer as the equivalent of a `-sys` crate for the NCurses library.
+A layer above this which are mainly `unsafe` but protect the calling code to a certain degree with assertions (some functions will also have a slight rust wrapping (for example functions returning a raw pointer) but are on the whole left as per the `bindgen` layer), these can be found in `ncursesw::shims::{ncurses, npanels, nmouse, nmenu, nform}` and you can consider this layer as the equivalent of a `-sys` crate for the NCurses library.
 
 Last but not least there are the safe (within the limits of NCurses itself) functions in `ncursesw` and `ncursesw::{panels, mouse, menu, form}` which retain there original NCurses names but have been rustified.
 
@@ -19,9 +19,11 @@ At the moment this crate has only been tested on 64-bit Linux (Linux Mint 19.1) 
 
 ## Inclusion
 
+I whould recommend using version `0.6.0` and above of this crate as the API has pretty much stabilized at this point.
+
 ```
 [dependencies]
-ncursesw = "0.5"
+ncursesw = "0.6"
 ```
 Or to use the latest git version
 ```
@@ -33,7 +35,7 @@ ncursesw = { git = "https://github.com/narfit66/ncursesw-rs" }
 
 As noted above this crate has *only* been tested on Debian based x86_64 Linux.
 
-You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install NCurses into `/usr/lib` with wide character and extended color support.
+You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install NCurses into `/usr/local/lib` with wide character and extended color support.
 
 To downland, compile and install the NCurses library.
 
@@ -104,7 +106,7 @@ use ncursesw::form::*;
 
 To use wide (UTF-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate has been used for this purpose.
 
-All features are supported as of NCurses ABI 6.1 including ansi 8-bit (normal) colors and color pairs, extended colors and color pairs, characters and strings (with attribute/color rendition), wide (UTF-8) characters and strings, complex characters and strings, soft labels (normal and extended), ripoff lines, panels, mouse, menus, forms and screen functions. I would suggest examining NCurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html), [menu](https://invisible-island.net/ncurses/man/menu.3x.html), [form](https://invisible-island.net/ncurses/man/form.3x.html) and [screen](https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html) documentation. If you get the chance have a read of the book `Dan Gookin's Guide to NCurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
+All features are supported as of NCurses ABI 6.1 including ansi 8-bit (normal) colors and color pairs, extended colors and color pairs, characters and strings (with attribute/color rendition), wide (UTF-8) characters and strings, complex characters and strings, soft labels, ripoff lines, panels, mouse, menus, forms and screen functions. I would suggest examining NCurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html), [menu](https://invisible-island.net/ncurses/man/menu.3x.html), [form](https://invisible-island.net/ncurses/man/form.3x.html) and [screen](https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html) documentation. If you get the chance have a read of the book `Dan Gookin's Guide to NCurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
 
 Alternativly have a look at the crate [ncursesw-win](https://crates.io/crates/ncursesw-win) which wraps this crate with the express purpose of not exposing the NCurses library raw pointers and encapsulating them in formalised structures.
 

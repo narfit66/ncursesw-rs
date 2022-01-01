@@ -21,11 +21,10 @@
 */
 
 use std::{ptr, convert::TryFrom};
-
 use errno::errno;
-
 use crate::{
     normal,
+    Origin, Size, WideChar,
     cstring::*,
     shims::{
         nform, nform::FieldType, ncurses::{SCREEN, WINDOW}, bindings::va_list,
@@ -41,10 +40,7 @@ use crate::{
             NCurseswFormError, ncursesw_form_error_system_error,
             ncursesw_form_error_from_rc
         }
-    },
-    wide::WideChar,
-    origin::Origin,
-    size::Size
+    }
 };
 
 /// Form.
@@ -57,7 +53,9 @@ pub type FIELDTYPE = nform::FIELDTYPE;
 pub type Form_Hook = nform::Form_Hook;
 
 /// Returns the current field of the given form.
-pub fn current_field(form: FORM) -> form_result!(FIELD) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn current_field(form: Option<FORM>) -> form_result!(FIELD) {
     unsafe { nform::current_field(form).ok_or_else(|| form_function_error!("current_field")) }
 }
 
@@ -94,13 +92,20 @@ pub fn dynamic_field_info(field: FIELD) -> form_result!(FieldInfo) {
     }
 }
 
-pub fn field_arg(field: FIELD) -> form_result!(*mut libc::c_void) {
+pub fn field_arg(field: Option<FIELD>) -> form_result!(*mut libc::c_void) {
     unsafe { nform::field_arg(field).ok_or_else(|| form_function_error!("field_arg")) }
 }
 
 /// Returns the background attribute. The default is `normal::Attributes::Normal`.
-pub fn field_back(field: FIELD) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nform::field_back(field)) }
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the field is attached to a form created using `new_form_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_back(field: Option<FIELD>) -> normal::Attributes {
+    unsafe { normal::Attributes::_from(None, nform::field_back(field)) }
 }
 
 /// Returns a vector of the contents of the given numbered buffer:
@@ -121,7 +126,9 @@ pub fn field_buffer(field: FIELD, buffer_number: i32) -> form_result!(Vec<i8>) {
 }
 
 /// Returns the count of fields in form.
-pub fn field_count(form: FORM) -> form_result!(i32) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn field_count(form: Option<FORM>) -> form_result!(i32) {
     let rc = unsafe { nform::field_count(form) };
 
     if rc.is_negative() {
@@ -132,8 +139,15 @@ pub fn field_count(form: FORM) -> form_result!(i32) {
 }
 
 /// Returns the foreground attribute. The default is `normal::Attributes::Standout`.
-pub fn field_fore(field: FIELD) -> normal::Attributes {
-    unsafe { normal::Attributes::from(nform::field_fore(field)) }
+///
+/// Please note that the `Attributes` value being returned has an internal screen
+/// value of `None`, if the field is attached to a form created using `new_form_sp()`
+/// then `normal::Attributes::set_screen()` should be called to set the correct
+/// screen pointer, this is required to obtain the correct `normal::ColorPair`.
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_fore(field: Option<FIELD>) -> normal::Attributes {
+    unsafe { normal::Attributes::_from(None, nform::field_fore(field)) }
 }
 
 /// Returns the index of the field in the field array of the form it is connected to.
@@ -166,12 +180,16 @@ pub fn field_info(field: FIELD) -> form_result!(FieldParameters) {
 }
 
 /// Returns the current field init hook.
-pub fn field_init(form: FORM) -> form_result!(Form_Hook) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn field_init(form: Option<FORM>) -> form_result!(Form_Hook) {
     unsafe { nform::field_init(form).ok_or_else(|| form_function_error_with_rc!("field_init", errno().into())) }
 }
 
 /// Returns a field's justification attribute.
-pub fn field_just(field: FIELD) -> form_result!(FieldJustification) {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_just(field: Option<FIELD>) -> form_result!(FieldJustification) {
     match unsafe { nform::field_just(field) } {
         NO_JUSTIFICATION => Ok(FieldJustification::None),
         JUSTIFY_LEFT     => Ok(FieldJustification::Left),
@@ -182,12 +200,16 @@ pub fn field_just(field: FIELD) -> form_result!(FieldJustification) {
 }
 
 /// Returns the field's current options.
-pub fn field_opts(field: FIELD) -> FieldOptions {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_opts(field: Option<FIELD>) -> FieldOptions {
     unsafe { FieldOptions::from(nform::field_opts(field)) }
 }
 
 /// Turns off the given options, and leaves others alone.
-pub fn field_opts_off(field: FIELD, opts: FieldOptions) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn field_opts_off(field: Option<FIELD>, opts: FieldOptions) -> form_result!(()) {
     match unsafe { nform::field_opts_off(field, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("field_opts_off", rc))
@@ -195,7 +217,9 @@ pub fn field_opts_off(field: FIELD, opts: FieldOptions) -> form_result!(()) {
 }
 
 /// Turns on the given options, and leaves others alone.
-pub fn field_opts_on(field: FIELD, opts: FieldOptions) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn field_opts_on(field: Option<FIELD>, opts: FieldOptions) -> form_result!(()) {
     match unsafe { nform::field_opts_on(field, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("field_opts_on", rc))
@@ -203,27 +227,37 @@ pub fn field_opts_on(field: FIELD, opts: FieldOptions) -> form_result!(()) {
 }
 
 /// Returns the given form's pad character. The default is a blank.
-pub fn field_pad(field: FIELD) -> form_result!(char) {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_pad(field: Option<FIELD>) -> form_result!(char) {
     Ok(char::from(u8::try_from(u32::try_from(unsafe { nform::field_pad(field) })?)?))
 }
 
 /// Gets the current field status value. The status is `true` whenever the field changes.
-pub fn field_status(field: FIELD) -> bool {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_status(field: Option<FIELD>) -> bool {
     unsafe { nform::field_status(field) }
 }
 
 /// Returns the current field term hook.
-pub fn field_term(form: FORM) -> form_result!(Form_Hook) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn field_term(form: Option<FORM>) -> form_result!(Form_Hook) {
     unsafe { nform::field_term(form).ok_or_else(|| form_function_error_with_rc!("field_term", errno().into())) }
 }
 
 /// Returns the data type validation for fields.
-pub fn field_type(field: FIELD) -> form_result!(FIELDTYPE) {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_type(field: Option<FIELD>) -> form_result!(FIELDTYPE) {
     unsafe { nform::field_type(field).ok_or_else(|| form_function_error_with_rc!("field_type", errno().into())) }
 }
 
 /// Returns the fields user pointer.
-pub fn field_userptr(field: FIELD) -> form_result!(*mut libc::c_void) {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn field_userptr(field: Option<FIELD>) -> form_result!(*mut libc::c_void) {
     unsafe { nform::field_userptr(field).ok_or_else(|| form_function_error!("field_userptr")) }
 }
 
@@ -276,22 +310,30 @@ pub fn form_driver_w(form: FORM, request: FormRequest, wch: WideChar) -> form_re
 }
 
 /// Returns a vector of the fields of the given form.
-pub fn form_fields(form: FORM) -> form_result!(Vec<FIELD>) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_fields(form: Option<FORM>) -> form_result!(Vec<FIELD>) {
     unsafe { nform::form_fields(form).ok_or_else(|| form_function_error!("form_fields")) }
 }
 
 /// Returns the current form init hook.
-pub fn form_init(form: FORM) -> form_result!(Form_Hook) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_init(form: Option<FORM>) -> form_result!(Form_Hook) {
     unsafe { nform::form_init(form).ok_or_else(|| form_function_error_with_rc!("form_init", errno().into())) }
 }
 
 /// Returns the form's current options.
-pub fn form_opts(form: FORM) -> FormOptions {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_opts(form: Option<FORM>) -> FormOptions {
     unsafe { FormOptions::from(nform::form_opts(form)) }
 }
 
 /// Turns off the given options, and leaves others alone.
-pub fn form_opts_off(form: FORM, opts: FormOptions) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn form_opts_off(form: Option<FORM>, opts: FormOptions) -> form_result!(()) {
     match unsafe { nform::form_opts_off(form, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("form_opts_off", rc))
@@ -299,7 +341,9 @@ pub fn form_opts_off(form: FORM, opts: FormOptions) -> form_result!(()) {
 }
 
 /// Turns on the given options, and leaves others alone.
-pub fn form_opts_on(form: FORM, opts: FormOptions) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn form_opts_on(form: Option<FORM>, opts: FormOptions) -> form_result!(()) {
     match unsafe { nform::form_opts_on(form, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("form_opts_on", rc))
@@ -307,7 +351,9 @@ pub fn form_opts_on(form: FORM, opts: FormOptions) -> form_result!(()) {
 }
 
 /// Returns the form's current page number.
-pub fn form_page(form: FORM) -> form_result!(i32) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_page(form: Option<FORM>) -> form_result!(i32) {
     let rc = unsafe { nform::form_page(form) };
 
     if rc.is_negative() {
@@ -340,22 +386,30 @@ pub fn form_request_name(request: FormRequest) -> form_result!(String) {
 }
 
 /// Return the forms sub-window.
-pub fn form_sub(form: FORM) -> form_result!(WINDOW) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_sub(form: Option<FORM>) -> form_result!(WINDOW) {
     unsafe { nform::form_sub(form) }.ok_or_else(|| form_function_error!("form_sub"))
 }
 
 /// Returns the current form term hook.
-pub fn form_term(form: FORM) -> form_result!(Form_Hook) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_term(form: Option<FORM>) -> form_result!(Form_Hook) {
     unsafe { nform::form_term(form).ok_or_else(|| form_function_error_with_rc!("form_term", errno().into())) }
 }
 
 /// Returns the forms user pointer.
-pub fn form_userptr(form: FORM) -> form_result!(*mut libc::c_void) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_userptr(form: Option<FORM>) -> form_result!(*mut libc::c_void) {
     unsafe { nform::form_userptr(form).ok_or_else(|| form_function_error!("form_userptr")) }
 }
 
 /// Return the forms main-window.
-pub fn form_win(form: FORM) -> form_result!(WINDOW) {
+///
+/// If `form` is `None` then the default value is returned.
+pub fn form_win(form: Option<FORM>) -> form_result!(WINDOW) {
     unsafe { nform::form_win(form).ok_or_else(|| form_function_error!("form_win")) }
 }
 
@@ -425,6 +479,17 @@ pub fn new_fieldtype(
 
 /// Creates a new form connected to specified fields as a vector (the vector
 /// must point to an area of contiguous memory representing the fields in order).
+///
+/// When `new_form()` is called make sure that the memory for the `fields`
+/// is contiguous and does not go out of scope until after `free_form()` has
+/// been called otherwise unpredicable results may occur, this is because the
+/// underlying NCurses form functions use this memory directly.
+/// See ncursesw-win-rs's `Form::new()` <https://github.com/narfit66/ncursesw-win-rs/blob/master/src/form/form.rs>
+/// as an example of how the `nform::new_form()` function can be called by
+/// allocating and keeping the memory required but bypasses this function
+/// and calling `nform::new_form()` directly (although you could also call
+/// this function directly as long as the underlying memory is contiguous
+/// and does not go out of scope).
 pub fn new_form(fields: &mut Vec<FIELD>) -> form_result!(FORM) {
     fields.push(ptr::null_mut());
     fields.shrink_to_fit();
@@ -438,7 +503,9 @@ pub fn new_form(fields: &mut Vec<FIELD>) -> form_result!(FORM) {
 
 /// The function `new_page()` is a predicate which tests if a given field
 /// marks a page beginning on its form.
-pub fn new_page(field: FIELD) -> bool {
+///
+/// If `field` is `None` then the default value is returned.
+pub fn new_page(field: Option<FIELD>) -> bool {
     unsafe { nform::new_page(field) }
 }
 
@@ -483,7 +550,9 @@ pub fn set_current_field(form: FORM, field: FIELD) -> form_result!(()) {
 
 /// Sets the background attribute of form. This is the highlight used to
 /// display the extent fields in the form.
-pub fn set_field_back(field: FIELD, attr: normal::Attributes) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_back(field: Option<FIELD>, attr: normal::Attributes) -> form_result!(()) {
     match unsafe { nform::set_field_back(field, attr.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_back", rc))
@@ -504,7 +573,9 @@ pub fn set_field_buffer(field: FIELD, buffer_number: i32, buffer: &[i8]) -> form
 
 /// Sets the foreground attribute of field. This is the highlight used to
 /// display the field contents.
-pub fn set_field_fore(field: FIELD, attr: normal::Attributes) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_fore(field: Option<FIELD>, attr: normal::Attributes) -> form_result!(()) {
     match unsafe { nform::set_field_fore(field, attr.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_fore", rc))
@@ -513,7 +584,9 @@ pub fn set_field_fore(field: FIELD, attr: normal::Attributes) -> form_result!(()
 
 /// Sets a hook to be called at form-post time and each time the selected
 /// field changes (after the change).
-pub fn set_field_init(form: FORM, func: Form_Hook) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn set_field_init(form: Option<FORM>, func: Form_Hook) -> form_result!(()) {
     match unsafe { nform::set_field_init(form, func) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_init", rc))
@@ -521,7 +594,9 @@ pub fn set_field_init(form: FORM, func: Form_Hook) -> form_result!(()) {
 }
 
 /// Sets the justification attribute of a field.
-pub fn set_field_just(field: FIELD, justification: FieldJustification) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_just(field: Option<FIELD>, justification: FieldJustification) -> form_result!(()) {
     match unsafe { nform::set_field_just(field, match justification {
         FieldJustification::None     => NO_JUSTIFICATION,
         FieldJustification::Left     => JUSTIFY_LEFT,
@@ -534,7 +609,9 @@ pub fn set_field_just(field: FIELD, justification: FieldJustification) -> form_r
 }
 
 /// Sets all the given field's options.
-pub fn set_field_opts(field: FIELD, opts: FieldOptions) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_opts(field: Option<FIELD>, opts: FieldOptions) -> form_result!(()) {
     match unsafe { nform::set_field_opts(field, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_opts", rc))
@@ -542,7 +619,9 @@ pub fn set_field_opts(field: FIELD, opts: FieldOptions) -> form_result!(()) {
 }
 
 /// Sets the character used to fill the field.
-pub fn set_field_pad(field: FIELD, pad: char) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_pad(field: Option<FIELD>, pad: char) -> form_result!(()) {
     match unsafe { nform::set_field_pad(field, i32::from(u8::try_from(u32::from(pad))?)) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_pad", rc))
@@ -550,7 +629,9 @@ pub fn set_field_pad(field: FIELD, pad: char) -> form_result!(()) {
 }
 
 /// Sets the associated status flag of field.
-pub fn set_field_status(field: FIELD, status: bool) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_status(field: Option<FIELD>, status: bool) -> form_result!(()) {
     match unsafe { nform::set_field_status(field, status) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_status", rc))
@@ -559,7 +640,9 @@ pub fn set_field_status(field: FIELD, status: bool) -> form_result!(()) {
 
 /// Sets a hook to be called at form-unpost time and each time the selected
 /// field changes (before the change).
-pub fn set_field_term(form: FORM, func: Form_Hook) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn set_field_term(form: Option<FORM>, func: Form_Hook) -> form_result!(()) {
     match unsafe { nform::set_field_term(form, func) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_term", rc))
@@ -568,7 +651,9 @@ pub fn set_field_term(form: FORM, func: Form_Hook) -> form_result!(()) {
 
 /// Declares a data type for a given form field.
 /// This is the type checked by validation functions.
-pub fn set_field_type(field: FIELD, fieldtype: FieldType) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_type(field: Option<FIELD>, fieldtype: FieldType) -> form_result!(()) {
     match unsafe { nform::set_field_type(field, fieldtype) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_type", rc))
@@ -601,7 +686,9 @@ pub fn set_fieldtype_choice(
 }
 
 /// Sets the fields user pointer.
-pub fn set_field_userptr(field: FIELD, userptr: Option<*mut libc::c_void>) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_field_userptr(field: Option<FIELD>, userptr: Option<*mut libc::c_void>) -> form_result!(()) {
     match unsafe { nform::set_field_userptr(field, userptr) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_field_userptr", rc))
@@ -624,7 +711,9 @@ pub fn set_form_fields(form: FORM, fields: &mut Vec<FIELD>) -> form_result!(()) 
 }
 
 /// Sets a hook to be called at form-post time and just after a page change once it is posted.
-pub fn set_form_init(form: FORM, func: Form_Hook) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn set_form_init(form: Option<FORM>, func: Form_Hook) -> form_result!(()) {
     match unsafe { nform::set_form_init(form, func) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_form_init", rc))
@@ -632,7 +721,9 @@ pub fn set_form_init(form: FORM, func: Form_Hook) -> form_result!(()) {
 }
 
 /// Sets all the given form's options.
-pub fn set_form_opts(form: FORM, opts: FormOptions) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn set_form_opts(form: Option<FORM>, opts: FormOptions) -> form_result!(()) {
     match unsafe { nform::set_form_opts(form, opts.into()) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_form_opts", rc))
@@ -657,7 +748,9 @@ pub fn set_form_sub(form: Option<FORM>, window: Option<WINDOW>) -> form_result!(
 }
 
 /// Sets a hook to be called at form-unpost time and just before a page change once it is posted.
-pub fn set_form_term(form: FORM, func: Form_Hook) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn set_form_term(form: Option<FORM>, func: Form_Hook) -> form_result!(()) {
     match unsafe { nform::set_form_term(form, func) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_form_term", rc))
@@ -665,7 +758,9 @@ pub fn set_form_term(form: FORM, func: Form_Hook) -> form_result!(()) {
 }
 
 /// Sets the forms user pointer.
-pub fn set_form_userptr(form: FORM, userptr: Option<*mut libc::c_void>) -> form_result!(()) {
+///
+/// If `form` is `None` then the default value is set.
+pub fn set_form_userptr(form: Option<FORM>, userptr: Option<*mut libc::c_void>) -> form_result!(()) {
     match unsafe { nform::set_form_userptr(form, userptr) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_form_userptr", rc))
@@ -691,7 +786,9 @@ pub fn set_max_field(field: FIELD, max: i32) -> form_result!(()) {
 }
 
 /// Sets or resets a flag marking the given field as the beginning of a new page on its form.
-pub fn set_new_page(field: FIELD, new_page_flag: bool) -> form_result!(()) {
+///
+/// If `field` is `None` then the default value is set.
+pub fn set_new_page(field: Option<FIELD>, new_page_flag: bool) -> form_result!(()) {
     match unsafe { nform::set_new_page(field, new_page_flag) } {
         E_OK => Ok(()),
         rc   => Err(form_function_error_with_rc!("set_new_page", rc))

@@ -20,12 +20,11 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
-
+use std::ops::{BitOr, BitXor};
 use crate::{form::FieldOption, shims::constants};
 
 /// Field options.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct FieldOptions {
     raw: i32
 }
@@ -68,12 +67,6 @@ impl FieldOptions {
     option_setter!(set_no_left_strip, O_NO_LEFT_STRIP);
 }
 
-impl Default for FieldOptions {
-    fn default() -> Self {
-        Self { raw: 0 }
-    }
-}
-
 /// Implement the | operator for adding FieldOption to FieldOptions
 impl BitOr for FieldOptions {
     type Output = Self;
@@ -96,7 +89,7 @@ impl BitXor for FieldOptions {
 impl BitOr<FieldOption> for FieldOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: FieldOption) -> Self::Output {
+    fn bitor(self, rhs: FieldOption) -> Self::Output {
         match rhs {
             FieldOption::Visible        => self.set_visible(true),
             FieldOption::Active         => self.set_active(true),
@@ -111,8 +104,6 @@ impl BitOr<FieldOption> for FieldOptions {
             FieldOption::DynamicJustify => self.set_dynamic_justify(true),
             FieldOption::NoLeftStrip    => self.set_no_left_strip(true)
         }
-
-        self
     }
 }
 
@@ -120,7 +111,7 @@ impl BitOr<FieldOption> for FieldOptions {
 impl BitXor<FieldOption> for FieldOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: FieldOption) -> Self::Output {
+    fn bitxor(self, rhs: FieldOption) -> Self::Output {
         match rhs {
             FieldOption::Visible        => self.set_visible(false),
             FieldOption::Active         => self.set_active(false),
@@ -135,14 +126,12 @@ impl BitXor<FieldOption> for FieldOptions {
             FieldOption::DynamicJustify => self.set_dynamic_justify(false),
             FieldOption::NoLeftStrip    => self.set_no_left_strip(false)
         }
-
-        self
     }
 }
 
 impl From<FieldOption> for FieldOptions {
-    fn from(form_option: FieldOption) -> Self {
-        Self::default() | form_option
+    fn from(field_option: FieldOption) -> Self {
+        Self::default() | field_option
     }
 }
 

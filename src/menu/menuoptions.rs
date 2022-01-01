@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
-
+use std::ops::{BitOr, BitXor};
 use crate::{menu::MenuOption, shims::constants};
 
 /// Menu options.
@@ -75,7 +74,7 @@ impl BitXor for MenuOptions {
 impl BitOr<MenuOption> for MenuOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: MenuOption) -> Self::Output {
+    fn bitor(self, rhs: MenuOption) -> Self::Output {
         match rhs {
             MenuOption::OneValue        => self.set_one_value(true),
             MenuOption::ShowDescription => self.set_show_description(true),
@@ -85,8 +84,6 @@ impl BitOr<MenuOption> for MenuOptions {
             MenuOption::NonCyclic       => self.set_non_cyclic(true),
             MenuOption::MouseMenu       => self.set_mouse_menu(true)
         }
-
-        self
     }
 }
 
@@ -94,7 +91,7 @@ impl BitOr<MenuOption> for MenuOptions {
 impl BitXor<MenuOption> for MenuOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: MenuOption) -> Self::Output {
+    fn bitxor(self, rhs: MenuOption) -> Self::Output {
         match rhs {
             MenuOption::OneValue        => self.set_one_value(false),
             MenuOption::ShowDescription => self.set_show_description(false),
@@ -104,8 +101,6 @@ impl BitXor<MenuOption> for MenuOptions {
             MenuOption::NonCyclic       => self.set_non_cyclic(false),
             MenuOption::MouseMenu       => self.set_mouse_menu(false)
         }
-
-        self
     }
 }
 

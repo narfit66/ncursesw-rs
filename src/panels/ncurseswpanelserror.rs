@@ -1,7 +1,7 @@
 /*
     src/panels/ncurseswpanelserror.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,10 +20,12 @@
     IN THE SOFTWARE.
 */
 
+use thiserror::Error;
+use crate::ncurseswerror::{rc_error, os_level_error};
 
-custom_error::custom_error! {
 /// NCursesw panels errors.
-#[derive(PartialEq, Eq)]
-pub NCurseswPanelsError
-    LibraryError { func: String, rc: i32 } = "npanels::{func}() (#{rc})"
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum NCurseswPanelsError {
+    #[error("npanels::{func}(){}{}", rc_error(*rc), os_level_error())]
+    LibraryError { func: String, rc: Option<i32> }
 }

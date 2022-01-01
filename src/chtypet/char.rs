@@ -20,9 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
+use std::ops::{BitOr, BitXor};
 use ascii::AsciiChar;
-
 use crate::{
     gen::*,
     normal::{Attribute, Attributes},
@@ -94,7 +93,7 @@ impl ChtypeChar {
 
     /// Get the attributes of the Chtype character.
     pub fn get_attributes(self) -> Attributes {
-        Attributes::from(self.raw & A_ATTRIBUTES)
+        Attributes::_from(None, self.raw & A_ATTRIBUTES)
     }
 }
 
@@ -154,14 +153,14 @@ fn chtype_char_test() {
 #[test]
 fn chtype_char_get_attributes() {
     let ch = ChtypeChar::new(AsciiChar::new('s'));
-    let mut attrs = Attributes::default();
-
-    attrs.set_bold(true);
-    attrs.set_dim(true);
+    let attrs = Attributes::default().set_bold(true).set_dim(true);
 
     let c = ch | attrs;
 
+    assert_eq!(c.as_char(), 's');
     assert_eq!(c.get_attributes(), attrs);
+    assert_eq!(c.get_attributes().is_normal(), false);
     assert_eq!(c.get_attributes().is_bold(), true);
-    assert_eq!(attrs.is_bold(), true);
+    assert_eq!(c.get_attributes().is_dim(), true);
+    assert_eq!(c.get_attributes().is_underline(), false);
 }

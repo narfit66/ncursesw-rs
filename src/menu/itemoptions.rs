@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
-
+use std::ops::{BitOr, BitXor};
 use crate::{menu::ItemOption, shims::constants};
 
 /// Menu item options.
@@ -57,12 +56,10 @@ impl BitXor for ItemOptions {
 impl BitOr<ItemOption> for ItemOptions {
     type Output = Self;
 
-    fn bitor(mut self, rhs: ItemOption) -> Self::Output {
+    fn bitor(self, rhs: ItemOption) -> Self::Output {
         match rhs {
             ItemOption::Selectable => self.set_selectable(true)
         }
-
-        self
     }
 }
 
@@ -70,12 +67,10 @@ impl BitOr<ItemOption> for ItemOptions {
 impl BitXor<ItemOption> for ItemOptions {
     type Output = Self;
 
-    fn bitxor(mut self, rhs: ItemOption) -> Self::Output {
+    fn bitxor(self, rhs: ItemOption) -> Self::Output {
         match rhs {
             ItemOption::Selectable => self.set_selectable(false)
         }
-
-        self
     }
 }
 

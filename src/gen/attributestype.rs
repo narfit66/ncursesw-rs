@@ -20,63 +20,12 @@
     IN THE SOFTWARE.
 */
 
-use crate::{AttributesGeneric, ColorAttributeTypes};
+use crate::{gen::ColorAttributeTypes, shims::ncurses::{SCREEN, attr_t}};
 
 /// Attributes.
-pub trait AttributesType<T>: AttributesGeneric
+pub trait AttributesType<T>
     where T: ColorAttributeTypes
 {
-    fn is_normal(&self) -> bool;
-    fn set_normal(&mut self);
-
-    fn is_char_text(&self) -> bool;
-    fn set_char_text(&mut self, _: bool);
-
-    fn is_standout(&self) -> bool;
-    fn set_standout(&mut self, _: bool);
-
-    fn is_underline(&self) -> bool;
-    fn set_underline(&mut self, _: bool);
-
-    fn is_reverse(&self) -> bool;
-    fn set_reverse(&mut self, _: bool);
-
-    fn is_blink(&self) -> bool;
-    fn set_blink(&mut self, _: bool);
-
-    fn is_dim(&self) -> bool;
-    fn set_dim(&mut self, _: bool);
-
-    fn is_bold(&self) -> bool;
-    fn set_bold(&mut self, _: bool);
-
-    fn is_alternate_char_set(&self) -> bool;
-    fn set_alternative_char_set(&mut self, _: bool);
-
-    fn is_invisible(&self) -> bool;
-    fn set_invisible(&mut self, _: bool);
-
-    fn is_protected(&self) -> bool;
-    fn set_protected(&mut self, _: bool);
-
-    fn is_horizontal(&self) -> bool;
-    fn set_horizontal(&mut self, _: bool);
-
-    fn is_left(&self) -> bool;
-    fn set_left(&mut self, _: bool);
-
-    fn is_low(&self) -> bool;
-    fn set_low(&mut self, _: bool);
-
-    fn is_right(&self) -> bool;
-    fn set_right(&mut self, _: bool);
-
-    fn is_top(&self) -> bool;
-    fn set_top(&mut self, _: bool);
-
-    fn is_vertical(&self) -> bool;
-    fn set_vertical(&mut self, _: bool);
-
-    fn is_italic(&self) -> bool;
-    fn set_italic(&mut self, _: bool);
+    fn screen(&self) -> Option<SCREEN>;
+    fn as_attr_t(&self) -> attr_t;
 }

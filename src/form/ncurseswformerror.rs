@@ -21,39 +21,56 @@
 */
 
 use std::{num, ffi, convert};
-
 use errno::{Errno, errno};
-
+use thiserror::Error;
 use crate::shims::constants;
 
-custom_error::custom_error! {
 /// NCursesw form errors.
-#[derive(PartialEq, Eq)]
-pub NCurseswFormError
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum NCurseswFormError {
     /// Routine detected an incorrect or out-of-range argument.
-    BadArgument { func: String } = "nform::{func}() : bad argument",
-    BadState { func: String } = "nform::{func}() : bad state",
+    #[error("nform::{func}() : bad argument")]
+    BadArgument { func: String },
+    #[error("nform::{func}() : bad state")]
+    BadState { func: String },
     /// Field is connected to a form.
-    Connected { func: String } = "nform::{func}() : connected",
-    Current { func: String } = "nform::{func}() : current",
-    InvalidField { func: String } = "nform::{func}() : invalid field",
-    NotConnected { func: String } = "nform::{func}() : not connected",
-    NotPosted { func: String } = "nform::{func}() : not posted",
-    NotSelectable { func: String } = "nform::{func}() : not selectable",
-    NoMatch { func: String } = "nform::{func}() : no match",
-    NoRoom { func: String } = "nform::{func}() : no room",
+    #[error("nform::{func}() : connected")]
+    Connected { func: String },
+    #[error("nform::{func}() : current")]
+    Current { func: String },
+    #[error("nform::{func}() : invalid field")]
+    InvalidField { func: String },
+    #[error("nform::{func}() : not connected")]
+    NotConnected { func: String },
+    #[error("nform::{func}() : not posted")]
+    NotPosted { func: String },
+    #[error("nform::{func}() : not selectable")]
+    NotSelectable { func: String },
+    #[error("nform::{func}() : no match")]
+    NoMatch { func: String },
+    #[error("nform::{func}() : no room")]
+    NoRoom { func: String },
     /// The routine succeeded.
-    Ok { func: String } = "nform::{func}() : ok",
-    Posted { func: String } = "nform::{func}() : posted",
-    RequestDenied { func: String } = "nform::{func}() : request denied",
+    #[error("nform::{func}() : ok",)]
+    Ok { func: String },
+    #[error("nform::{func}() : posted")]
+    Posted { func: String },
+    #[error("nform::{func}() : request denied")]
+    RequestDenied { func: String },
     /// System error occurred, (see errno)
-    SystemError { func: String, errno: Errno } = @{ format!("nform::{}() : {} (#{})", func, errno, errno.0) },
-    UnknownCommand { func: String } = "nform::{func}() : unknown command",
-    UnknownError { func: String, errno: i32 } = "nform::{func} : error number {errno}",
+    #[error("nform::{}() : {} (#{})", func, errno, errno.0)]
+    SystemError { func: String, errno: Errno },
+    #[error("nform::{func}() : unknown command")]
+    UnknownCommand { func: String },
+    #[error("nform::{func} : error number {errno}")]
+    UnknownError { func: String, errno: i32 },
 
-    IntError { source: num::TryFromIntError } = "{source}",
-    NulError { source: ffi::NulError } = "{source}",
-    Infallible { source: convert::Infallible } = "{source}"
+    #[error("{source}")]
+    IntError { #[from] source: num::TryFromIntError },
+    #[error("{source}")]
+    NulError { #[from] source: ffi::NulError },
+    #[error("{source}")]
+    Infallible { #[from] source: convert::Infallible }
 }
 
 pub fn ncursesw_form_error_from_rc(func: &str, err: i32) -> NCurseswFormError {

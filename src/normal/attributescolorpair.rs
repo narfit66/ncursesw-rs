@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-use crate::{gen::*, normal::*, shims::ncurses::short_t};
+use crate::{gen::*, normal::*};
 
 include!("../include/attributescolorpair.rs");
-
-define_attributescolorpairtype!(short_t);

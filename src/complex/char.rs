@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, TryInto, Into};
-
+use std::convert::TryInto;
 use crate::{
     gen::{AttributesType, ColorPairType, ColorAttributeTypes},
     ncurseswerror::NCurseswError,
@@ -42,10 +41,7 @@ impl ComplexChar {
               P: ColorPairType<T>,
               T: ColorAttributeTypes
     {
-        match setcchar(WideChar::try_into(ch)?, attrs, color_pair) {
-            Err(e)    => Err(e),
-            Ok(cchar) => Ok(cchar)
-        }
+        setcchar(WideChar::try_into(ch)?, attrs, color_pair)
     }
 
     pub fn from_char<A, P, T>(ch: char, attrs: &A, color_pair: &P) -> result!(Self)
@@ -53,16 +49,11 @@ impl ComplexChar {
               P: ColorPairType<T>,
               T: ColorAttributeTypes
     {
-        match setcchar(ch, attrs, color_pair) {
-            Err(e)    => Err(e),
-            Ok(cchar) => Ok(cchar)
-        }
+        setcchar(ch, attrs, color_pair)
     }
 
     pub fn as_wide_char(self) -> result!(WideChar) {
-        let ch = wunctrl(self)?;
-
-        Ok(ch)
+        wunctrl(self)
     }
 }
 

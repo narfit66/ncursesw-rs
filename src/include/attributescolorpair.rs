@@ -1,7 +1,7 @@
 /*
     src/include/attributescolorpair.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,26 +20,27 @@
     IN THE SOFTWARE.
 */
 
+/// A pair of `Attributes` and `ColorPair`.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct AttributesColorPair {
     attributes: Attributes,
     color_pair: ColorPair
 }
 
-macro_rules! define_attributescolorpairtype {
-    ($type: ty) => {
-        impl AttributesColorPairType<Attributes, ColorPair, $type> for AttributesColorPair {
-            fn new(attributes: Attributes, color_pair: ColorPair) -> Self {
-                Self { attributes, color_pair: color_pair }
-            }
+impl AttributesColorPair {
+    pub fn new(attributes: Attributes, color_pair: ColorPair) -> Self {
+        assert!(attributes.screen() == color_pair.screen(), "AttributesColorPair::new() : attributes.screen() != color_pair.screen()");
 
-            fn attributes(&self) -> Attributes {
-                self.attributes
-            }
+        Self { attributes, color_pair }
+    }
 
-            fn color_pair(&self) -> ColorPair {
-                self.color_pair.to_owned()
-            }
-        }
+    /// Return the attribute of the pair.
+    pub fn attributes(&self) -> Attributes {
+        self.attributes
+    }
+
+    /// Return the color pair of the pair.
+    pub fn color_pair(&self) -> ColorPair {
+        self.color_pair
     }
 }

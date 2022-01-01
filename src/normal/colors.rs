@@ -20,11 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use crate::{
-    gen::ColorsType, normal::Color, shims::ncurses::short_t,
-    ncursescolortype::NCursesColorType
-};
+use crate::{gen::ColorsType, normal::Color, shims::ncurses::short_t};
 
 include!("../include/colors.rs");
 
-define_colors!(short_t, NCursesColorType::Normal);
+define_colors!(short_t);

@@ -1,7 +1,7 @@
 /*
     examples/menu-test.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -25,12 +25,12 @@ extern crate ncursesw;
 use ncursesw::{*, menu::*};
 
 fn main() {
-    if let Err(source) = menu_test() {
+    if let Err(source) = menu_routine() {
         eprintln!("error: {}", source);
     }
 }
 
-fn menu_test() -> Result<(), NCurseswError> {
+fn menu_routine() -> Result<(), NCurseswError> {
     // initialize ncurses.
     initscr()?;
     cbreak()?;
@@ -50,10 +50,9 @@ fn menu_test() -> Result<(), NCurseswError> {
     // Crate menu.
     let my_menu = new_menu(&mut items)?;
 
-    let mut menu_opts = MenuOptions::default();
-    menu_opts.set_show_description(true);
+    let menu_opts = MenuOptions::default().set_show_description(true);
 
-    menu_opts_off(my_menu, menu_opts)?;
+    menu_opts_off(Some(my_menu), menu_opts)?;
 
     let my_menu_win = newwin(Size { lines: 9, columns: 18 }, Origin { y: 4, x: 4 })?;
     keypad(my_menu_win, true)?;
@@ -64,7 +63,7 @@ fn menu_test() -> Result<(), NCurseswError> {
     set_menu_sub(Some(my_menu), Some(my_menu_win_der_win))?;
 
     // Set menu mark to the string " * ".
-    set_menu_mark(my_menu, " * ")?;
+    set_menu_mark(Some(my_menu), " * ")?;
 
     // Print a border around the main window.
     r#box(my_menu_win, ChtypeChar::from(0), ChtypeChar::from(0))?;
@@ -78,25 +77,26 @@ fn menu_test() -> Result<(), NCurseswError> {
     post_menu(my_menu)?;
     wrefresh(my_menu_win)?;
 
-    let mut ch = getch()?;
-
-    while ch != CharacterResult::Key(KeyBinding::FunctionKey(1)) {
-        match ch {
-            CharacterResult::Key(KeyBinding::UpArrow)   => {
+    loop {
+        match getch()? {
+            CharacterResult::Key(KeyBinding::FunctionKey(1)) => {
+                break
+            },
+            CharacterResult::Key(KeyBinding::UpArrow)        => {
                 if let Err(source) = menu_driver(my_menu, MenuRequest::UpItem) {
                     if source != request_denied_error() {
                         return Err(NCurseswError::from(source))
                     }
                 }
             },
-            CharacterResult::Key(KeyBinding::DownArrow) => {
+            CharacterResult::Key(KeyBinding::DownArrow)      => {
                 if let Err(source) = menu_driver(my_menu, MenuRequest::DownItem) {
                     if source != request_denied_error() {
                         return Err(NCurseswError::from(source))
                     }
                 }
             },
-            CharacterResult::Character('\n')            => { // Enter
+            CharacterResult::Character('\n')                 => { // Enter
                 origin = Origin { y: 20, x: 0 };
 
                 r#move(origin)?;
@@ -108,8 +108,6 @@ fn menu_test() -> Result<(), NCurseswError> {
         };
 
         wrefresh(my_menu_win)?;
-
-        ch = getch()?;
     }
 
     unpost_menu(my_menu)?;

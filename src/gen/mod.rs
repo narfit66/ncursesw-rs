@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-mod attributescolorpairtype;
-mod attributesgeneric;
 mod attributestype;
 mod colorattributetypes;
 mod colorpaircolors;
@@ -33,8 +31,7 @@ mod getcharactertype;
 mod rawwithnul;
 
 pub use self::{
-    attributescolorpairtype::*, attributesgeneric::*, attributestype::*,
-    colorattributetypes::*, colorpaircolors::*, colorpairtype::*,
-    colorstype::*, colortype::*, getcharactertype::*
+    attributestype::*, colorattributetypes::*, colorpaircolors::*,
+    colorpairtype::*, colorstype::*, colortype::*, getcharactertype::*
 };
 pub(in crate) use crate::gen::{colorpairgeneric::*, rawwithnul::*};

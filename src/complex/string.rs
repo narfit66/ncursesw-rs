@@ -1,7 +1,7 @@
 /*
     src/complex/string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,8 +20,7 @@
     IN THE SOFTWARE.
 */
 
-use std::convert::{From, TryInto, Into};
-
+use std::convert::TryInto;
 use crate::{
     gen::{AttributesType, ColorPairType, ColorAttributeTypes, RawWithNul},
     complex::ComplexChar,
@@ -113,10 +112,7 @@ impl ComplexString {
     }
 
     pub fn pop(&mut self) -> Option<ComplexChar> {
-        match self.raw.pop() {
-            None    => None,
-            Some(c) => Some(ComplexChar::from(c))
-        }
+        self.raw.pop().map(ComplexChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> ComplexChar {
@@ -166,13 +162,14 @@ impl<'a> From<&'a [cchar_t]> for ComplexString {
 
 impl Into<Vec<cchar_t>> for ComplexString {
     fn into(self) -> Vec<cchar_t> {
-        self.raw.to_owned()
+        self.raw
     }
 }
 
 impl RawWithNul<Vec<cchar_t>> for ComplexString {
     fn raw_with_nul(self) -> Vec<cchar_t> {
         let mut raw = self.raw;
+
         raw.push(unsafe { std::mem::zeroed() });
 
         raw.to_owned()

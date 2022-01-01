@@ -1,7 +1,7 @@
 /*
     src/wide/string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -21,8 +21,6 @@
 */
 
 #![allow(clippy::should_implement_trait)]
-
-use std::convert::{From, Into};
 
 use crate::{gen::*, shims::ncurses::wchar_t, wide::WideChar};
 
@@ -78,10 +76,7 @@ impl WideString {
     }
 
     pub fn pop(&mut self) -> Option<WideChar> {
-        match self.raw.pop() {
-            None    => None,
-            Some(c) => Some(WideChar::from(c))
-        }
+        self.raw.pop().map(WideChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> WideChar {
@@ -125,13 +120,14 @@ impl<'a> From<&'a [wchar_t]> for WideString {
 
 impl Into<Vec<wchar_t>> for WideString {
     fn into(self) -> Vec<wchar_t> {
-        self.raw.clone()
+        self.raw
     }
 }
 
 impl RawWithNul<Vec<wchar_t>> for WideString {
     fn raw_with_nul(self) -> Vec<wchar_t> {
         let mut raw: Vec<wchar_t> = Self::into(self);
+
         raw.push(0x00);
 
         raw

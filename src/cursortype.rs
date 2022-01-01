@@ -52,15 +52,6 @@ impl CursorType {
 
 impl Default for CursorType {
     /// The default cursor type
-    ///
-    /// ## Example
-    /// ```rust
-    /// extern crate ncursesw;
-    ///
-    /// use ncursesw::*;
-    ///
-    /// assert_eq!(CursorType::default(), CursorType::Visible);
-    /// ```
     fn default() -> Self {
         CursorType::Visible
     }

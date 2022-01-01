@@ -23,7 +23,6 @@
 #![allow(non_camel_case_types)]
 
 extern crate libc;
-extern crate custom_error;
 extern crate ascii;
 extern crate semver;
 extern crate errno;
@@ -92,7 +91,6 @@ mod complex;
 mod wide;
 
 mod attributescolorpairset;
-mod basecolor;
 mod characterresult;
 mod cstring;
 mod changed;
@@ -113,10 +111,9 @@ mod softlabeltype;
 pub use crate::{
     chtypet::*, complex::*, wide::*,
 
-    attributescolorpairset::*, basecolor::*, characterresult::*,
-    changed::*, cursortype::*, funcs::*, gen::*, justification::*,
-    keybinding::*, legacy::*, ncurses::*, ncursescolortype::*,
-    ncurseswerror::*, origin::*, orientation::*, region::*,
+    attributescolorpairset::*, characterresult::*, changed::*, cursortype::*,
+    funcs::*, gen::*, justification::*, keybinding::*, legacy::*, ncurses::*,
+    ncursescolortype::*, ncurseswerror::*, origin::*, orientation::*, region::*,
     size::*, softlabeltype::*
 };
 use crate::shims::*;

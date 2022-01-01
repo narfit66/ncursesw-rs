@@ -2,7 +2,7 @@
 #
 #    ncurses-install
 #
-#    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+#    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 #
 #    Permission is hereby granted, free of charge, to any person obtaining a copy
 #    of this software and associated documentation files (the "Software"),
@@ -31,14 +31,15 @@ package="ncurses"
 
 source ".$package"
 
-apt-get update
+apt update
 rc=$?
 
 [[ $rc -ne 0 ]] && exit $rc
 
-apt-get -y install wget \
-                   pkg-config \
-                   build-essential
+apt install --yes \
+            wget \
+            pkg-config \
+            build-essential
 rc=$?
 
 [[ $rc -ne 0 ]] && exit $rc
@@ -51,7 +52,7 @@ if [[ ! -d "$install_dir" ]] ; then
     [[ $rc -ne 0 ]] && exit $rc
 fi
 
-cd "$install_dir"
+pushd "$install_dir"
 rc=$?
 
 [[ $rc -ne 0 ]] && exit $rc

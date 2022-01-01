@@ -21,13 +21,12 @@
 */
 
 use std::{
-    convert::{TryFrom, From, TryInto, Into},
+    convert::{TryFrom, TryInto},
     char::{
         CharTryFromError, EscapeUnicode, EscapeDebug,
         EscapeDefault, ToLowercase, ToUppercase
     }
 };
-
 use crate::{
     ncurseswerror::NCurseswError,
     shims::{
@@ -49,161 +48,161 @@ impl WideChar {
 
     pub fn is_digit(self, radix: u32) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_digit(radix)
         }
     }
 
     pub fn to_digit(self, radix: u32) -> Option<u32> {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.to_digit(radix)
         }
     }
 
     pub fn escape_unicode(self) -> EscapeUnicode {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.escape_unicode()
         }
     }
 
     pub fn escape_debug(self) -> EscapeDebug {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.escape_debug()
         }
     }
 
     pub fn escape_default(self) -> EscapeDefault {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.escape_default()
         }
     }
 
     pub fn len_utf8(self) -> usize {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.len_utf8()
         }
     }
 
     pub fn len_utf16(self) -> usize {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.len_utf16()
         }
     }
 
     pub fn encode_utf8(self, dst: &mut [u8]) -> &mut str {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.encode_utf8(dst)
         }
     }
 
     pub fn encode_utf16(self, dst: &mut [u16]) -> &mut [u16] {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.encode_utf16(dst)
         }
     }
 
     pub fn is_alphabetic(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_alphabetic()
         }
     }
 
     pub fn is_lowercase(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_lowercase()
         }
     }
 
     pub fn is_uppercase(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_uppercase()
         }
     }
 
     pub fn is_whitespace(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_whitespace()
         }
     }
 
     pub fn is_alphanumeric(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_alphanumeric()
         }
     }
 
     pub fn is_control(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_control()
         }
     }
 
     pub fn is_numeric(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_numeric()
         }
     }
 
     pub fn to_lowercase(self) -> ToLowercase {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.to_lowercase()
         }
     }
 
     pub fn to_uppercase(self) -> ToUppercase {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.to_uppercase()
         }
     }
 
     pub fn is_ascii(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii()
         }
     }
 
     pub fn to_ascii_uppercase(self) -> char {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.to_ascii_uppercase()
         }
     }
 
     pub fn to_ascii_lowercase(self) -> char {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.to_ascii_lowercase()
         }
     }
 
     pub fn eq_ignore_ascii_case(self, other: char) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.eq_ignore_ascii_case(&other)
         }
     }
 
     pub fn make_ascii_uppercase(&mut self) {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => {
                 let mut ascii = c;
                 ascii.make_ascii_uppercase();
@@ -215,7 +214,7 @@ impl WideChar {
 
     pub fn make_ascii_lowercase(&mut self) {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => {
                 let mut ascii = c;
                 ascii.make_ascii_lowercase();
@@ -227,70 +226,70 @@ impl WideChar {
 
     pub fn is_ascii_alphabetic(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_alphabetic()
         }
     }
 
     pub fn is_ascii_uppercase(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_uppercase()
         }
     }
 
     pub fn is_ascii_lowercase(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_lowercase()
         }
     }
 
     pub fn is_ascii_alphanumeric(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_alphanumeric()
         }
     }
 
     pub fn is_ascii_digit(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_digit()
         }
     }
 
     pub fn is_ascii_hexdigit(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_hexdigit()
         }
     }
 
     pub fn is_ascii_punctuation(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_punctuation()
         }
     }
 
     pub fn is_ascii_graphic(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_graphic()
         }
     }
 
     pub fn is_ascii_whitespace(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_whitespace()
         }
     }
 
     pub fn is_ascii_control(self) -> bool {
         match self.as_char() {
-            Err(e) => panic!(e),
+            Err(e) => panic!("{}", e),
             Ok(c)  => c.is_ascii_control()
         }
     }
@@ -300,9 +299,7 @@ impl WideChar {
     }
 
     pub fn as_char(self) -> result!(char) {
-        let ch = char::try_from(self.raw)?;
-
-        Ok(ch)
+        Ok(char::try_from(self.raw)?)
     }
 }
 

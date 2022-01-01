@@ -27,7 +27,7 @@ pub mod bindings;
 /// Defined constatnts.
 pub mod constants;
 /// Utility functions thin API wrapper with assertions as appropriate.
-pub mod funcs;
+pub(in crate) mod funcs;
 /// Main ncurses functions thin API wrapper with assertions as appropriate
 ///
 /// Most of the functions are `unsafe`.

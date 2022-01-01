@@ -25,12 +25,12 @@ extern crate ncursesw;
 use ncursesw::*;
 
 fn main() {
-    if let Err(source) = menu_test() {
+    if let Err(source) = menu_routine() {
         eprintln!("error: {}", source);
     }
 }
 
-fn menu_test() -> Result<(), NCurseswError> {
+fn menu_routine() -> Result<(), NCurseswError> {
     // initialize ncurses.
     initscr()?;
     cbreak()?;

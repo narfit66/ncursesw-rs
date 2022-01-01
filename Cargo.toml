@@ -1,8 +1,8 @@
 [package]
 name = "ncursesw"
-version = "0.5.2"
+version = "0.6.0"
 authors = [ "Steve Whittle <narfit66@googlemail.com>" ]
-edition = "2018"
+edition = "2021"
 description = "A fat wrapper around the NCurses TUI library"
 homepage = "https://lib.rs/crates/ncursesw"
 repository = "https://github.com/narfit66/ncursesw-rs"
@@ -22,17 +22,17 @@ is-it-maintained-open-issues = { repository = "narfit66/ncursesw-rs" }
 [dependencies]
 libc = "0.2"
 errno = "0.2"
-custom_error = "1.7"
+thiserror = "1.0"
 ascii = "1.0"
-semver = "0.9"
+semver = "1.0"
 lazy_static = "1.4"
 
 [dev-dependencies]
-gettext-rs = "0.4"
+gettext-rs = "0.7"
 
 [build-dependencies]
 pkg-config = "0.3"
-bindgen = "0.53"
+bindgen = "0.59"
 
 [features]
 # conditional compulation of KEY_RESIZE to return as a NCurseswError::KeyResize (the default) for getch(), mvgetch(),

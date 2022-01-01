@@ -1,7 +1,7 @@
 /*
     src/include/rgb.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -22,8 +22,8 @@
 
 macro_rules! define_rgb {
     ($type: ty) => {
-        /// The (R)ed (G)reen (B)lue content of a color.
-        #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+        /// The (R)ed, (G)reen and (B)lue content of a color.
+        #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
         pub struct RGB {
             red:   $type,
             green: $type,
@@ -31,8 +31,12 @@ macro_rules! define_rgb {
         }
 
         impl RGB {
-            /// Create a new instance.
+            /// Create a new rgb instance.
             pub fn new(red: $type, green: $type, blue: $type) -> Self {
+                assert!((0..=1000).contains(&red));
+                assert!((0..=1000).contains(&green));
+                assert!((0..=1000).contains(&blue));
+
                 Self { red, green, blue }
             }
 

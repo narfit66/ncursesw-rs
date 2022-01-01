@@ -20,12 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use crate::{
-    gen::ColorsType,
-    extend::Color,
-    ncursescolortype::NCursesColorType
-};
+use crate::{gen::ColorsType, extend::Color};
 
 include!("../include/colors.rs");
 
-define_colors!(i32, NCursesColorType::Extended);
+define_colors!(i32);

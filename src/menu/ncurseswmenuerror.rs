@@ -21,39 +21,56 @@
 */
 
 use std::{num, ffi, convert};
-
 use errno::{Errno, errno};
-
+use thiserror::Error;
 use crate::shims::constants;
 
-custom_error::custom_error! {
 /// NCursesw menu errors.
-#[derive(PartialEq, Eq)]
-pub NCurseswMenuError
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum NCurseswMenuError {
     /// Routine detected an incorrect or out-of-range argument.
-    BadArgument { func: String } = "nmenu::{func}() : bad argument",
-    BadState { func: String } = "nmenu::{func}() : bad state",
+    #[error("nmenu::{func}() : bad argument")]
+    BadArgument { func: String },
+    #[error("nmenu::{func}() : bad state")]
+    BadState { func: String },
     /// Item is connected to a menu.
-    Connected { func: String } = "nmenu::{func}() : connected",
-    Current { func: String } = "nmenu::{func}() : current",
-    InvalidField { func: String } = "nmenu::{func}() : invalid field",
-    NotConnected { func: String } = "nmenu::{func}() : not connected",
-    NotPosted { func: String } = "nmenu::{func}() : not posted",
-    NotSelectable { func: String } = "nmenu::{func}() : not selectable",
-    NoMatch { func: String } = "nmenu::{func}() : no match",
-    NoRoom { func: String } = "nmenu::{func}() : no room",
+    #[error("nmenu::{func}() : connected")]
+    Connected { func: String },
+    #[error("nmenu::{func}() : current")]
+    Current { func: String },
+    #[error("nmenu::{func}() : invalid field")]
+    InvalidField { func: String },
+    #[error("nmenu::{func}() : not connected")]
+    NotConnected { func: String },
+    #[error("nmenu::{func}() : not connected")]
+    NotPosted { func: String },
+    #[error("nmenu::{func}() : not selectable")]
+    NotSelectable { func: String },
+    #[error("nmenu::{func}() : no match")]
+    NoMatch { func: String },
+    #[error("nmenu::{func}() : no room")]
+    NoRoom { func: String },
     /// The routine succeeded.
-    Ok { func: String } = "nmenu::{func}() : ok",
-    Posted { func: String } = "nmenu::{func}() : posted",
-    RequestDenied { func: String } = "nmenu::{func}() : request denied",
+    #[error("nmenu::{func}() : ok")]
+    Ok { func: String },
+    #[error("nmenu::{func}() : posted")]
+    Posted { func: String },
+    #[error("nmenu::{func}() : request denied")]
+    RequestDenied { func: String },
     /// System error occurred, (see errno)
-    SystemError { func: String, errno: Errno } = @{ format!("nmenu::{}() : {} (#{})", func, errno, errno.0) },
-    UnknownCommand { func: String } = "nmenu::{func}() : unknown command",
-    UnknownError { func: String, errno: i32 } = "nmenu::{func} : error number {errno}",
+    #[error("nmenu::{}() : {} (#{})", func, errno, errno.0)]
+    SystemError { func: String, errno: Errno },
+    #[error("nmenu::{func}() : unknown command")]
+    UnknownCommand { func: String },
+    #[error("nmenu::{func} : error number {errno}")]
+    UnknownError { func: String, errno: i32 },
 
-    IntError { source: num::TryFromIntError } = "{source}",
-    NulError { source: ffi::NulError } = "{source}",
-    Infallible { source: convert::Infallible } = "{source}"
+    #[error("{source}")]
+    IntError { #[from] source: num::TryFromIntError },
+    #[error("{source}")]
+    NulError { #[from] source: ffi::NulError },
+    #[error("{source}")]
+    Infallible { #[from] source: convert::Infallible }
 }
 
 pub fn ncursesw_menu_error_from_rc(func: &str, err: i32) -> NCurseswMenuError {

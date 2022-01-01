@@ -1,7 +1,7 @@
 /*
     src/chtypet/string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,10 +20,8 @@
     IN THE SOFTWARE.
 */
 
-use std::{convert::{From, Into}, ops::{BitOr, BitXor}};
-
+use std::ops::{BitOr, BitXor};
 use ascii::AsciiString;
-
 use crate::{
     gen::*,
     chtypet::ChtypeChar,
@@ -83,10 +81,7 @@ impl ChtypeString {
     }
 
     pub fn pop(&mut self) -> Option<ChtypeChar> {
-        match self.raw.pop() {
-            None    => None,
-            Some(c) => Some(ChtypeChar::from(c))
-        }
+        self.raw.pop().map(ChtypeChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> ChtypeChar {
@@ -160,13 +155,14 @@ impl<'a> From<&'a [chtype]> for ChtypeString {
 
 impl Into<Vec<chtype>> for ChtypeString {
     fn into(self) -> Vec<chtype> {
-        self.raw.clone()
+        self.raw
     }
 }
 
 impl RawWithNul<Vec<chtype>> for ChtypeString {
     fn raw_with_nul(self) -> Vec<chtype> {
         let mut vec_of_chtype: Vec<chtype> = Self::into(self);
+
         vec_of_chtype.push(0x00);
 
         vec_of_chtype

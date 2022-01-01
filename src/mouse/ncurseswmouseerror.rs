@@ -1,7 +1,7 @@
 /*
     src/mouse/ncurseswmouseerror.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -21,11 +21,14 @@
 */
 
 use std::num;
+use thiserror::Error;
+use crate::ncurseswerror::{rc_error, os_level_error};
 
-custom_error::custom_error! {
 /// NCursesw mouse errors.
-#[derive(PartialEq, Eq)]
-pub NCurseswMouseError
-    LibraryError { func: String, rc: i32 } = "nmouse::{func}() (#{rc})",
-    IntError { source: num::TryFromIntError } = "{source}"
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum NCurseswMouseError {
+    #[error("nmouse::{func}(){}{}", rc_error(*rc), os_level_error())]
+    LibraryError { func: String, rc: Option<i32> },
+    #[error("{source}")]
+    IntError { #[from] source: num::TryFromIntError }
 }

@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(clippy::trivially_copy_pass_by_ref)]
+
 /// The soft-label layout type
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SoftLabelType {
@@ -28,15 +30,41 @@ pub enum SoftLabelType {
     /// A four-four layout
     FourFour,
     /// A four-four layout with an index
-    FourFourIndex
+    FourFourFour,
+    /// A four-four layout with an index
+    FourFourFourIndex
 }
 
 impl SoftLabelType {
-    pub(in crate) fn value(self) -> i32 {
+    pub(in crate) fn value(&self) -> i32 {
         match self {
-            SoftLabelType::ThreeTwoThree => 0,
-            SoftLabelType::FourFour      => 1,
-            SoftLabelType::FourFourIndex => 2
+            SoftLabelType::ThreeTwoThree     => 0,
+            SoftLabelType::FourFour          => 1,
+            SoftLabelType::FourFourFour      => 2,
+            SoftLabelType::FourFourFourIndex => 3
+        }
+    }
+
+    /// Returns the minimum label number.
+    pub fn min_label(&self) -> i32 {
+        1
+    }
+
+    /// Returns the maximum label number.
+    pub fn max_label(&self) -> i32 {
+        if *self == SoftLabelType::ThreeTwoThree || *self == SoftLabelType::FourFour {
+            8
+        } else {
+            12
+        }
+    }
+
+    /// Returns the maximum label length.
+    pub fn max_label_len(&self) -> i32 {
+        if *self == SoftLabelType::ThreeTwoThree || *self == SoftLabelType::FourFour {
+            8
+        } else {
+            5
         }
     }
 }

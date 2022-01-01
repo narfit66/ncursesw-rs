@@ -1,7 +1,7 @@
 /*
     src/normal/mod.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -24,11 +24,13 @@ mod attribute;
 mod attributes;
 mod attributescolorpair;
 mod color;
+mod colorpalette;
 mod colorpair;
 mod colors;
+mod funcs;
 mod rgb;
 
 pub use self::{
     attribute::*, attributes::*, attributescolorpair::*, color::*,
-    colorpair::*, colors::*, rgb::*
+    colorpalette::*, colorpair::*, colors::*, funcs::*, rgb::*
 };

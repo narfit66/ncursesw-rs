@@ -25,6 +25,7 @@
 
 use crate::{
     normal::{Attribute, ColorPair},
+    gen::ColorPairType,
     ncurses::{COLOR_PAIR, PAIR_NUMBER},
     shims::ncurses::short_t
 };
@@ -34,31 +35,37 @@ include!("../include/attributes.rs");
 impl_attributes_type!(short_t);
 
 impl Attributes {
+    /// Return the `ColorPair` associated with the `Attributes`.
     pub fn color_pair(&self) -> ColorPair {
-        PAIR_NUMBER(*self)
+        ColorPair::_from(self.screen, PAIR_NUMBER(self.raw))
     }
 }
 
-/// Implement the | operator for setting a color pair on an `Attributes` object
+/// Implement the | operator for setting a `ColorPair` on a `Attributes`.
 ///
 /// Note: as only one color pair can be applied to attributes at any one time any previously Or'd
-/// color_pair will be Xor'd out of the attributes before Or'ing the new color pair..
+/// color_pair will be Xor'd out of the attributes before Or'ing the new color pair.
 impl BitOr<ColorPair> for Attributes {
     type Output = Attributes;
 
     fn bitor(mut self, rhs: ColorPair) -> Self::Output {
-        self.raw ^= COLOR_PAIR(self.color_pair());
-        self.raw |= COLOR_PAIR(rhs);
+        assert!(self.screen == rhs.screen());
+
+        self.raw ^= COLOR_PAIR(i32::from(self.color_pair().number()));
+        self.raw |= COLOR_PAIR(i32::from(rhs.number()));
 
         self
     }
 }
 
+/// Implement the ^ operator for removing a `ColorPair` on a `Attributes`.
 impl BitXor<ColorPair> for Attributes {
     type Output = Self;
 
     fn bitxor(mut self, rhs: ColorPair) -> Self::Output {
-        self.raw ^= COLOR_PAIR(rhs);
+        assert!(self.screen == rhs.screen());
+
+        self.raw ^= COLOR_PAIR(i32::from(rhs.number()));
 
         self
     }

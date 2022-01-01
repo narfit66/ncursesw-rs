@@ -1,7 +1,7 @@
 /*
     src/shims/nmouse.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -21,7 +21,6 @@
 */
 
 #![allow(non_camel_case_types)]
-#![allow(clippy::missing_safety_doc)]
 
 use crate::{bindings, shims};
 
@@ -33,6 +32,8 @@ pub type MEVENT = *mut bindings::MEVENT;
 
 static MODULE_PATH: &str = "ncursesw::shims::nmouse::";
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn getmouse(event: MEVENT) -> i32 {
     assert!(!event.is_null(), "{}getmouse() : event.is_null()", MODULE_PATH);
@@ -45,6 +46,8 @@ pub fn has_mouse() -> bool {
     unsafe { bindings::has_mouse() }
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn mouse_trafo(py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
     assert!(!py.is_null(), "{}mouse_trafo : py.is_null()", MODULE_PATH);
@@ -55,9 +58,13 @@ pub unsafe fn mouse_trafo(py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
 
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub fn mouseinterval(erval: i32) -> i32 {
+    assert!(erval >= -1, "{}mouseinterval() : erval = {}", MODULE_PATH, erval);
+
     unsafe { bindings::mouseinterval(erval) }
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmask_t {
     assert!(oldmask.map_or_else(|| true, |oldmask| !oldmask.is_null()), "{}mousemask() : oldmask.is_null()", MODULE_PATH);
@@ -65,6 +72,8 @@ pub unsafe fn mousemask(newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmas
     bindings::mousemask(newmask, return_mut_ptr!(oldmask))
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn ungetmouse(event: MEVENT) -> i32 {
     assert!(!event.is_null(), "{}ungetmouse() : event.is_null()", MODULE_PATH);
@@ -72,6 +81,8 @@ pub unsafe fn ungetmouse(event: MEVENT) -> i32 {
     bindings::ungetmouse(event)
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn wenclose(win: WINDOW, y: i32, x: i32) -> bool {
     assert!(!win.is_null(), "{}wenclose() : win.is_null()", MODULE_PATH);
@@ -81,6 +92,8 @@ pub unsafe fn wenclose(win: WINDOW, y: i32, x: i32) -> bool {
     bindings::wenclose(win, y, x)
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_mouse.3x.html>
 pub unsafe fn wmouse_trafo(win: WINDOW, py: *mut i32, px: *mut i32, to_screen: bool) -> bool {
     assert!(!win.is_null(), "{}wmouse_trafo() : win.is_null()", MODULE_PATH);
@@ -90,6 +103,8 @@ pub unsafe fn wmouse_trafo(win: WINDOW, py: *mut i32, px: *mut i32, to_screen: b
     bindings::wmouse_trafo(win, py, px, to_screen)
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn getmouse_sp(sp: SCREEN, event: MEVENT) -> i32 {
     assert!(!sp.is_null(), "{}getmouse_sp() : sp.is_null()", MODULE_PATH);
@@ -98,6 +113,8 @@ pub unsafe fn getmouse_sp(sp: SCREEN, event: MEVENT) -> i32 {
     bindings::getmouse_sp(sp, event)
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn has_mouse_sp(sp: SCREEN) -> bool {
     assert!(!sp.is_null(), "{}has_mouse_sp() : sp.is_null()", MODULE_PATH);
@@ -105,13 +122,18 @@ pub unsafe fn has_mouse_sp(sp: SCREEN) -> bool {
     bindings::has_mouse_sp(sp)
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn mouseinterval_sp(sp: SCREEN, erval: i32) -> i32 {
     assert!(!sp.is_null(), "{}mouseinterval_sp() : sp.is_null()", MODULE_PATH);
+    assert!(erval >= -1, "{}mouseinterval_sp() : erval = {}", MODULE_PATH, erval);
 
     bindings::mouseinterval_sp(sp, erval)
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn mousemask_sp(sp: SCREEN, newmask: mmask_t, oldmask: Option<*mut mmask_t>) -> mmask_t {
     assert!(!sp.is_null(), "{}mousemask_sp() : sp.is_null()", MODULE_PATH);
@@ -120,6 +142,8 @@ pub unsafe fn mousemask_sp(sp: SCREEN, newmask: mmask_t, oldmask: Option<*mut mm
     bindings::mousemask_sp(sp, newmask, return_mut_ptr!(oldmask))
 }
 
+/// # Safety
+///
 /// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
 pub unsafe fn ungetmouse_sp(sp: SCREEN, event: MEVENT) -> i32 {
     assert!(!sp.is_null(), "{}ungetmouse_sp() : sp.is_null()", MODULE_PATH);

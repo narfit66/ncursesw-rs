@@ -1,7 +1,7 @@
 /*
     src/ncurses.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -23,13 +23,13 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(clippy::too_many_arguments)]
+#![allow(clippy::unit_arg)]
 
-use libc::{c_void, EINTR};
 use std::{
-    convert::{From, TryFrom}, char, ptr, slice, time, mem,
-    path::Path, os::unix::io::AsRawFd, io::{Write, Read}
+    convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
+    ffi, path::Path, os::unix::io::AsRawFd, io::{Write, Read}
 };
-
+use libc::{c_void, EINTR};
 use crate::{
     constants::{
         ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
@@ -43,6 +43,9 @@ use crate::{
     ncurseswerror::*, region::*, size::*, softlabeltype::*,
     shims::{funcs, ncurses, bindings}
 };
+
+macro_rules! path_to_cstring_as_slice { ($name: ident) => { &*(path_to_cstring_as_vec($name)?.as_slice() as *const [u8] as *const [i8]) } }
+macro_rules! str_to_cstring_as_slice { ($name: ident) => { &*(str_to_cstring_as_vec($name)?.as_slice() as *const [u8] as *const [i8]) } }
 
 static MODULE_PATH: &str = "ncursesw::ncurses::";
 
@@ -80,7 +83,7 @@ pub fn stdscr() -> WINDOW {
 }
 
 pub fn ttytype() -> result!(String) {
-    unsafe { ncurses::ttytype().ok_or(ncurses_function_error!("ttytype")) }
+    ncurses::ttytype().ok_or(ncurses_function_error!("ttytype"))
 }
 
 /// Return the number of colors available.
@@ -88,16 +91,16 @@ pub fn COLORS() -> i32 {
     ncurses::COLORS()
 }
 
-#[deprecated(since = "0.4.0", note = "no publicly exposed equivalent.")]
+#[deprecated(since = "0.4.0", note = "use shims::ncurses::COLOR_PAIR() instead")]
 /// Return the attribute value of a given `normal` color pair.
-pub fn COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t {
-    ncurses::COLOR_PAIR(normal::ColorPair::into(color_pair)) as attr_t
+pub fn COLOR_PAIR(color_pair: i32) -> attr_t {
+    ncurses::COLOR_PAIR(color_pair) as attr_t
 }
 
 #[deprecated(since = "0.4.0", note = "use normal::Attributes::color_pair() instead")]
-/// Return the color pair from  given `normal` attributes value.
-pub fn PAIR_NUMBER(attrs: normal::Attributes) -> normal::ColorPair {
-    normal::ColorPair::_from(None, ncurses::PAIR_NUMBER(normal::Attributes::into(attrs)) as short_t)
+/// Return the color pair number from  given `normal` attributes value.
+pub fn PAIR_NUMBER(attrs: attr_t) -> short_t {
+    ncurses::PAIR_NUMBER(attrs.try_into().unwrap()) as short_t
 }
 
 /// Return the number of color pairs available.
@@ -212,7 +215,7 @@ pub fn addwstr(wstr: &WideString) -> result!(()) {
 /// The following are equivalent:
 /// ```text
 /// use_default_colors()?;
-/// assume_default_colors(Colors::new(Color::TerminalDefault, Color::TerminalDefault));
+/// assume_default_colors(Colors::default())?;
 /// ```
 pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
     where S: ColorsType<C, T>,
@@ -227,7 +230,31 @@ pub fn assume_default_colors<S, C, T>(colors: S) -> result!(())
 
 /// Equivalent of `wattr_get()` using `stdscr()` as window `handle`.
 pub fn attr_get() -> result!(AttributesColorPairSet) {
-    _attr_get(None)
+    let mut attrs: [attr_t; 1] = [0];
+    let mut color_pair: [short_t; 1] = [0];
+    let mut opts: [i32; 1] = [0];
+
+    match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
+        OK => Ok(match ncurses_colortype() {
+            NCursesColorType::Normal => {
+                AttributesColorPairSet::Normal(
+                    normal::AttributesColorPair::new(
+                        normal::Attributes::_from(None, attrs[0]),
+                        normal::ColorPair::_from(None, color_pair[0])
+                    )
+                )
+            },
+            NCursesColorType::Extend => {
+                AttributesColorPairSet::Extend(
+                    extend::AttributesColorPair::new(
+                        extend::Attributes::_from(None, attrs[0]),
+                        extend::ColorPair::_from(None, opts[0])
+                    )
+                )
+            }
+        }),
+        rc => Err(ncurses_function_error_with_rc!("attr_get", rc))
+    }
 }
 
 /// Equivalent of `wattr_off()` using `stdscr()` as window `handle`.
@@ -474,17 +501,17 @@ pub fn clrtoeol() -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::Color::rgb() or shims::ncurses::color_content() instead")]
 /// Return the intensity of the red, green, and blue (RGB) components in
 /// the color, which must be between 0 and COLORS. Return a structure,
 /// containing the R,G,B values for the given color, which will be
 /// between 0 (no component) and 1000 (maximum amount of component).
-pub fn color_content(color: normal::Color) -> result!(normal::RGB) {
+pub fn color_content(color_number: short_t) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
     let mut b: [short_t; 1] = [0];
 
-    match unsafe { ncurses::color_content(normal::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::color_content(color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(normal::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("color_content", rc))
     }
@@ -575,7 +602,7 @@ pub fn def_shell_mode() -> result!(()) {
 /// is negative or zero, any existing string for the given definition
 /// is removed.
 pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key(option_str_as_ptr(definition)?, KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key(option_str_as_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key", rc))
     }
@@ -716,27 +743,27 @@ pub fn erasewchar() -> result!(WideChar) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::rgb() or shims::ncurses::extended_color_content() instead")]
 /// The extended color version of the `color_content()` routine.
-pub fn extended_color_content(color: extend::Color) -> result!(extend::RGB) {
+pub fn extended_color_content(color_number: i32) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
     let mut b: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_color_content(extend::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::extended_color_content(color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(extend::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("extended_color_content", rc))
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::colors() or shims::ncurses::extended_pair_content() instead")]
 /// The extended color version of the `pair_content()` routine.
-pub fn extended_pair_content(color_pair: extend::ColorPair) -> result!(extend::Colors) {
+pub fn extended_pair_content(color_pair: i32) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_pair_content(extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0]))),
+    match unsafe { ncurses::extended_pair_content(color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(extend::Colors::new(extend::Color::_from(None, extend::ColorPalette::_from(fg[0])), extend::Color::_from(None, extend::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("extended_pair_content", rc))
     }
 }
@@ -862,7 +889,7 @@ pub fn get_wstr() -> result!(WideString) {
 /// wide-character library configuration, color pairs may not fit into
 /// a chtype, so `wattr_get()` is the only way to obtain the color information.
 pub fn getattrs(handle: WINDOW) -> normal::Attributes {
-    normal::Attributes::from(unsafe { ncurses::getattrs(handle) as attr_t })
+    normal::Attributes::_from(None, unsafe { ncurses::getattrs(handle) as attr_t })
 }
 
 /// Return a `x` of co-ordinates of upper-left corner.
@@ -918,7 +945,45 @@ pub fn getbkgrnd() -> result!(ComplexChar) {
 
 /// Get a widecharacter string and rendition from a complex character.
 pub fn getcchar(wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    _getcchar(None, wcval)
+    let mut wch: [wchar_t; bindings::CCHARW_MAX as usize] = [0; bindings::CCHARW_MAX as usize];
+    let mut attrs: [attr_t; 1] = [0];
+    let mut color_pair: [short_t; 1] = [0];
+    let opts: *mut i32 = ptr::null_mut();
+
+    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, ext_color_pair: i32| -> AttributesColorPairSet {
+        match ncurses_colortype() {
+            NCursesColorType::Normal   => {
+                AttributesColorPairSet::Normal(
+                    normal::AttributesColorPair::new(
+                        normal::Attributes::_from(None, attrs),
+                        normal::ColorPair::_from(None, color_pair)
+                    )
+                )
+            },
+            NCursesColorType::Extend => {
+                AttributesColorPairSet::Extend(
+                    extend::AttributesColorPair::new(
+                        extend::Attributes::_from(None, attrs),
+                        extend::ColorPair::_from(None, ext_color_pair)
+                    )
+                )
+            }
+        }
+    };
+
+    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
+        OK => {
+            // TODO : get opts working correct so not to rely on bodge!
+            //assert!(!opts.is_null(), "{}getcchar() : opts.is_null()", MODULE_PATH);
+            //
+            //Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], unsafe { ptr::read(opts) })))
+
+            let c: cchar_t = ComplexChar::into(wcval); // bodge to get extended color pair.
+
+            Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
+        },
+        rc => Err(ncurses_function_error_with_rc!("getcchar", rc))
+    }
 }
 
 /// Equivalent of `wgetch()` using `stdscr()` as window `handle`.
@@ -932,7 +997,7 @@ pub fn getch() -> result!(CharacterResult<char>) {
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -1099,20 +1164,20 @@ pub fn getstr() -> result!(String) {
 }
 
 /// Return the current coordinates of the virtual screen cursor.
-/// If leaveok is currently `true`, then return `Origin { y: -1, x: -1 }`.
-pub fn getsyx() -> result!(Origin) {
+/// If `leaveok()` is currently `true`, then return `None`.
+pub fn getsyx() -> result!(Option<Origin>) {
     if is_leaveok(newscr()) {
-        Ok(Origin { y: -1, x: -1 })
+        Ok(None)
     } else {
-        getcuryx(newscr())
+        Ok(Some(getcuryx(newscr())?))
     }
 }
 
 /// Read window related data stored in the file by an earlier `putwin()` call.
 /// The routine then creates and initializes a new window using that data,
 /// returning the new window object.
-pub fn getwin<I: AsRawFd + Read>(file: I) -> result!(WINDOW) {
-    unsafe { ncurses::getwin(fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin")) }
+pub fn getwin<I: AsRawFd + Read>(file: &I) -> result!(WINDOW) {
+    unsafe { ncurses::getwin(fdopen(file, "r")?).ok_or(ncurses_function_error!("getwin")) }
 }
 
 /// Used for half-delay mode, which is similar to cbreak mode in that characters
@@ -1279,7 +1344,7 @@ pub fn inchstr() -> result!(ChtypeString) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::Color::set_rgb() or shims::ncurses::init_color() instead")]
 /// Change the definition of a color, taking the number of the color to be
 /// changed followed by three RGB values (for the amounts of red, green,
 /// and blue components). The value of color_number must be between 0 and
@@ -1287,7 +1352,7 @@ pub fn inchstr() -> result!(ChtypeString) {
 /// `init_color()` is used, all occurrences of that color on the screen
 /// immediately change to the new definition. This function is a no-op on
 /// most terminals; it is active only if `can_change_color()` returns `true`.
-pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
+pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(()) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
@@ -1295,68 +1360,60 @@ pub fn init_color(color_number: short_t, rgb: normal::RGB) -> result!(normal::Co
             OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
-                Ok(normal::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_color", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::Color::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::set_rgb() or shims::ncurses::init_extended_color() instead")]
 /// The extended color version of the `init_color()` routine.
-pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
+pub fn init_extended_color(color_number: i32, rgb: extend::RGB) -> result!(()) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
         match ncurses::init_extended_color(color_number, rgb.red(), rgb.green(), rgb.blue()) {
             OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
+                set_ncurses_colortype(NCursesColorType::Extend);
 
-                Ok(extend::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_extended_color", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::ColorPair::new() or shims::ncurses::init_extended_pair() instead")]
 /// The extended color version of the `init_pair()` routine.
-pub fn init_extended_pair(pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if pair_number >= COLOR_PAIRS() {
+pub fn init_extended_pair(color_pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
+    if color_pair < 1 || color_pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_extended_pair(pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
-
-                Ok(extend::ColorPair::_from(None, pair_number))
-            },
+        match ncurses::init_extended_pair(color_pair, colors.foreground().number(), colors.background().number()) {
+            OK => Ok(extend::ColorPair::_from(None, color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_extended_pair", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::new() or shims::ncurses::init_pair() instead")]
 /// Change the definition of a color-pair. It takes two arguments: the number
 /// of the color-pair to be changed, and the foreground and background colors.
-/// The value of pair_number must be between 1 and COLOR_PAIRS - 1 (the 0 color
+/// The value of color_pair must be between 1 and COLOR_PAIRS - 1 (the 0 color
 /// pair is wired to white on black and cannot be changed).
 /// If the color-pair was previously initialized, the screen is refreshed and
 /// all occurrences of that color-pair are changed to the new definition.
-pub fn init_pair(pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(pair_number) >= COLOR_PAIRS() {
+pub fn init_pair(color_pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
+    if color_pair < 1 || i32::from(color_pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match ncurses::init_pair(pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Normal);
-
-                Ok(normal::ColorPair::_from(None, pair_number))
-            },
+        match ncurses::init_pair(color_pair, short_t::try_from(colors.foreground().number())?, short_t::try_from(colors.background().number())?) {
+            OK => Ok(normal::ColorPair::_from(None, color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_pair", rc))
         }
     }
@@ -1503,9 +1560,8 @@ pub fn instr() -> result!(String) {
 /// the interrupt, but causing NCurses to have the wrong idea of what is on the
 /// screen. Disabling the option (`flag` is `false`) prevents the flush.
 /// The default for the option is inherited from the tty driver settings.
-/// The window argument is ignored.
-pub fn intrflush(handle: WINDOW, flag: bool) -> result!(()) {
-    match unsafe { ncurses::intrflush(handle, flag) } {
+pub fn intrflush(flag: bool) -> result!(()) {
+    match unsafe { ncurses::intrflush(ptr::null_mut(), flag) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("intrflush", rc))
     }
@@ -1612,27 +1668,29 @@ pub fn isendwin() -> bool {
     ncurses::isendwin()
 }
 
-/// Permits an application to determine if a string is currently bound
-/// to any `KeyBindind`.
-pub fn key_defined(definition: &str) -> result!(KeyBinding) {
-    let c = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
+/// Permits an application to determine if a string represented
+/// as individual bytes is currently bound to any `KeyBindind`.
+pub fn key_defined(definition: &str) -> result!(Option<KeyBinding>) {
+    let rc = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
 
-    if c.is_negative() {
-        Err(ncurses_function_error_with_rc!("key_defined", c))
+    if rc.is_negative() {
+        Err(ncurses_function_error_with_rc!("key_defined", rc))
+    } else if rc == 0 {
+        Ok(None)
     } else {
-        Ok(KeyBinding::from(c))
+        Ok(Some(KeyBinding::from(rc)))
     }
 }
 
 /// Returns a string corresponding to a given `KeyBinding`.
-pub fn key_name(w: KeyBinding) -> result!(String) {
-    ncurses::key_name(KeyBinding::into(w)).ok_or(ncurses_function_error!("key_name"))
+pub fn key_name(wch: WideChar) -> Option<String> {
+    ncurses::key_name(WideChar::into(wch))
 }
 
 /// Permits an application to determine the string which is defined
 /// in the terminfo for specific keycodes.
-pub fn keybound(keycode: KeyBinding, count: i32) -> result!(String) {
-    ncurses::keybound(KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound"))
+pub fn keybound(keycode: KeyBinding, count: i32) -> Option<String> {
+    ncurses::keybound(KeyBinding::into(keycode), count)
 }
 
 /// Return the name of the key binding c. The name of a key generating
@@ -1710,7 +1768,8 @@ pub fn longname() -> result!(String) {
     ncurses::longname().ok_or(ncurses_function_error!("longname"))
 }
 
-/// Ship binary data to printer.
+/// Ship binary data to printer. Returns the number of characters
+/// actually sent to the printer.
 ///
 /// This function uses the mc5p or mc4 and mc5 capabilities, if they are
 /// present, to ship given data to a printer attached to the terminal.
@@ -1935,7 +1994,7 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -2508,7 +2567,7 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -2867,9 +2926,7 @@ pub fn mvwvline_set(handle: WINDOW, origin: Origin, wch: ComplexChar, number: i3
 #[deprecated(since = "0.3.2", note = "ncurses library call superseeded by native rust call. Use std::thread::sleep(dur: std::time::Duration) instead")]
 /// Sleep for ms milliseconds.
 pub fn napms(ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    match ncurses::napms(ms) {
+    match ncurses::napms(i32::try_from(ms.as_millis())?) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("napms", rc))
     }
@@ -2905,13 +2962,16 @@ pub fn newpad(size: Size) -> result!(WINDOW) {
 /// - another file descriptor for input from the terminal
 ///
 /// If the `term_type` parameter is `None`, $TERM will be used.
-pub fn newterm<O, I>(term: Option<&str>, output: O, input: I) -> result!(SCREEN)
+pub fn newterm<O, I>(term: Option<&str>, output: &O, input: &I) -> result!(SCREEN)
     where O: AsRawFd + Write,
           I: AsRawFd + Read
 {
     unsafe {
-        ncurses::newterm(option_str_as_option_slice(term)?, fdopen(output, "wb+")?, fdopen(input, "rb+")?)
-            .ok_or(ncurses_function_error!("newterm"))
+        ncurses::newterm(
+            option_str_as_ptr!(term),
+            fdopen(output, "wb+")?,
+            fdopen(input, "rb+")?
+        ).ok_or(ncurses_function_error!("newterm"))
     }
 }
 
@@ -3028,15 +3088,15 @@ pub fn overwrite(src_handle: WINDOW, dst_handle: WINDOW) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() instead")]
+#[deprecated(since = "0.4.0", note = "Use normal::ColorPair::colors() or shims::ncurses::pair_content() instead")]
 /// Return a structure containing the colors for the requested color pair.
 /// The value of `color_pair` must be between 1 and COLOR_PAIRS - 1.
-pub fn pair_content(color_pair: normal::ColorPair) -> result!(normal::Colors) {
+pub fn pair_content(color_pair: short_t) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    match unsafe { ncurses::pair_content(normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0]))),
+    match unsafe { ncurses::pair_content(color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(normal::Colors::new(normal::Color::_from(None, normal::ColorPalette::_from(fg[0])), normal::Color::_from(None, normal::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("pair_content", rc))
     }
 }
@@ -3113,8 +3173,8 @@ pub fn putp(_str: &str) -> i32 {
 
 /// Write all data associated with the window into the provided file.
 /// This information can be later retrieved using the `getwin()` function.
-pub fn putwin<O: AsRawFd + Write>(handle: WINDOW, file: O) -> result!(()) {
-    match unsafe { ncurses::putwin(handle, fdopen(file, "wb+")?) } {
+pub fn putwin<O: AsRawFd + Write>(handle: WINDOW, file: &O) -> result!(()) {
+    match unsafe { ncurses::putwin(handle, fdopen(file, "w")?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("putwin", rc))
     }
@@ -3237,43 +3297,43 @@ pub fn savetty() -> result!(()) {
 }
 
 /// The `scr_dump()` routine dumps the current contents of the virtual screen
-/// to the file filename.
-pub fn scr_dump(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_dump(path_as_slice(filename)?.as_ptr()) } {
+/// to the file specificed by `path`.
+pub fn scr_dump<P: AsRef<Path>>(path: P) -> result!(()) {
+    match unsafe { ncurses::scr_dump(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_dump", rc))
     }
 }
 
-/// The `scr_init()` routine reads in the contents of filename and uses them to
+/// The `scr_init()` routine reads in the contents of `path` and uses them to
 /// initialize the curses data structures about what the terminal currently has
 /// on its screen. If the data is determined to be valid, curses bases its next
 /// update of the screen on this information rather than clearing the screen
 /// and starting from scratch.
-pub fn scr_init(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_init(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_init<P: AsRef<Path>>(path: P) -> result!(()) {
+    match unsafe { ncurses::scr_init(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init", rc))
     }
 }
 
-/// The `scr_restore()` routine sets the virtual screen to the contents of
-/// filename, which must have been written using `scr_dump()`. The next call
+/// The `scr_restore()` routine sets the virtual screen to the contents of the file
+/// specificed by `path`, which must have been written using `scr_dump()`. The next call
 /// to `doupdate()` restores the physical screen to the way it looked in the
 /// dump file.
-pub fn scr_restore(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_restore(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_restore<P: AsRef<Path>>(path: P) -> result!(()) {
+    match unsafe { ncurses::scr_restore(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore", rc))
     }
 }
 
 /// The `scr_set()` routine is a combination of `scr_restore()` and `scr_init()`.
-/// It tells the program that the information in filename is what is currently
+/// It tells the program that the information in `path` is what is currently
 /// on the screen, and also what the program wants on the screen. This can be
 /// thought of as a screen inheritance function.
-pub fn scr_set(filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_set(path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_set<P: AsRef<Path>>(path: P) -> result!(()) {
+    match unsafe { ncurses::scr_set(path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set", rc))
     }
@@ -3367,23 +3427,19 @@ pub fn setscrreg(region: Region) -> result!(()) {
     }
 }
 
-/// Set the virtual screen cursor to `origin`. If y and x are both -1,
-/// then leaveok is set `true`.
-pub fn setsyx(origin: Origin) -> result!(()) {
-    if origin == (Origin { y: -1, x: -1 }) {
-        leaveok(newscr(), true)
-    } else {
+/// Set the virtual screen cursor to `origin`. If `None` then `leaveok()` is set `true`.
+pub fn setsyx(origin: Option<Origin>) -> result!(()) {
+    if let Some(origin) = origin {
         leaveok(newscr(), false)?;
         wmove(newscr(), origin)
+    } else {
+        leaveok(newscr(), true)
     }
 }
 
 /// Retrieve attributes of soft label.
-// convert into the attributes type of your choice with
-//     normal::Attributes::from(slk_attr()) or
-//     extend::Attributes::from(slk_attr())
-pub fn slk_attr() -> attr_t {
-    ncurses::slk_attr()
+pub fn slk_attr() -> normal::Attributes {
+    normal::Attributes::_from(None, ncurses::slk_attr())
 }
 
 /// Turn off soft label attributes, without affecting other attributes.
@@ -3474,8 +3530,8 @@ pub fn slk_init(fmt: SoftLabelType) -> result!(()) {
 
 /// Returns the current label for label number `labnum`, with leading and
 /// trailing blanks stripped.
-pub fn slk_label(labnum: i32) -> result!(String) {
-    ncurses::slk_label(labnum).ok_or(ncurses_function_error!("slk_label"))
+pub fn slk_label(labnum: i32) -> Option<String> {
+    ncurses::slk_label(labnum)
 }
 
 /// Mark for refresh but wait. This function updates the data structure representing
@@ -3508,14 +3564,14 @@ pub fn slk_restore() -> result!(()) {
 /// The `slk_set()` routine sets a soft label.
 ///
 /// - labnum: is the label number, from 1 to 8 (12 if `slk_init()` was called
-///           with `SoftLabelType::{FourFour,FourFourIndex}`);
+///           with `SoftLabelType::{FourFourFour,FourFourFourIndex}`);
 /// - label:  is be the string to put on the label, up to eight (five if
 ///           `slk_init() was called with `SoftLabelType::{FourFour,FourFourIndex}`)
 ///           characters in length.
 /// - fmt:    indicating whether the label is to be left-justified, centered
 ///           or right-justified.
-pub fn slk_set(labnum: i32, label: &str, fmt: Justification) -> result!(()) {
-    match ncurses::slk_set(labnum, unsafe { c_str_with_nul!(label) }, fmt.value()) {
+pub fn slk_set(labnum: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_set(labnum, option_str_as_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
     }
@@ -3530,11 +3586,11 @@ pub fn slk_touch() -> result!(()) {
     }
 }
 
-/// The wide character version of the `slk_set()` routine.
-pub fn slk_wset(labnum: i32, label: &WideString, fmt: Justification) -> result!(()) {
-    match ncurses::slk_wset(labnum, raw_with_nul_as_slice!(label), fmt.value()) {
+/// The wide string version of the `slk_set()` routine.
+pub fn slk_wset(labnum: i32, label: Option<&WideString>, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_wset(labnum, option_widestr_as_ptr(label), fmt.value()) } {
         OK => Ok(()),
-        rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
+        rc => Err(ncurses_function_error_with_rc!("slk_wset", rc))
     }
 }
 
@@ -3617,43 +3673,38 @@ pub fn termname() -> result!(String) {
     ncurses::termname().ok_or(ncurses_function_error!("termname"))
 }
 
-/// At present this function is unimplemented.
-///
 /// Return the value of the Boolean capability corresponding to the terminfo
-/// capability name capname as an integer. Return the value -1 if capname is
-/// not a Boolean capability, or 0 if it is canceled or absent from the
-/// terminal description.
-pub fn tigetflag(_capname: &str) -> i32 {
-    unimplemented!();
+/// capability name capname as an `bool`.
+pub fn tigetflag(capname: &str) -> result!(bool) {
+    match unsafe { ncurses::tigetflag(str_to_cstring_as_slice!(capname)) } {
+        -1 => Err(NCurseswError::InvalidCapability),
+        0  => Ok(false),
+        _  => Ok(true)
+    }
 }
 
-/// At present this function is unimplemented.
-///
 /// Return the value of the numeric capability corresponding to the terminfo
-/// capability name capname as an integer. Return the value -2 if capname is
-/// not a numeric capability, or -1 if it is canceled or absent from the
-/// terminal description.
-pub fn tigetnum(_capname: &str) -> i32 {
-    unimplemented!();
+/// capability name capname as an integer or `None` if it is canceled or
+/// absent from the terminal description.
+pub fn tigetnum(capname: &str) -> result!(Option<i32>) {
+    match unsafe { ncurses::tigetnum(str_to_cstring_as_slice!(capname)) } {
+        -2 => Err(NCurseswError::InvalidCapability),
+        -1 => Ok(None),
+        rc => Ok(Some(rc))
+    }
 }
 
-/// At present this function is unimplemented.
-///
 /// Return the value of the string capability corresponding to the terminfo
 /// capability name capname as a bytes object. Return None if capname is not
 /// a terminfo “string capability”, or is canceled or absent from the terminal
 /// description.
-pub fn tigetstr(_capname: &str) -> String {
-    unimplemented!();
+pub fn tigetstr(capname: &str) -> result!(Option<String>) {
+    Ok(unsafe { ncurses::tigetstr(str_to_cstring_as_slice!(capname)) })
 }
 
 /// Set blocking or non-blocking read behavior for the window.
 pub fn timeout(ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    ncurses::timeout(ms);
-
-    Ok(())
+    Ok(ncurses::timeout(i32::try_from(ms.as_millis())?))
 }
 
 /// Pretend that `count` lines have been changed, beginning with line `start`.
@@ -3929,7 +3980,31 @@ pub fn waddwstr(handle: WINDOW, wstr: &WideString) -> result!(()) {
 
 /// Retrieve attributes for the given window.
 pub fn wattr_get(handle: WINDOW) -> result!(AttributesColorPairSet) {
-    _wattr_get(None, handle)
+    let mut attrs: [attr_t; 1] = [0];
+    let mut color_pair: [short_t; 1] = [0];
+    let mut opts: [i32; 1] = [0];
+
+    match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
+        OK => Ok(match ncurses_colortype() {
+                     NCursesColorType::Normal => {
+                         AttributesColorPairSet::Normal(
+                             normal::AttributesColorPair::new(
+                                 normal::Attributes::_from(None, attrs[0]),
+                                 normal::ColorPair::_from(None, color_pair[0])
+                             )
+                         )
+                     },
+                     NCursesColorType::Extend => {
+                         AttributesColorPairSet::Extend(
+                             extend::AttributesColorPair::new(
+                                 extend::Attributes::_from(None, attrs[0]),
+                                 extend::ColorPair::_from(None, opts[0])
+                             )
+                         )
+                     }
+              }),
+        rc => Err(ncurses_function_error_with_rc!("wattr_get", rc))
+    }
 }
 
 /// Turn off window attributes, without affecting other attributes.
@@ -4293,7 +4368,7 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetch", rc))
-            } else if rc >= KEY_MIN && rc <= KEY_MAX {
+            } else if (KEY_MIN..=KEY_MAX).contains(&rc) {
                 Ok(CharacterResult::Key(KeyBinding::from(rc)))
             } else {
                 Ok(CharacterResult::Character(char::from(u8::try_from(i8::try_from(rc)?)?)))
@@ -4741,11 +4816,7 @@ pub fn wsyncup(handle: WINDOW) {
 
 /// Set blocking or non-blocking read behavior for the window.
 pub fn wtimeout(handle: WINDOW, ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    unsafe { ncurses::wtimeout(handle, ms) };
-
-    Ok(())
+    Ok(unsafe { ncurses::wtimeout(handle, i32::try_from(ms.as_millis())?) })
 }
 
 /// The `wtouchln()` routine makes `n` lines in the window, starting at `line`,
@@ -4799,6 +4870,8 @@ pub fn assume_default_colors_sp<S, C, T>(screen: SCREEN, colors: S) -> result!((
           C: ColorType<T>,
           T: ColorAttributeTypes
 {
+    assert!(screen == colors.screen().unwrap_or(ptr::null_mut()), "assume_default_colors_sp() : screen != colors.screen()");
+
     match unsafe { ncurses::assume_default_colors_sp(screen, colors.foreground().number(), colors.background().number()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("assume_default_colors_sp", rc))
@@ -4831,14 +4904,14 @@ pub fn cbreak_sp(screen: SCREEN) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::Color::rgb_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::Color::rgb() or shims::ncurses::color_content_sp() instead")]
 /// Screen function of `color_content()`.
-pub fn color_content_sp(screen: SCREEN, color: normal::Color) -> result!(normal::RGB) {
+pub fn color_content_sp(screen: SCREEN, color_number: short_t) -> result!(normal::RGB) {
     let mut r: [short_t; 1] = [0];
     let mut g: [short_t; 1] = [0];
     let mut b: [short_t; 1] = [0];
 
-    match unsafe { ncurses::color_content_sp(screen, normal::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::color_content_sp(screen, color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(normal::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("color_content_sp", rc))
     }
@@ -4853,7 +4926,7 @@ pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
 
 /// Screen function of `define_key()`.
 pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
-    match unsafe { ncurses::define_key_sp(screen, option_str_as_ptr(definition)?, KeyBinding::into(keycode)) } {
+    match unsafe { ncurses::define_key_sp(screen, option_str_as_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
     }
@@ -4918,27 +4991,27 @@ pub fn erasechar_sp(screen: SCREEN) -> result!(char) {
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use extend::Color::rgb_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::Color::rgb() or shims::ncurses::extended_color_content_sp() instead")]
 /// Screen function of `extended_color_content()`.
-pub fn extended_color_content_sp(screen: SCREEN, color: extend::Color) -> result!(extend::RGB) {
+pub fn extended_color_content_sp(screen: SCREEN, color_number: i32) -> result!(extend::RGB) {
     let mut r: [i32; 1] = [0];
     let mut g: [i32; 1] = [0];
     let mut b: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_color_content_sp(screen, extend::Color::into(color), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
+    match unsafe { ncurses::extended_color_content_sp(screen, color_number, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr()) } {
         OK => Ok(extend::RGB::new(r[0], g[0], b[0])),
         rc => Err(ncurses_function_error_with_rc!("extended_color_content_sp", rc))
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::colors() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::colors() or shims::ncurses::extended_pair_content_sp() instead")]
 /// Screen function of `extended_pair_content()`.
-pub fn extended_pair_content_sp(screen: SCREEN, color_pair: extend::ColorPair) -> result!(extend::Colors) {
+pub fn extended_pair_content_sp(screen: SCREEN, color_pair: i32) -> result!(extend::Colors) {
     let mut fg: [i32; 1] = [0];
     let mut bg: [i32; 1] = [0];
 
-    match unsafe { ncurses::extended_pair_content_sp(screen, extend::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(extend::Colors::new(extend::Color::from(fg[0]), extend::Color::from(bg[0]))),
+    match unsafe { ncurses::extended_pair_content_sp(screen, color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(extend::Colors::new(extend::Color::_from(Some(screen), extend::ColorPalette::_from(fg[0])), extend::Color::_from(Some(screen), extend::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("extended_pair_content_sp", rc))
     }
 }
@@ -4963,6 +5036,8 @@ pub fn free_pair_sp<P, T>(screen: SCREEN, color_pair: P) -> result!(())
           i32: From<T>,
           T:   ColorAttributeTypes
 {
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()), "free_pair_sp() : screen != color_pair.screen()");
+
     match unsafe { ncurses::free_pair_sp(screen, i32::from(color_pair.number())) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("free_pair_sp", rc))
@@ -4991,8 +5066,8 @@ pub fn get_escdelay_sp(screen: SCREEN) -> result!(time::Duration) {
 }
 
 /// Screen function of `getwin()`.
-pub fn getwin_sp<I: AsRawFd + Read>(screen: SCREEN, file: I) -> result!(WINDOW) {
-    unsafe { ncurses::getwin_sp(screen, fdopen(file, "rb+")?).ok_or(ncurses_function_error!("getwin_sp")) }
+pub fn getwin_sp<I: AsRawFd + Read>(screen: SCREEN, file: &I) -> result!(WINDOW) {
+    unsafe { ncurses::getwin_sp(screen, fdopen(file, "r")?).ok_or(ncurses_function_error!("getwin_sp")) }
 }
 
 /// Screen function of `halfdelay()`.
@@ -5023,9 +5098,9 @@ pub fn has_key_sp(screen: SCREEN, ch: KeyBinding) -> bool {
     unsafe { ncurses::has_key_sp(screen, KeyBinding::into(ch)) == TRUE }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::Color::new_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::Color::set_rgb() or shims::ncurses::init_color_sp() instead")]
 /// Screen function of `init_color()`.
-pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> result!(normal::Color) {
+pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) -> result!(()) {
     if i32::from(color_number) >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
@@ -5033,71 +5108,63 @@ pub fn init_color_sp(screen: SCREEN, color_number: short_t, rgb: normal::RGB) ->
             OK => {
                 set_ncurses_colortype(NCursesColorType::Normal);
 
-                Ok(normal::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_color_sp", rc))
         }
     }
 }
 
-#[deprecated(since = "0.4.0", note = "Use extend::Color::new_sp() instead")]
+#[deprecated(since = "0.4.0", note = "Use extend::Color::set_rgb() or shims::ncurses::init_extended_color_sp() instead")]
 /// Screen function of `init_extended_color()`.
-pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> result!(extend::Color) {
+pub fn init_extended_color_sp(screen: SCREEN, color_number: i32, rgb: extend::RGB) -> result!(()) {
     if color_number >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
         match unsafe { ncurses::init_extended_color_sp(screen, color_number, rgb.red(), rgb.green(), rgb.blue()) } {
             OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
+                set_ncurses_colortype(NCursesColorType::Extend);
 
-                Ok(extend::Color::from(color_number))
+                Ok(())
             },
             rc => Err(ncurses_function_error_with_rc!("init_extended_color_sp", rc))
         }
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::new_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use extend::ColorPair::new_sp() or shims::ncurses::init_extended_pair_sp() instead")]
 /// Screen function of `init_extended_pair()`.
-pub fn init_extended_pair_sp(screen: SCREEN, pair_number: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
-    if pair_number >= COLOR_PAIRS() {
+pub fn init_extended_pair_sp(screen: SCREEN, color_pair: i32, colors: extend::Colors) -> result!(extend::ColorPair) {
+    if color_pair < 1 || color_pair >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match unsafe { ncurses::init_extended_pair_sp(screen, pair_number, extend::Color::into(colors.foreground()), extend::Color::into(colors.background())) } {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Extended);
-
-                Ok(extend::ColorPair::_from(Some(screen), pair_number))
-            },
+        match unsafe { ncurses::init_extended_pair_sp(screen, color_pair, colors.foreground().number(), colors.background().number()) } {
+            OK => Ok(extend::ColorPair::_from(Some(screen), color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_extended_pair_sp", rc))
         }
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::new_sp() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::new_sp() or shims::ncurses::init_pair_sp() instead")]
 /// Screen function of `init_pair()`.
-pub fn init_pair_sp(screen: SCREEN, pair_number: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
-    if i32::from(pair_number) >= COLOR_PAIRS() {
+pub fn init_pair_sp(screen: SCREEN, color_pair: short_t, colors: normal::Colors) -> result!(normal::ColorPair) {
+    if color_pair < 1 || i32::from(color_pair) >= COLOR_PAIRS() {
         Err(NCurseswError::ColorPairLimit)
     } else if colors.foreground().number() >= COLORS() || colors.background().number() >= COLORS() {
         Err(NCurseswError::ColorLimit)
     } else {
-        match unsafe { ncurses::init_pair_sp(screen, pair_number, normal::Color::into(colors.foreground()), normal::Color::into(colors.background())) } {
-            OK => {
-                set_ncurses_colortype(NCursesColorType::Normal);
-
-                Ok(normal::ColorPair::_from(Some(screen), pair_number))
-            },
+        match unsafe { ncurses::init_pair_sp(screen, color_pair, short_t::try_from(colors.foreground().number())?, short_t::try_from(colors.background().number())?) } {
+            OK => Ok(normal::ColorPair::_from(Some(screen), color_pair)),
             rc => Err(ncurses_function_error_with_rc!("init_pair_sp", rc))
         }
     }
 }
 
 /// Screen function of `intrflush()`.
-pub fn intrflush_sp(screen: SCREEN, window: WINDOW, flag: bool) -> result!(()) {
-    match unsafe { ncurses::intrflush_sp(screen, window, flag) } {
+pub fn intrflush_sp(screen: SCREEN, flag: bool) -> result!(()) {
+    match unsafe { ncurses::intrflush_sp(screen, ptr::null_mut(), flag) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("intrflush_sp", rc))
     }
@@ -5114,18 +5181,20 @@ pub fn is_term_resized_sp(screen: SCREEN, size: Size) -> bool {
 }
 
 /// Screen function of `keybound()`.
-pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> result!(String) {
-    unsafe { ncurses::keybound_sp(screen, KeyBinding::into(keycode), count).ok_or(ncurses_function_error!("keybound_sp")) }
+pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> Option<String> {
+    unsafe { ncurses::keybound_sp(screen, KeyBinding::into(keycode), count) }
 }
 
 /// Screen function of `key_defined()`.
-pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(KeyBinding) {
-    let c = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
+pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(Option<KeyBinding>) {
+    let rc = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
 
-    if c.is_negative() {
-        Err(ncurses_function_error_with_rc!("key_defined_sp", c))
+    if rc.is_negative() {
+        Err(ncurses_function_error_with_rc!("key_defined_sp", rc))
+    } else if rc == 0 {
+        Ok(None)
     } else {
-        Ok(KeyBinding::from(c))
+        Ok(Some(KeyBinding::from(rc)))
     }
 }
 
@@ -5177,9 +5246,7 @@ pub fn mvcur_sp(screen: SCREEN, old: Origin, new: Origin) -> result!(()) {
 #[deprecated(since = "0.5.0", note = "ncurses library call superseeded by native rust call. Use std::thread::sleep(dur: std::time::Duration) instead")]
 /// Screen function of `namps()`.
 pub fn napms_sp(screen: SCREEN, ms: time::Duration) -> result!(()) {
-    let ms = i32::try_from(ms.as_millis())?;
-
-    match unsafe { ncurses::napms_sp(screen, ms) } {
+    match unsafe { ncurses::napms_sp(screen, i32::try_from(ms.as_millis())?) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("napms_sp", rc))
     }
@@ -5201,13 +5268,17 @@ pub fn new_prescr() -> result!(SCREEN) {
 }
 
 /// Screen function of `newterm()`.
-pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: O, input: I) -> result!(SCREEN)
+pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: &O, input: &I) -> result!(SCREEN)
     where O: AsRawFd + Write,
           I: AsRawFd + Read
 {
     unsafe {
-        ncurses::newterm_sp(screen, option_str_as_option_slice(term)?, fdopen(output, "wb+")?, fdopen(input, "rb+")?)
-            .ok_or(ncurses_function_error!("newterm_sp"))
+        ncurses::newterm_sp(
+            screen,
+            option_str_as_ptr!(term),
+            fdopen(output, "wb+")?,
+            fdopen(input, "rb+")?
+        ).ok_or(ncurses_function_error!("newterm_sp"))
     }
 }
 
@@ -5266,14 +5337,14 @@ pub fn noraw_sp(screen: SCREEN) -> result!(()) {
     }
 }
 
-#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::colors() instead")]
+#[deprecated(since = "0.5.0", note = "Use normal::ColorPair::colors() or shims::ncurses::pair_content_sp() instead")]
 /// Screen function of `pair_content()`.
-pub fn pair_content_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(normal::Colors) {
+pub fn pair_content_sp(screen: SCREEN, color_pair: short_t) -> result!(normal::Colors) {
     let mut fg: [short_t; 1] = [0];
     let mut bg: [short_t; 1] = [0];
 
-    match unsafe { ncurses::pair_content_sp(screen, normal::ColorPair::into(color_pair), fg.as_mut_ptr(), bg.as_mut_ptr()) } {
-        OK => Ok(normal::Colors::new(normal::Color::from(fg[0]), normal::Color::from(bg[0]))),
+    match unsafe { ncurses::pair_content_sp(screen, color_pair, fg.as_mut_ptr(), bg.as_mut_ptr()) } {
+        OK => Ok(normal::Colors::new(normal::Color::_from(Some(screen), normal::ColorPalette::_from(fg[0])), normal::Color::_from(Some(screen), normal::ColorPalette::_from(bg[0])))),
         rc => Err(ncurses_function_error_with_rc!("pair_content_sp", rc))
     }
 }
@@ -5356,24 +5427,24 @@ pub fn savetty_sp(screen: SCREEN) -> result!(()) {
 }
 
 /// Screen function of `scr_init()`.
-pub fn scr_init_sp(screen: SCREEN, filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_init_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_init_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
+    match unsafe { ncurses::scr_init_sp(screen, path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_init_sp", rc))
     }
 }
 
 /// Screen function of `scr_restore()`.
-pub fn scr_restore_sp(screen: SCREEN, filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_restore_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_restore_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
+    match unsafe { ncurses::scr_restore_sp(screen, path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_restore_sp", rc))
     }
 }
 
 /// Screen function of `scr_set()`.
-pub fn scr_set_sp(screen: SCREEN, filename: &Path) -> result!(()) {
-    match unsafe { bindings::scr_set_sp(screen, path_as_slice(filename)?.as_ptr()) } {
+pub fn scr_set_sp<P: AsRef<Path>>(screen: SCREEN, path: P) -> result!(()) {
+    match unsafe { ncurses::scr_set_sp(screen, path_to_cstring_as_slice!(path)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("scr_set_sp", rc))
     }
@@ -5399,6 +5470,8 @@ pub fn set_tabsize_sp(screen: SCREEN, size: i32) -> result!(()) {
 
 /// Screen function of `slk_attroff()`.
 pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attroff_sp() : screen != color_pair.screen()");
+
     match unsafe { ncurses::slk_attroff_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attroff_sp", rc))
@@ -5407,6 +5480,8 @@ pub fn slk_attroff_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) 
 
 /// Screen function of `slk_attron()`.
 pub fn slk_attron_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attron_sp() : screen != color_pair.screen()");
+
     match unsafe { ncurses::slk_attron_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attron_sp", rc))
@@ -5419,6 +5494,9 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
           P: ColorPairType<T>,
           T: ColorAttributeTypes
 {
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attr_set_sp() : screen != attrs.screen()");
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()), "slk_attr_set_sp() : screen != color_pair.screen()");
+
     match unsafe { ncurses::slk_attr_set_sp(screen, attrs.as_attr_t(), color_pair.as_short_t(), color_pair.as_mut_ptr()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attr_set_sp", rc))
@@ -5427,6 +5505,8 @@ pub fn slk_attr_set_sp<A, P, T>(screen: SCREEN, attrs: A, color_pair: P) -> resu
 
 /// Screen function of `slk_attrset()`.
 pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) {
+    assert!(screen == attrs.screen().unwrap_or(ptr::null_mut()), "slk_attrset_sp() : screen != attrs.screen()");
+
     match unsafe { ncurses::slk_attrset_sp(screen, normal::Attributes::into(attrs)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_attrset_sp", rc))
@@ -5434,8 +5514,8 @@ pub fn slk_attrset_sp(screen: SCREEN, attrs: normal::Attributes) -> result!(()) 
 }
 
 /// Screen function of `slk_attr()`.
-pub fn slk_attr_sp(screen: SCREEN) -> attr_t {
-    unsafe { ncurses::slk_attr_sp(screen) }
+pub fn slk_attr_sp(screen: SCREEN) -> normal::Attributes {
+    normal::Attributes::_from(Some(screen), unsafe { ncurses::slk_attr_sp(screen) })
 }
 
 /// Screen function of `slk_clear()`.
@@ -5448,6 +5528,8 @@ pub fn slk_clear_sp(screen: SCREEN) -> result!(()) {
 
 /// Screen function of `slk_color()`.
 pub fn slk_color_sp(screen: SCREEN, color_pair: normal::ColorPair) -> result!(()) {
+    assert!(screen == color_pair.screen().unwrap_or(ptr::null_mut()), "slk_color_sp() : screen != color_pair.screen()");
+
     match unsafe { ncurses::slk_color_sp(screen, color_pair.number()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_color_sp", rc))
@@ -5463,8 +5545,8 @@ pub fn slk_init_sp(screen: SCREEN, fmt: SoftLabelType) -> result!(()) {
 }
 
 /// Screen function of `slk_label()`.
-pub fn slk_label_sp(screen: SCREEN, number: i32) -> result!(String) {
-    unsafe { ncurses::slk_label_sp(screen, number).ok_or(ncurses_function_error!("slk_label_sp")) }
+pub fn slk_label_sp(screen: SCREEN, labnum: i32) -> Option<String> {
+    unsafe { ncurses::slk_label_sp(screen, labnum) }
 }
 
 /// Screen function of `slk_noutrefresh()`.
@@ -5492,8 +5574,8 @@ pub fn slk_restore_sp(screen: SCREEN) -> result!(()) {
 }
 
 /// Screen function of `slk_set()`.
-pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: &str, fmt: Justification) -> result!(()) {
-    match unsafe { ncurses::slk_set_sp(screen, label_number, c_str_with_nul!(label), fmt.value()) } {
+pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
+    match unsafe { ncurses::slk_set_sp(screen, label_number, option_str_as_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set_sp", rc))
     }
@@ -5608,150 +5690,22 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
     }
 }
 
-// additional screen functions specific to `ncursesw`.
-
-/// Screen function of `attr_get()`. additional functionality not found in NCurses library.
-pub fn attr_get_sp(screen: SCREEN) -> result!(AttributesColorPairSet) {
-    _attr_get(Some(screen))
-}
-
-/// Screen function of `getcchar()`. additional functionality not found in NCurses library.
-pub fn getcchar_sp(screen: SCREEN, wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    _getcchar(Some(screen), wcval)
-}
-
-/// Screen function of `wattr_get()`. additional functionality not found in NCurses library.
-pub fn wattr_get_sp(screen: SCREEN, handle: WINDOW) -> result!(AttributesColorPairSet) {
-    _wattr_get(Some(screen), handle)
-}
-
-// private functions implementing NCurses functionality.
-
-fn _attr_get(screen: Option<SCREEN>) -> result!(AttributesColorPairSet) {
-    let mut attrs: [attr_t; 1] = [0];
-    let mut color_pair: [short_t; 1] = [0];
-    let mut opts: [i32; 1] = [0];
-
-    match unsafe { ncurses::attr_get(attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
-        OK => Ok(match ncurses_colortype() {
-            NCursesColorType::Normal => {
-                AttributesColorPairSet::Normal(
-                    normal::AttributesColorPair::new(
-                        normal::Attributes::from(attrs[0]),
-                        normal::ColorPair::_from(screen, color_pair[0])
-                    )
-                )
-            },
-            NCursesColorType::Extended => {
-                AttributesColorPairSet::Extended(
-                    extend::AttributesColorPair::new(
-                        extend::Attributes::from(attrs[0]),
-                        extend::ColorPair::_from(screen, opts[0])
-                    )
-                )
-            }
-        }),
-        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "attr_get", |_| "attr_get_sp"), rc))
-    }
-}
-
-fn _getcchar(screen: Option<SCREEN>, wcval: ComplexChar) -> result!(WideCharAndAttributes) {
-    let mut wch: [wchar_t; bindings::CCHARW_MAX as usize] = [0; bindings::CCHARW_MAX as usize];
-    let mut attrs: [attr_t; 1] = [0];
-    let mut color_pair: [short_t; 1] = [0];
-    let opts: *mut i32 = ptr::null_mut();
-
-    let attribute_colorpair_set = |attrs: attr_t, color_pair: short_t, ext_color_pair: i32| -> AttributesColorPairSet {
-        match ncurses_colortype() {
-            NCursesColorType::Normal   => {
-                AttributesColorPairSet::Normal(
-                    normal::AttributesColorPair::new(
-                        normal::Attributes::from(attrs),
-                        normal::ColorPair::_from(screen, color_pair)
-                    )
-                )
-            },
-            NCursesColorType::Extended => {
-                AttributesColorPairSet::Extended(
-                    extend::AttributesColorPair::new(
-                        extend::Attributes::from(attrs),
-                        extend::ColorPair::_from(screen, ext_color_pair)
-                    )
-                )
-            }
-        }
-    };
-
-    match unsafe { ncurses::getcchar(&ComplexChar::into(wcval), wch.as_mut_ptr(), attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts) } {
-        OK => {
-            // TODO : get opts working correct so not to rely on bodge!
-            //assert!(!opts.is_null(), "{}getcchar() : opts.is_null()", MODULE_PATH);
-            //
-            //Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], unsafe { ptr::read(opts) })))
-
-            let c: cchar_t = ComplexChar::into(wcval); // bodge to get extended color pair.
-
-            Ok(WideCharAndAttributes::new(WideChar::from(wch[0]), attribute_colorpair_set(attrs[0], color_pair[0], c.ext_color)))
-        },
-        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "getcchar", |_| "getcchar_sp"), rc))
-    }
-}
-
-fn _wattr_get(screen: Option<SCREEN>, handle: WINDOW) -> result!(AttributesColorPairSet) {
-    let mut attrs: [attr_t; 1] = [0];
-    let mut color_pair: [short_t; 1] = [0];
-    let mut opts: [i32; 1] = [0];
-
-    match unsafe { ncurses::wattr_get(handle, attrs.as_mut_ptr(), color_pair.as_mut_ptr(), opts.as_mut_ptr() as *mut c_void) } {
-        OK => Ok(match ncurses_colortype() {
-                     NCursesColorType::Normal => {
-                         AttributesColorPairSet::Normal(
-                             normal::AttributesColorPair::new(
-                                 normal::Attributes::from(attrs[0]),
-                                 normal::ColorPair::_from(screen, color_pair[0])
-                             )
-                         )
-                     },
-                     NCursesColorType::Extended => {
-                         AttributesColorPairSet::Extended(
-                             extend::AttributesColorPair::new(
-                                 extend::Attributes::from(attrs[0]),
-                                 extend::ColorPair::_from(screen, opts[0])
-                             )
-                         )
-                     }
-              }),
-        rc => Err(ncurses_function_error_with_rc!(screen.map_or_else(|| "wattr_get", |_| "wattr_get_sp"), rc))
-    }
-}
-
 // private functions.
 
 // get a file stream from a file descriptor.
-fn fdopen<FD: AsRawFd>(file: FD, mode: &str) -> result!(ncurses::FILE) {
+fn fdopen<FD: AsRawFd>(file: &FD, mode: &str) -> result!(ncurses::FILE) {
     unsafe { funcs::fdopen(file, c_str_with_nul!(mode)).ok_or(ncurses_os_error!("fdopen")) }
 }
 
-// obtain a slice from a path.
-fn path_as_slice(path: &Path) -> result!(&[i8]) {
-    let fqname = format!("{}", path.display());
-    let s = fqname.as_str();
-
-    Ok(unsafe { c_str_with_nul!(s) })
+fn path_to_cstring_as_vec<P: AsRef<Path>>(path: P) -> result!(Vec<u8>) {
+    str_to_cstring_as_vec(path.as_ref().to_str().expect("path is invalid!!!"))
 }
 
-// convert a optional &str to a pointer of type i8.
-fn option_str_as_ptr(str: Option<&str>) -> result!(*mut i8) {
-    Ok(match str {
-        Some(str) => unsafe { c_str_with_nul!(str).as_ptr() as *mut i8 },
-        None      => ptr::null_mut()
-    })
+fn str_to_cstring_as_vec(str: &str) -> result!(Vec<u8>) {
+    Ok(ffi::CString::new(str)?.into_bytes_with_nul())
 }
 
-// convert a optional &str to a optional slice of type i8.
-fn option_str_as_option_slice(str: Option<&str>) -> result!(Option<&[i8]>) {
-    Ok(match str {
-        Some(str) => Some(unsafe { c_str_with_nul!(str) }),
-        None      => None
-    })
+fn option_widestr_as_ptr(wstr: Option<&WideString>) -> *const wchar_t {
+    // mbstowcs
+    wstr.map_or_else(ptr::null, |name| raw_with_nul_as_slice!(name).as_ptr())
 }
