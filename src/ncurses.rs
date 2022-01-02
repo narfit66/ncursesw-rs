@@ -1,7 +1,7 @@
 /*
     src/ncurses.rs
 
-    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -24,6 +24,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::unit_arg)]
+#![allow(clippy::upper_case_acronyms)]
 
 use std::{
     convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
@@ -4841,7 +4842,8 @@ pub fn wunctrl(ch: ComplexChar) -> result!(WideChar) {
     let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
 
     match unsafe { ncurses::wunctrl(wch.as_mut_ptr()) } {
-        Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
+        //Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
+        Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] })),
         None      => Err(ncurses_function_error!("wunctrl"))
     }
 }
@@ -5685,7 +5687,8 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
     let mut wch: [cchar_t; 1] = [ComplexChar::into(ch)];
 
     match unsafe { ncurses::wunctrl_sp(screen, wch.as_mut_ptr()) } {
-        Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
+        //Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
+        Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] })),
         None      => Err(ncurses_function_error!("wunctrl_sp"))
     }
 }

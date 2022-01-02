@@ -1,7 +1,7 @@
 /*
     src/shims/npanels.rs
 
-    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,10 +20,10 @@
     IN THE SOFTWARE.
 */
 
-#![allow(dead_code)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(missing_debug_implementations)]
+#![allow(clippy::upper_case_acronyms)]
 
 use crate::shims::{
     bindings, ncurses,

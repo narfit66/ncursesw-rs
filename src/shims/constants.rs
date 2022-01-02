@@ -1,7 +1,7 @@
 /*
     src/shims/constants.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -239,7 +239,7 @@ wrap_const!(A_LOW: attr_t);
 wrap_const!(A_RIGHT: attr_t);
 wrap_const!(A_TOP: attr_t);
 wrap_const!(A_VERTICAL: attr_t);
-pub const A_ITALIC: attr_t = (1 as attr_t) << 31;
+pub const A_ITALIC: attr_t = 1 << 31;
 //wrap_const!(A_ITALIC: attr_t);
 
 // Menu/Form Errors.

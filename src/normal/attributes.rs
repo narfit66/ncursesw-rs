@@ -1,7 +1,7 @@
 /*
     src/normal/attributes.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,8 +20,9 @@
     IN THE SOFTWARE.
 */
 
-#![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(deprecated)]
+#![allow(clippy::trivially_copy_pass_by_ref)]
+#![allow(clippy::from_over_into)]
 
 use crate::{
     normal::{Attribute, ColorPair},
