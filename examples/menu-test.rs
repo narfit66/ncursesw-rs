@@ -39,13 +39,11 @@ fn menu_routine() -> Result<(), NCurseswError> {
     keypad(stdscr(), true)?;
 
     // Create items.
-    let mut items = vec!();
-
-    items.push(new_item("Choice 1", "Choice 1 description")?);
-    items.push(new_item("Choice 2", "Choice 2 description")?);
-    items.push(new_item("Choice 3", "Choice 3 description")?);
-    items.push(new_item("Choice 4", "Choice 4 description")?);
-    items.push(new_item("Exit", "Exit description")?);
+    let mut items = vec![new_item("Choice 1", "Choice 1 description")?,
+                         new_item("Choice 2", "Choice 2 description")?,
+                         new_item("Choice 3", "Choice 3 description")?,
+                         new_item("Choice 4", "Choice 4 description")?,
+                         new_item("Exit", "Exit description")?];
 
     // Crate menu.
     let my_menu = new_menu(&mut items)?;
