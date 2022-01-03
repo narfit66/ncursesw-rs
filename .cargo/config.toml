@@ -1,3 +1,0 @@
-[env]
-
-NCURSESW_RUSTC_FLAGS="-L /usr/local/lib"

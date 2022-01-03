@@ -2,7 +2,10 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
-## [0.6.0] - ????.??.??
+## [0.6.1] - 2022.??.??
+- NCurses (v6.1) is now compiled from it's git repository and is statically linked to this crate.
+
+## [0.6.0] - 2022.01.01
 - Upgraded source code to rust 2021 edition.
 - Now uses `thiserror` crate instead of `custom_error` crate to create `Error` types.
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
