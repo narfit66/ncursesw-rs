@@ -7,8 +7,6 @@ matrix:
     allow_failures:
         - rust: nightly
     fast_finish: true
-install:
-    ./.travis/ncurses-install
 script:
     - cargo build -vv --features docs-rs
     - cargo build -vv

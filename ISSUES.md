@@ -1,15 +1,3 @@
-## Issues with Travis CI
+## Environment
 
-When compiling under Travis CI `curses_version()` and `ncurses_version()` are reporting different version numbers!!!
-
-```
-$ cargo run --example ncursesw-version
-   Compiling ncursesw v0.3.3 (/home/travis/build/narfit66/ncursesw-rs)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.52s
-     Running `target/debug/examples/ncursesw-version`
-
-curses_version:  ncurses 6.0.20160213
-ncurses_version: 6.1.20180127
-
-The command "cargo run --example ncursesw-version" exited with 0.
-```
+For some reason and i don't understand why at the moment you need to set the environment variable 'TERMINFO' to point to a valid terminfo database such as '/usr/share/terminfo'. You can do this by editing ~/.bashrc and adding the line 'export TERMINFO=/usr/share/terminfo' so every time you run a shell it defines the variable.

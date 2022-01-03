@@ -35,26 +35,13 @@ ncursesw = { git = "https://github.com/narfit66/ncursesw-rs" }
 
 As noted above this crate has *only* been tested on Debian based x86_64 Linux.
 
-You need to have the NCurses library (ABI 6.1 and above) installed on your system, included in the root directory of this crate are two bin script which will download NCurses library ABI 6.1 `ncurses-install` (this will download into `/usr/local/src`) and `ncurses-compile` which will compile and install NCurses into `/usr/local/lib` with wide character and extended color support.
-
-To downland, compile and install the NCurses library.
-
-```
-sudo ./ncurses-install
-sudo ./ncurses-compile
-```
+The NCurses library (ABI 6.1 and above) is statically linked to when this crate is built with all features required (wide character and extended color support) along with the menu, form and panels libraries.
 
 The compiled crate will be built in the `target` directory.
 
 ```
 cargo build
 ```
-
-## Custom Build
-
-Environment variables are used by `build.rs`:
-
-If set, `NCURSESW_RUSTC_LINK_LIB` will be used for the `cargo:rustc-link-lib` setting and `NCURSESW_RUSTC_FLAGS` will be used for the `cargo:rustc-flags` setting.
 
 ## Features
 
@@ -103,6 +90,8 @@ To use the form functions
 ```
 use ncursesw::form::*;
 ```
+
+The environment variable `TERMINFO` needs to point to a valid terminfo database such as `/usr/share/terminfo`, this can be done by adding the line `export TERMINFO=/usr/share/terminfo` to the `~/.bashrc` file.
 
 To use wide (UTF-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate has been used for this purpose.
 

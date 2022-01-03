@@ -1,4 +1,0 @@
-install_dir="/usr/local/src/$package"
-archive_version="6.1"
-archive_file="$package-$archive_version.tar.gz"
-lib_prefix_dir="/usr/local"
