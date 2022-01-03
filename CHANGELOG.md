@@ -2,7 +2,7 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
-## [0.6.1] - 2022.??.??
+## [0.6.1] - 2022.01.03
 - NCurses (v6.1) is now compiled from it's git repository and is statically linked to this crate.
 
 ## [0.6.0] - 2022.01.01

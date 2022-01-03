@@ -91,6 +91,8 @@ To use the form functions
 use ncursesw::form::*;
 ```
 
+The environment variable `TERMINFO` needs to point to a valid terminfo database such as `/usr/share/terminfo`, this can be done by adding the line `export TERMINFO=/usr/share/terminfo` to the `~/.bashrc` file.
+
 To use wide (UTF-8) characters `setlocale()` needs to be called before the NCurses library is initialised, in the examples the [gettext-rs](https://crates.io/crates/gettext-rs) crate has been used for this purpose.
 
 All features are supported as of NCurses ABI 6.1 including ansi 8-bit (normal) colors and color pairs, extended colors and color pairs, characters and strings (with attribute/color rendition), wide (UTF-8) characters and strings, complex characters and strings, soft labels, ripoff lines, panels, mouse, menus, forms and screen functions. I would suggest examining NCurses maintainer Thomas E. Dickey [online documentation](https://invisible-island.net/ncurses/man/ncurses.3x.html) and also the [panels](https://invisible-island.net/ncurses/man/panel.3x.html), [mouse](https://invisible-island.net/ncurses/man/curs_mouse.3x.html), [menu](https://invisible-island.net/ncurses/man/menu.3x.html), [form](https://invisible-island.net/ncurses/man/form.3x.html) and [screen](https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html) documentation. If you get the chance have a read of the book `Dan Gookin's Guide to NCurses Programming` by well i guessing here but i'm thinking it's Dan Gookin, this is a good primer to gain an understanding in how to use this library. In both cases you will need a basic knowlege of 'C'.
