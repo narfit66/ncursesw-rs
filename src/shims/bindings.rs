@@ -1,7 +1,7 @@
 /*
     src/shims/bindings.rs
 
-    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
