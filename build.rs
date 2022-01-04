@@ -27,7 +27,7 @@ extern crate bindgen;
 
 use std::{env, path::{Path, PathBuf}, process::Command};
 
-const NCURSES_VERSION: &'static str = "v6.1";
+const NCURSES_VERSION: &str = "v6.1";
 
 #[derive(Debug)]
 pub struct Fix753 { }
@@ -73,7 +73,7 @@ fn main() {
     if !clone_path.join("Makefile").exists() {
         let status = Command::new("./configure")
             .current_dir(clone_path.clone())
-            .args(&["--prefix=".to_owned() + &clone_path.to_str().unwrap(),
+            .args(&["--prefix=".to_owned() + clone_path.to_str().unwrap(),
                     "--without-ada".to_owned(),
                     "--without-cxx-binding".to_owned(),
                     "--without-progs".to_owned(),

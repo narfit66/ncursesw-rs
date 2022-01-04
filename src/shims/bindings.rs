@@ -24,6 +24,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
+#![allow(deref_nullptr)]
 #![allow(clippy::unreadable_literal)]
 #![allow(clippy::redundant_static_lifetimes)]
 
