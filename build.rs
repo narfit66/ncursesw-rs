@@ -25,7 +25,7 @@
 
 extern crate bindgen;
 
-use std::{env, path::{Path, PathBuf}, process::Command};
+use std::{env, fs::{File, remove_file}, io::Write, path::{Path, PathBuf}, process::Command};
 
 const NCURSES_VERSION: &str = "v6.1";
 
@@ -44,14 +44,20 @@ fn main() { } // Skip the build script when the doc is building.
 
 #[cfg(not(feature = "docs-rs"))]
 fn main() {
-    let out_path = PathBuf::from(env::var("OUT_DIR")
-        .expect("Environment variable 'OUT_DIR' is undefined."));
+    let manifest_path = &PathBuf::from(env::var("CARGO_MANIFEST_DIR")
+        .expect("environment variable 'CARGO_MANIFEST_DIR' is undefined."));
 
-    // out upstream working directory for NCurses.
-    let clone_path = Path::new(&out_path).join("ncursesw-upstream");
+    let out_path = &PathBuf::from(env::var("OUT_DIR")
+        .expect("environment variable 'OUT_DIR' is undefined."));
 
-    // if we haven't got a .git directory then clone NCurses from it's repo and panic if we can't
-    // get it for any reason.
+    // our upstream working directory for NCurses.
+    let clone_path = &Path::new(out_path).join("ncursesw-upstream");
+
+    // our upstream installation directory for NCurses.
+    let install_path = &Path::new(out_path).join("local");
+
+    // if we haven't got a .git directory then clone NCurses from it's repo and panic if it can't
+    // be done for any reason (this will create the directory clone_path).
     if !clone_path.join(".git").exists() {
         let status = Command::new("git")
             .args(&["clone",
@@ -60,7 +66,7 @@ fn main() {
                     "--depth",
                     "1",
                     "https://github.com/mirror/ncurses.git",
-                    clone_path.to_str().unwrap()])
+                    &format!("{}", clone_path.display())])
             .status().unwrap();
 
         if !status.success() {
@@ -69,22 +75,24 @@ fn main() {
     }
 
     // if we don't already have a makefile i.e. we haven't already configured NCurses then
-    // configure with the features required and panic if we can't do it for any reason.
+    // configure with the features required and panic if it can't be done for any reason.
     if !clone_path.join("Makefile").exists() {
         let status = Command::new("./configure")
-            .current_dir(clone_path.clone())
-            .args(&["--prefix=".to_owned() + clone_path.to_str().unwrap(),
-                    "--without-ada".to_owned(),
-                    "--without-cxx-binding".to_owned(),
-                    "--without-progs".to_owned(),
-                    "--without-tack".to_owned(),
-                    "--without-tests".to_owned(),
-                    "--enable-sp-funcs".to_owned(),
-                    "--enable-widec".to_owned(),
-                    "--enable-ext-colors".to_owned(),
-                    "--enable-ext-mouse".to_owned(),
-                    "--enable-ext-putwin".to_owned(),
-                    "CPPFLAGS=-P".to_owned()])
+            .current_dir(clone_path)
+            .args(&[&format!("--prefix={}", install_path.display()),
+                    "--without-ada",
+                    "--without-cxx-binding",
+                    "--disable-db-install",
+                    "--without-manpages",
+                    "--without-progs",
+                    "--without-tack",
+                    "--without-tests",
+                    "--enable-sp-funcs",
+                    "--enable-widec",
+                    "--enable-ext-colors",
+                    "--enable-ext-mouse",
+                    "--enable-ext-putwin",
+                    "CPPFLAGS=-P"])
             .status().unwrap();
 
         if !status.success() {
@@ -92,17 +100,30 @@ fn main() {
         }
     }
 
-    // make NCurses and panic if can't do it for any reason.
+    // make NCurses and panic if it can't be done for any reason.
     let status = Command::new("make")
-        .current_dir(clone_path.clone())
+        .current_dir(clone_path)
         .status().unwrap();
 
     if !status.success() {
         panic!("make of ncurses was not successful!");
     }
 
+    // if the install_path directory doesn't exist then that means we haven't done a 'make install'
+    // so do the install and panic if it can't be done for any reason.
+    if !install_path.exists() {
+        let status = Command::new("make")
+            .current_dir(clone_path)
+            .arg("install")
+            .status().unwrap();
+
+        if !status.success() {
+            panic!("make install of ncurses was not successful!");
+        }
+    }
+
     // say to the compiler where our native libraries are.
-    println!("cargo:rustc-link-search=native={}/lib", clone_path.display());
+    println!("cargo:rustc-link-search=native={}/lib", install_path.display());
 
     // say to the compiler which libraries we won't to link to.
     println!("cargo:rustc-link-lib=formw");
@@ -110,9 +131,62 @@ fn main() {
     println!("cargo:rustc-link-lib=panelw");
     println!("cargo:rustc-link-lib=ncursesw");
 
+    // our 'C' wrapper file name for bindgen to process.
+    let wrapper_file_name = "wrapper.h";
+
+    // our wrapper file contents.
+    let wrapper_contents = "
+#define _XOPEN_SOURCE_EXTENDED 1
+
+#include <ctype.h>
+#include <locale.h>
+
+#include \"%include%/ncurses_dll.h\"
+#include \"%include%/ncurses.h\"
+#include \"%include%/panel.h\"
+#include \"%include%/menu.h\"
+#include \"%include%/form.h\"
+
+// Workaround for rust-bindgen#753
+#define MARK_FIX_753(req_name, type) const type Fix753_##req_name = req_name;
+
+MARK_FIX_753(A_NORMAL, attr_t);
+MARK_FIX_753(A_ATTRIBUTES, attr_t);
+MARK_FIX_753(A_CHARTEXT, attr_t);
+MARK_FIX_753(A_COLOR, attr_t);
+MARK_FIX_753(A_STANDOUT, attr_t);
+MARK_FIX_753(A_UNDERLINE, attr_t);
+MARK_FIX_753(A_REVERSE, attr_t);
+MARK_FIX_753(A_BLINK, attr_t);
+MARK_FIX_753(A_DIM, attr_t);
+MARK_FIX_753(A_BOLD, attr_t);
+MARK_FIX_753(A_ALTCHARSET, attr_t);
+MARK_FIX_753(A_INVIS, attr_t);
+MARK_FIX_753(A_PROTECT, attr_t);
+MARK_FIX_753(A_HORIZONTAL, attr_t);
+MARK_FIX_753(A_LEFT, attr_t);
+MARK_FIX_753(A_LOW, attr_t);
+MARK_FIX_753(A_RIGHT, attr_t);
+MARK_FIX_753(A_TOP, attr_t);
+MARK_FIX_753(A_VERTICAL, attr_t);
+MARK_FIX_753(A_ITALIC, attr_t);"
+    .replace("%include%", install_path.join("include").join("ncursesw").to_str().expect("unable to build wrapper contents!"));
+
+    // create our wrapper file...
+    let mut wrapper_file = File::create(manifest_path.join(wrapper_file_name))
+        .expect("unable to create wrapper file!");
+
+    // and write it's contents.
+    wrapper_file.write_all(wrapper_contents.as_str().as_bytes())
+        .expect("unable to write wrapper file!");
+
+    // sync the file i.e. make sure the contents have been written to disk.
+    wrapper_file.sync_all()
+        .expect("unable to sync wrapper file to disk!");
+
     // build the crates bindings using bindgen and panic if we can't do it for any reason.
     let bindings = bindgen::Builder::default()
-        .header("wrapper.h")                    // 'C' header file
+        .header(wrapper_file_name)              // 'C' header file
         // NCurses core functions
         .blocklist_function("getcchar")         // blacklisted to implement our own function
         .blocklist_function("ripoffline")       // blacklisted to implement our own function
@@ -123,9 +197,12 @@ fn main() {
         //
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding
-        .expect("Unable to generate bindings");
+        .expect("unable to generate bindings!");
 
     bindings
         .write_to_file(out_path.join("bindings.rs"))
-        .expect("Couldn't write bindings");
+        .expect("unable to write bindings!");
+
+    remove_file(manifest_path.join(wrapper_file_name))
+        .expect("unable to remove wrapper file!");
 }
