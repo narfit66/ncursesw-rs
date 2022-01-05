@@ -37,6 +37,8 @@ bindgen = "0.59"
 # conditional compulation of KEY_RESIZE to return as a NCurseswError::KeyResize (the default) for getch(), mvgetch(),
 # mvwgetch(), wgetch(), get_wch(), mvget_wch(), mvwget_wch() and wget_wch().
 key_resize_as_error = []
+# the `key_event_as_error` feature has been depricated as of crate 0.6.3 (the stub has been left in place but has no effect).
+key_event_as_error = []
 docs-rs = []
 
 [package.metadata.docs.rs]

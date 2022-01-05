@@ -28,6 +28,12 @@ pub fn key_resize_as_error() -> bool {
     return false;
 }
 
+#[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
+/// Has the crate been compiled with the `key_event_as_error` feature.
+pub fn key_event_as_error() -> bool {
+    return false;
+}
+
 /// Has the crate been compiled with the `docs-rs` feature.
 pub fn docs_rs() -> bool {
     #[cfg(feature = "docs-rs")]
