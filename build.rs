@@ -27,7 +27,7 @@ extern crate bindgen;
 
 use std::{env, fs::{File, remove_file}, io::Write, path::{Path, PathBuf}, process::Command};
 
-const NCURSES_VERSION: &str = "v6.1";
+const NCURSES_VERSION: &str = "v6.3";
 
 #[derive(Debug)]
 pub struct Fix753 { }
@@ -82,6 +82,7 @@ fn main() {
             .args(&[&format!("--prefix={}", install_path.display()),
                     "--without-ada",
                     "--without-cxx-binding",
+                    "--with-default-terminfo-dir=/usr/share/terminfo",
                     "--disable-db-install",
                     "--without-manpages",
                     "--without-progs",
@@ -135,49 +136,16 @@ fn main() {
     let wrapper_file_name = "wrapper.h";
 
     // our wrapper file contents.
-    let wrapper_contents = "
-#define _XOPEN_SOURCE_EXTENDED 1
-
-#include <ctype.h>
-#include <locale.h>
-
-#include \"%include%/ncurses_dll.h\"
-#include \"%include%/ncurses.h\"
-#include \"%include%/panel.h\"
-#include \"%include%/menu.h\"
-#include \"%include%/form.h\"
-
-// Workaround for rust-bindgen#753
-#define MARK_FIX_753(req_name, type) const type Fix753_##req_name = req_name;
-
-MARK_FIX_753(A_NORMAL, attr_t);
-MARK_FIX_753(A_ATTRIBUTES, attr_t);
-MARK_FIX_753(A_CHARTEXT, attr_t);
-MARK_FIX_753(A_COLOR, attr_t);
-MARK_FIX_753(A_STANDOUT, attr_t);
-MARK_FIX_753(A_UNDERLINE, attr_t);
-MARK_FIX_753(A_REVERSE, attr_t);
-MARK_FIX_753(A_BLINK, attr_t);
-MARK_FIX_753(A_DIM, attr_t);
-MARK_FIX_753(A_BOLD, attr_t);
-MARK_FIX_753(A_ALTCHARSET, attr_t);
-MARK_FIX_753(A_INVIS, attr_t);
-MARK_FIX_753(A_PROTECT, attr_t);
-MARK_FIX_753(A_HORIZONTAL, attr_t);
-MARK_FIX_753(A_LEFT, attr_t);
-MARK_FIX_753(A_LOW, attr_t);
-MARK_FIX_753(A_RIGHT, attr_t);
-MARK_FIX_753(A_TOP, attr_t);
-MARK_FIX_753(A_VERTICAL, attr_t);
-MARK_FIX_753(A_ITALIC, attr_t);"
-    .replace("%include%", install_path.join("include").join("ncursesw").to_str().expect("unable to build wrapper contents!"));
+    let wrapper_contents = {
+        include_str!("assets/wrapper.h")
+    }.replace("%include%", install_path.join("include").join("ncursesw").to_str().expect("unable to build wrapper contents!"));
 
     // create our wrapper file...
     let mut wrapper_file = File::create(manifest_path.join(wrapper_file_name))
         .expect("unable to create wrapper file!");
 
     // and write it's contents.
-    wrapper_file.write_all(wrapper_contents.as_str().as_bytes())
+    wrapper_file.write_all(wrapper_contents.as_bytes())
         .expect("unable to write wrapper file!");
 
     // sync the file i.e. make sure the contents have been written to disk.
@@ -199,10 +167,12 @@ MARK_FIX_753(A_ITALIC, attr_t);"
         .generate()                             // generate the binding
         .expect("unable to generate bindings!");
 
+    // write our bindings file and panic if we can't do it for any reason.
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("unable to write bindings!");
 
+    // clean up after ourselfs by removing our processed `wrapper.h` file.
     remove_file(manifest_path.join(wrapper_file_name))
         .expect("unable to remove wrapper file!");
 }

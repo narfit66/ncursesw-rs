@@ -34,7 +34,7 @@ use libc::{c_void, EINTR};
 use crate::{
     constants::{
         ERR, OK, KEY_MIN, KEY_MAX, KEY_CODE_YES, KEY_RESIZE,
-        KEY_EVENT, TRUE, FALSE
+        TRUE, FALSE
     },
     normal, extend,
     attributescolorpairset::*, changed::*, characterresult::*,
@@ -833,14 +833,10 @@ pub fn get_wch() -> result!(CharacterResult<WideChar>) {
         EINTR        => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
-                #[cfg(feature = "key_event_as_error")]
-                KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
@@ -863,7 +859,6 @@ pub fn get_wstr() -> result!(WideString) {
     match unsafe { ncurses::get_wstr(ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("get_wstr", rc))
@@ -993,8 +988,6 @@ pub fn getch() -> result!(CharacterResult<char>) {
         EINTR      => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getch", rc))
@@ -1071,7 +1064,6 @@ pub fn getn_wstr(number: i32) -> result!(WideString) {
     match unsafe { ncurses::getn_wstr(ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getn_wstr", rc))
@@ -1102,7 +1094,6 @@ pub fn getnstr(number: i32) -> result!(String) {
     match unsafe { ncurses::getnstr(ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getnstr", rc))
@@ -1151,7 +1142,6 @@ pub fn getstr() -> result!(String) {
     match unsafe { ncurses::getstr(ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("getstr", rc))
@@ -1933,14 +1923,10 @@ pub fn mvget_wch(origin: Origin) -> result!(CharacterResult<WideChar>) {
         EINTR        => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
-                #[cfg(feature = "key_event_as_error")]
-                KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
@@ -1963,7 +1949,6 @@ pub fn mvget_wstr(origin: Origin) -> result!(WideString) {
     match unsafe { ncurses::mvget_wstr(origin.y, origin.x, ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvget_wstr", rc))
@@ -1990,8 +1975,6 @@ pub fn mvgetch(origin: Origin) -> result!(CharacterResult<char>) {
         EINTR      => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetch", rc))
@@ -2014,7 +1997,6 @@ pub fn mvgetn_wstr(origin: Origin, number: i32) -> result!(WideString) {
     match unsafe { ncurses::mvgetn_wstr(origin.y, origin.x, ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetn_wstr", rc))
@@ -2045,7 +2027,6 @@ pub fn mvgetnstr(origin: Origin, number: i32) -> result!(String) {
     match unsafe { ncurses::mvgetnstr(origin.y, origin.x, ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetnstr", rc))
@@ -2067,7 +2048,6 @@ pub fn mvgetstr(origin: Origin) -> result!(String) {
     match unsafe { ncurses::mvgetstr(origin.y, origin.x, ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvgetstr", rc))
@@ -2497,14 +2477,10 @@ pub fn mvwget_wch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<Wid
         EINTR        => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
-                #[cfg(feature = "key_event_as_error")]
-                KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
@@ -2527,7 +2503,6 @@ pub fn mvwget_wstr(handle: WINDOW, origin: Origin) -> result!(WideString) {
     match unsafe { ncurses::mvwget_wstr(handle, origin.y, origin.y, ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwget_wstr", rc))
@@ -2563,8 +2538,6 @@ pub fn mvwgetch(handle: WINDOW, origin: Origin) -> result!(CharacterResult<char>
         EINTR      => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetch", rc))
@@ -2588,7 +2561,6 @@ pub fn mvwgetn_wstr(handle: WINDOW, origin: Origin, number: i32) -> result!(Wide
     match unsafe { ncurses::mvwgetn_wstr(handle, origin.y, origin.x, ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetn_wstr", rc))
@@ -2620,7 +2592,6 @@ pub fn mvwgetnstr(handle: WINDOW, origin: Origin, number: i32) -> result!(String
     match unsafe { ncurses::mvwgetnstr(handle, origin.y, origin.x, ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetnstr", rc))
@@ -2642,7 +2613,6 @@ pub fn mvwgetstr(handle: WINDOW, origin: Origin) -> result!(String) {
     match unsafe { ncurses::mvwgetstr(handle, origin.y, origin.x, ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("mvwgetstr", rc))
@@ -4297,14 +4267,10 @@ pub fn wget_wch(handle: WINDOW) -> result!(CharacterResult<WideChar>) {
         EINTR        => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE   => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT    => Err(NCurseswError::KeyEvent),
         KEY_CODE_YES => {
             match i32::try_from(wch[0])? {
                 #[cfg(feature = "key_resize_as_error")]
                 KEY_RESIZE => Err(NCurseswError::KeyResize),
-                #[cfg(feature = "key_event_as_error")]
-                KEY_EVENT  => Err(NCurseswError::KeyEvent),
                 _          => Ok(CharacterResult::Key(KeyBinding::try_from(wch[0])?))
             }
         },
@@ -4327,7 +4293,6 @@ pub fn wget_wstr(handle: WINDOW) -> result!(WideString) {
     match unsafe { ncurses::wget_wstr(handle, ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wget_wstr", rc))
@@ -4364,8 +4329,6 @@ pub fn wgetch(handle: WINDOW) -> result!(CharacterResult<char>) {
         EINTR      => Err(NCurseswError::InterruptedCall),
         #[cfg(feature = "key_resize_as_error")]
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        #[cfg(feature = "key_event_as_error")]
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetch", rc))
@@ -4393,7 +4356,6 @@ pub fn wgetn_wstr(handle: WINDOW, number: i32) -> result!(WideString) {
     match unsafe { ncurses::wgetn_wstr(handle, ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetn_wstr", rc))
@@ -4424,7 +4386,6 @@ pub fn wgetnstr(handle: WINDOW, number: i32) -> result!(String) {
     match unsafe { ncurses::wgetnstr(handle, ptr, number) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetnstr", rc))
@@ -4464,7 +4425,6 @@ pub fn wgetstr(handle: WINDOW) -> result!(String) {
     match unsafe { ncurses::wgetstr(handle, ptr) } {
         EINTR      => Err(NCurseswError::InterruptedCall),
         KEY_RESIZE => Err(NCurseswError::KeyResize),
-        KEY_EVENT  => Err(NCurseswError::KeyEvent),
         rc         => {
             if rc.is_negative() {
                 Err(ncurses_function_error_with_rc!("wgetstr", rc))
@@ -5690,6 +5650,26 @@ pub fn wunctrl_sp(screen: SCREEN, ch: ComplexChar) -> result!(WideChar) {
         //Some(ptr) => Ok(WideChar::from(unsafe { wchar_t::try_from(slice::from_raw_parts(ptr, 1)[0])? })),
         Some(ptr) => Ok(WideChar::from(unsafe { slice::from_raw_parts(ptr, 1)[0] })),
         None      => Err(ncurses_function_error!("wunctrl_sp"))
+    }
+}
+
+/// Screen function of `erasewchar()`.
+pub fn erasewchar_sp(screen: SCREEN) -> result!(WideChar) {
+    let mut wch: [wchar_t; 1] = [0];
+
+    match unsafe { ncurses::erasewchar_sp(screen, wch.as_mut_ptr()) } {
+        OK => Ok(WideChar::from(wch[0])),
+        rc => Err(ncurses_function_error_with_rc!("erasewchar_sp", rc))
+    }
+}
+
+/// Screen function of `killwchar()`.
+pub fn killwchar_sp(screen: SCREEN) -> result!(WideChar) {
+    let mut wch: [wchar_t; 1] = [0];
+
+    match unsafe { ncurses::killwchar_sp(screen, wch.as_mut_ptr()) } {
+        OK => Ok(WideChar::from(wch[0])),
+        rc => Err(ncurses_function_error_with_rc!("killwchar_sp", rc))
     }
 }
 

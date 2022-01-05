@@ -67,6 +67,12 @@ impl FieldOptions {
 
     option_getter!(is_no_left_strip, O_NO_LEFT_STRIP);
     option_setter!(set_no_left_strip, O_NO_LEFT_STRIP);
+
+    option_getter!(is_edge_insert_stay, O_EDGE_INSERT_STAY);
+    option_setter!(set_edge_insert_stay, O_EDGE_INSERT_STAY);
+
+    option_getter!(is_input_limit, O_INPUT_LIMIT);
+    option_setter!(set_input_limit, O_INPUT_LIMIT);
 }
 
 /// Implement the | operator for adding FieldOption to FieldOptions
@@ -104,7 +110,9 @@ impl BitOr<FieldOption> for FieldOptions {
             FieldOption::PassOk         => self.set_pass_ok(true),
             FieldOption::Static         => self.set_static(true),
             FieldOption::DynamicJustify => self.set_dynamic_justify(true),
-            FieldOption::NoLeftStrip    => self.set_no_left_strip(true)
+            FieldOption::NoLeftStrip    => self.set_no_left_strip(true),
+            FieldOption::EdgeInsertStay => self.set_edge_insert_stay(true),
+            FieldOption::InputLimit     => self.set_input_limit(true)
         }
     }
 }
@@ -126,7 +134,9 @@ impl BitXor<FieldOption> for FieldOptions {
             FieldOption::PassOk         => self.set_pass_ok(false),
             FieldOption::Static         => self.set_static(false),
             FieldOption::DynamicJustify => self.set_dynamic_justify(false),
-            FieldOption::NoLeftStrip    => self.set_no_left_strip(false)
+            FieldOption::NoLeftStrip    => self.set_no_left_strip(false),
+            FieldOption::EdgeInsertStay => self.set_edge_insert_stay(false),
+            FieldOption::InputLimit     => self.set_input_limit(false)
         }
     }
 }

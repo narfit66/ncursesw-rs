@@ -2,6 +2,14 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
+## [0.6.3] - ????.??.??
+- Updated NCurses to v6.3.20211021
+- Added `erasewchar_sp` and `killwchar_sp` functions to both 'ncursesw::shims::ncurses` and `ncursesw` modules.
+- Added `FieldOption::EdgeInsertStay` and `FieldOption::InputLimit`.
+- `KeyBinding::Event` and `NCurseswError::KeyEvent` have been deprecated as they are no longer supported by NCurses v6.3.20211021.
+- Have removed `key_event_as_error` crate feature.
+- Environment variable `TERMINFO` no longer needs to be set as we are compiling NCurses with a default terminfo database of `/usr/share/terminfo`.
+
 ## [0.6.2] - 2022.01.04
 - Improved the way NCurses (v6.1) is compiled and linked to in the build script.
 

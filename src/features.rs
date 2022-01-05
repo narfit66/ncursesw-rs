@@ -1,7 +1,7 @@
 /*
     src/features.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -25,14 +25,6 @@ pub fn key_resize_as_error() -> bool {
     #[cfg(feature = "key_resize_as_error")]
     return true;
     #[cfg(not(feature = "key_resize_as_error"))]
-    return false;
-}
-
-/// Has the crate been compiled with the `key_event_as_error` feature.
-pub fn key_event_as_error() -> bool {
-    #[cfg(feature = "key_event_as_error")]
-    return true;
-    #[cfg(not(feature = "key_event_as_error"))]
     return false;
 }
 
