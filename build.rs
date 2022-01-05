@@ -43,22 +43,27 @@ impl bindgen::callbacks::ParseCallbacks for Fix753 {
 fn main() { } // Skip the build script when the doc is building.
 
 #[cfg(not(feature = "docs-rs"))]
+// compile NCurses locally to the crate with all the features required so we can statically link it.
+// this will enable the crate to be independent of any other NCurses installation with a different
+// ABI or feature set installed by the distribution/operating system.
 fn main() {
-    let manifest_path = &PathBuf::from(env::var("CARGO_MANIFEST_DIR")
+    // the cargo manifest directory.
+    let cargo_manifest_dir = &PathBuf::from(env::var("CARGO_MANIFEST_DIR")
         .expect("environment variable 'CARGO_MANIFEST_DIR' is undefined."));
 
-    let out_path = &PathBuf::from(env::var("OUT_DIR")
+    // the output directory.
+    let out_dir = &PathBuf::from(env::var("OUT_DIR")
         .expect("environment variable 'OUT_DIR' is undefined."));
 
     // our upstream working directory for NCurses.
-    let clone_path = &Path::new(out_path).join("ncursesw-upstream");
+    let upstream_path = &Path::new(out_dir).join("ncursesw-upstream");
 
     // our upstream installation directory for NCurses.
-    let install_path = &Path::new(out_path).join("local");
+    let install_path = &Path::new(out_dir).join("local");
 
     // if we haven't got a .git directory then clone NCurses from it's repo and panic if it can't
-    // be done for any reason (this will create the directory clone_path).
-    if !clone_path.join(".git").exists() {
+    // be done for any reason (this will create the directory pointed to by 'upstream_path').
+    if !upstream_path.join(".git").exists() {
         let status = Command::new("git")
             .args(&["clone",
                     "--branch",
@@ -66,8 +71,9 @@ fn main() {
                     "--depth",
                     "1",
                     "https://github.com/mirror/ncurses.git",
-                    &format!("{}", clone_path.display())])
-            .status().unwrap();
+                    &format!("{}", upstream_path.display())])
+            .status()
+            .expect("git clone command failed!");
 
         if !status.success() {
             panic!("git clone of ncurses was not successful!");
@@ -76,9 +82,9 @@ fn main() {
 
     // if we don't already have a makefile i.e. we haven't already configured NCurses then
     // configure with the features required and panic if it can't be done for any reason.
-    if !clone_path.join("Makefile").exists() {
+    if !upstream_path.join("Makefile").exists() {
         let status = Command::new("./configure")
-            .current_dir(clone_path)
+            .current_dir(upstream_path)
             .args(&[&format!("--prefix={}", install_path.display()),
                     "--without-ada",
                     "--without-cxx-binding",
@@ -94,7 +100,8 @@ fn main() {
                     "--enable-ext-mouse",
                     "--enable-ext-putwin",
                     "CPPFLAGS=-P"])
-            .status().unwrap();
+            .status()
+            .expect("configure command failed!");
 
         if !status.success() {
             panic!("configure of ncurses was not successful!");
@@ -103,8 +110,9 @@ fn main() {
 
     // make NCurses and panic if it can't be done for any reason.
     let status = Command::new("make")
-        .current_dir(clone_path)
-        .status().unwrap();
+        .current_dir(upstream_path)
+        .status()
+        .expect("make command failed!");
 
     if !status.success() {
         panic!("make of ncurses was not successful!");
@@ -114,9 +122,10 @@ fn main() {
     // so do the install and panic if it can't be done for any reason.
     if !install_path.exists() {
         let status = Command::new("make")
-            .current_dir(clone_path)
+            .current_dir(upstream_path)
             .arg("install")
-            .status().unwrap();
+            .status()
+            .expect("make install command failed!");
 
         if !status.success() {
             panic!("make install of ncurses was not successful!");
@@ -133,15 +142,17 @@ fn main() {
     println!("cargo:rustc-link-lib=ncursesw");
 
     // our 'C' wrapper file name for bindgen to process.
-    let wrapper_file_name = "wrapper.h";
+    let wrapper_fname = "wrapper.h";
+    let wrapper_fname_path = &cargo_manifest_dir.join(wrapper_fname);
 
-    // our wrapper file contents.
+    // define our wrapper file contents, this is derived from our asset file replacing all occurances
+    // of %include% with the full path that the installed include files will be located in.
     let wrapper_contents = {
         include_str!("assets/wrapper.h")
     }.replace("%include%", install_path.join("include").join("ncursesw").to_str().expect("unable to build wrapper contents!"));
 
     // create our wrapper file...
-    let mut wrapper_file = File::create(manifest_path.join(wrapper_file_name))
+    let mut wrapper_file = File::create(wrapper_fname_path)
         .expect("unable to create wrapper file!");
 
     // and write it's contents.
@@ -154,7 +165,7 @@ fn main() {
 
     // build the crates bindings using bindgen and panic if we can't do it for any reason.
     let bindings = bindgen::Builder::default()
-        .header(wrapper_file_name)              // 'C' header file
+        .header(wrapper_fname)                  // 'C' header file
         // NCurses core functions
         .blocklist_function("getcchar")         // blacklisted to implement our own function
         .blocklist_function("ripoffline")       // blacklisted to implement our own function
@@ -169,10 +180,11 @@ fn main() {
 
     // write our bindings file and panic if we can't do it for any reason.
     bindings
-        .write_to_file(out_path.join("bindings.rs"))
+        .write_to_file(out_dir.join("bindings.rs"))
         .expect("unable to write bindings!");
 
-    // clean up after ourselfs by removing our processed `wrapper.h` file.
-    remove_file(manifest_path.join(wrapper_file_name))
+    // clean up after ourselfs by removing our processed `wrapper.h` file and panic if we can't do
+    // it for any reason.
+    remove_file(wrapper_fname_path)
         .expect("unable to remove wrapper file!");
 }
