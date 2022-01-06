@@ -1,7 +1,7 @@
 /*
     src/form/fieldoption.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -47,5 +47,13 @@ pub enum FieldOption {
     /// Permit dynamic fields to be justified, like static fields.
     DynamicJustify,
     /// Preserve leading whitespace in the field buffer, which is normally discarded.
-    NoLeftStrip
+    NoLeftStrip,
+    /// When inserting into a field up to the boundary position, optionally delay the scrolling, so that
+    /// the last inserted character remains visible, but advance the cursor to reflect the insertion.
+    /// This allows the form library to display the inserted character in one-character fields as well as
+    /// allowing the library to maintain consistent state.
+    EdgeInsertStay,
+    /// The `set_max_field` function checks for this extension, which allows a dynamic field to shrink if
+    /// the new limit is smaller than the current field size.
+    InputLimit
 }

@@ -1,7 +1,7 @@
 /*
-    src/features.rs
+    assets/wrapper.h
 
-    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
+    Copyright (c) 2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,24 +20,38 @@
     IN THE SOFTWARE.
 */
 
-/// Has the crate been compiled with the `key_resize_as_error` feature.
-pub fn key_resize_as_error() -> bool {
-    #[cfg(feature = "key_resize_as_error")]
-    return true;
-    #[cfg(not(feature = "key_resize_as_error"))]
-    return false;
-}
+#define _XOPEN_SOURCE_EXTENDED 1
 
-#[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
-/// Has the crate been compiled with the `key_event_as_error` feature.
-pub fn key_event_as_error() -> bool {
-    return false;
-}
+#include <ctype.h>
+#include <locale.h>
 
-/// Has the crate been compiled with the `docs-rs` feature.
-pub fn docs_rs() -> bool {
-    #[cfg(feature = "docs-rs")]
-    return true;
-    #[cfg(not(feature = "docs-rs"))]
-    return false;
-}
+#include "%include%/ncurses_dll.h"
+
+#include "%include%/ncurses.h"
+#include "%include%/panel.h"
+#include "%include%/menu.h"
+#include "%include%/form.h"
+
+// Workaround for rust-bindgen#753
+#define MARK_FIX_753(req_name, type) const type Fix753_##req_name = req_name;
+
+MARK_FIX_753(A_NORMAL, attr_t);
+MARK_FIX_753(A_ATTRIBUTES, attr_t);
+MARK_FIX_753(A_CHARTEXT, attr_t);
+MARK_FIX_753(A_COLOR, attr_t);
+MARK_FIX_753(A_STANDOUT, attr_t);
+MARK_FIX_753(A_UNDERLINE, attr_t);
+MARK_FIX_753(A_REVERSE, attr_t);
+MARK_FIX_753(A_BLINK, attr_t);
+MARK_FIX_753(A_DIM, attr_t);
+MARK_FIX_753(A_BOLD, attr_t);
+MARK_FIX_753(A_ALTCHARSET, attr_t);
+MARK_FIX_753(A_INVIS, attr_t);
+MARK_FIX_753(A_PROTECT, attr_t);
+MARK_FIX_753(A_HORIZONTAL, attr_t);
+MARK_FIX_753(A_LEFT, attr_t);
+MARK_FIX_753(A_LOW, attr_t);
+MARK_FIX_753(A_RIGHT, attr_t);
+MARK_FIX_753(A_TOP, attr_t);
+MARK_FIX_753(A_VERTICAL, attr_t);
+MARK_FIX_753(A_ITALIC, attr_t);

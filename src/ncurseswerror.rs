@@ -1,7 +1,7 @@
 /*
     src/ncurseswerror.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -37,6 +37,7 @@ pub enum NCurseswError {
     InterruptedCall,
     #[error("KEY_RESIZE")]
     KeyResize,
+    #[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
     #[error("KEY_EVENT")]
     KeyEvent,
     #[error("'{color}' is not a known color")]

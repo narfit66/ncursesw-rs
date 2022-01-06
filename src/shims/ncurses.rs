@@ -1,7 +1,7 @@
 /*
     src/shims/ncurses.rs
 
-    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -4671,6 +4671,26 @@ pub unsafe fn wunctrl_sp(sp: SCREEN, ch: *mut cchar_t) -> Option<*mut wchar_t> {
     assert!(!ch.is_null(), "{}wunctrl_sp() : ch.is_null()", MODULE_PATH);
 
     bindings::wunctrl_sp(sp, ch).as_mut().map(|ptr| ptr as *mut wchar_t)
+}
+
+/// # Safety
+///
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn erasewchar_sp(sp: SCREEN, ch: *mut wchar_t) -> i32 {
+    assert!(!sp.is_null(), "{}erasewchar_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!ch.is_null(), "{}erasewchar_sp() : ch.is_null()", MODULE_PATH);
+
+    bindings::erasewchar_sp(sp, ch)
+}
+
+/// # Safety
+///
+/// <https://invisible-island.net/ncurses/man/curs_sp_funcs.3x.html>
+pub unsafe fn killwchar_sp(sp: SCREEN, ch: *mut wchar_t) -> i32 {
+    assert!(!sp.is_null(), "{}killwchar_sp() : sp.is_null()", MODULE_PATH);
+    assert!(!ch.is_null(), "{}killwchar_sp() : ch.is_null()", MODULE_PATH);
+
+    bindings::killwchar_sp(sp, ch)
 }
 
 // private functions

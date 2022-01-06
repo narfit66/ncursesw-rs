@@ -20,6 +20,8 @@
     IN THE SOFTWARE.
 */
 
+#![allow(unused_attributes)]
+#![allow(deprecated)]
 #![allow(clippy::from_over_into)]
 
 use std::convert::TryFrom;
@@ -210,6 +212,7 @@ pub enum KeyBinding {
     MouseEvent,                
     /// Terminal resize event
     ResizeEvent,               
+    #[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
     /// We were interrupted by an event
     Event,                     
     ///
@@ -318,6 +321,7 @@ impl From<i32> for KeyBinding {
             KEY_UNDO         => KeyBinding::Undo,
             KEY_MOUSE        => KeyBinding::MouseEvent,
             KEY_RESIZE       => KeyBinding::ResizeEvent,
+            #[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
             KEY_EVENT        => KeyBinding::Event,
             _                => KeyBinding::Unknown(key)
         }
@@ -422,6 +426,7 @@ impl Into<i32> for KeyBinding {
             KeyBinding::Undo                  => KEY_UNDO,
             KeyBinding::MouseEvent            => KEY_MOUSE,
             KeyBinding::ResizeEvent           => KEY_RESIZE,
+            #[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
             KeyBinding::Event                 => KEY_EVENT,
             KeyBinding::Unknown(key)          => key
         }

@@ -215,8 +215,9 @@ wrap_const!(KEY_SUSPEND: i32);             // suspend key
 wrap_const!(KEY_UNDO: i32);                // undo key
 wrap_const!(KEY_MOUSE: i32);               // Mouse event has occurred
 wrap_const!(KEY_RESIZE: i32);              // Terminal resize event
-wrap_const!(KEY_EVENT: i32);               // We were interrupted by an event
-wrap_const!(KEY_MAX: i32);                 // Maximum key value is 0633
+#[deprecated(since = "0.6.3", note = "this was deprecated as of NCurses API v6.3.20211021")]
+pub const KEY_EVENT: i32 = i32::MIN;       // We were interrupted by an event.
+wrap_const!(KEY_MAX: i32);                 // Maximum key value is 0632
 
 // Attributes.
 wrap_const!(A_NORMAL: attr_t);
@@ -268,6 +269,8 @@ wrap_const!(O_IGNORECASE: i32);
 wrap_const!(O_SHOWMATCH: i32);
 wrap_const!(O_NONCYCLIC: i32);
 wrap_const!(O_MOUSE_MENU: i32);
+wrap_const!(O_EDGE_INSERT_STAY: i32);
+wrap_const!(O_INPUT_LIMIT: i32);
 
 wrap_const!(REQ_LEFT_ITEM: i32);
 wrap_const!(REQ_RIGHT_ITEM: i32);

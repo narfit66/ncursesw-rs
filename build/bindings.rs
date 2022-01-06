@@ -96,14 +96,14 @@ pub const LC_TELEPHONE_MASK: u32 = 1024;
 pub const LC_MEASUREMENT_MASK: u32 = 2048;
 pub const LC_IDENTIFICATION_MASK: u32 = 4096;
 pub const LC_ALL_MASK: u32 = 8127;
+pub const NCURSES_DLL_H_incl: u32 = 1;
 pub const CURSES: u32 = 1;
 pub const CURSES_H: u32 = 1;
 pub const NCURSES_VERSION_MAJOR: u32 = 6;
-pub const NCURSES_VERSION_MINOR: u32 = 1;
-pub const NCURSES_VERSION_PATCH: u32 = 20180127;
-pub const NCURSES_VERSION: &[u8; 4usize] = b"6.1\0";
+pub const NCURSES_VERSION_MINOR: u32 = 3;
+pub const NCURSES_VERSION_PATCH: u32 = 20211021;
+pub const NCURSES_VERSION: &[u8; 4usize] = b"6.3\0";
 pub const NCURSES_MOUSE_VERSION: u32 = 2;
-pub const NCURSES_DLL_H_incl: u32 = 1;
 pub const _STDINT_H: u32 = 1;
 pub const __GLIBC_USE_LIB_EXT2: u32 = 0;
 pub const __GLIBC_USE_IEC_60559_BFP_EXT: u32 = 0;
@@ -156,7 +156,7 @@ pub const NCURSES_OPAQUE: u32 = 0;
 pub const NCURSES_OPAQUE_FORM: u32 = 0;
 pub const NCURSES_OPAQUE_MENU: u32 = 0;
 pub const NCURSES_OPAQUE_PANEL: u32 = 0;
-pub const NCURSES_WATTR_MACROS: u32 = 1;
+pub const NCURSES_WATTR_MACROS: u32 = 0;
 pub const NCURSES_REENTRANT: u32 = 0;
 pub const NCURSES_INTEROP_FUNCS: u32 = 1;
 pub const NCURSES_TPARM_VARARGS: u32 = 1;
@@ -234,9 +234,9 @@ pub const _WINT_T: u32 = 1;
 pub const __mbstate_t_defined: u32 = 1;
 pub const WEOF: u32 = 4294967295;
 pub const CCHARW_MAX: u32 = 5;
-pub const NCURSES_EXT_COLORS: u32 = 20180127;
-pub const NCURSES_EXT_FUNCS: u32 = 20180127;
-pub const NCURSES_SP_FUNCS: u32 = 20180127;
+pub const NCURSES_EXT_COLORS: u32 = 20211021;
+pub const NCURSES_EXT_FUNCS: u32 = 20211021;
+pub const NCURSES_SP_FUNCS: u32 = 20211021;
 pub const NCURSES_ATTR_SHIFT: u32 = 8;
 pub const A_NORMAL: u32 = 0;
 pub const KEY_CODE_YES: u32 = 256;
@@ -332,7 +332,6 @@ pub const KEY_SUSPEND: u32 = 407;
 pub const KEY_UNDO: u32 = 408;
 pub const KEY_MOUSE: u32 = 409;
 pub const KEY_RESIZE: u32 = 410;
-pub const KEY_EVENT: u32 = 411;
 pub const KEY_MAX: u32 = 511;
 pub const _XOPEN_CURSES: u32 = 1;
 pub const NCURSES_BUTTON_RELEASED: u32 = 1;
@@ -420,6 +419,8 @@ pub const O_PASSOK: u32 = 256;
 pub const O_STATIC: u32 = 512;
 pub const O_DYNAMIC_JUSTIFY: u32 = 1024;
 pub const O_NO_LEFT_STRIP: u32 = 2048;
+pub const O_EDGE_INSERT_STAY: u32 = 4096;
+pub const O_INPUT_LIMIT: u32 = 8192;
 pub const O_NL_OVERLOAD: u32 = 1;
 pub const O_BS_OVERLOAD: u32 = 2;
 pub const REQ_NEXT_PAGE: u32 = 512;
@@ -5492,10 +5493,13 @@ extern "C" {
     pub fn term_attrs_sp(arg1: *mut SCREEN) -> attr_t;
 }
 extern "C" {
-    pub fn unget_wch_sp(arg1: *mut SCREEN, arg2: wchar_t) -> ::std::os::raw::c_int;
+    pub fn erasewchar_sp(arg1: *mut SCREEN, arg2: *mut wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn wunctrl_sp(arg1: *mut SCREEN, arg2: *mut cchar_t) -> *mut wchar_t;
+    pub fn killwchar_sp(arg1: *mut SCREEN, arg2: *mut wchar_t) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn unget_wch_sp(arg1: *mut SCREEN, arg2: wchar_t) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn vid_attr_sp(
@@ -5513,6 +5517,9 @@ extern "C" {
         arg4: *mut ::std::os::raw::c_void,
         arg5: NCURSES_OUTC_sp,
     ) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn wunctrl_sp(arg1: *mut SCREEN, arg2: *mut cchar_t) -> *mut wchar_t;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -5674,6 +5681,12 @@ extern "C" {
 }
 extern "C" {
     pub fn trace(arg1: ::std::os::raw::c_uint);
+}
+extern "C" {
+    pub fn curses_trace(arg1: ::std::os::raw::c_uint) -> ::std::os::raw::c_uint;
+}
+extern "C" {
+    pub fn exit_curses(arg1: ::std::os::raw::c_int);
 }
 extern "C" {
     pub fn unctrl(arg1: chtype) -> *const ::std::os::raw::c_char;
@@ -6654,6 +6667,7 @@ extern "C" {
 pub type FIELD_CELL = *mut ::std::os::raw::c_void;
 pub type Form_Options = ::std::os::raw::c_int;
 pub type Field_Options = ::std::os::raw::c_int;
+#[doc = "  _PAGE  *"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct pagenode {
@@ -6715,7 +6729,9 @@ fn bindgen_test_layout_pagenode() {
         )
     );
 }
+#[doc = "  _PAGE  *"]
 pub type _PAGE = pagenode;
+#[doc = "  FIELD  *"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct fieldnode {
@@ -7008,7 +7024,9 @@ fn bindgen_test_layout_fieldnode() {
         )
     );
 }
+#[doc = "  FIELD  *"]
 pub type FIELD = fieldnode;
+#[doc = "  FORM  *"]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct formnode {
@@ -7268,7 +7286,9 @@ fn bindgen_test_layout_formnode() {
         )
     );
 }
+#[doc = "  FORM  *"]
 pub type FORM = formnode;
+#[doc = "  FIELDTYPE  *"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct typenode {
@@ -7616,9 +7636,11 @@ fn bindgen_test_layout_typenode() {
         )
     );
 }
+#[doc = "  FIELDTYPE  *"]
 pub type FIELDTYPE = typenode;
 pub type Form_Hook = ::std::option::Option<unsafe extern "C" fn(arg1: *mut FORM)>;
 extern "C" {
+    #[doc = "  standard field types  *"]
     pub static mut TYPE_ALPHA: *mut FIELDTYPE;
 }
 extern "C" {
@@ -7637,9 +7659,12 @@ extern "C" {
     pub static mut TYPE_REGEXP: *mut FIELDTYPE;
 }
 extern "C" {
+    #[doc = "  built-in additional field types  *"]
+    #[doc = "  They are not defined in SVr4     *"]
     pub static mut TYPE_IPV4: *mut FIELDTYPE;
 }
 extern "C" {
+    #[doc = "  FIELDTYPE routines  *"]
     pub fn new_fieldtype(
         field_check: ::std::option::Option<
             unsafe extern "C" fn(arg1: *mut FIELD, arg2: *const ::std::os::raw::c_void) -> bool,
@@ -7684,6 +7709,7 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
+    #[doc = "  FIELD routines  *"]
     pub fn new_field(
         arg1: ::std::os::raw::c_int,
         arg2: ::std::os::raw::c_int,
@@ -7819,6 +7845,7 @@ extern "C" {
     pub fn field_opts(arg1: *const FIELD) -> Field_Options;
 }
 extern "C" {
+    #[doc = "  FORM routines  *"]
     pub fn new_form(arg1: *mut *mut FIELD) -> *mut FORM;
 }
 extern "C" {
