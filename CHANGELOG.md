@@ -2,9 +2,9 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
-## [0.6.3] - ????.??.??
+## [0.6.3] - 2022.01.06
 - Updated NCurses to v6.3.20211021
-- Added `erasewchar_sp` and `killwchar_sp` functions to both 'ncursesw::shims::ncurses` and `ncursesw` modules.
+- Added `erasewchar_sp()` and `killwchar_sp()` functions to both `ncursesw::shims::ncurses` and `ncursesw` namespaces.
 - Added `FieldOption::EdgeInsertStay` and `FieldOption::InputLimit`.
 - `KeyBinding::Event` and `NCurseswError::KeyEvent` have been deprecated as they are no longer supported by NCurses v6.3.20211021.
 - Have removed `key_event_as_error` crate feature.
@@ -14,7 +14,7 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Improved the way NCurses (v6.1) is compiled and linked to in the build script.
 
 ## [0.6.1] - 2022.01.03
-- NCurses (v6.1) is now compiled from it's git repository and is statically linked to this crate.
+- NCurses (v6.1) is now compiled from its git repository and is statically linked to this crate.
 
 ## [0.6.0] - 2022.01.01
 - Upgraded source code to rust 2021 edition.
