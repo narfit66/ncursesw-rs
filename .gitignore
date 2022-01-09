@@ -3,3 +3,4 @@ temp
 Cargo.lock
 *.bk
 *.swp
+wrapper.h

@@ -25,7 +25,7 @@
 
 extern crate bindgen;
 
-use std::{env, fs::{File, remove_file}, io::Write, path::{Path, PathBuf}, process::Command};
+use std::{env, fs, path::{Path, PathBuf}, process::Command};
 
 const NCURSES_VERSION: &str = "v6.3";
 
@@ -152,27 +152,19 @@ fn main() {
     }.replace("%include%", install_path.join("include").join("ncursesw").to_str().expect("unable to build wrapper contents!"));
 
     // create our wrapper file...
-    let mut wrapper_file = File::create(wrapper_fname_path)
-        .expect("unable to create wrapper file!");
-
-    // and write it's contents.
-    wrapper_file.write_all(wrapper_contents.as_bytes())
+    fs::write(wrapper_fname_path, wrapper_contents.as_bytes())
         .expect("unable to write wrapper file!");
-
-    // sync the file i.e. make sure the contents have been written to disk.
-    wrapper_file.sync_all()
-        .expect("unable to sync wrapper file to disk!");
 
     // build the crates bindings using bindgen and panic if we can't do it for any reason.
     let bindings = bindgen::Builder::default()
         .header(wrapper_fname)                  // 'C' header file
         // NCurses core functions
-        .blocklist_function("getcchar")         // blacklisted to implement our own function
-        .blocklist_function("ripoffline")       // blacklisted to implement our own function
-        .blocklist_function("ripoffline_sp")    // blacklisted to implement our own function
+        .blocklist_function("getcchar")         // blocked to implement our own function
+        .blocklist_function("ripoffline")       // blocked to implement our own function
+        .blocklist_function("ripoffline_sp")    // blocked to implement our own function
         // NCurses menu types.
-        .blocklist_type("ITEM")                 // blacklisted to implement our own type
-        .blocklist_type("MENU")                 // blacklisted to implement our own type
+        .blocklist_type("ITEM")                 // blocked to implement our own type
+        .blocklist_type("MENU")                 // blocked to implement our own type
         //
         .parse_callbacks(Box::new(Fix753 { }))  // parse output to deal with rust-bindgen#753
         .generate()                             // generate the binding
@@ -183,8 +175,10 @@ fn main() {
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("unable to write bindings!");
 
-    // clean up after ourselfs by removing our processed `wrapper.h` file and panic if we can't do
-    // it for any reason.
-    remove_file(wrapper_fname_path)
-        .expect("unable to remove wrapper file!");
+    // clean up after ourselfs by removing our processed `wrapper.h` file, if this fails then don't
+    // worry about it as the 'wrapper.h' can be left behind when this package is a dependencey and
+    // is in the '.gitignore' for the development package.
+    // This is a better solution than if failing with an 'expect()' as this will occasional cause
+    // the compilation to faile under vscode.
+    let _ = fs::remove_file(wrapper_fname_path);
 }
