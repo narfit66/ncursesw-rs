@@ -34,7 +34,7 @@ use crate::{
 };
 
 /// Ascii character and rendition.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq, Hash)]
 pub struct ChtypeChar {
     raw: chtype
 }

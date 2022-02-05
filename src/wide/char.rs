@@ -38,7 +38,7 @@ use crate::{
 };
 
 /// Wide character (UTF-8 character).
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq, Hash)]
 pub struct WideChar {
     raw: wint_t
 }
