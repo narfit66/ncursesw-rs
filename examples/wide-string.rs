@@ -1,7 +1,7 @@
 /*
     examples/wide-string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -40,11 +40,11 @@ pub fn main_routine() -> Result<(), NCurseswError> {
     let str1 = "\u{41f}\u{440}\u{438}\u{432}\u{435}\u{442} is hello in russian!\n";
     let str2 = "🙈🙊🙉🙈🙊🙉\n";
 
-    let wide_string1 = &WideString::from_str(str1);
-    let wide_string2 = &WideString::from_str(str2);
+    let wide_string1 = WideString::from(str1);
+    let wide_string2 = WideString::from(str2);
 
-    addwstr(wide_string1)?;
-    addwstr(wide_string2)?;
+    addwstr(wide_string1.as_ref())?;
+    addwstr(wide_string2.as_ref())?;
 
     refresh()?;
 

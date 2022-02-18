@@ -1,7 +1,7 @@
 /*
     examples/complex-string.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -43,16 +43,16 @@ pub fn main_routine() -> Result<(), NCurseswError> {
     let str1 = "\u{41f}\u{440}\u{438}\u{432}\u{435}\u{442} is hello in russian!";
     let str2 = "🙈🙊🙉🙈🙊🙉";
 
-    let complex_string1 = &ComplexString::from_wide_string(&WideString::from_str(str1), &attrs, &color_pair0)?;
-    let complex_string2 = &ComplexString::from_wide_string(&WideString::from_str(str2), &attrs, &color_pair0)?;
+    let complex_string1 = ComplexString::from_wide_string(WideString::from(str1).as_ref(), attrs.as_ref(), color_pair0.as_ref())?;
+    let complex_string2 = ComplexString::from_wide_string(WideString::from(str2).as_ref(), attrs.as_ref(), color_pair0.as_ref())?;
 
     let mut origin = Origin { y: 1, x: 1 };
 
-    mvadd_wchstr(origin, complex_string1)?;
+    mvadd_wchstr(origin, complex_string1.as_ref())?;
 
     origin.y += 1;
 
-    mvadd_wchstr(origin, complex_string2)?;
+    mvadd_wchstr(origin, complex_string2.as_ref())?;
 
     refresh()?;
 

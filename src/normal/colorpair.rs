@@ -124,3 +124,15 @@ impl From<Attributes> for ColorPair {
         Self::_from(attrs.screen(), PAIR_NUMBER(attrs.as_attr_t()))
     }
 }
+
+impl AsRef<ColorPair> for ColorPair {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl AsMut<ColorPair> for ColorPair {
+    fn as_mut(&mut self) -> &mut Self {
+        self
+    }
+}

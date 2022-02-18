@@ -34,7 +34,7 @@ use crate::{
 /// Complex character (wide character and rendition).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ComplexChar {
-    raw: cchar_t
+    inner: cchar_t
 }
 
 impl ComplexChar {
@@ -61,12 +61,12 @@ impl ComplexChar {
 
 impl From<cchar_t> for ComplexChar {
     fn from(raw: cchar_t) -> Self {
-        Self { raw }
+        Self { inner: raw }
     }
 }
 
 impl Into<cchar_t> for ComplexChar {
     fn into(self) -> cchar_t {
-        self.raw
+        self.inner
     }
 }

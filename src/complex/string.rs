@@ -34,12 +34,12 @@ use crate::{
 /// Complex character string (wide characters and renditions).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ComplexString {
-    raw: Vec<cchar_t>
+    inner: Vec<cchar_t>
 }
 
 impl ComplexString {
     pub fn new() -> Self {
-        Self { raw: vec!() }
+        Self { inner: vec!() }
     }
 
     pub fn from_wide_string<A, P, T>(str: &WideString, attrs: &A, color_pair: &P) -> result!(Self)
@@ -57,7 +57,7 @@ impl ComplexString {
             }
         }
 
-        Ok(Self { raw })
+        Ok(Self { inner: raw })
     }
 
     pub fn from_str<A, P, T>(str: &str, attrs: &A, color_pair: &P) -> result!(Self)
@@ -74,11 +74,11 @@ impl ComplexString {
             }
         }
 
-        Ok(Self { raw })
+        Ok(Self { inner: raw })
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
-        Self { raw: Vec::with_capacity(capacity) }
+        Self { inner: Vec::with_capacity(capacity) }
     }
 
     //pub unsafe fn from_raw_parts(buf: *mut ChtypeChar, length: usize, capacity: usize) -> Self { }
@@ -86,47 +86,47 @@ impl ComplexString {
     //pub fn from_ascii<B>(bytes: B) -> Result<ChtypeString, FromAsciiError<B>> where B: Into<Vec<u8>> + AsRef<[u8]> { }
 
     pub fn push_str(&mut self, rhs: &Self) {
-        self.raw.append(&mut Self::into(rhs.to_owned()));
+        self.inner.append(&mut Self::into(rhs.to_owned()));
     }
 
     pub fn capacity(&self) -> usize {
-        self.raw.capacity()
+        self.inner.capacity()
     }
 
     pub fn reserve(&mut self, additional: usize) {
-        self.raw.reserve(additional)
+        self.inner.reserve(additional)
     }
 
     pub fn reserve_exact(&mut self, additional: usize) {
-        self.raw.reserve_exact(additional)
+        self.inner.reserve_exact(additional)
     }
 
     pub fn shrink_to_fit(&mut self) {
-        self.raw.shrink_to_fit()
+        self.inner.shrink_to_fit()
     }
 
     pub fn push(&mut self, rhs: &ComplexChar) {
-        self.raw.push(ComplexChar::into(rhs.to_owned()));
+        self.inner.push(ComplexChar::into(rhs.to_owned()));
     }
 
     pub fn truncate(&mut self, new_len: usize) {
-        self.raw.truncate(new_len)
+        self.inner.truncate(new_len)
     }
 
     pub fn pop(&mut self) -> Option<ComplexChar> {
-        self.raw.pop().map(ComplexChar::from)
+        self.inner.pop().map(ComplexChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> ComplexChar {
-        ComplexChar::from(self.raw.remove(idx))
+        ComplexChar::from(self.inner.remove(idx))
     }
 
     pub fn insert(&mut self, idx: usize, ch: ComplexChar) {
-        self.raw.insert(idx, ComplexChar::into(ch))
+        self.inner.insert(idx, ComplexChar::into(ch))
     }
 
     pub fn len(&self) -> usize {
-        self.raw.len()
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -134,7 +134,7 @@ impl ComplexString {
     }
 
     pub fn clear(&mut self) {
-        self.raw.clear()
+        self.inner.clear()
     }
 }
 
@@ -144,36 +144,48 @@ impl Default for ComplexString {
     }
 }
 
-impl<'a> From<&'a Vec<ComplexChar>> for ComplexString {
+impl <'a>From<&'a Vec<ComplexChar>> for ComplexString {
     fn from(vwch: &'a Vec<ComplexChar>) -> Self {
-        Self { raw: vwch.iter().map(|wch| ComplexChar::into(*wch)).collect() }
+        Self { inner: vwch.iter().map(|wch| ComplexChar::into(*wch)).collect() }
     }
 }
 
 impl Into<Vec<ComplexChar>> for ComplexString {
     fn into(self) -> Vec<ComplexChar> {
-        self.raw.iter().map(|cch| ComplexChar::from(*cch)).collect()
+        self.inner.iter().map(|cch| ComplexChar::from(*cch)).collect()
     }
 }
 
-impl<'a> From<&'a [cchar_t]> for ComplexString {
+impl <'a>From<&'a [cchar_t]> for ComplexString {
     fn from(slice: &'a [cchar_t]) -> Self {
-        Self { raw : slice.to_vec() }
+        Self { inner : slice.to_vec() }
     }
 }
 
 impl Into<Vec<cchar_t>> for ComplexString {
     fn into(self) -> Vec<cchar_t> {
-        self.raw
+        self.inner
     }
 }
 
 impl RawWithNul<Vec<cchar_t>> for ComplexString {
     fn raw_with_nul(self) -> Vec<cchar_t> {
-        let mut raw = self.raw;
+        let mut raw = self.inner;
 
         raw.push(unsafe { std::mem::zeroed() });
 
         raw.to_owned()
+    }
+}
+
+impl AsRef<ComplexString> for ComplexString {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl AsMut<ComplexString> for ComplexString {
+    fn as_mut(&mut self) -> &mut Self {
+        self
     }
 }

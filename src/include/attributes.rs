@@ -1,7 +1,7 @@
 /*
     src/include/attributes.rs
 
-    Copyright (c) 2019-2021 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -253,5 +253,17 @@ impl Into<attr_t> for Attributes {
 impl fmt::Debug for Attributes {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Attributes {{ screen: {:?}, raw: 0b{:032b} }}", self.screen, self.raw)
+    }
+}
+
+impl AsRef<Attributes> for Attributes {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl AsMut<Attributes> for Attributes {
+    fn as_mut(&mut self) -> &mut Self {
+        self
     }
 }

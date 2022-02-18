@@ -1,7 +1,7 @@
 /*
     examples/COLOR_PAIR-test.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -52,13 +52,13 @@ fn main_routine() -> Result<(), NCurseswError> {
         let color_pair5 = ColorPair::new(5, Colors::new(green, yellow))?;
         let color_pair6 = ColorPair::new(6, Colors::new(green, blue))?;
 
-        addstr(&color_pair_info(color_pair0))?;
-        addstr(&color_pair_info(color_pair1))?;
-        addstr(&color_pair_info(color_pair2))?;
-        addstr(&color_pair_info(color_pair3))?;
-        addstr(&color_pair_info(color_pair4))?;
-        addstr(&color_pair_info(color_pair5))?;
-        addstr(&color_pair_info(color_pair6))?;
+        addstr(color_pair_info(color_pair0).as_str())?;
+        addstr(color_pair_info(color_pair1).as_str())?;
+        addstr(color_pair_info(color_pair2).as_str())?;
+        addstr(color_pair_info(color_pair3).as_str())?;
+        addstr(color_pair_info(color_pair4).as_str())?;
+        addstr(color_pair_info(color_pair5).as_str())?;
+        addstr(color_pair_info(color_pair6).as_str())?;
     } else {
         addstr("terminal has no color support!!!")?;
     }

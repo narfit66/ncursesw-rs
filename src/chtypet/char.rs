@@ -36,21 +36,21 @@ use crate::{
 /// Ascii character and rendition.
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, Hash)]
 pub struct ChtypeChar {
-    raw: chtype
+    inner: chtype
 }
 
 impl ChtypeChar {
     pub fn new(ch: AsciiChar) -> Self {
-        Self { raw: chtype::from(ch.as_byte()) }
+        Self { inner: chtype::from(ch.as_byte()) }
     }
 
     pub fn from_chtype(raw: chtype) -> Self {
-        Self { raw }
+        Self { inner: raw }
     }
 
     /// Converts a Chtype character into a `u8`.
     pub fn as_byte(self) -> u8 {
-        self.raw.to_be_bytes()[3]
+        self.inner.to_be_bytes()[3]
     }
 
     /// Converts a Chtype character into a `char`.
@@ -95,7 +95,7 @@ impl ChtypeChar {
 
     /// Get the attributes of the Chtype character.
     pub fn get_attributes(self) -> Attributes {
-        Attributes::_from(None, self.raw & A_ATTRIBUTES)
+        Attributes::_from(None, self.inner & A_ATTRIBUTES)
     }
 }
 
@@ -103,7 +103,7 @@ impl BitOr<Attributes> for ChtypeChar {
     type Output = Self;
 
     fn bitor(self, rhs: Attributes) -> Self::Output {
-        Self { raw: self.raw | rhs.as_attr_t() }
+        Self { inner: self.inner | rhs.as_attr_t() }
     }
 }
 
@@ -111,7 +111,7 @@ impl BitXor<Attributes> for ChtypeChar {
     type Output = Self;
 
     fn bitxor(self, rhs: Attributes) -> Self::Output {
-        Self { raw: self.raw ^ rhs.as_attr_t() }
+        Self { inner: self.inner ^ rhs.as_attr_t() }
     }
 }
 
@@ -121,7 +121,7 @@ impl BitOr<Attribute> for ChtypeChar {
     fn bitor(self, rhs: Attribute) -> Self::Output {
         let attr: attr_t = rhs.into();
 
-        Self { raw: self.raw | attr }
+        Self { inner: self.inner | attr }
     }
 }
 
@@ -131,19 +131,19 @@ impl BitXor<Attribute> for ChtypeChar {
     fn bitxor(self, rhs: Attribute) -> Self::Output {
         let attr: attr_t = rhs.into();
 
-        Self { raw: self.raw ^ attr }
+        Self { inner: self.inner ^ attr }
     }
 }
 
 impl From<chtype> for ChtypeChar {
     fn from(raw: chtype) -> Self {
-        Self { raw }
+        Self { inner: raw }
     }
 }
 
 impl Into<chtype> for ChtypeChar {
     fn into(self) -> chtype {
-        self.raw.to_owned()
+        self.inner.to_owned()
     }
 }
 

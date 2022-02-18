@@ -113,3 +113,15 @@ impl ColorPairGeneric<i32> for ColorPair {
         ptr as *mut libc::c_void
     }
 }
+
+impl AsRef<ColorPair> for ColorPair {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl AsMut<ColorPair> for ColorPair {
+    fn as_mut(&mut self) -> &mut Self {
+        self
+    }
+}
