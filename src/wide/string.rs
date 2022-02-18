@@ -23,25 +23,26 @@
 #![allow(clippy::should_implement_trait)]
 #![allow(clippy::from_over_into)]
 
-use crate::{gen::*, shims::ncurses::wchar_t, wide::WideChar};
+use crate::{WideChar, RawWithNul, shims::ncurses::wchar_t};
 
 /// Wide character string (UTF-8).
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct WideString {
-    raw: Vec<wchar_t>
+    inner: Vec<wchar_t>
 }
 
 impl WideString {
     pub fn new() -> Self {
-        Self { raw: vec!() }
+        Self { inner: vec!() }
     }
 
-    pub fn from_str(str: &str) -> Self {
-        Self { raw: str.chars().map(|c| u32::from(c) as wchar_t).collect() }
+    #[deprecated(since = "0.6.4", note = "use `From` trait instead!")]
+    pub fn from_str<S: Into<String>>(str: S) -> Self {
+        Self { inner: str.into().chars().map(|c| u32::from(c) as wchar_t).collect() }
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
-        Self { raw: Vec::with_capacity(capacity) }
+        Self { inner: Vec::with_capacity(capacity) }
     }
 
     //pub unsafe fn from_raw_parts(buf: *mut ChtypeChar, length: usize, capacity: usize) -> Self { }
@@ -49,47 +50,47 @@ impl WideString {
     //pub fn from_ascii<B>(bytes: B) -> Result<ChtypeString, FromAsciiError<B>> where B: Into<Vec<u8>> + AsRef<[u8]> { }
 
     pub fn push_str(&mut self, rhs: &Self) {
-        self.raw.append(&mut Self::into(rhs.to_owned()));
+        self.inner.append(&mut Self::into(rhs.to_owned()));
     }
 
     pub fn capacity(&self) -> usize {
-        self.raw.capacity()
+        self.inner.capacity()
     }
 
     pub fn reserve(&mut self, additional: usize) {
-        self.raw.reserve(additional)
+        self.inner.reserve(additional)
     }
 
     pub fn reserve_exact(&mut self, additional: usize) {
-        self.raw.reserve_exact(additional)
+        self.inner.reserve_exact(additional)
     }
 
     pub fn shrink_to_fit(&mut self) {
-        self.raw.shrink_to_fit()
+        self.inner.shrink_to_fit()
     }
 
     pub fn push(&mut self, rhs: WideChar) {
-        self.raw.push(WideChar::into(rhs.to_owned()));
+        self.inner.push(WideChar::into(rhs.to_owned()));
     }
 
     pub fn truncate(&mut self, new_len: usize) {
-        self.raw.truncate(new_len)
+        self.inner.truncate(new_len)
     }
 
     pub fn pop(&mut self) -> Option<WideChar> {
-        self.raw.pop().map(WideChar::from)
+        self.inner.pop().map(WideChar::from)
     }
 
     pub fn remove(&mut self, idx: usize) -> WideChar {
-        WideChar::from(self.raw.remove(idx))
+        WideChar::from(self.inner.remove(idx))
     }
 
     pub fn insert(&mut self, idx: usize, ch: WideChar) {
-        self.raw.insert(idx, WideChar::into(ch))
+        self.inner.insert(idx, WideChar::into(ch))
     }
 
     pub fn len(&self) -> usize {
-        self.raw.len()
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -97,7 +98,7 @@ impl WideString {
     }
 
     pub fn clear(&mut self) {
-        self.raw.clear()
+        self.inner.clear()
     }
 }
 
@@ -107,21 +108,33 @@ impl Default for WideString {
     }
 }
 
-impl<'a> From<&'a Vec<WideChar>> for WideString {
+impl <'a>From<&'a Vec<WideChar>> for WideString {
     fn from(vwch: &'a Vec<WideChar>) -> Self {
-        Self { raw: vwch.iter().map(|wch| WideChar::into(*wch)).collect() }
+        Self { inner: vwch.iter().map(|wch| WideChar::into(*wch)).collect() }
     }
 }
 
-impl<'a> From<&'a [wchar_t]> for WideString {
+impl <'a>From<&'a [wchar_t]> for WideString {
     fn from(slice: &'a [wchar_t]) -> Self {
-        Self { raw : slice.to_vec() }
+        Self { inner : slice.to_vec() }
     }
 }
 
 impl Into<Vec<wchar_t>> for WideString {
     fn into(self) -> Vec<wchar_t> {
-        self.raw
+        self.inner
+    }
+}
+
+impl From<&str> for WideString {
+    fn from(value: &str) -> Self {
+        Self { inner: value.chars().map(|chr| u32::from(chr) as wchar_t).collect() }
+    }
+}
+
+impl From<String> for WideString {
+    fn from(value: String) -> Self {
+        Self::from(value.as_str())
     }
 }
 
@@ -132,5 +145,17 @@ impl RawWithNul<Vec<wchar_t>> for WideString {
         raw.push(0x00);
 
         raw
+    }
+}
+
+impl AsRef<WideString> for WideString {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl AsMut<WideString> for WideString {
+    fn as_mut(&mut self) -> &mut Self {
+        self
     }
 }
