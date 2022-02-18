@@ -22,30 +22,18 @@
 
 #![allow(clippy::from_over_into)]
 
-use std::{
-    convert::{TryFrom, TryInto},
-    char::{
-        CharTryFromError, EscapeUnicode, EscapeDebug,
-        EscapeDefault, ToLowercase, ToUppercase
-    }
-};
-use crate::{
-    ncurseswerror::NCurseswError,
-    shims::{
-        bindings::WEOF,
-        ncurses::{wint_t, wchar_t}
-    }
-};
+use std::{convert::TryFrom, char::{EscapeUnicode, EscapeDebug, EscapeDefault, ToLowercase, ToUppercase}};
+use crate::{NCurseswError, shims::{bindings::WEOF, ncurses::{wint_t, wchar_t}}};
 
 /// Wide character (UTF-8 character).
 #[derive(Copy, Clone, Default, Debug, PartialEq, Eq, Hash)]
 pub struct WideChar {
-    raw: wint_t
+    inner: wint_t
 }
 
 impl WideChar {
     pub fn new(ch: char) -> Self {
-        Self { raw: wint_t::from(ch) }
+        Self { inner: wint_t::from(ch) }
     }
 
     pub fn is_digit(self, radix: u32) -> bool {
@@ -209,7 +197,7 @@ impl WideChar {
                 let mut ascii = c;
                 ascii.make_ascii_uppercase();
 
-                self.raw = wint_t::from(ascii)
+                self.inner = wint_t::from(ascii)
             }
         }
     }
@@ -221,7 +209,7 @@ impl WideChar {
                 let mut ascii = c;
                 ascii.make_ascii_lowercase();
 
-                self.raw = wint_t::from(ascii)
+                self.inner = wint_t::from(ascii)
             }
         }
     }
@@ -297,42 +285,42 @@ impl WideChar {
     }
 
     pub fn is_weof(self) -> bool {
-        self.raw == WEOF
+        self.inner == WEOF
     }
 
     pub fn as_char(self) -> result!(char) {
-        Ok(char::try_from(self.raw)?)
+        Ok(char::try_from(self.inner)?)
     }
 }
 
 impl From<wint_t> for WideChar {
     fn from(raw: wint_t) -> Self {
-        Self { raw }
+        Self { inner: raw }
     }
 }
 
 impl Into<wint_t> for WideChar {
     fn into(self) -> wint_t {
-        self.raw
+        self.inner
     }
 }
 
 impl From<wchar_t> for WideChar {
     fn from(value: wchar_t) -> Self {
-        Self { raw: value as wint_t }
+        Self { inner: value as wint_t }
     }
 }
 
 impl Into<wchar_t> for WideChar {
     fn into(self) -> wchar_t {
-        self.raw.to_owned() as wchar_t
+        self.inner.to_owned() as wchar_t
     }
 }
 
-impl TryInto<char> for WideChar {
-    type Error = CharTryFromError;
+impl TryFrom<WideChar> for char {
+    type Error = NCurseswError;
 
-    fn try_into(self) -> Result<char, Self::Error> {
-        char::try_from(self.raw)
+    fn try_from(value: WideChar) -> Result<Self, Self::Error> {
+        char::from_u32(value.inner).ok_or(NCurseswError::WideCharTryFromError { inner: value.inner })
     }
 }

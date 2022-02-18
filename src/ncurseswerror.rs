@@ -25,7 +25,7 @@ use errno::{errno, Errno};
 use thiserror::Error;
 use crate::{
     COLORS, COLOR_PAIRS, panels::NCurseswPanelsError, mouse::NCurseswMouseError,
-    menu::NCurseswMenuError, form::NCurseswFormError
+    menu::NCurseswMenuError, form::NCurseswFormError, shims::ncurses::wint_t
 };
 
 /// NCursesw Errors/Events.
@@ -48,6 +48,8 @@ pub enum NCurseswError {
     ColorPairLimit,
     #[error("Invalid capability")]
     InvalidCapability,
+    #[error("WideChar to char error with a value of {inner}!")]
+    WideCharTryFromError { inner: wint_t },
 
     #[error("{source}")]
     IntError { #[from] source: num::TryFromIntError },
