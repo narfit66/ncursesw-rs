@@ -1,7 +1,7 @@
 /*
     examples/COLORS-test.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -38,7 +38,7 @@ fn main_routine() -> Result<(), NCurseswError> {
     if has_colors() {
         start_color()?;
 
-        addstr(&format!("terminal supports {} colors", COLORS()))?;
+        addstr(format!("terminal supports {} colors", COLORS()))?;
     } else {
         addstr("terminal has no color support!!!")?;
     }

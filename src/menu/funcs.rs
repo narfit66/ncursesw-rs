@@ -1,7 +1,7 @@
 /*
     src/menu/func.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -320,7 +320,9 @@ pub fn menu_pattern(menu: MENU) -> menu_result!(String) {
 
 /// Searches in the name-table for a request with the given name and returns
 /// its `MenuRequest`. Otherwise `None` is returned.
-pub fn menu_request_by_name(name: &str) -> menu_result!(Option<MenuRequest>) {
+pub fn menu_request_by_name<S: Into<String>>(name: S) -> menu_result!(Option<MenuRequest>) {
+    let name = name.into().to_string();
+
     match unsafe { nmenu::menu_request_by_name(c_str_with_nul!(name)) } {
         E_NO_MATCH => Ok(None),
         rc         => {
@@ -619,7 +621,9 @@ pub fn set_menu_pad(menu: Option<MENU>, pad: char) -> menu_result!(()) {
 /// Sets the pattern buffer for the given menu and tries to find the first
 /// matching item. If it succeeds, that item becomes current; if not, the
 /// current item does not change.
-pub fn set_menu_pattern(menu: MENU, pattern: &str) -> menu_result!(()) {
+pub fn set_menu_pattern<S: Into<String>>(menu: MENU, pattern: S) -> menu_result!(()) {
+    let pattern = pattern.into().to_string();
+
     match unsafe { nmenu::set_menu_pattern(menu, c_str_with_nul!(pattern)) } {
         E_OK => Ok(()),
         rc   => Err(menu_function_error_with_rc!("set_menu_pattern", rc))

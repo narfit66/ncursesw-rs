@@ -1,7 +1,7 @@
 /*
     examples/wattr_get.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -19,8 +19,6 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
     IN THE SOFTWARE.
 */
-
-extern crate ncursesw;
 
 use ncursesw::{*, normal::*};
 
@@ -55,10 +53,10 @@ fn main_routine() -> Result<(), NCurseswError> {
         wattr_set(stdscr, attrs0, color_pair0)?;
 
         waddstr(stdscr, "\n\nNormal attributes and color pair of `attrs1`...\n\n")?;
-        waddstr(stdscr, &format!("retrived_attrs.attributes={:?}\n", retrived_attrs_colorpair.attributes()))?;
-        waddstr(stdscr, &format!("retrived_attrs.is_normal={}\n", retrived_attrs_colorpair.attributes().is_normal()))?;
-        waddstr(stdscr, &format!("retrived_attrs.is_bold={}\n", retrived_attrs_colorpair.attributes().is_bold()))?;
-        waddstr(stdscr, &format!("retrived_attrs.color_pair={:?}", retrived_attrs_colorpair.color_pair()))?;
+        waddstr(stdscr, format!("retrived_attrs.attributes={:?}\n", retrived_attrs_colorpair.attributes()))?;
+        waddstr(stdscr, format!("retrived_attrs.is_normal={}\n", retrived_attrs_colorpair.attributes().is_normal()))?;
+        waddstr(stdscr, format!("retrived_attrs.is_bold={}\n", retrived_attrs_colorpair.attributes().is_bold()))?;
+        waddstr(stdscr, format!("retrived_attrs.color_pair={:?}", retrived_attrs_colorpair.color_pair()))?;
     } else {
         waddstr(stdscr, "terminal has no color support!!!")?;
     }

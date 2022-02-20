@@ -60,14 +60,15 @@ impl ComplexString {
         Ok(Self { inner: raw })
     }
 
-    pub fn from_str<A, P, T>(str: &str, attrs: &A, color_pair: &P) -> result!(Self)
-        where A: AttributesType<T>,
+    pub fn from_str<S, A, P, T>(str: S, attrs: &A, color_pair: &P) -> result!(Self)
+        where S: Into<String>,
+              A: AttributesType<T>,
               P: ColorPairType<T>,
               T: ColorAttributeTypes
     {
         let mut raw = vec!();
 
-        for ch in str.chars() {
+        for ch in str.into().to_string().chars() {
             match crate::setcchar(ch, attrs, color_pair) {
                 Err(e)    => return Err(e),
                 Ok(cchar) => raw.push(ComplexChar::into(cchar))

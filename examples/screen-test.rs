@@ -1,7 +1,7 @@
 /*
     examples/screen-test.rs
 
-    Copyright (c) 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2020-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-extern crate ncursesw;
-
 use std::{convert::TryFrom, env, io};
 
 use ncursesw::{*, shims::ncurses::{ACS_ULCORNER, ACS_LLCORNER, ACS_URCORNER, ACS_LRCORNER, ACS_HLINE, ACS_VLINE}};
@@ -35,7 +33,7 @@ fn main() {
 }
 
 fn main_routine() -> result!(()) {
-    let term = &env::var("TERM").expect("$TERM is undefined!!!");
+    let term = env::var("TERM").expect("$TERM is undefined!!!");
 
     // create a screen using stdout and stdin for output and input.
     let screen = newterm(Some(term), &io::stdout().lock(), &io::stdin().lock())?;

@@ -20,9 +20,6 @@
     IN THE SOFTWARE.
 */
 
-extern crate gettextrs;
-extern crate ncursesw;
-
 use gettextrs::*;
 use ncursesw::*;
 

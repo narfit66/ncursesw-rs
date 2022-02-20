@@ -27,8 +27,8 @@
 #![allow(clippy::upper_case_acronyms)]
 
 use std::{
-    convert::{TryFrom, TryInto}, char, ptr, slice, time, mem,
-    ffi, path::Path, os::unix::io::AsRawFd, io::{Write, Read}
+    char, ptr, slice, time, mem, ffi, path::Path, io::{Write, Read},
+    os::unix::io::AsRawFd
 };
 use libc::{c_void, EINTR};
 use crate::{
@@ -178,7 +178,9 @@ pub fn addchstr(chstr: &ChtypeString) -> result!(()) {
 }
 
 /// Equivalent of `waddnstr()` using `stdscr()` as window `handle`.
-pub fn addnstr(str: &str, number: i32) -> result!(()) {
+pub fn addnstr<S: Into<String>>(str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::addnstr(unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("addnstr", rc)),
@@ -194,7 +196,9 @@ pub fn addnwstr(wstr: &WideString, number: i32) -> result!(()) {
 }
 
 /// Equivalent of `waddstr()` using `stdscr()` as window `handle`.
-pub fn addstr(str: &str) -> result!(()) {
+pub fn addstr<S: Into<String>>(str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::addstr(unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("addstr", rc))
@@ -602,7 +606,9 @@ pub fn def_shell_mode() -> result!(()) {
 /// the keycode is removed. Similarly, if the given `KeyBinding::Unknown`
 /// is negative or zero, any existing string for the given definition
 /// is removed.
-pub fn define_key(definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
+pub fn define_key<S: Into<String>>(definition: Option<S>, keycode: KeyBinding) -> result!(()) {
+    let definition = definition.and_then(|str| Some(str.into().to_string()));
+
     match unsafe { ncurses::define_key(option_str_as_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key", rc))
@@ -1512,7 +1518,9 @@ pub fn insertln() -> result!(()) {
 }
 
 /// Equivalent of `insnstr()` using `stdscr()` as window `handle`.
-pub fn insnstr(str: &str, number: i32) -> result!(()) {
+pub fn insnstr<S: Into<String>>(str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::insnstr(unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("insnstr", rc))
@@ -1520,7 +1528,9 @@ pub fn insnstr(str: &str, number: i32) -> result!(()) {
 }
 
 /// Equivalent of `insstr()` using `stdscr()` as window `handle`.
-pub fn insstr(str: &str) -> result!(()) {
+pub fn insstr<S: Into<String>>(str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::insstr(unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("insstr", rc))
@@ -1661,7 +1671,9 @@ pub fn isendwin() -> bool {
 
 /// Permits an application to determine if a string represented
 /// as individual bytes is currently bound to any `KeyBindind`.
-pub fn key_defined(definition: &str) -> result!(Option<KeyBinding>) {
+pub fn key_defined<S: Into<String>>(definition: S) -> result!(Option<KeyBinding>) {
+    let definition = definition.into().to_string();
+
     let rc = ncurses::key_defined(unsafe { c_str_with_nul!(definition) });
 
     if rc.is_negative() {
@@ -1845,7 +1857,9 @@ pub fn mvaddchstr(origin: Origin, chstr: &ChtypeString) -> result!(()) {
 }
 
 /// Equivalent of `mvwaddnstr()` using `stdscr()` as window `handle`.
-pub fn mvaddnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
+pub fn mvaddnstr<S: Into<String>>(origin: Origin, str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::mvaddnstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvaddnstr", rc))
@@ -1861,7 +1875,9 @@ pub fn mvaddnwstr(origin: Origin, wstr: &WideString, number: i32) -> result!(())
 }
 
 /// Equivalent of `mvwaddstr()` using `stdscr()` as window `handle`.
-pub fn mvaddstr(origin: Origin, str: &str) -> result!(()) {
+pub fn mvaddstr<S: Into<String>>(origin: Origin, str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::mvaddstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvaddstr", rc))
@@ -2232,7 +2248,9 @@ pub fn mvinsch(origin: Origin, ch: ChtypeChar) -> result!(()) {
 }
 
 /// Equivalent of `mvwinsnstr()` using `stdscr()` as window `handle`.
-pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
+pub fn mvinsnstr<S: Into<String>>(origin: Origin, str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::mvinsnstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }, number) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvinsnstr", rc))
@@ -2240,7 +2258,9 @@ pub fn mvinsnstr(origin: Origin, str: &str, number: i32) -> result!(()) {
 }
 
 /// Equivalent of `mvwinsstr()` using `stdscr()` as window `handle`.
-pub fn mvinsstr(origin: Origin, str: &str) -> result!(()) {
+pub fn mvinsstr<S: Into<String>>(origin: Origin, str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match ncurses::mvinsstr(origin.y, origin.x, unsafe { c_str_with_nul!(str) }) {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvinsstr", rc))
@@ -2388,7 +2408,9 @@ pub fn mvwaddchstr(handle: WINDOW, origin: Origin, chstr: &ChtypeString) -> resu
 /// Attempting to write to the lower right corner of a window, sub-window,
 /// or pad will cause an `NCurseswError` to be raised after the character
 /// is printed.
-pub fn mvwaddnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
+pub fn mvwaddnstr<S: Into<String>>(handle: WINDOW, origin: Origin, str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::mvwaddnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvwaddnstr", rc))
@@ -2416,7 +2438,9 @@ pub fn mvwaddnwstr(handle: WINDOW, origin: Origin, wstr: &WideString, number: i3
 /// Attempting to write to the lower right corner of a window, sub-window,
 /// or pad will cause an `NCurseswError` to be raised after the character
 /// is printed.
-pub fn mvwaddstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
+pub fn mvwaddstr<S: Into<String>>(handle: WINDOW, origin: Origin, str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::mvwaddstr(handle, origin.y, origin.x, c_str_with_nul!(str)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvwaddstr", rc))
@@ -2826,7 +2850,9 @@ pub fn mvwinsch(handle: WINDOW, origin: Origin, ch: ChtypeChar) -> result!(()) {
 /// negative, the entire string is inserted. All characters to the right of
 /// the cursor are shifted right, with the rightmost characters on the line
 /// being lost. The cursor position does not change (after moving to `origin`).
-pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> result!(()) {
+pub fn mvwinsnstr<S: Into<String>>(handle: WINDOW, origin: Origin, str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::mvwinsnstr(handle, origin.y, origin.x, c_str_with_nul!(str), number) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvwinsnstr", rc))
@@ -2837,7 +2863,9 @@ pub fn mvwinsnstr(handle: WINDOW, origin: Origin, str: &str, number: i32) -> res
 /// character at `origin`. All characters to the right of the cursor are shifted
 /// right, with the rightmost characters on the line being lost. The cursor
 /// position does not change (after moving to `origin`).
-pub fn mvwinsstr(handle: WINDOW, origin: Origin, str: &str) -> result!(()) {
+pub fn mvwinsstr<S: Into<String>>(handle: WINDOW, origin: Origin, str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::mvwinsstr(handle, origin.y, origin.x, c_str_with_nul!(str)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("mvwinsstr", rc))
@@ -2933,10 +2961,13 @@ pub fn newpad(size: Size) -> result!(WINDOW) {
 /// - another file descriptor for input from the terminal
 ///
 /// If the `term_type` parameter is `None`, $TERM will be used.
-pub fn newterm<O, I>(term: Option<&str>, output: &O, input: &I) -> result!(SCREEN)
-    where O: AsRawFd + Write,
+pub fn newterm<S, O, I>(term: Option<S>, output: &O, input: &I) -> result!(SCREEN)
+    where S: Into<String>,
+          O: AsRawFd + Write,
           I: AsRawFd + Read
 {
+    let term = term.and_then(|str| Some(str.into().to_string()));
+
     unsafe {
         ncurses::newterm(
             option_str_as_ptr!(term),
@@ -3138,7 +3169,7 @@ pub fn prefresh(pad: WINDOW, pmin: Origin, smin: Origin, smax: Origin) -> result
 }
 
 /// At present this function is unimplemented.
-pub fn putp(_str: &str) -> i32 {
+pub fn putp<S: Into<String>>(_str: S) -> i32 {
     unimplemented!();
 }
 
@@ -3541,7 +3572,9 @@ pub fn slk_restore() -> result!(()) {
 ///           characters in length.
 /// - fmt:    indicating whether the label is to be left-justified, centered
 ///           or right-justified.
-pub fn slk_set(labnum: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
+pub fn slk_set<S: Into<String>>(labnum: i32, label: Option<S>, fmt: Justification) -> result!(()) {
+    let label = label.and_then(|str| Some(str.into().to_string()));
+
     match unsafe { ncurses::slk_set(labnum, option_str_as_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set", rc))
@@ -3709,7 +3742,7 @@ pub fn touchwin(handle: WINDOW) -> result!(()) {
 }
 
 /// At present this function is unimplemented.
-pub fn tparm(_s: &str) -> String {
+pub fn tparm<S: Into<String>>(_s: S) -> String {
     unimplemented!();
 }
 
@@ -3918,7 +3951,9 @@ pub fn waddchstr(handle: WINDOW, chstr: &ChtypeString) -> result!(()) {
 }
 
 /// Equivalent of `mvwaddnstr()` using `getcuryx()` as `origin`.
-pub fn waddnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
+pub fn waddnstr<S: Into<String>>(handle: WINDOW, str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::waddnstr(handle, c_str_with_nul!(str), number) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("waddnstr", rc))
@@ -3934,7 +3969,9 @@ pub fn waddnwstr(handle: WINDOW, wstr: &WideString, number: i32) -> result!(()) 
 }
 
 /// Equivalent of `mvwaddstr()` using `getcuryx()` as `origin`.
-pub fn waddstr(handle: WINDOW, str: &str) -> result!(()) {
+pub fn waddstr<S: Into<String>>(handle: WINDOW, str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::waddstr(handle, c_str_with_nul!(str)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("waddstr", rc))
@@ -4629,7 +4666,9 @@ pub fn winsertln(handle: WINDOW) -> result!(()) {
 }
 
 /// Equivalent of `mvwinsnstr()` using `getcuryx()` as `origin`.
-pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
+pub fn winsnstr<S: Into<String>>(handle: WINDOW, str: S, number: i32) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::winsnstr(handle, c_str_with_nul!(str), number) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("winsnstr", rc))
@@ -4637,7 +4676,9 @@ pub fn winsnstr(handle: WINDOW, str: &str, number: i32) -> result!(()) {
 }
 
 /// Equivalent of `mvwinsstr()` using `getcuryx()` as `origin`.
-pub fn winsstr(handle: WINDOW, str: &str) -> result!(()) {
+pub fn winsstr<S: Into<String>>(handle: WINDOW, str: S) -> result!(()) {
+    let str = str.into().to_string();
+
     match unsafe { ncurses::winsstr(handle, c_str_with_nul!(str)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("winsstr", rc))
@@ -4887,7 +4928,9 @@ pub fn curs_set_sp(screen: SCREEN, cursor: CursorType) -> result!(CursorType) {
 }
 
 /// Screen function of `define_key()`.
-pub fn define_key_sp(screen: SCREEN, definition: Option<&str>, keycode: KeyBinding) -> result!(()) {
+pub fn define_key_sp<S: Into<String>>(screen: SCREEN, definition: Option<S>, keycode: KeyBinding) -> result!(()) {
+    let definition = definition.and_then(|str| Some(str.into().to_string()));
+
     match unsafe { ncurses::define_key_sp(screen, option_str_as_ptr!(definition), KeyBinding::into(keycode)) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("define_key_sp", rc))
@@ -5148,7 +5191,9 @@ pub fn keybound_sp(screen: SCREEN, keycode: KeyBinding, count: i32) -> Option<St
 }
 
 /// Screen function of `key_defined()`.
-pub fn key_defined_sp(screen: SCREEN, definition: &str) -> result!(Option<KeyBinding>) {
+pub fn key_defined_sp<S: Into<String>>(screen: SCREEN, definition: S) -> result!(Option<KeyBinding>) {
+    let definition = definition.into().to_string();
+
     let rc = unsafe { ncurses::key_defined_sp(screen, c_str_with_nul!(definition)) };
 
     if rc.is_negative() {
@@ -5230,10 +5275,13 @@ pub fn new_prescr() -> result!(SCREEN) {
 }
 
 /// Screen function of `newterm()`.
-pub fn newterm_sp<O, I>(screen: SCREEN, term: Option<&str>, output: &O, input: &I) -> result!(SCREEN)
-    where O: AsRawFd + Write,
+pub fn newterm_sp<S, O, I>(screen: SCREEN, term: Option<S>, output: &O, input: &I) -> result!(SCREEN)
+    where S: Into<String>,
+          O: AsRawFd + Write,
           I: AsRawFd + Read
 {
+    let term = term.and_then(|str| Some(str.into().to_string()));
+
     unsafe {
         ncurses::newterm_sp(
             screen,
@@ -5536,7 +5584,9 @@ pub fn slk_restore_sp(screen: SCREEN) -> result!(()) {
 }
 
 /// Screen function of `slk_set()`.
-pub fn slk_set_sp(screen: SCREEN, label_number: i32, label: Option<&str>, fmt: Justification) -> result!(()) {
+pub fn slk_set_sp<S: Into<String>>(screen: SCREEN, label_number: i32, label: Option<S>, fmt: Justification) -> result!(()) {
+    let label = label.and_then(|str| Some(str.into().to_string()));
+
     match unsafe { ncurses::slk_set_sp(screen, label_number, option_str_as_ptr!(label), fmt.value()) } {
         OK => Ok(()),
         rc => Err(ncurses_function_error_with_rc!("slk_set_sp", rc))

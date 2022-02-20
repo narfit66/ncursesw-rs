@@ -1,7 +1,7 @@
 /*
     src/cstring/tocstr.rs
 
-    Copyright (c) 2019 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -29,5 +29,11 @@ pub trait ToCStr {
 impl <'a>ToCStr for &'a str {
     fn to_c_str(&self) -> Result<ffi::CString, ffi::NulError> {
         ffi::CString::new(*self)
+    }
+}
+
+impl ToCStr for String {
+    fn to_c_str(&self) -> Result<ffi::CString, ffi::NulError> {
+        self.as_str().to_c_str()
     }
 }

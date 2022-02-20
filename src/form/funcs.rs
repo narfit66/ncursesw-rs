@@ -1,7 +1,7 @@
 /*
     src/form/funcs.rs
 
-    Copyright (c) 2019, 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2019-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -365,7 +365,9 @@ pub fn form_page(form: Option<FORM>) -> form_result!(i32) {
 
 /// Searches in the name-table for a request with the given name and returns
 /// its request code as a `Some`. Otherwise `None` is returned.
-pub fn form_request_by_name(name: &str) -> form_result!(Option<FormRequest>) {
+pub fn form_request_by_name<S: Into<String>>(name: S) -> form_result!(Option<FormRequest>) {
+    let name = name.into().to_string();
+
     match unsafe { nform::form_request_by_name(c_str_with_nul!(name)) } {
         E_NO_MATCH => Ok(None),
         rc         => {

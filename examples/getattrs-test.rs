@@ -1,7 +1,7 @@
 /*
     examples/getattrs-test.rs
 
-    Copyright (c) 2020 Stephen Whittle  All rights reserved.
+    Copyright (c) 2020-2022 Stephen Whittle  All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"),
@@ -19,8 +19,6 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
     IN THE SOFTWARE.
 */
-
-extern crate ncursesw;
 
 use ncursesw::{*, normal::*};
 
@@ -55,10 +53,10 @@ fn main_routine() -> Result<(), NCurseswError> {
         wattrset(stdscr, attrs0)?;
 
         waddstr(stdscr, "\n\nNormal attributes and color pair of `attrs1`...\n\n")?;
-        waddstr(stdscr, &format!("retrived_attrs={:?}\n", retrived_attrs))?;
-        waddstr(stdscr, &format!("retrived_attrs.is_normal={}\n", retrived_attrs.is_normal()))?;
-        waddstr(stdscr, &format!("retrived_attrs.is_bold={}\n", retrived_attrs.is_bold()))?;
-        waddstr(stdscr, &format!("retrived_attrs.color_pair={:?}", retrived_attrs.color_pair()))?;
+        waddstr(stdscr, format!("retrived_attrs={:?}\n", retrived_attrs))?;
+        waddstr(stdscr, format!("retrived_attrs.is_normal={}\n", retrived_attrs.is_normal()))?;
+        waddstr(stdscr, format!("retrived_attrs.is_bold={}\n", retrived_attrs.is_bold()))?;
+        waddstr(stdscr, format!("retrived_attrs.color_pair={:?}", retrived_attrs.color_pair()))?;
     } else {
         waddstr(stdscr, "terminal has no color support!!!")?;
     }

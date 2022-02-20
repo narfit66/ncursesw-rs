@@ -23,8 +23,6 @@
 #![allow(non_snake_case)]
 #![allow(deprecated)]
 
-extern crate ncursesw;
-
 use std::str::FromStr;
 use ncursesw::{*, normal::*};
 
@@ -52,13 +50,13 @@ fn main_routine() -> Result<(), NCurseswError> {
         let color_pair5 = ColorPair::new(5, Colors::new(green, yellow))?;
         let color_pair6 = ColorPair::new(6, Colors::new(green, blue))?;
 
-        addstr(color_pair_info(color_pair0).as_str())?;
-        addstr(color_pair_info(color_pair1).as_str())?;
-        addstr(color_pair_info(color_pair2).as_str())?;
-        addstr(color_pair_info(color_pair3).as_str())?;
-        addstr(color_pair_info(color_pair4).as_str())?;
-        addstr(color_pair_info(color_pair5).as_str())?;
-        addstr(color_pair_info(color_pair6).as_str())?;
+        addstr(color_pair_info(color_pair0))?;
+        addstr(color_pair_info(color_pair1))?;
+        addstr(color_pair_info(color_pair2))?;
+        addstr(color_pair_info(color_pair3))?;
+        addstr(color_pair_info(color_pair4))?;
+        addstr(color_pair_info(color_pair5))?;
+        addstr(color_pair_info(color_pair6))?;
     } else {
         addstr("terminal has no color support!!!")?;
     }

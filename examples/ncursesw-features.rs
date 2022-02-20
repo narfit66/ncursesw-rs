@@ -20,8 +20,6 @@
     IN THE SOFTWARE.
 */
 
-extern crate ncursesw;
-
 use ncursesw::features;
 
 fn main() {
