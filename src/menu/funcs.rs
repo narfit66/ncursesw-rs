@@ -586,7 +586,9 @@ pub fn set_menu_items(menu: MENU, item_handles: &mut Vec<ITEM>) -> menu_result!(
 /// undefined behavior. The default string is "-" (a dash).
 ///
 /// If `menu` is `None` then the default value is set.
-pub fn set_menu_mark(menu: Option<MENU>, mark: &str) -> menu_result!(()) {
+pub fn set_menu_mark<S: Into<String>>(menu: Option<MENU>, mark: S) -> menu_result!(()) {
+    let mark = mark.into().to_string();
+
     if menu_mark(menu)? != '-'.to_string() {
         Err(NCurseswMenuError::BadArgument { func: "set_menu_mark".to_string() })
     } else {
