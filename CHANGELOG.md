@@ -2,7 +2,16 @@
 
 All breaking changes are marked with [BC] and potentially require API consumer changes after updating to the respective version.
 
+## [0.6.4] - 2022.02.21
+
+- Added `Default` traits for `WideChar` and `ChtypeChar`.
+- Added `Display` trait for `KeyBinding`.
+- Added `PartialOrd` and `Ord` traits for `Origin` and `Size`.
+- Made improvements to `WideString`.
+- Added `Into<String>` traits to functions where appropriate.
+
 ## [0.6.3] - 2022.01.06
+
 - Updated NCurses to v6.3.20211021
 - Added `erasewchar_sp()` and `killwchar_sp()` functions to both `ncursesw::shims::ncurses` and `ncursesw` namespaces.
 - Added `FieldOption::EdgeInsertStay` and `FieldOption::InputLimit`.
@@ -11,12 +20,15 @@ All breaking changes are marked with [BC] and potentially require API consumer c
 - Environment variable `TERMINFO` no longer needs to be set as we are compiling NCurses with a default terminfo database of `/usr/share/terminfo`.
 
 ## [0.6.2] - 2022.01.04
+
 - Improved the way NCurses (v6.1) is compiled and linked to in the build script.
 
 ## [0.6.1] - 2022.01.03
+
 - NCurses (v6.1) is now compiled from its git repository and is statically linked to this crate.
 
 ## [0.6.0] - 2022.01.01
+
 - Upgraded source code to rust 2021 edition.
 - Now uses `thiserror` crate instead of `custom_error` crate to create `Error` types.
 - Changed signature of `getsyx() -> Result<Origin, NCurseswError>` to `getsyx() -> Result<Option<Origin>, NCurseswError>` to return a `None` instead of `Origin { y: -1, x: -1 }`. [BC]
@@ -63,6 +75,7 @@ The way that colors are defined has been changed as of this release to cater for
 When the client code is using screens, functions that return `Attributes` and `ColorPair` types such as `attr_get()`, `wattr_get()` and `getcchar()` will always set the screen attribute of what they are returning as a `None`, it is upto the clinet code to rectify this by calling `Attributes::set_screen()` and/or `ColorPair::set_screen()`.
 
 Although deprecated it should be noted that the following functions have changed their signatures and should be considered as breaking changes:
+
 - `COLOR_PAIR(color_pair: normal::ColorPair) -> attr_t` has become `COLOR_PAIR(color_pair: i32) -> attr_t`
 - `PAIR_NUMBER(attrs: normal::Attributes) -> normal::ColorPair` has become `PAIR_NUMBER(attrs: attr_t) -> short_t`
 - `color_content(color_number: normal::Color) -> Result<normal::RGB, NCurseswError>` has become `color_content(color_number: short_t) -> Result<normal::RGB, NCurseswError>`
@@ -79,9 +92,11 @@ Although deprecated it should be noted that the following functions have changed
 - `pair_content_sp(screen: SCREEN, color_pair: normal::ColorPair) -> Result<normal::Colors, NCurseswError>` has become `pair_content_sp(screen: SCREEN, color_pair: short_t) -> Result<normal::Colors, NCurseswError>`
 
 ## [0.5.1] - 2020.01.30
+
 - Fix so that crate compiles on `docs.rs` for documentation.
 
 ## [0.5.0] - 2020.01.29 [BC]
+
 - `bindgen` will now only create bindings against version 6.1 and above of the NCurses library.
 - NCurses form module implemented as `form`.
 - Added missing NCurses `_sp` (screen) functions.
@@ -108,40 +123,52 @@ Although deprecated it should be noted that the following functions have changed
 - Removed `mouse::set_mouseinterval()` which is replaced by calling `mouse::mouseinterval(Some(std::time::Duration))`. [BC]
 
 ## [0.4.0] - 2019-12-09 [BC]
+
 - NCurses menu module implemented as `menu`.
 - Minor API changes. [BC]
 - NCurses panels module functions are now correctly linked to.
 - Depreciated NCurses color type functions in favor of encapsulated color type structures.
 
 ## [0.3.2] - 2019-11-02
+
 - NCurses mouse functionality implemented in `mouse`.
 
 ## [0.3.1] - 2019-10-25
+
 - ...
 
 ## [0.3.0] - 2019-10-15 [BC]
+
 - ...
 
 ## [0.2.0] - 2019-10-14 [BC]
+
 - ...
 
 ## [0.1.6] - 2019-09-27
+
 - ...
 
 ## [0.1.5] - 2019-07-13
+
 - ...
 
 ## [0.1.4] - 2019-07-09
+
 - ...
 
 ## [0.1.3] - 2019-07-06
+
 - ...
 
 ## [0.1.2] - 2019-07-04
+
 - ...
 
 ## [0.1.1] - 2019-07-01
+
 - ...
 
 ## [0.1.0] - 2019-07-01
+
 - Initial release.
